@@ -1,0 +1,48 @@
+{
+  "name": "devapi-manager-desktop",
+  "version": "1.0.0",
+  "description": "DevAPI Manager Desktop Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.devapi.manager",
+    "productName": "DevAPI Manager",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "../frontend/dist/**/*",
+      "../backend/dist/**/*",
+      "../backend/node_modules/**/*",
+      "../backend/prisma/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  },
+  "dependencies": {
+    "electron": "^26.2.1",
+    "electron-is-dev": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.6.4"
+  }
+}

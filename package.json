@@ -1,0 +1,69 @@
+{
+  "name": "devapi-manager",
+  "version": "2.0.0",
+  "description": "DevAPI Manager - 专业的API聚合和项目管理工具，支持Swagger导入、MCP搜索和跨平台部署",
+  "private": true,
+  "workspaces": [
+    "packages/backend",
+    "packages/frontend", 
+    "packages/desktop",
+    "packages/mcp-server",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:mcp\"",
+    "dev:backend": "npm run dev --workspace=packages/backend",
+    "dev:frontend": "npm run dev --workspace=packages/frontend",
+    "dev:mcp": "npm run dev --workspace=packages/mcp-server",
+    "build": "npm run build --workspaces",
+    "build:backend": "npm run build --workspace=packages/backend",
+    "build:frontend": "npm run build --workspace=packages/frontend",
+    "build:desktop": "npm run build --workspace=packages/desktop",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "npm run clean --workspaces && rm -rf node_modules",
+    "db:setup": "npm run db:push --workspace=packages/backend",
+    "db:migrate": "npm run db:migrate --workspace=packages/backend",
+    "db:generate": "npm run db:generate --workspace=packages/backend",
+    "postinstall": "npm run db:generate --workspace=packages/backend",
+    "type-check": "npm run type-check --workspaces",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.0.3",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "eslint": "^8.50.0",
+    "typescript": "^5.2.2",
+    "cross-env": "^7.0.3",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devapi-team/devapi-manager.git"
+  },
+  "keywords": [
+    "api-management",
+    "swagger",
+    "openapi",
+    "project-management",
+    "developer-tools",
+    "mcp",
+    "electron",
+    "react",
+    "typescript",
+    "prisma"
+  ],
+  "author": "DevAPI Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devapi-team/devapi-manager/issues"
+  },
+  "homepage": "https://github.com/devapi-team/devapi-manager#readme"
+}

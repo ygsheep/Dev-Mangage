@@ -1,0 +1,26 @@
+{
+  "name": "devapi-manager-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for DevAPI Manager search functionality",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "@prisma/client": "^5.4.2",
+    "fuse.js": "^7.0.0",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.0",
+    "typescript": "^5.2.2",
+    "tsx": "^3.12.7",
+    "prisma": "^5.4.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
