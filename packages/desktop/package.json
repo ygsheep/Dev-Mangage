@@ -1,0 +1,88 @@
+{
+  "name": "@devapi/desktop",
+  "version": "2.0.0",
+  "description": "DevAPI Manager Desktop Application",
+  "main": "dist/main.js",
+  "author": {
+    "name": "DevAPI Team",
+    "email": "contact@devapi.team"
+  },
+  "homepage": "https://github.com/devapi-team/devapi-manager",
+  "scripts": {
+    "dev": "concurrently \"npm run build:watch\" \"electron dist/main.js\"",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "start": "electron dist/main.js",
+    "pack": "electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:linux": "npm run build && electron-builder --linux",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "electron-serve": "^1.1.0",
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "electron": "27.1.3",
+    "electron-builder": "^24.6.4",
+    "typescript": "^5.2.2",
+    "concurrently": "^8.2.2"
+  },
+  "build": {
+    "appId": "com.devapi.manager",
+    "productName": "DevAPI Manager",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "../frontend/dist/**/*",
+      "!node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../frontend/dist",
+        "to": "frontend",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
+      "category": "Development"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DevAPI Manager"
+    }
+  }
+}

@@ -1,0 +1,3 @@
+@echo off
+echo 🚀 Starting DevAPI Manager...
+node start-dev.js

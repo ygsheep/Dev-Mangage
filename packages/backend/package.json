@@ -3,6 +3,10 @@
   "version": "2.0.0",
   "description": "DevAPI Manager Backend Service",
   "main": "dist/server.js",
+  "exports": {
+    ".": "./dist/server.js",
+    "./prisma": "./dist/lib/prisma.js"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc && tsc-alias",
@@ -21,7 +25,7 @@
     "db:seed": "tsx src/scripts/seed.ts"
   },
   "dependencies": {
-    "@devapi/shared": "workspace:*",
+    "@devapi/shared": "file:../shared",
     "@prisma/client": "^5.6.0",
     "express": "^4.18.2",
     "cors": "^2.8.5",

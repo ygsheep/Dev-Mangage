@@ -4,17 +4,15 @@
   "description": "DevAPI Manager - 专业的API聚合和项目管理工具，支持Swagger导入、MCP搜索和跨平台部署",
   "private": true,
   "workspaces": [
-    "packages/backend",
-    "packages/frontend", 
-    "packages/desktop",
-    "packages/mcp-server",
-    "packages/shared"
+    "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:mcp\"",
+    "dev": "node start-dev.js",
+    "dev:quick": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "npm run dev --workspace=packages/backend",
     "dev:frontend": "npm run dev --workspace=packages/frontend",
     "dev:mcp": "npm run dev --workspace=packages/mcp-server",
+    "start": "node start-dev.js",
     "build": "npm run build --workspaces",
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",

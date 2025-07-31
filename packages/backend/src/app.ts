@@ -52,6 +52,11 @@ if (config.nodeEnv !== 'test') {
   app.use(morgan(config.nodeEnv === 'production' ? 'combined' : 'dev'))
 }
 
+// Root endpoint - redirect to API documentation
+app.get('/', (req, res) => {
+  res.redirect(config.apiPrefix)
+})
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
