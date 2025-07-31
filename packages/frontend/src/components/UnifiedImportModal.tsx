@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { X, FileText, Upload, Database, Brain, Code, AlertCircle, CheckCircle, Settings, Download } from 'lucide-react'
+import { X, FileText, Upload, Database, Brain, Code, AlertCircle, CheckCircle, Settings, Download, Clock, Zap } from 'lucide-react'
 import { API, HTTPMethod, APIStatus, APIParameter, APIResponseSchema } from '@shared/types'
-import { createAIParsingService, AIParsingConfig, AI_PARSING_PRESETS } from '../services/aiParsingService'
+import { createAIParsingService, AIParsingConfig, AI_PARSING_PRESETS, AI_MODEL_LIMITS, DocumentChunk } from '../services/aiParsingService'
 import { useMutation } from '@tanstack/react-query'
 import { apiMethods } from '../utils/api'
 import AIConfigModal from './AIConfigModal'
@@ -59,6 +59,21 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
     return AI_PARSING_PRESETS.ollama_qwen
   })
   
+  // 文档分析和进度相关状态
+  const [documentStats, setDocumentStats] = useState<{
+    size: number
+    estimatedTokens: number
+    chunks: number
+    willNeedChunking: boolean
+    processingTime: string
+  } | null>(null)
+  const [parseProgress, setParseProgress] = useState<{
+    current: number
+    total: number
+    currentChunk: DocumentChunk | null
+    startTime: number
+  } | null>(null)
+  
   // Swagger导入相关状态
   const [swaggerUrl, setSwaggerUrl] = useState('')
   const [swaggerContent, setSwaggerContent] = useState('')
@@ -76,6 +91,43 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
   useEffect(() => {
     setActiveTab(initialTab)
   }, [initialTab])
+  
+  /**
+   * 简单Token估算 (与AI服务保持一致)
+   */
+  const estimateTokenCount = (text: string): number => {
+    const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length
+    const otherChars = text.length - chineseChars
+    return Math.ceil(chineseChars * 2 + otherChars * 0.75)
+  }
+  
+  /**
+   * 分析文档统计信息
+   */
+  const analyzeDocument = (content: string) => {
+    const size = content.length
+    const estimatedTokens = estimateTokenCount(content)
+    const limits = AI_MODEL_LIMITS[aiConfig.provider] || AI_MODEL_LIMITS.ollama
+    const promptTokens = 1500 // 估算提示词token数
+    const availableTokens = limits.maxInputTokens - promptTokens
+    
+    const willNeedChunking = estimatedTokens > availableTokens
+    const chunks = willNeedChunking ? Math.ceil(estimatedTokens / availableTokens) : 1
+    
+    // 估算处理时间 (每个chunk约30-60秒)
+    const estimatedSeconds = chunks * (aiConfig.provider === 'ollama' ? 45 : 30)
+    const processingTime = estimatedSeconds < 60 ? 
+      `约 ${estimatedSeconds} 秒` : 
+      `约 ${Math.ceil(estimatedSeconds / 60)} 分钟`
+    
+    return {
+      size,
+      estimatedTokens,
+      chunks,
+      willNeedChunking,
+      processingTime
+    }
+  }
   
   // Swagger导入mutation
   const swaggerImportMutation = useMutation({
@@ -116,11 +168,19 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
       setApiFile(selectedFile)
       setApiParseError(null)
       setParsedAPIs([])
+      setDocumentStats(null)
+      setParseProgress(null)
       
       const reader = new FileReader()
       reader.onload = (e) => {
         const content = e.target?.result as string
         setApiPreviewContent(content.slice(0, 1000) + (content.length > 1000 ? '...' : ''))
+        
+        // 分析文档统计信息
+        if (useAI) {
+          const stats = analyzeDocument(content)
+          setDocumentStats(stats)
+        }
       }
       reader.readAsText(selectedFile)
     }
@@ -223,6 +283,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
     setIsParsingAPI(true)
     setApiParseError(null)
     setParsedAPIs([])
+    setParseProgress(null)
     
     try {
       const content = await apiFile.text()
@@ -231,7 +292,27 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
       if (useAI) {
         console.log('使用AI解析，配置:', aiConfig)
         const aiService = createAIParsingService(aiConfig)
-        const result = await aiService.parseAPIDocument(content, projectId)
+        
+        // 检查是否需要显示进度
+        const stats = documentStats || analyzeDocument(content)
+        
+        let result
+        if (stats.willNeedChunking) {
+          // 显示进度的分块解析
+          setParseProgress({ current: 0, total: stats.chunks, currentChunk: null, startTime: Date.now() })
+          
+          result = await aiService.parseAPIDocumentWithProgress(content, projectId, (progress) => {
+            setParseProgress({
+              current: progress.current,
+              total: progress.total,
+              currentChunk: progress.chunk,
+              startTime: Date.now()
+            })
+          })
+        } else {
+          // 普通解析
+          result = await aiService.parseAPIDocument(content, projectId)
+        }
         
         console.log('AI解析结果:', result)
         
@@ -262,7 +343,8 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
         
         setParsedAPIs(convertedAPIs)
         const confidenceText = result.confidence ? ` (置信度: ${Math.round(result.confidence * 100)}%)` : ''
-        toast.success(`AI成功解析到 ${result.apis.length} 个API接口${confidenceText}`)
+        const chunkText = stats.willNeedChunking ? ` (分${stats.chunks}块处理)` : ''
+        toast.success(`AI成功解析到 ${result.apis.length} 个API接口${confidenceText}${chunkText}`)
       } else {
         console.log('使用传统Markdown解析')
         const parsed = parseMarkdownAPI(content)
@@ -284,6 +366,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
       toast.error('API文档解析失败: ' + errorMessage)
     } finally {
       setIsParsingAPI(false)
+      setParseProgress(null)
     }
   }
 
@@ -523,6 +606,87 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                           </button>
                         </div>
                       </div>
+                      
+                      {/* 文档统计信息 */}
+                      {documentStats && useAI && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <h4 className="text-sm font-medium text-blue-800 mb-3 flex items-center">
+                            <Zap className="w-4 h-4 mr-2" />
+                            文档分析结果
+                          </h4>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-blue-700">文件大小:</span>
+                                <span className="font-medium text-blue-900">{(documentStats.size / 1024).toFixed(1)} KB</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-blue-700">估算Token:</span>
+                                <span className="font-medium text-blue-900">{documentStats.estimatedTokens.toLocaleString()}</span>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-blue-700">处理方式:</span>
+                                <span className={`font-medium ${documentStats.willNeedChunking ? 'text-orange-700' : 'text-green-700'}`}>
+                                  {documentStats.willNeedChunking ? `分${documentStats.chunks}块` : '单块处理'}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-blue-700">预计时间:</span>
+                                <span className="font-medium text-blue-900 flex items-center">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  {documentStats.processingTime}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          {documentStats.willNeedChunking && (
+                            <div className="mt-3 p-2 bg-orange-100 rounded text-xs text-orange-800">
+                              <strong>注意:</strong> 文档较大，将分块处理以避免Token限制。每个分块会单独解析后合并结果。
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* 解析进度 */}
+                      {parseProgress && (
+                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-medium text-purple-800 flex items-center">
+                              <Brain className="w-4 h-4 mr-2" />
+                              AI解析进度
+                            </h4>
+                            <span className="text-sm text-purple-700">
+                              {parseProgress.current}/{parseProgress.total}
+                            </span>
+                          </div>
+                          
+                          {/* 进度条 */}
+                          <div className="mb-3">
+                            <div className="bg-purple-200 rounded-full h-2 overflow-hidden">
+                              <div 
+                                className="bg-purple-600 h-2 rounded-full transition-all duration-300 ease-out"
+                                style={{ width: `${(parseProgress.current / parseProgress.total) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* 当前分块信息 */}
+                          {parseProgress.currentChunk && (
+                            <div className="text-xs text-purple-700">
+                              <div className="flex justify-between">
+                                <span>当前分块:</span>
+                                <span className="font-medium">{parseProgress.currentChunk.title}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>分块大小:</span>
+                                <span>{parseProgress.currentChunk.estimatedTokens} tokens</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                       
                       {/* 解析配置选项 */}
                       <div className="space-y-4">

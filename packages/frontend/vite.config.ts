@@ -18,6 +18,11 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
+      '/__mcp': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/__mcp/, '/api/v1/mcp'),
+      },
     },
   },
   build: {

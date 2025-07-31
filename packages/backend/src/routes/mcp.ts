@@ -352,4 +352,58 @@ router.get('/logs/stream', (req, res) => {
   })
 })
 
+// MCP 工具代理接口
+router.post('/tools/:toolName', async (req, res) => {
+  try {
+    const { toolName } = req.params
+    const { arguments: args } = req.body
+    
+    if (!mcpManager.getStatus().isRunning) {
+      return res.status(503).json({
+        success: false,
+        message: 'MCP服务器未运行，请先启动服务器'
+      })
+    }
+    
+    // 模拟 MCP 工具调用结果（实际应该通过 MCP 协议调用）
+    // 这里先返回一个模拟的响应格式
+    const mockResult = {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          tool: toolName,
+          query: args.query || '',
+          results: [],
+          message: `MCP工具 ${toolName} 调用成功，但需要实现与MCP服务器的通信`
+        })
+      }]
+    }
+    
+    mcpManager.updateStatus({ 
+      requestCount: mcpManager.getStatus().requestCount + 1,
+      lastActivity: new Date()
+    })
+    
+    res.json(mockResult)
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error)
+    })
+  }
+})
+
+// 添加对错误路径的重定向处理
+router.get('/__mcp/sse', (req, res) => {
+  // 重定向到正确的SSE端点
+  res.redirect('/api/v1/mcp/status/stream')
+})
+
+// 添加对所有 __mcp 路径的处理
+router.all('/__mcp/*', (req, res) => {
+  const correctPath = req.path.replace('/__mcp', '/api/v1/mcp')
+  res.redirect(correctPath)
+})
+
 export { router as mcpRouter }

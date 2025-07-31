@@ -6,8 +6,12 @@ import { fallbackVectorSearchService } from './fallbackSearch.js';
 // 配置transformers缓存目录
 env.cacheDir = path.join(process.cwd(), '.cache', 'transformers');
 
+// 配置镜像源
+env.remoteHost = 'https://hf-mirror.com';
+env.remotePathTemplate = '{model}/resolve/{revision}/';
+
 // 配置网络超时和重试
-env.allowRemoteModels = false; // 禁用远程模型，强制使用本地缓存
+env.allowRemoteModels = true; // 启用远程模型下载
 env.allowLocalModels = true;
 
 // 配置本地模型路径
@@ -54,12 +58,19 @@ export class VectorSearchService {
 
     console.log('🚀 初始化向量搜索服务...');
     
-    // 首先检查完整的本地缓存模型
+    // 直接使用回退方案，跳过模型下载
+    console.log('⚠️  跳过模型下载，直接使用回退向量搜索');
+    console.log('💡 回退方案使用 TF-IDF + 余弦相似度，专门为API搜索优化');
+    
+    this.useFallback = true;
+    await fallbackVectorSearchService.initialize();
+    this.isInitialized = true;
+    return;
+    
+    // 原有的模型检查逻辑（暂时注释）
     const cacheModelDir = path.join(env.cacheDir!, 'Xenova', 'all-MiniLM-L6-v2');
     const requiredFiles = ['config.json', 'tokenizer.json', 'model_quantized.onnx'];
-    const hasCompleteCache = requiredFiles.every(file => 
-      fs.existsSync(path.join(cacheModelDir, file))
-    );
+    const hasCompleteCache = false; // 强制跳过缓存检查
     
     if (hasCompleteCache) {
       console.log('🎯 检测到完整的本地缓存模型');

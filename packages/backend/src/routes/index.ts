@@ -27,6 +27,9 @@ export const setupRoutes = (app: Express): void => {
   app.use(`${apiPrefix}/swagger`, swaggerRouter)
   app.use(`${apiPrefix}/debug`, debugRouter)
   app.use(`${apiPrefix}/mcp`, mcpRouter)
+  
+  // 处理错误的MCP路径（临时修复）
+  app.use('/__mcp', mcpRouter)
 
   // API documentation
   app.get(`${apiPrefix}`, (req, res) => {

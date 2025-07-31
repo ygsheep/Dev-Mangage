@@ -8,6 +8,55 @@ export interface AIParsingConfig {
   apiKey?: string
 }
 
+// 模型Token限制配置
+export interface ModelLimits {
+  maxTokens: number      // 模型最大token数
+  reserveTokens: number  // 为响应预留的token数
+  maxInputTokens: number // 实际可用于输入的token数
+}
+
+// AI模型限制配置
+export const AI_MODEL_LIMITS: Record<string, ModelLimits> = {
+  'ollama': { 
+    maxTokens: 4096, 
+    reserveTokens: 1024, 
+    maxInputTokens: 3072 
+  },
+  'deepseek': { 
+    maxTokens: 16384, 
+    reserveTokens: 2048, 
+    maxInputTokens: 14336 
+  },
+  'openai': { 
+    maxTokens: 16384, 
+    reserveTokens: 2048, 
+    maxInputTokens: 14336 
+  },
+  'mock': { 
+    maxTokens: 8192, 
+    reserveTokens: 1024, 
+    maxInputTokens: 7168 
+  }
+}
+
+// 文档分块结果接口
+export interface DocumentChunk {
+  content: string
+  index: number
+  type: 'header' | 'api' | 'content'
+  title?: string
+  estimatedTokens: number
+}
+
+// 分块处理结果接口
+export interface ChunkedParseResult {
+  totalChunks: number
+  processedChunks: number
+  failedChunks: number
+  results: ParsedAPIDocument[]
+  errors: string[]
+}
+
 export interface ParsedAPIDocument {
   apis: API[]
   success: boolean
@@ -27,6 +76,316 @@ class AIParsingService {
 
   constructor(config: AIParsingConfig) {
     this.config = config
+  }
+
+  /**
+   * 简单Token估算 (中文字符按2个token计算，英文按0.75个token计算)
+   */
+  private estimateTokenCount(text: string): number {
+    const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length
+    const otherChars = text.length - chineseChars
+    return Math.ceil(chineseChars * 2 + otherChars * 0.75)
+  }
+
+  /**
+   * 获取当前模型的Token限制
+   */
+  private getModelLimits(): ModelLimits {
+    const limits = AI_MODEL_LIMITS[this.config.provider]
+    if (!limits) {
+      console.warn(`未找到${this.config.provider}的Token限制配置，使用默认配置`)
+      return AI_MODEL_LIMITS.ollama
+    }
+    return limits
+  }
+
+  /**
+   * 智能文档分块策略
+   */
+  private chunkDocument(content: string): DocumentChunk[] {
+    const limits = this.getModelLimits()
+    const promptTokens = this.estimateTokenCount(this.getAPIParsingPrompt())
+    const availableTokens = limits.maxInputTokens - promptTokens
+    
+    console.log('分块分析:', {
+      provider: this.config.provider,
+      maxInputTokens: limits.maxInputTokens,
+      promptTokens,
+      availableTokens,
+      contentLength: content.length,
+      estimatedContentTokens: this.estimateTokenCount(content)
+    })
+
+    // 如果内容长度在限制内，直接返回单个块
+    const contentTokens = this.estimateTokenCount(content)
+    if (contentTokens <= availableTokens) {
+      return [{
+        content,
+        index: 0,
+        type: 'content',
+        title: '完整文档',
+        estimatedTokens: contentTokens
+      }]
+    }
+
+    // 需要分块处理
+    const chunks: DocumentChunk[] = []
+    const lines = content.split('\n')
+    let currentChunk = ''
+    let currentTokens = 0
+    let chunkIndex = 0
+
+    // 策略1: 按章节分块 (优先级最高)
+    const sections = this.splitByHeaders(content)
+    if (sections.length > 1) {
+      return this.chunkBySections(sections, availableTokens)
+    }
+
+    // 策略2: 按API接口分块
+    const apiBlocks = this.extractAPIBlocks(content)
+    if (apiBlocks.length > 1) {
+      return this.chunkByAPIs(apiBlocks, availableTokens)
+    }
+
+    // 策略3: 按段落分块 (保留重叠)
+    return this.chunkByParagraphs(content, availableTokens)
+  }
+
+  /**
+   * 按标题章节分块
+   */
+  private splitByHeaders(content: string): Array<{title: string, content: string}> {
+    const sections: Array<{title: string, content: string}> = []
+    const lines = content.split('\n')
+    let currentSection = { title: '', content: '' }
+
+    for (const line of lines) {
+      const headerMatch = line.match(/^#+\s+(.+)$/)
+      if (headerMatch) {
+        if (currentSection.content.trim()) {
+          sections.push(currentSection)
+        }
+        currentSection = {
+          title: headerMatch[1],
+          content: line + '\n'
+        }
+      } else {
+        currentSection.content += line + '\n'
+      }
+    }
+
+    if (currentSection.content.trim()) {
+      sections.push(currentSection)
+    }
+
+    return sections
+  }
+
+  /**
+   * 按章节进行分块
+   */
+  private chunkBySections(sections: Array<{title: string, content: string}>, availableTokens: number): DocumentChunk[] {
+    const chunks: DocumentChunk[] = []
+    let currentChunk = ''
+    let currentTokens = 0
+    let chunkIndex = 0
+
+    for (const section of sections) {
+      const sectionTokens = this.estimateTokens(section.content)
+      
+      // 如果当前块加上这个章节会超出限制，先保存当前块
+      if (currentTokens + sectionTokens > availableTokens && currentChunk) {
+        chunks.push({
+          content: currentChunk.trim(),
+          index: chunkIndex++,
+          type: 'header',
+          title: `分块 ${chunkIndex}`,
+          estimatedTokens: currentTokens
+        })
+        currentChunk = ''
+        currentTokens = 0
+      }
+
+      // 如果单个章节就超出限制，需要进一步分割
+      if (sectionTokens > availableTokens) {
+        const subChunks = this.chunkByParagraphs(section.content, availableTokens)
+        chunks.push(...subChunks.map(chunk => ({
+          ...chunk,
+          index: chunkIndex++,
+          title: section.title
+        })))
+      } else {
+        currentChunk += section.content + '\n'
+        currentTokens += sectionTokens
+      }
+    }
+
+    // 保存最后一个块
+    if (currentChunk.trim()) {
+      chunks.push({
+        content: currentChunk.trim(),
+        index: chunkIndex,
+        type: 'header',
+        title: `分块 ${chunkIndex + 1}`,
+        estimatedTokens: currentTokens
+      })
+    }
+
+    return chunks
+  }
+
+  /**
+   * 提取API接口块
+   */
+  private extractAPIBlocks(content: string): Array<{title: string, content: string}> {
+    const apiBlocks: Array<{title: string, content: string}> = []
+    const lines = content.split('\n')
+    let currentBlock = { title: '', content: '' }
+    let inAPIBlock = false
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+      
+      // 检测API接口定义
+      const apiMatch = line.match(/^#{1,4}\s*(.+?)\s*-\s*(GET|POST|PUT|DELETE|PATCH)\s+(.+)$/) ||
+                      line.match(/^(GET|POST|PUT|DELETE|PATCH)\s+(.+)$/)
+      
+      if (apiMatch) {
+        // 保存上一个API块
+        if (inAPIBlock && currentBlock.content.trim()) {
+          apiBlocks.push(currentBlock)
+        }
+        
+        // 开始新的API块
+        currentBlock = {
+          title: apiMatch[1] || `${apiMatch[1] || apiMatch[0]} API`,
+          content: line + '\n'
+        }
+        inAPIBlock = true
+      } else if (inAPIBlock) {
+        currentBlock.content += line + '\n'
+        
+        // 如果遇到下一个API或章节标题，结束当前块
+        const nextApiMatch = lines[i + 1]?.match(/^#{1,4}\s*(.+?)\s*-\s*(GET|POST|PUT|DELETE|PATCH)\s+(.+)$/) ||
+                            lines[i + 1]?.match(/^(GET|POST|PUT|DELETE|PATCH)\s+(.+)$/)
+        const nextHeaderMatch = lines[i + 1]?.match(/^#+\s+(.+)$/)
+        
+        if (nextApiMatch || nextHeaderMatch) {
+          apiBlocks.push(currentBlock)
+          inAPIBlock = false
+        }
+      }
+    }
+
+    // 保存最后一个API块
+    if (inAPIBlock && currentBlock.content.trim()) {
+      apiBlocks.push(currentBlock)
+    }
+
+    return apiBlocks
+  }
+
+  /**
+   * 按API接口分块
+   */
+  private chunkByAPIs(apiBlocks: Array<{title: string, content: string}>, availableTokens: number): DocumentChunk[] {
+    const chunks: DocumentChunk[] = []
+    let currentChunk = ''
+    let currentTokens = 0
+    let chunkIndex = 0
+
+    for (const apiBlock of apiBlocks) {
+      const blockTokens = this.estimateTokenCount(apiBlock.content)
+      
+      // 如果当前块加上这个API会超出限制，先保存当前块
+      if (currentTokens + blockTokens > availableTokens && currentChunk) {
+        chunks.push({
+          content: currentChunk.trim(),
+          index: chunkIndex++,
+          type: 'api',
+          title: `API分块 ${chunkIndex}`,
+          estimatedTokens: currentTokens
+        })
+        currentChunk = ''
+        currentTokens = 0
+      }
+
+      currentChunk += apiBlock.content + '\n'
+      currentTokens += blockTokens
+    }
+
+    // 保存最后一个块
+    if (currentChunk.trim()) {
+      chunks.push({
+        content: currentChunk.trim(),
+        index: chunkIndex,
+        type: 'api',
+        title: `API分块 ${chunkIndex + 1}`,
+        estimatedTokens: currentTokens
+      })
+    }
+
+    return chunks
+  }
+
+  /**
+   * 按段落分块 (带重叠)
+   */
+  private chunkByParagraphs(content: string, availableTokens: number): DocumentChunk[] {
+    const chunks: DocumentChunk[] = []
+    const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim())
+    const overlapSize = Math.floor(availableTokens * 0.1) // 10% 重叠
+    
+    let currentChunk = ''
+    let currentTokens = 0
+    let chunkIndex = 0
+    let overlapContent = ''
+
+    for (let i = 0; i < paragraphs.length; i++) {
+      const paragraph = paragraphs[i]
+      const paragraphTokens = this.estimateTokenCount(paragraph)
+      
+      if (currentTokens + paragraphTokens > availableTokens && currentChunk) {
+        // 保存当前块
+        chunks.push({
+          content: currentChunk.trim(),
+          index: chunkIndex++,
+          type: 'content',
+          title: `内容分块 ${chunkIndex}`,
+          estimatedTokens: currentTokens
+        })
+        
+        // 准备重叠内容
+        const sentences = currentChunk.split(/[。！？.!?]\s*/).slice(-3) // 保留最后3句
+        overlapContent = sentences.join('。') + (sentences.length > 0 ? '。' : '')
+        
+        currentChunk = overlapContent + '\n' + paragraph + '\n'
+        currentTokens = this.estimateTokenCount(currentChunk)
+      } else {
+        currentChunk += paragraph + '\n'
+        currentTokens += paragraphTokens
+      }
+    }
+
+    // 保存最后一个块
+    if (currentChunk.trim()) {
+      chunks.push({
+        content: currentChunk.trim(),
+        index: chunkIndex,
+        type: 'content',
+        title: `内容分块 ${chunkIndex + 1}`,
+        estimatedTokens: currentTokens
+      })
+    }
+
+    return chunks
+  }
+
+  /**
+   * 估算Token数量的辅助方法
+   */
+  private estimateTokens(text: string): number {
+    return this.estimateTokenCount(text)
   }
 
   // API文档解析的系统提示词
@@ -208,11 +567,100 @@ class AIParsingService {
 请严格按照以上格式输出，只返回JSON，不要其他文字。`
   }
 
-  // 调用Ollama本地模型
+  /**
+   * 带重试的API调用
+   */
+  private async callWithRetry<T>(
+    apiCall: () => Promise<T>, 
+    maxRetries: number = 3, 
+    delayMs: number = 1000,
+    context: string = ''
+  ): Promise<T> {
+    let lastError: Error | null = null
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`${context} - 尝试 ${attempt}/${maxRetries}`)
+        const result = await apiCall()
+        
+        // 检查是否是token限制错误
+        if (this.isTokenLimitError(result)) {
+          throw new Error('Token限制错误，需要重新分块')
+        }
+        
+        return result
+      } catch (error: any) {
+        lastError = error
+        console.warn(`${context} - 尝试 ${attempt}/${maxRetries} 失败:`, error.message)
+        
+        // 如果是最后一次尝试，直接抛出错误
+        if (attempt === maxRetries) {
+          break
+        }
+        
+        // 根据错误类型决定是否重试
+        if (this.shouldRetry(error)) {
+          const delay = delayMs * Math.pow(2, attempt - 1) // 指数退避
+          console.log(`${context} - 等待 ${delay}ms 后重试...`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+        } else {
+          console.log(`${context} - 错误类型不支持重试，直接失败`)
+          break
+        }
+      }
+    }
+    
+    throw lastError || new Error(`${context} - 重试 ${maxRetries} 次后仍然失败`)
+  }
+
+  /**
+   * 检查是否是token限制错误
+   */
+  private isTokenLimitError(result: any): boolean {
+    if (typeof result === 'string') {
+      return result.toLowerCase().includes('token') && 
+             (result.toLowerCase().includes('limit') || result.toLowerCase().includes('exceed'))
+    }
+    if (result?.error) {
+      const errorStr = result.error.toLowerCase()
+      return (errorStr.includes('token') && errorStr.includes('limit')) ||
+             errorStr.includes('context length') ||
+             errorStr.includes('maximum context')
+    }
+    return false
+  }
+
+  /**
+   * 判断错误是否应该重试
+   */
+  private shouldRetry(error: any): boolean {
+    const message = error?.message?.toLowerCase() || ''
+    const isNetworkError = message.includes('network') || 
+                          message.includes('timeout') || 
+                          message.includes('connection') ||
+                          message.includes('fetch')
+    
+    const isServerError = error?.status >= 500 && error?.status < 600
+    const isRateLimitError = error?.status === 429
+    const isTokenError = this.isTokenLimitError(error)
+    
+    // 不重试的情况
+    if (isTokenError || 
+        error?.status === 401 || // 认证失败
+        error?.status === 403 || // 权限不足
+        error?.status === 404) { // 资源不存在
+      return false
+    }
+    
+    // 应该重试的情况
+    return isNetworkError || isServerError || isRateLimitError
+  }
+
+  // 调用Ollama本地模型 - 增强错误处理
   private async callOllama(prompt: string, content: string): Promise<any> {
     const baseUrl = this.config.baseUrl || 'http://localhost:11434'
     
-    try {
+    return await this.callWithRetry(async () => {
       console.log('调用Ollama API:', {
         url: `${baseUrl}/api/generate`,
         model: this.config.model
@@ -237,12 +685,15 @@ class AIParsingService {
       if (!response.ok) {
         const errorText = await response.text()
         console.error('Ollama请求失败:', response.status, response.statusText, errorText)
-        return {
-          apis: [],
-          success: false,
-          errors: [`Ollama请求失败: ${response.status} ${response.statusText}`],
-          confidence: 0
+        
+        // 检查是否是token限制错误
+        if (errorText.includes('context length') || errorText.includes('token')) {
+          throw new Error(`Token限制错误: ${errorText}`)
         }
+        
+        const error = new Error(`Ollama请求失败: ${response.status} ${response.statusText}`)
+        ;(error as any).status = response.status
+        throw error
       }
 
       const result = await response.json()
@@ -256,64 +707,55 @@ class AIParsingService {
       }
       
       return parsedResult
-    } catch (error) {
-      console.error('Ollama调用失败:', error)
-      // 返回错误响应而不是抛出异常
-      return {
-        apis: [],
-        success: false,
-        errors: [`Ollama调用异常: ${error.message}`],
-        confidence: 0
-      }
-    }
+    }, 3, 2000, 'Ollama API调用')
   }
 
-  // 调用在线API (DeepSeek、OpenAI等)
+  // 调用在线API (DeepSeek、OpenAI等) - 增强错误处理
   private async callOnlineAPI(prompt: string, content: string): Promise<any> {
     const { provider, model, apiKey, baseUrl } = this.config
     
-    let url: string
-    let headers: Record<string, string>
-    let body: any
+    return await this.callWithRetry(async () => {
+      let url: string
+      let headers: Record<string, string>
+      let body: any
 
-    switch (provider) {
-      case 'deepseek':
-        url = `${baseUrl || 'https://api.deepseek.com'}/v1/chat/completions`
-        headers = {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        }
-        body = {
-          model: model || 'deepseek-coder',
-          messages: [
-            { role: 'system', content: prompt },
-            { role: 'user', content: content }
-          ],
-          temperature: 0.1
-        }
-        break
+      switch (provider) {
+        case 'deepseek':
+          url = `${baseUrl || 'https://api.deepseek.com'}/v1/chat/completions`
+          headers = {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          }
+          body = {
+            model: model || 'deepseek-coder',
+            messages: [
+              { role: 'system', content: prompt },
+              { role: 'user', content: content }
+            ],
+            temperature: 0.1
+          }
+          break
 
-      case 'openai':
-        url = `${baseUrl || 'https://api.openai.com'}/v1/chat/completions`
-        headers = {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        }
-        body = {
-          model: model || 'gpt-3.5-turbo',
-          messages: [
-            { role: 'system', content: prompt },
-            { role: 'user', content: content }
-          ],
-          temperature: 0.1
-        }
-        break
+        case 'openai':
+          url = `${baseUrl || 'https://api.openai.com'}/v1/chat/completions`
+          headers = {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          }
+          body = {
+            model: model || 'gpt-3.5-turbo',
+            messages: [
+              { role: 'system', content: prompt },
+              { role: 'user', content: content }
+            ],
+            temperature: 0.1
+          }
+          break
 
-      default:
-        throw new Error(`不支持的AI提供商: ${provider}`)
-    }
+        default:
+          throw new Error(`不支持的AI提供商: ${provider}`)
+      }
 
-    try {
       const response = await fetch(url, {
         method: 'POST',
         headers,
@@ -321,14 +763,24 @@ class AIParsingService {
       })
 
       if (!response.ok) {
-        throw new Error(`API请求失败: ${response.statusText}`)
+        const errorText = await response.text()
+        console.error('在线API请求失败:', response.status, response.statusText, errorText)
+        
+        // 检查是否是token限制错误
+        if (errorText.includes('token') || errorText.includes('context_length')) {
+          throw new Error(`Token限制错误: ${errorText}`)
+        }
+        
+        const error = new Error(`API请求失败: ${response.status} ${response.statusText}`)
+        ;(error as any).status = response.status
+        throw error
       }
 
       const result = await response.json()
       const content = result.choices?.[0]?.message?.content
       
       if (!content) {
-        throw new Error('AI响应格式错误')
+        throw new Error('AI响应格式错误: 未找到有效内容')
       }
 
       const parsedResult = this.parseAIResponse(content)
@@ -339,16 +791,7 @@ class AIParsingService {
       }
       
       return parsedResult
-    } catch (error) {
-      console.error('在线API调用失败:', error)
-      // 返回错误响应而不是抛出异常
-      return {
-        apis: [],
-        success: false,
-        errors: [`在线API调用异常: ${error.message}`],
-        confidence: 0
-      }
-    }
+    }, 3, 2000, `${provider}在线API调用`)
   }
 
   // 解析AI响应
@@ -431,7 +874,7 @@ class AIParsingService {
     }
   }
 
-  // 解析API文档
+  // 解析API文档 - 支持分块处理
   async parseAPIDocument(content: string, projectId: string): Promise<ParsedAPIDocument> {
     try {
       console.log('开始解析API文档:', {
@@ -452,44 +895,15 @@ class AIParsingService {
         }
       }
 
-      const prompt = this.getAPIParsingPrompt()
-      let result: any
-
-      if (this.config.provider === 'ollama') {
-        result = await this.callOllama(prompt, content)
-      } else {
-        result = await this.callOnlineAPI(prompt, content)
-      }
+      // 检查是否需要分块处理
+      const chunks = this.chunkDocument(content)
       
-      // 检查结果是否包含错误
-      if (!result.success && result.errors) {
-        console.warn('AI解析返回错误:', result.errors)
-        return {
-          apis: [],
-          success: false,
-          errors: result.errors,
-          confidence: 0
-        }
-      }
-
-      // 转换为标准API格式
-      const apis: API[] = result.apis?.map((api: any, index: number) => ({
-        id: `ai-parsed-${Date.now()}-${index}`,
-        projectId,
-        name: api.name || '未命名API',
-        description: api.description || '',
-        method: this.normalizeHTTPMethod(api.method),
-        path: api.path || '/',
-        status: APIStatus.NOT_STARTED,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      })) || []
-
-      return {
-        apis,
-        success: apis.length > 0,
-        errors: apis.length === 0 ? ['未能解析到任何API接口'] : [],
-        confidence: result.confidence || 0.8
+      if (chunks.length === 1) {
+        // 单块处理
+        return await this.parseSingleChunk(chunks[0], projectId)
+      } else {
+        // 多块处理
+        return await this.parseMultipleChunks(chunks, projectId)
       }
     } catch (error: any) {
       return {
@@ -498,6 +912,237 @@ class AIParsingService {
         errors: [error.message || '解析失败'],
         confidence: 0
       }
+    }
+  }
+
+  /**
+   * 解析单个分块
+   */
+  private async parseSingleChunk(chunk: DocumentChunk, projectId: string): Promise<ParsedAPIDocument> {
+    const prompt = this.getAPIParsingPrompt()
+    let result: any
+
+    if (this.config.provider === 'ollama') {
+      result = await this.callOllama(prompt, chunk.content)
+    } else {
+      result = await this.callOnlineAPI(prompt, chunk.content)
+    }
+    
+    // 检查结果是否包含错误
+    if (!result.success && result.errors) {
+      console.warn('AI解析返回错误:', result.errors)
+      return {
+        apis: [],
+        success: false,
+        errors: result.errors,
+        confidence: 0
+      }
+    }
+
+    // 转换为标准API格式
+    const apis: API[] = result.apis?.map((api: any, index: number) => ({
+      id: `ai-parsed-${Date.now()}-${index}`,
+      projectId,
+      name: api.name || '未命名API',
+      description: api.description || '',
+      method: this.normalizeHTTPMethod(api.method),
+      path: api.path || '/',
+      status: APIStatus.NOT_STARTED,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    })) || []
+
+    return {
+      apis,
+      success: apis.length > 0,
+      errors: apis.length === 0 ? ['未能解析到任何API接口'] : [],
+      confidence: result.confidence || 0.8
+    }
+  }
+
+  /**
+   * 解析多个分块并合并结果
+   */
+  private async parseMultipleChunks(chunks: DocumentChunk[], projectId: string): Promise<ParsedAPIDocument> {
+    console.log(`文档过长，分为${chunks.length}个块进行处理`)
+    
+    const results: ParsedAPIDocument[] = []
+    const errors: string[] = []
+    let totalAPIs: API[] = []
+    let successCount = 0
+    let totalConfidence = 0
+
+    // 并行处理所有分块（限制并发数）
+    const concurrency = 3 // 最大并发数
+    const chunkGroups = []
+    
+    for (let i = 0; i < chunks.length; i += concurrency) {
+      chunkGroups.push(chunks.slice(i, i + concurrency))
+    }
+
+    for (const chunkGroup of chunkGroups) {
+      const promises = chunkGroup.map(async (chunk, index) => {
+        try {
+          console.log(`处理分块 ${chunk.index + 1}/${chunks.length}: ${chunk.title} (${chunk.estimatedTokens} tokens)`)
+          
+          const result = await this.parseSingleChunk(chunk, projectId)
+          
+          if (result.success && result.apis.length > 0) {
+            console.log(`分块 ${chunk.index + 1} 解析成功: ${result.apis.length} 个API`)
+            successCount++
+            totalConfidence += result.confidence
+            
+            // 为API添加分块信息
+            const chunkAPIs = result.apis.map(api => ({
+              ...api,
+              id: `chunk-${chunk.index}-${api.id}`,
+              description: `[分块${chunk.index + 1}] ${api.description || ''}`
+            }))
+            
+            return {
+              ...result,
+              apis: chunkAPIs
+            }
+          } else {
+            console.warn(`分块 ${chunk.index + 1} 解析失败:`, result.errors)
+            errors.push(`分块${chunk.index + 1}解析失败: ${result.errors.join(', ')}`)
+            return result
+          }
+        } catch (error: any) {
+          console.error(`分块 ${chunk.index + 1} 处理异常:`, error)
+          errors.push(`分块${chunk.index + 1}处理异常: ${error.message}`)
+          return {
+            apis: [],
+            success: false,
+            errors: [error.message],
+            confidence: 0
+          }
+        }
+      })
+
+      const groupResults = await Promise.all(promises)
+      results.push(...groupResults)
+      
+      // 添加延迟避免过于频繁的API调用
+      if (chunkGroups.indexOf(chunkGroup) < chunkGroups.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
+
+    // 合并所有成功的结果
+    for (const result of results) {
+      if (result.success && result.apis.length > 0) {
+        totalAPIs.push(...result.apis)
+      }
+    }
+
+    // 去重处理 - 基于name和path的相似性
+    const uniqueAPIs = this.deduplicateAPIs(totalAPIs)
+    
+    const averageConfidence = successCount > 0 ? totalConfidence / successCount : 0
+    const hasErrors = errors.length > 0
+    
+    console.log(`分块解析完成: ${chunks.length}个分块, ${successCount}个成功, ${uniqueAPIs.length}个API (去重后)`)
+
+    return {
+      apis: uniqueAPIs,
+      success: uniqueAPIs.length > 0,
+      errors: hasErrors ? errors : (uniqueAPIs.length === 0 ? ['所有分块都未能解析到API接口'] : []),
+      confidence: averageConfidence
+    }
+  }
+
+  /**
+   * API去重处理
+   */
+  private deduplicateAPIs(apis: API[]): API[] {
+    const uniqueAPIs: API[] = []
+    const seenAPIs = new Set<string>()
+
+    for (const api of apis) {
+      // 创建唯一标识符
+      const key = `${api.method}:${api.path}:${api.name}`.toLowerCase()
+      
+      if (!seenAPIs.has(key)) {
+        seenAPIs.add(key)
+        uniqueAPIs.push(api)
+      } else {
+        // 如果重复，合并描述信息
+        const existingAPI = uniqueAPIs.find(existing => 
+          existing.method === api.method && 
+          existing.path === api.path && 
+          existing.name === api.name
+        )
+        
+        if (existingAPI && api.description && api.description !== existingAPI.description) {
+          existingAPI.description = `${existingAPI.description}\n\n补充信息: ${api.description}`
+        }
+      }
+    }
+
+    return uniqueAPIs
+  }
+
+  /**
+   * 获取分块处理进度的回调接口
+   */
+  async parseAPIDocumentWithProgress(
+    content: string, 
+    projectId: string,
+    onProgress?: (progress: { current: number, total: number, chunk: DocumentChunk }) => void
+  ): Promise<ParsedAPIDocument> {
+    const chunks = this.chunkDocument(content)
+    
+    if (chunks.length === 1) {
+      onProgress?.({ current: 1, total: 1, chunk: chunks[0] })
+      return await this.parseSingleChunk(chunks[0], projectId)
+    }
+    
+    console.log(`开始分块处理: ${chunks.length} 个分块`)
+    
+    const results: ParsedAPIDocument[] = []
+    const errors: string[] = []
+    let totalAPIs: API[] = []
+    let successCount = 0
+    let totalConfidence = 0
+
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i]
+      onProgress?.({ current: i + 1, total: chunks.length, chunk })
+      
+      try {
+        const result = await this.parseSingleChunk(chunk, projectId)
+        results.push(result)
+        
+        if (result.success && result.apis.length > 0) {
+          successCount++
+          totalConfidence += result.confidence
+          totalAPIs.push(...result.apis.map(api => ({
+            ...api,
+            id: `chunk-${i}-${api.id}`,
+            description: `[分块${i + 1}] ${api.description || ''}`
+          })))
+        } else {
+          errors.push(`分块${i + 1}解析失败: ${result.errors.join(', ')}`)
+        }
+        
+        // 添加延迟
+        if (i < chunks.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
+      } catch (error: any) {
+        errors.push(`分块${i + 1}处理异常: ${error.message}`)
+      }
+    }
+
+    const uniqueAPIs = this.deduplicateAPIs(totalAPIs)
+    const averageConfidence = successCount > 0 ? totalConfidence / successCount : 0
+
+    return {
+      apis: uniqueAPIs,
+      success: uniqueAPIs.length > 0,
+      errors: errors.length > 0 ? errors : (uniqueAPIs.length === 0 ? ['所有分块都未能解析到API接口'] : []),
+      confidence: averageConfidence
     }
   }
 

@@ -52,8 +52,8 @@ function displayModelInfo() {
 }
 
 function checkProxy() {
-  const httpProxy = process.env.HTTP_PROXY || process.env.http_proxy;
-  const httpsProxy = process.env.HTTPS_PROXY || process.env.https_proxy;
+  const httpProxy = "127.0.0.1:7897";
+  const httpsProxy = "127.0.0.1:7897";
   
   console.log('🔍 代理配置检查:');
   console.log(`   HTTP_PROXY: ${httpProxy || '未设置'}`);
@@ -134,9 +134,14 @@ async function downloadModel(modelName) {
   
   try {
     // 使用transformers.js来下载和缓存模型
-    const { pipeline } = await import('@xenova/transformers');
+    const { pipeline, env } = await import('@xenova/transformers');
+    
+    // 配置使用镜像源
+    env.remoteHost = 'https://hf-mirror.com';
+    env.remotePathTemplate = '{model}/resolve/{revision}/';
     
     console.log('🔧 初始化pipeline...');
+    console.log('🌐 使用镜像源:', env.remoteHost);
     const encoder = await pipeline('feature-extraction', modelName, {
       quantized: true,
       progress_callback: (progress) => {
