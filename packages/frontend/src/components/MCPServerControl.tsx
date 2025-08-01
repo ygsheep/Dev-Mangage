@@ -17,11 +17,16 @@ import {
 } from 'lucide-react'
 import { debug, useDebugComponent } from '../debug'
 import { mcpServerAPI, MCPServerStatus, MCPServerLog } from '../api/mcpServer'
+import { useMCPConfig, useMCPConnection } from '../hooks/useMCPConfig'
 
 const MCPServerControl: React.FC = () => {
+  // 使用 MCP 配置管理
+  const { config, urls, isValid } = useMCPConfig()
+  const { isConnected, isChecking, checkConnection } = useMCPConnection()
+  
   const [serverStatus, setServerStatus] = useState<MCPServerStatus>({
     isRunning: false,
-    port: 3001,
+    port: parseInt(config.BACKEND_PORT),
     uptime: 0,
     requestCount: 0,
     lastActivity: null,
@@ -33,7 +38,6 @@ const MCPServerControl: React.FC = () => {
   const [isStopping, setIsStopping] = useState(false)
   const [logs, setLogs] = useState<MCPServerLog[]>([])
   const [showLogs, setShowLogs] = useState(false)
-  const [isConnected, setIsConnected] = useState(false)
 
   // 调试组件状态跟踪
   useDebugComponent('MCPServerControl', {
@@ -45,24 +49,29 @@ const MCPServerControl: React.FC = () => {
     timestamp: Date.now()
   })
 
-  // 初始化：检查连接状态和获取服务器状态
+  // 初始化：获取服务器状态
   useEffect(() => {
-    const checkConnection = async () => {
-      const connected = await mcpServerAPI.testConnection()
-      setIsConnected(connected)
-      
-      if (connected) {
-        const status = await mcpServerAPI.getStatus()
-        setServerStatus(status)
-        
-        // 获取最近的日志
-        const recentLogs = await mcpServerAPI.getLogs(20)
-        setLogs(recentLogs)
+    const initializeStatus = async () => {
+      if (isConnected) {
+        try {
+          const status = await mcpServerAPI.getStatus()
+          setServerStatus(prev => ({
+            ...prev,
+            ...status,
+            port: parseInt(config.BACKEND_PORT)
+          }))
+          
+          // 获取最近的日志
+          const recentLogs = await mcpServerAPI.getLogs(20)
+          setLogs(recentLogs)
+        } catch (error) {
+          debug.error('初始化状态失败', error, 'MCPServerControl')
+        }
       }
     }
     
-    checkConnection()
-  }, [])
+    initializeStatus()
+  }, [isConnected]) // 移除config依赖，避免过度触发
 
   // 设置状态流和日志流
   useEffect(() => {
@@ -84,20 +93,24 @@ const MCPServerControl: React.FC = () => {
     }
   }, [isConnected])
 
-  // 定时刷新状态（作为备用）
+  // 定时刷新状态（暂时禁用）
   useEffect(() => {
-    if (!isConnected) return
-
-    const interval = setInterval(async () => {
-      try {
-        const status = await mcpServerAPI.getStatus()
-        setServerStatus(status)
-      } catch (error) {
-        debug.error('定时获取状态失败', error, 'MCPServerControl')
-      }
-    }, 10000) // 每10秒刷新一次
-
-    return () => clearInterval(interval)
+    // 暂时禁用定时刷新，避免无限循环
+    // if (!isConnected) return
+    // let isRequesting = false
+    // const interval = setInterval(async () => {
+    //   if (isRequesting) return
+    //   isRequesting = true
+    //   try {
+    //     const status = await mcpServerAPI.getStatus()
+    //     setServerStatus(status)
+    //   } catch (error) {
+    //     debug.error('定时获取状态失败', error, 'MCPServerControl')
+    //   } finally {
+    //     isRequesting = false
+    //   }
+    // }, 30000)
+    // return () => clearInterval(interval)
   }, [isConnected])
 
   const startServer = async () => {
@@ -264,6 +277,51 @@ const MCPServerControl: React.FC = () => {
         )}
       </div>
 
+      {/* 连接和配置状态 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="flex items-center space-x-2 mb-1">
+            {isConnected ? (
+              <Wifi className="h-4 w-4 text-green-500" />
+            ) : (
+              <WifiOff className="h-4 w-4 text-red-500" />
+            )}
+            <span className="text-sm font-medium text-gray-700">连接状态</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className={`text-sm font-medium ${
+              isConnected ? 'text-green-600' : 'text-red-600'
+            }`}>
+              {isChecking ? '检查中...' : (isConnected ? '已连接' : '断开连接')}
+            </span>
+          </div>
+        </div>
+        
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="flex items-center space-x-2 mb-1">
+            <Server className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">服务地址</span>
+          </div>
+          <p className="text-xs font-mono text-gray-900">{urls.backend}</p>
+        </div>
+        
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="flex items-center space-x-2 mb-1">
+            {isValid ? (
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            ) : (
+              <AlertCircle className="h-4 w-4 text-red-500" />
+            )}
+            <span className="text-sm font-medium text-gray-700">配置状态</span>
+          </div>
+          <span className={`text-sm font-medium ${
+            isValid ? 'text-green-600' : 'text-red-600'
+          }`}>
+            {isValid ? '配置正常' : '配置错误'}
+          </span>
+        </div>
+      </div>
+
       {/* 服务状态 */}
       {serverStatus.isRunning && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -355,7 +413,7 @@ const MCPServerControl: React.FC = () => {
             <div>
               <h3 className="font-medium text-yellow-900">后端连接断开</h3>
               <p className="text-sm text-yellow-700">
-                无法连接到后端服务器，请确保后端服务正在运行 (http://localhost:3000)
+                无法连接到后端服务器，请确保后端服务正在运行 (http://localhost:3320)
               </p>
             </div>
           </div>

@@ -36,7 +36,7 @@ router.get(
     const where = {
       ...(projectId && { projectId }),
       ...(search && {
-        name: { contains: search, mode: 'insensitive' },
+        name: { contains: search },
       }),
     }
 

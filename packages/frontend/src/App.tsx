@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage'
 import ProjectsPage from './pages/ProjectsPage'
 import ProjectDetailPage from './pages/ProjectDetailPage'
 import SwaggerImportPage from './pages/SwaggerImportPage'
+import DocumentsImportPage from './pages/DocumentsImportPage'
 import SettingsPage from './pages/SettingsPage'
 
 // 布局组件
@@ -22,6 +23,8 @@ function App() {
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="projects/:id" element={<ProjectDetailPage />} />
           <Route path="import/swagger" element={<SwaggerImportPage />} />
+          <Route path="import" element={<DocumentsImportPage />} />
+          <Route path="import/documents" element={<DocumentsImportPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>

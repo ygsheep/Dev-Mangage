@@ -51,9 +51,9 @@ router.get(
       ...(method && { method }),
       ...(search && {
         OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-          { path: { contains: search, mode: 'insensitive' } },
+          { name: { contains: search } },
+          { description: { contains: search } },
+          { path: { contains: search } },
         ],
       }),
       ...(tagIds && {

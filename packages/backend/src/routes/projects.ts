@@ -38,8 +38,8 @@ router.get(
       ...(status && { status }),
       ...(search && {
         OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
+          { name: { contains: search } },
+          { description: { contains: search } },
         ],
       }),
     }

@@ -5,13 +5,13 @@ dotenv.config()
 
 export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '3000', 10),
+  port: parseInt(process.env.PORT, 10),
   
   // Database
   databaseUrl: process.env.DATABASE_URL || 'file:./dev.db',
   
   // CORS
-  corsOrigin: process.env.CORS_ORIGIN || ['http://localhost:5173', 'http://localhost:5174'],
+  corsOrigin: process.env.CORS_ORIGIN,
   
   // Rate limiting
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // 15 minutes

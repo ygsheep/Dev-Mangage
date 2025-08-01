@@ -15,11 +15,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:3320',
         changeOrigin: true,
       },
       '/__mcp': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:3321',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/__mcp/, '/api/v1/mcp'),
       },

@@ -54,7 +54,7 @@ async function initializeSearchIndexes() {
         id: true,
         name: true,
         color: true,
-        description: true,
+        projectId: true,
       },
     }),
   ]);

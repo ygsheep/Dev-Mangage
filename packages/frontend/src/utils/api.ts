@@ -1,8 +1,13 @@
 import axios from 'axios'
+import { mcpConfig } from '../config/mcpConfig'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1'
+// 获取 API 基础 URL，优先使用环境变量，否则使用配置管理
+const API_BASE_URL = import.meta.env.VITE_API_URL || mcpConfig.getBackendBaseUrl()
 
-// 创建axios实例
+/**
+ * 创建 axios 实例
+ * 统一管理 API 请求配置
+ */
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,

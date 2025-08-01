@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { prisma } from '@devapi/backend/prisma'
 import { spawn, ChildProcess } from 'child_process'
 import path from 'path'
 import { EventEmitter } from 'events'
@@ -10,7 +11,7 @@ class MCPServerManager extends EventEmitter {
   private mcpProcess: ChildProcess | null = null
   private status = {
     isRunning: false,
-    port: 3001,
+    port: 3321,
     uptime: 0,
     requestCount: 0,
     lastActivity: null as Date | null,
@@ -365,17 +366,35 @@ router.post('/tools/:toolName', async (req, res) => {
       })
     }
     
-    // 模拟 MCP 工具调用结果（实际应该通过 MCP 协议调用）
-    // 这里先返回一个模拟的响应格式
-    const mockResult = {
-      content: [{
-        type: 'text',
-        text: JSON.stringify({
+    // 实现真正的MCP工具调用
+    let result;
+    
+    switch (toolName) {
+      case 'global_search':
+        result = await handleGlobalSearch(args)
+        break
+      case 'search_projects':
+        result = await handleSearchProjects(args)
+        break
+      case 'search_apis':
+        result = await handleSearchAPIs(args)
+        break
+      case 'get_recent_items':
+        result = await handleGetRecentItems(args)
+        break
+      default:
+        result = {
           tool: toolName,
           query: args.query || '',
           results: [],
-          message: `MCP工具 ${toolName} 调用成功，但需要实现与MCP服务器的通信`
-        })
+          message: `工具 ${toolName} 暂未实现，请联系开发者`
+        }
+    }
+    
+    const mcpResult = {
+      content: [{
+        type: 'text',
+        text: JSON.stringify(result)
       }]
     }
     
@@ -384,7 +403,7 @@ router.post('/tools/:toolName', async (req, res) => {
       lastActivity: new Date()
     })
     
-    res.json(mockResult)
+    res.json(mcpResult)
     
   } catch (error) {
     res.status(500).json({
@@ -405,5 +424,216 @@ router.all('/__mcp/*', (req, res) => {
   const correctPath = req.path.replace('/__mcp', '/api/v1/mcp')
   res.redirect(correctPath)
 })
+
+// MCP工具处理函数
+async function handleGlobalSearch(args: any) {
+  const { query = '', types = ['projects', 'apis'], limit = 10 } = args
+  const results: any[] = []
+  
+  try {
+    if (types.includes('projects')) {
+      const projects = await prisma.project.findMany({
+        where: {
+          OR: [
+            { name: { contains: query } },
+            { description: { contains: query } }
+          ]
+        },
+        take: Math.ceil(limit / types.length),
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          status: true,
+          createdAt: true
+        }
+      })
+      
+      results.push(...projects.map(p => ({ type: 'project', ...p })))
+    }
+    
+    if (types.includes('apis')) {
+      const apis = await prisma.aPI.findMany({
+        where: {
+          OR: [
+            { name: { contains: query } },
+            { path: { contains: query } },
+            { description: { contains: query } }
+          ]
+        },
+        take: Math.ceil(limit / types.length),
+        select: {
+          id: true,
+          name: true,
+          method: true,
+          path: true,
+          description: true,
+          status: true,
+          projectId: true
+        }
+      })
+      
+      results.push(...apis.map(a => ({ type: 'api', ...a })))
+    }
+    
+    return {
+      tool: 'global_search',
+      query,
+      types,
+      results: results.slice(0, limit),
+      total: results.length
+    }
+  } catch (error) {
+    return {
+      tool: 'global_search',
+      query,
+      results: [],
+      error: `搜索失败: ${error instanceof Error ? error.message : String(error)}`
+    }
+  }
+}
+
+async function handleSearchProjects(args: any) {
+  const { query = '', limit = 10 } = args
+  
+  try {
+    const projects = await prisma.project.findMany({
+      where: {
+        OR: [
+          { name: { contains: query } },
+          { description: { contains: query } }
+        ]
+      },
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        _count: {
+          select: { apis: true }
+        }
+      }
+    })
+    
+    return {
+      tool: 'search_projects',
+      query,
+      results: projects,
+      total: projects.length
+    }
+  } catch (error) {
+    return {
+      tool: 'search_projects',
+      query,
+      results: [],
+      error: `项目搜索失败: ${error instanceof Error ? error.message : String(error)}`
+    }
+  }
+}
+
+async function handleSearchAPIs(args: any) {
+  const { query = '', method, limit = 10 } = args
+  
+  try {
+    const whereClause: any = {
+      OR: [
+        { name: { contains: query } },
+        { path: { contains: query } },
+        { description: { contains: query } }
+      ]
+    }
+    
+    if (method) {
+      whereClause.method = method.toUpperCase()
+    }
+    
+    const apis = await prisma.aPI.findMany({
+      where: whereClause,
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        method: true,
+        path: true,
+        description: true,
+        status: true,
+        projectId: true,
+        project: {
+          select: { name: true }
+        }
+      }
+    })
+    
+    return {
+      tool: 'search_apis',
+      query,
+      method,
+      results: apis,
+      total: apis.length
+    }
+  } catch (error) {
+    return {
+      tool: 'search_apis',
+      query,
+      results: [],
+      error: `API搜索失败: ${error instanceof Error ? error.message : String(error)}`
+    }
+  }
+}
+
+async function handleGetRecentItems(args: any) {
+  const { limit = 10 } = args
+  
+  try {
+    const [recentProjects, recentAPIs] = await Promise.all([
+      prisma.project.findMany({
+        take: Math.ceil(limit / 2),
+        orderBy: { updatedAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          status: true,
+          updatedAt: true
+        }
+      }),
+      prisma.aPI.findMany({
+        take: Math.ceil(limit / 2),
+        orderBy: { updatedAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          method: true,
+          path: true,
+          description: true,
+          status: true,
+          updatedAt: true,
+          project: {
+            select: { name: true }
+          }
+        }
+      })
+    ])
+    
+    const results = [
+      ...recentProjects.map(p => ({ type: 'project', ...p })),
+      ...recentAPIs.map(a => ({ type: 'api', ...a }))
+    ].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    
+    return {
+      tool: 'get_recent_items',
+      results: results.slice(0, limit),
+      total: results.length
+    }
+  } catch (error) {
+    return {
+      tool: 'get_recent_items',
+      results: [],
+      error: `获取最近项目失败: ${error instanceof Error ? error.message : String(error)}`
+    }
+  }
+}
 
 export { router as mcpRouter }

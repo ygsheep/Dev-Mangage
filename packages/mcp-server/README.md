@@ -254,6 +254,90 @@ curl http://localhost:3001/health
 
 ## 🔗 集成指南
 
+### 与 Trae AI 集成
+
+#### 标准 stdio 连接（推荐）
+```json
+{
+  "mcpServers": {
+    "devapi-manager": {
+      "command": "node",
+      "args": ["d:\\Code\\Dev-Mangage\\packages\\mcp-server\\dist\\index.js"],
+      "env": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": "file:d:\\Code\\Dev-Mangage\\packages\\backend\\prisma\\dev.db",
+        "PORT": "3001"
+      }
+    }
+  }
+}
+```
+
+#### HTTP 连接方式
+```json
+{
+  "mcpServers": {
+    "devapi-manager-http": {
+      "command": "node",
+      "args": ["-e", "console.log('HTTP MCP Server: http://localhost:3320')"],
+      "env": {
+        "MCP_SERVER_URL": "http://localhost:3320"
+      }
+    }
+  }
+}
+```
+
+### 与 Claude Desktop 集成
+
+#### 开发环境配置
+```json
+{
+  "mcpServers": {
+    "devapi-manager": {
+      "command": "node",
+      "args": ["./packages/mcp-server/dist/index.js"],
+      "env": {
+        "NODE_ENV": "development",
+        "DATABASE_URL": "file:./packages/backend/prisma/dev.db",
+        "PORT": "3001"
+      }
+    }
+  }
+}
+```
+
+#### 生产环境配置
+```json
+{
+  "mcpServers": {
+    "devapi-manager": {
+      "command": "node",
+      "args": ["./dist/index.js"],
+      "env": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": "file:./data/production.db"
+      }
+    }
+  }
+}
+```
+
+#### HTTP 连接配置
+```json
+{
+  "mcpServers": {
+    "devapi-manager-http": {
+      "command": "curl",
+      "args": [
+        "-X", "GET",
+        "http://localhost:3320/mcp/tools"
+      ]
+    }
+  }
+}
+```
+
 ### 与DevAPI Manager集成
 ```typescript
 // 前端调用示例
@@ -269,13 +353,15 @@ const results = await mcpServerAPI.search('用户API', 10, 0.3)
 ### 与其他系统集成
 ```javascript
 // HTTP API调用
-const response = await fetch('http://localhost:3001/api/search', {
+const response = await fetch('http://localhost:3320/mcp/tools/vector_search', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    query: 'user authentication',
-    type: 'vector',
-    limit: 5
+    arguments: {
+      query: 'user authentication',
+      limit: 5,
+      threshold: 0.3
+    }
   })
 })
 ```

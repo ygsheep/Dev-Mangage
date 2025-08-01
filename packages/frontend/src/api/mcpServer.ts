@@ -1,4 +1,5 @@
 import { debug } from '../debug'
+import { mcpConfig } from '../config/mcpConfig'
 
 export interface MCPServerStatus {
   isRunning: boolean
@@ -22,12 +23,18 @@ export interface MCPServerLog {
   source?: string
 }
 
+/**
+ * MCP 服务器 API 客户端
+ * 统一管理与 MCP 服务器的通信
+ */
 class MCPServerAPI {
-  private baseUrl = 'http://localhost:3001/api/v1'
+  /**
+   * 获取 MCP 服务器状态
+   */
 
   async getStatus(): Promise<MCPServerStatus> {
     try {
-      const response = await fetch(`${this.baseUrl}/mcp/status`)
+      const response = await fetch(mcpConfig.getMCPStatusUrl())
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
@@ -49,11 +56,14 @@ class MCPServerAPI {
     }
   }
 
+  /**
+   * 启动 MCP 服务器
+   */
   async start(): Promise<{ success: boolean; message: string }> {
     try {
       debug.log('启动MCP服务器请求', {}, 'MCPServerAPI')
       
-      const response = await fetch(`${this.baseUrl}/mcp/start`, {
+      const response = await fetch(mcpConfig.getMCPStartUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -79,11 +89,14 @@ class MCPServerAPI {
     }
   }
 
+  /**
+   * 停止 MCP 服务器
+   */
   async stop(): Promise<{ success: boolean; message: string }> {
     try {
       debug.log('停止MCP服务器请求', {}, 'MCPServerAPI')
       
-      const response = await fetch(`${this.baseUrl}/mcp/stop`, {
+      const response = await fetch(mcpConfig.getMCPStopUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -109,18 +122,27 @@ class MCPServerAPI {
     }
   }
 
+  /**
+   * 重启 MCP 服务器
+   */
   async restart(): Promise<{ success: boolean; message: string }> {
     try {
       debug.log('重启MCP服务器请求', {}, 'MCPServerAPI')
       
       // 先停止
-      await this.stop()
+      const stopResult = await this.stop()
+      if (!stopResult.success) {
+        return stopResult
+      }
       
       // 等待一秒
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       // 再启动
-      return await this.start()
+      const startResult = await this.start()
+      
+      debug.log('MCP服务器重启完成', startResult, 'MCPServerAPI')
+      return startResult
       
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error)
@@ -132,9 +154,12 @@ class MCPServerAPI {
     }
   }
 
+  /**
+   * 获取 MCP 服务器日志
+   */
   async getLogs(limit: number = 50): Promise<MCPServerLog[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/mcp/logs?limit=${limit}`)
+      const response = await fetch(`${mcpConfig.getMCPLogsUrl()}?limit=${limit}`)
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
@@ -147,9 +172,12 @@ class MCPServerAPI {
     }
   }
 
+  /**
+   * 测试 MCP 服务器连接
+   */
   async testConnection(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/mcp/ping`)
+      const response = await fetch(mcpConfig.getMCPPingUrl())
       return response.ok
     } catch (error) {
       debug.error('MCP服务器连接测试失败', error, 'MCPServerAPI')
@@ -157,10 +185,12 @@ class MCPServerAPI {
     }
   }
 
-  // 创建EventSource连接来接收实时状态更新
+  /**
+   * 创建EventSource连接来接收实时状态更新
+   */
   createStatusStream(onUpdate: (status: MCPServerStatus) => void): EventSource | null {
     try {
-      const eventSource = new EventSource(`${this.baseUrl}/mcp/status/stream`)
+      const eventSource = new EventSource(mcpConfig.getMCPStatusStreamUrl())
       
       eventSource.onmessage = (event) => {
         try {
@@ -184,10 +214,12 @@ class MCPServerAPI {
     }
   }
 
-  // 创建日志流
+  /**
+   * 创建日志流
+   */
   createLogStream(onLog: (log: MCPServerLog) => void): EventSource | null {
     try {
-      const eventSource = new EventSource(`${this.baseUrl}/mcp/logs/stream`)
+      const eventSource = new EventSource(mcpConfig.getMCPLogStreamUrl())
       
       eventSource.onmessage = (event) => {
         try {

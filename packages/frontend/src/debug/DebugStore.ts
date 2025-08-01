@@ -193,7 +193,7 @@ const useDebugStore = create<DebugStore & DebugStoreActions>((set, get) => ({
   // 查看服务器保存的日志
   viewServerLogs: async () => {
     try {
-      const response = await fetch('/api/v1/debug/logs')
+      const response = await fetch('/api/debug/logs')
       if (response.ok) {
         const data = await response.json()
         logger.info('服务器日志信息', {
