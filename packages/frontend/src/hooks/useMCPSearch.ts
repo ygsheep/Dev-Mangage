@@ -1,19 +1,16 @@
 import { useState, useCallback } from 'react'
-import { mcpConfig } from '../config/mcpConfig'
 
-/**
- * MCP 客户端接口
- * 用于调用 MCP 工具
- */
+// MCP客户端模拟接口
 class MCPClient {
-  /**
-   * 调用 MCP 工具
-   * @param name 工具名称
-   * @param args 工具参数
-   */
+  private serverUrl: string
+
+  constructor(serverUrl = 'http://localhost:3001') {
+    this.serverUrl = serverUrl
+  }
+
   async callTool(name: string, args: any) {
     try {
-      const response = await fetch(mcpConfig.getMCPToolUrl(name), {
+      const response = await fetch(`${this.serverUrl}/mcp/tools/${name}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

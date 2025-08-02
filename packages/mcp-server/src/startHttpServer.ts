@@ -31,12 +31,12 @@ async function startHTTPMCPServer() {
     console.log('📖 使用指南:');
     console.log(`   • 健康检查: curl http://localhost:${port}/health`);
     console.log(`   • 工具列表: curl http://localhost:${port}/mcp/tools`);
-    console.log(`   • 搜索项目: curl -X POST http://localhost:${port}/mcp/tools/search_projects`);
-    console.log('                    -H "Content-Type: application/json"');
-    console.log('                    -d ' + "'{\"arguments\":{\"query\":\"API管理\"}}'" );
-    console.log(`   • 向量搜索: curl -X POST http://localhost:${port}/mcp/tools/vector_search`);
-    console.log('                    -H "Content-Type: application/json"');
-    console.log('                    -d ' + "'{\"arguments\":{\"query\":\"用户认证\"}}'" );
+    console.log(`   • 搜索项目: curl -X POST http://localhost:${port}/mcp/tools/search_projects \\`);
+    console.log('                    -H "Content-Type: application/json" \\');
+    console.log('                    -d \'{\'"arguments\'":{\'"query\'":\'"API管理\'"}}\''');
+    console.log(`   • 向量搜索: curl -X POST http://localhost:${port}/mcp/tools/vector_search \\`);
+    console.log('                    -H "Content-Type: application/json" \\');
+    console.log('                    -d \'{\'"arguments\'":{\'"query\'":\'"用户认证\'"}}\''');
     console.log('');
     console.log('🔧 前端集成:');
     console.log('   const response = await fetch(\'http://localhost:3002/mcp/tools/global_search\', {');
