@@ -1,7 +1,8 @@
-import { Router } from 'express'
+import { Router, Express } from 'express'
 import { spawn, ChildProcess } from 'child_process'
 import path from 'path'
 import { EventEmitter } from 'events'
+import { mcpService } from '../services/mcpService'
 
 const router = Router()
 
@@ -405,5 +406,782 @@ router.all('/__mcp/*', (req, res) => {
   const correctPath = req.path.replace('/__mcp', '/api/v1/mcp')
   res.redirect(correctPath)
 })
+
+/**
+ * 集成HTTP MCP服务路由到主应用
+ * 在同一端口3001提供MCP HTTP服务
+ */
+export const setupIntegratedMCPRoutes = (app: Express): void => {
+  // 健康检查 - 继承主应用的健康检查
+  app.get('/mcp/health', (req, res) => {
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      service: 'Integrated MCP Service',
+      version: '2.0.0',
+      port: 3001
+    })
+  })
+
+  // 列出可用的MCP工具
+  app.get('/mcp/tools', async (req, res) => {
+    try {
+      const tools = mcpService.getToolsList()
+      res.json({ tools })
+    } catch (error) {
+      res.status(500).json({
+        error: 'Failed to list MCP tools',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 搜索项目
+  app.post('/mcp/tools/search_projects', async (req, res) => {
+    try {
+      const { arguments: args } = req.body
+      const { query, limit = 10 } = args || {}
+      
+      if (!query) {
+        return res.status(400).json({
+          error: 'Missing required parameter: query'
+        })
+      }
+      
+      const result = await mcpService.searchProjects(query, limit)
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: 'Search projects failed',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 搜索API
+  app.post('/mcp/tools/search_apis', async (req, res) => {
+    try {
+      const { arguments: args } = req.body
+      const { query, projectId, method, status, limit = 10 } = args || {}
+      
+      if (!query) {
+        return res.status(400).json({
+          error: 'Missing required parameter: query'
+        })
+      }
+      
+      const result = await mcpService.searchAPIs(query, {
+        projectId,
+        method,
+        status,
+        limit
+      })
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: 'Search APIs failed',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 搜索标签
+  app.post('/mcp/tools/search_tags', async (req, res) => {
+    try {
+      const { arguments: args } = req.body
+      const { query, projectId, limit = 10 } = args || {}
+      
+      if (!query) {
+        return res.status(400).json({
+          error: 'Missing required parameter: query'
+        })
+      }
+      
+      const result = await mcpService.searchTags(query, {
+        projectId,
+        limit
+      })
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: 'Search tags failed',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 全局搜索
+  app.post('/mcp/tools/global_search', async (req, res) => {
+    try {
+      const { arguments: args } = req.body
+      const { query, types = ['projects', 'apis', 'tags'], limit = 10 } = args || {}
+      
+      if (!query) {
+        return res.status(400).json({
+          error: 'Missing required parameter: query'
+        })
+      }
+      
+      const result = await mcpService.globalSearch(query, {
+        types,
+        limit
+      })
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: 'Global search failed',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 获取搜索建议
+  app.post('/mcp/tools/get_search_suggestions', async (req, res) => {
+    try {
+      const { arguments: args } = req.body
+      const { query, limit = 5 } = args || {}
+      
+      if (!query) {
+        return res.status(400).json({
+          error: 'Missing required parameter: query'
+        })
+      }
+      
+      const result = await mcpService.getSearchSuggestions(query, limit)
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: 'Get search suggestions failed',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 获取最近项目
+  app.post('/mcp/tools/get_recent_items', async (req, res) => {
+    try {
+      const { arguments: args } = req.body
+      const { limit = 10 } = args || {}
+      
+      const result = await mcpService.getRecentItems(limit)
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: 'Get recent items failed',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 刷新搜索索引
+  app.post('/mcp/tools/refresh_search_index', async (req, res) => {
+    try {
+      const { arguments: args } = req.body
+      const { force = false } = args || {}
+      
+      const result = await mcpService.refreshSearchIndex(force)
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: 'Refresh search index failed',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 通用工具调用端点
+  app.post('/mcp/tools/:toolName', async (req, res) => {
+    try {
+      const { toolName } = req.params
+      const { arguments: args } = req.body || {}
+
+      let result
+      
+      switch (toolName) {
+        case 'search_projects':
+          if (!args?.query) {
+            return res.status(400).json({ error: 'Missing required parameter: query' })
+          }
+          result = await mcpService.searchProjects(args.query, args.limit || 10)
+          break
+          
+        case 'search_apis':
+          if (!args?.query) {
+            return res.status(400).json({ error: 'Missing required parameter: query' })
+          }
+          result = await mcpService.searchAPIs(args.query, {
+            projectId: args.projectId,
+            method: args.method,
+            status: args.status,
+            limit: args.limit || 10
+          })
+          break
+          
+        case 'search_tags':
+          if (!args?.query) {
+            return res.status(400).json({ error: 'Missing required parameter: query' })
+          }
+          result = await mcpService.searchTags(args.query, {
+            projectId: args.projectId,
+            limit: args.limit || 10
+          })
+          break
+          
+        case 'global_search':
+          if (!args?.query) {
+            return res.status(400).json({ error: 'Missing required parameter: query' })
+          }
+          result = await mcpService.globalSearch(args.query, {
+            types: args.types || ['projects', 'apis', 'tags'],
+            limit: args.limit || 10
+          })
+          break
+          
+        case 'get_search_suggestions':
+          if (!args?.query) {
+            return res.status(400).json({ error: 'Missing required parameter: query' })
+          }
+          result = await mcpService.getSearchSuggestions(args.query, args.limit || 5)
+          break
+          
+        case 'get_recent_items':
+          result = await mcpService.getRecentItems(args?.limit || 10)
+          break
+          
+        case 'refresh_search_index':
+          result = await mcpService.refreshSearchIndex(args?.force || false)
+          break
+          
+        default:
+          return res.status(404).json({
+            error: `Unknown MCP tool: ${toolName}`,
+            availableTools: mcpService.getToolsList().map(t => t.name)
+          })
+      }
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+      
+    } catch (error) {
+      res.status(500).json({
+        error: 'MCP tool execution failed',
+        message: error instanceof Error ? error.message : String(error)
+      })
+    }
+  })
+
+  // 标准MCP HTTP协议端点
+  
+  // 初始化连接
+  app.post('/v1/initialize', (req, res) => {
+    res.json({
+      protocolVersion: "2024-11-05",
+      capabilities: {
+        tools: {},
+        logging: {},
+        prompts: {}
+      },
+      serverInfo: {
+        name: "dev-manage-mcp-integrated",
+        version: "2.0.0"
+      }
+    })
+  })
+
+  // 列出工具 (标准格式)
+  app.post('/v1/tools/list', async (req, res) => {
+    try {
+      const tools = mcpService.getToolsList()
+      res.json({
+        tools: tools.map(tool => ({
+          name: tool.name,
+          description: tool.description,
+          inputSchema: tool.inputSchema
+        }))
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: {
+          code: -32603,
+          message: 'Internal error',
+          data: error instanceof Error ? error.message : String(error)
+        }
+      })
+    }
+  })
+
+  // 调用工具 (标准格式)
+  app.post('/v1/tools/call', async (req, res) => {
+    try {
+      const { name, arguments: args } = req.body.params || {}
+      
+      if (!name) {
+        return res.status(400).json({
+          error: {
+            code: -32602,
+            message: 'Invalid params',
+            data: 'Missing tool name'
+          }
+        })
+      }
+
+      let result
+      
+      switch (name) {
+        case 'search_projects':
+          if (!args?.query) {
+            return res.status(400).json({
+              error: {
+                code: -32602,
+                message: 'Invalid params',
+                data: 'Missing required parameter: query'
+              }
+            })
+          }
+          result = await mcpService.searchProjects(args.query, args.limit || 10)
+          break
+          
+        case 'search_apis':
+          if (!args?.query) {
+            return res.status(400).json({
+              error: {
+                code: -32602,
+                message: 'Invalid params',
+                data: 'Missing required parameter: query'
+              }
+            })
+          }
+          result = await mcpService.searchAPIs(args.query, {
+            projectId: args.projectId,
+            method: args.method,
+            status: args.status,
+            limit: args.limit || 10
+          })
+          break
+          
+        case 'search_tags':
+          if (!args?.query) {
+            return res.status(400).json({
+              error: {
+                code: -32602,
+                message: 'Invalid params',
+                data: 'Missing required parameter: query'
+              }
+            })
+          }
+          result = await mcpService.searchTags(args.query, {
+            projectId: args.projectId,
+            limit: args.limit || 10
+          })
+          break
+          
+        case 'global_search':
+          if (!args?.query) {
+            return res.status(400).json({
+              error: {
+                code: -32602,
+                message: 'Invalid params',
+                data: 'Missing required parameter: query'
+              }
+            })
+          }
+          result = await mcpService.globalSearch(args.query, {
+            types: args.types || ['projects', 'apis', 'tags'],
+            limit: args.limit || 10
+          })
+          break
+          
+        case 'get_search_suggestions':
+          if (!args?.query) {
+            return res.status(400).json({
+              error: {
+                code: -32602,
+                message: 'Invalid params',
+                data: 'Missing required parameter: query'
+              }
+            })
+          }
+          result = await mcpService.getSearchSuggestions(args.query, args.limit || 5)
+          break
+          
+        case 'get_recent_items':
+          result = await mcpService.getRecentItems(args?.limit || 10)
+          break
+          
+        case 'refresh_search_index':
+          result = await mcpService.refreshSearchIndex(args?.force || false)
+          break
+          
+        default:
+          return res.status(404).json({
+            error: {
+              code: -32601,
+              message: 'Method not found',
+              data: `Unknown tool: ${name}`
+            }
+          })
+      }
+      
+      res.json({
+        content: [{
+          type: 'text',
+          text: JSON.stringify(result, null, 2)
+        }]
+      })
+      
+    } catch (error) {
+      res.status(500).json({
+        error: {
+          code: -32603,
+          message: 'Internal error',
+          data: error instanceof Error ? error.message : String(error)
+        }
+      })
+    }
+  })
+
+  // ping
+  app.post('/v1/ping', (req, res) => {
+    res.json({ result: {} })
+  })
+
+  // SSE 连接端点 - 简化版本提高兼容性
+  app.get('/v1/sse', (req, res) => {
+    try {
+      // 设置SSE响应头
+      res.setHeader('Content-Type', 'text/event-stream')
+      res.setHeader('Cache-Control', 'no-cache')
+      res.setHeader('Connection', 'keep-alive')
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      res.setHeader('Access-Control-Allow-Headers', 'Cache-Control')
+      
+      // 发送状态码
+      res.status(200)
+
+      // 发送初始化数据
+      res.write('data: {"type":"init","server":"dev-manage-mcp","version":"2.0.0"}\n\n')
+      
+      // 发送工具列表
+      const tools = mcpService.getToolsList()
+      res.write(`data: ${JSON.stringify({
+        type: "tools",
+        tools: tools
+      })}\n\n`)
+
+      // 心跳间隔
+      const heartbeat = setInterval(() => {
+        try {
+          res.write(`data: ${JSON.stringify({
+            type: "ping",
+            timestamp: new Date().toISOString()
+          })}\n\n`)
+        } catch (error) {
+          clearInterval(heartbeat)
+        }
+      }, 30000)
+
+      // 客户端断开连接时清理
+      req.on('close', () => {
+        clearInterval(heartbeat)
+      })
+
+      req.on('error', () => {
+        clearInterval(heartbeat)
+      })
+      
+    } catch (error) {
+      console.error('SSE Error:', error)
+      res.status(500).json({ error: 'SSE connection failed' })
+    }
+  })
+
+  // MCP消息处理端点 (用于一些客户端的消息格式)
+  app.post('/v1/messages', async (req, res) => {
+    try {
+      const { method, params } = req.body
+      
+      switch (method) {
+        case 'initialize':
+          res.json({
+            id: req.body.id,
+            result: {
+              protocolVersion: "2024-11-05",
+              capabilities: {
+                tools: {},
+                logging: {},
+                prompts: {}
+              },
+              serverInfo: {
+                name: "dev-manage-mcp-integrated",
+                version: "2.0.0"
+              }
+            }
+          })
+          break
+          
+        case 'tools/list':
+          const tools = mcpService.getToolsList()
+          res.json({
+            id: req.body.id,
+            result: {
+              tools: tools.map(tool => ({
+                name: tool.name,
+                description: tool.description,
+                inputSchema: tool.inputSchema
+              }))
+            }
+          })
+          break
+          
+        case 'tools/call':
+          const { name, arguments: args } = params || {}
+          
+          if (!name) {
+            return res.json({
+              id: req.body.id,
+              error: {
+                code: -32602,
+                message: 'Invalid params',
+                data: 'Missing tool name'
+              }
+            })
+          }
+
+          let result
+          
+          switch (name) {
+            case 'search_projects':
+              if (!args?.query) {
+                return res.json({
+                  id: req.body.id,
+                  error: {
+                    code: -32602,
+                    message: 'Invalid params',
+                    data: 'Missing required parameter: query'
+                  }
+                })
+              }
+              result = await mcpService.searchProjects(args.query, args.limit || 10)
+              break
+              
+            case 'search_apis':
+              if (!args?.query) {
+                return res.json({
+                  id: req.body.id,
+                  error: {
+                    code: -32602,
+                    message: 'Invalid params',
+                    data: 'Missing required parameter: query'
+                  }
+                })
+              }
+              result = await mcpService.searchAPIs(args.query, {
+                projectId: args.projectId,
+                method: args.method,
+                status: args.status,
+                limit: args.limit || 10
+              })
+              break
+              
+            case 'global_search':
+              if (!args?.query) {
+                return res.json({
+                  id: req.body.id,
+                  error: {
+                    code: -32602,
+                    message: 'Invalid params',
+                    data: 'Missing required parameter: query'
+                  }
+                })
+              }
+              result = await mcpService.globalSearch(args.query, {
+                types: args.types || ['projects', 'apis', 'tags'],
+                limit: args.limit || 10
+              })
+              break
+              
+            default:
+              return res.json({
+                id: req.body.id,
+                error: {
+                  code: -32601,
+                  message: 'Method not found',
+                  data: `Unknown tool: ${name}`
+                }
+              })
+          }
+          
+          res.json({
+            id: req.body.id,
+            result: {
+              content: [{
+                type: 'text',
+                text: JSON.stringify(result, null, 2)
+              }]
+            }
+          })
+          break
+          
+        default:
+          res.json({
+            id: req.body.id,
+            error: {
+              code: -32601,
+              message: 'Method not found',
+              data: `Unknown method: ${method}`
+            }
+          })
+      }
+    } catch (error) {
+      res.json({
+        id: req.body.id,
+        error: {
+          code: -32603,
+          message: 'Internal error',
+          data: error instanceof Error ? error.message : String(error)
+        }
+      })
+    }
+  })
+
+  // 根路径SSE端点 (一些客户端可能期望这个路径)
+  app.get('/sse', (req, res) => {
+    // 移除可能干扰的中间件设置的头部
+    res.removeHeader('X-Powered-By')
+    res.removeHeader('ETag')
+    res.removeHeader('Last-Modified')
+    
+    // 设置SSE头
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Cache-Control',
+      'Access-Control-Allow-Methods': 'GET',
+      'X-Accel-Buffering': 'no'
+    })
+
+    // 发送初始连接确认
+    res.write('event: connect\n')
+    res.write('data: {"type":"connect","timestamp":"' + new Date().toISOString() + '"}\n\n')
+
+    // 心跳间隔
+    const heartbeat = setInterval(() => {
+      res.write('event: heartbeat\n')
+      res.write('data: {"type":"heartbeat","timestamp":"' + new Date().toISOString() + '"}\n\n')
+    }, 30000)
+
+    // 客户端断开连接时清理
+    req.on('close', () => {
+      clearInterval(heartbeat)
+    })
+
+    req.on('error', () => {
+      clearInterval(heartbeat)
+    })
+  })
+
+  // MCP客户端配置信息端点
+  app.get('/mcp.json', (req, res) => {
+    res.json({
+      "name": "dev-manage-mcp-integrated",
+      "version": "2.0.0",
+      "protocol": "http",
+      "capabilities": {
+        "tools": {},
+        "logging": {},
+        "prompts": {}
+      },
+      "endpoints": {
+        "tools": "/v1/tools/list",
+        "call": "/v1/tools/call", 
+        "messages": "/v1/messages",
+        "sse": "/v1/sse",
+        "ping": "/v1/ping"
+      },
+      "transport": {
+        "type": "http",
+        "methods": ["GET", "POST"],
+        "sse": true,
+        "websocket": false
+      }
+    })
+  })
+
+  // 健康检查端点（兼容MCP客户端）
+  app.get('/v1/health', (req, res) => {
+    res.json({
+      "status": "ok",
+      "timestamp": new Date().toISOString(),
+      "server": "dev-manage-mcp-integrated",
+      "version": "2.0.0",
+      "tools_count": mcpService.getToolsList().length
+    })
+  })
+
+  // 处理OPTIONS请求
+  app.options('/v1/*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    res.sendStatus(200)
+  })
+  
+  app.options('/mcp*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    res.sendStatus(200)
+  })
+}
 
 export { router as mcpRouter }

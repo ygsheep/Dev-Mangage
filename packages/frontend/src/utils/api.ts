@@ -67,6 +67,10 @@ export const createAPI = async (data: any) => {
   return apiClient.post('/apis', data)
 }
 
+export const createBatchAPIs = async (apis: any[]) => {
+  return apiClient.post('/apis/batch', { apis })
+}
+
 export const updateAPI = async (id: string, data: any) => {
   return apiClient.put(`/apis/${id}`, data)
 }
@@ -109,6 +113,31 @@ export const importSwagger = async (data: any) => {
   return apiClient.post('/swagger/import', data)
 }
 
+// 数据模型相关API
+export const getDataTables = async (params?: any) => {
+  return apiClient.get('/data-models', { params })
+}
+
+export const getDataTable = async (id: string) => {
+  return apiClient.get(`/data-models/${id}`)
+}
+
+export const createDataTable = async (data: any) => {
+  return apiClient.post('/data-models', data)
+}
+
+export const updateDataTable = async (id: string, data: any) => {
+  return apiClient.put(`/data-models/${id}`, data)
+}
+
+export const deleteDataTable = async (id: string) => {
+  return apiClient.delete(`/data-models/${id}`)
+}
+
+export const createBatchDataTables = async (tables: any[]) => {
+  return apiClient.post('/data-models/batch', { tables })
+}
+
 // 导出API对象
 export const apiMethods = {
   getProjects,
@@ -119,6 +148,7 @@ export const apiMethods = {
   getProjectStats,
   getAPIs,
   createAPI,
+  createBatchAPIs,
   updateAPI,
   deleteAPI,
   updateAPIStatus,
@@ -129,6 +159,12 @@ export const apiMethods = {
   deleteTag,
   validateSwagger,
   importSwagger,
+  getDataTables,
+  getDataTable,
+  createDataTable,
+  updateDataTable,
+  deleteDataTable,
+  createBatchDataTables,
 }
 
 export default apiMethods

@@ -17,8 +17,10 @@ model Project {
   updatedAt   DateTime      @updatedAt
 
   // Relations
-  apis API[]
-  tags Tag[]
+  apis              API[]
+  tags              Tag[]
+  databaseTables    DatabaseTable[]
+  dataModelDocuments DataModelDocument[]
 
   @@map("projects")
 }
@@ -76,7 +78,134 @@ model APITag {
   @@map("api_tags")
 }
 
+// DatabaseTable model for data models
+model DatabaseTable {
+  id            String   @id @default(uuid())
+  projectId     String
+  name          String
+  displayName   String?
+  comment       String?
+  engine        String   @default("InnoDB")
+  charset       String   @default("utf8mb4")
+  collation     String   @default("utf8mb4_unicode_ci")
+  status        String   @default("DRAFT")
+  category      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fields          DatabaseField[]   @relation("TableFields")
+  indexes         DatabaseIndex[]
+  fromRelations   TableRelationship[] @relation("FromTable")
+  toRelations     TableRelationship[] @relation("ToTable")
+  referencedByFields DatabaseField[] @relation("FieldReference")
+
+  @@index([projectId])
+  @@unique([name, projectId])
+  @@map("database_tables")
+}
+
+// DatabaseField model for table fields
+model DatabaseField {
+  id                String   @id @default(uuid())
+  tableId           String
+  name              String
+  type              String
+  length            Int?
+  precision         Int?
+  scale             Int?
+  nullable          Boolean  @default(true)
+  defaultValue      String?
+  comment           String?
+  isPrimaryKey      Boolean  @default(false)
+  isAutoIncrement   Boolean  @default(false)
+  enumValues        String?  // JSON string array for enum values
+  referencedTableId String?
+  referencedFieldId String?
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  table             DatabaseTable @relation("TableFields", fields: [tableId], references: [id], onDelete: Cascade)
+  referencedTable   DatabaseTable? @relation("FieldReference", fields: [referencedTableId], references: [id])
+  referencedField   DatabaseField? @relation("FieldToField", fields: [referencedFieldId], references: [id])
+  referencingFields DatabaseField[] @relation("FieldToField")
+
+  @@index([tableId])
+  @@unique([name, tableId])
+  @@map("database_fields")
+}
+
+// DatabaseIndex model for table indexes
+model DatabaseIndex {
+  id        String   @id @default(uuid())
+  tableId   String
+  name      String
+  type      String   @default("INDEX")
+  fields    String   // JSON string array of field names
+  isUnique  Boolean  @default(false)
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  table     DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@index([tableId])
+  @@unique([name, tableId])
+  @@map("database_indexes")
+}
+
+// TableRelationship model for table relationships
+model TableRelationship {
+  id               String   @id @default(uuid())
+  fromTableId      String
+  toTableId        String
+  fromFieldId      String
+  toFieldId        String
+  relationshipType String   @default("ONE_TO_MANY")
+  name             String?
+  description      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  fromTable        DatabaseTable @relation("FromTable", fields: [fromTableId], references: [id], onDelete: Cascade)
+  toTable          DatabaseTable @relation("ToTable", fields: [toTableId], references: [id], onDelete: Cascade)
+
+  @@index([fromTableId])
+  @@index([toTableId])
+  @@map("table_relationships")
+}
+
+// DataModelDocument model for imported documents
+model DataModelDocument {
+  id           String   @id @default(uuid())
+  projectId    String
+  name         String
+  description  String?
+  filePath     String?
+  content      String
+  parseStatus  String   @default("PENDING")
+  parseError   String?
+  language     String   @default("markdown")
+  importedAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("data_model_documents")
+}
+
 // Note: SQLite doesn't support enums, so we use String with validation in application layer
 // ProjectStatus: "ACTIVE" | "ARCHIVED" | "DELETED"
 // APIStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "NOT_TESTED" | "TESTED" | "DEPRECATED"
 // HTTPMethod: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS"
+// DataModelStatus: "DRAFT" | "ACTIVE" | "DEPRECATED"
+// DatabaseFieldType: "VARCHAR" | "INT" | "BIGINT" | "TEXT" | etc.
+// DatabaseIndexType: "PRIMARY" | "UNIQUE" | "INDEX" | "FULLTEXT" | "FOREIGN"

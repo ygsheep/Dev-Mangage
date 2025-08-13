@@ -298,6 +298,74 @@ router.post(
   })
 )
 
+// Batch create APIs
+const createBatchAPISchema = z.object({
+  apis: z.array(createAPISchema).min(1),
+})
+
+router.post(
+  '/batch',
+  validateBody(createBatchAPISchema),
+  asyncHandler(async (req, res) => {
+    const { apis } = req.body
+    
+    const createdAPIs = []
+    const errors = []
+    
+    for (const apiData of apis) {
+      try {
+        const { tagIds, ...data } = apiData
+        
+        const api = await prisma.aPI.create({
+          data,
+          include: {
+            project: { select: { id: true, name: true } },
+            apiTags: {
+              include: { tag: true },
+            },
+          },
+        })
+
+        // Add tags if provided
+        if (tagIds && tagIds.length > 0) {
+          await prisma.aPI.update({
+            where: { id: api.id },
+            data: {
+              apiTags: {
+                create: tagIds.map((tagId: string) => ({ tagId })),
+              },
+            },
+            include: {
+              project: { select: { id: true, name: true } },
+              apiTags: {
+                include: { tag: true },
+              },
+            },
+          })
+        }
+        
+        createdAPIs.push(api)
+      } catch (error: any) {
+        errors.push({
+          api: apiData,
+          error: error.message
+        })
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      data: { 
+        created: createdAPIs,
+        total: apis.length,
+        success: createdAPIs.length,
+        failed: errors.length,
+        errors
+      },
+    })
+  })
+)
+
 // Helper functions for code generation
 function generateFrontendCode(api: any, framework: string): string {
   const baseUrl = 'http://localhost:3001/api/v1'

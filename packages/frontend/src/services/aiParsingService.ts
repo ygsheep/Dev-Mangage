@@ -66,9 +66,68 @@ export interface ParsedAPIDocument {
 
 export interface ParsedDatabaseDocument {
   tables: DatabaseTable[]
+  relationships: DatabaseRelationship[]
+  indexes: DatabaseIndex[]
   success: boolean
   errors: string[]
   confidence: number
+}
+
+export interface DatabaseTable {
+  id: string
+  name: string
+  displayName: string
+  comment?: string
+  engine?: string
+  charset?: string
+  fields: DatabaseField[]
+  constraints: DatabaseConstraint[]
+  indexes: TableIndex[]
+  source?: string
+  sqlDefinition?: string
+}
+
+export interface DatabaseField {
+  name: string
+  type: string
+  length?: number | null
+  nullable: boolean
+  primaryKey: boolean
+  autoIncrement: boolean
+  unique?: boolean
+  defaultValue?: any
+  comment?: string
+}
+
+export interface DatabaseConstraint {
+  type: string
+  column?: string
+  referencedTable?: string
+  referencedColumn?: string
+  definition?: string
+}
+
+export interface TableIndex {
+  name: string
+  columns: string[]
+  type: string
+  unique?: boolean
+}
+
+export interface DatabaseIndex {
+  name: string
+  table: string
+  columns: string[]
+  unique: boolean
+  type?: string
+}
+
+export interface DatabaseRelationship {
+  type: string
+  fromTable?: string
+  fromColumn: string
+  toTable: string
+  toColumn: string
 }
 
 class AIParsingService {
@@ -519,52 +578,129 @@ class AIParsingService {
 
   // 数据库文档解析的系统提示词
   private getDatabaseParsingPrompt(): string {
-    return `你是一个专业的数据库文档解析专家。请分析以下数据库设计文档，提取所有数据表信息。
+    return `# 数据库文档解析专家
 
-要求：
-1. 识别所有数据表的名称、描述、字段信息
-2. 提取字段的类型、长度、是否必填、是否主键等属性
-3. 识别字段注释和说明
-4. 提取索引信息（如果有）
+你是一个专业的数据库文档解析专家，擅长从各种格式的数据库设计文档中提取和标准化数据库结构信息。
 
-输出格式示例：
+## 解析目标
+
+请将提供的数据库文档解析为标准的JSON格式，包含以下信息：
+- 数据表定义（表名、字段、类型、约束等）
+- 索引定义
+- 表关系（外键约束）
+- 表注释和字段注释
+
+## 输出格式要求
+
+请严格按照以下JSON格式输出，不要添加任何额外的文本说明：
+
 {
   "tables": [
     {
-      "name": "users",
-      "displayName": "用户表",
-      "comment": "用户基础信息表",
+      "name": "table_name",
+      "displayName": "表显示名称",
+      "comment": "表注释说明",
       "engine": "InnoDB",
       "charset": "utf8mb4",
-      "collation": "utf8mb4_unicode_ci",
       "fields": [
         {
-          "name": "id",
-          "type": "BIGINT",
-          "length": null,
-          "nullable": false,
-          "isPrimaryKey": true,
-          "isAutoIncrement": true,
-          "comment": "用户ID",
-          "sortOrder": 1
-        },
+          "name": "字段名",
+          "type": "数据类型",
+          "length": 字段长度,
+          "nullable": true/false,
+          "primaryKey": true/false,
+          "autoIncrement": true/false,
+          "unique": true/false,
+          "defaultValue": "默认值",
+          "comment": "字段注释"
+        }
+      ],
+      "constraints": [
         {
-          "name": "username",
-          "type": "VARCHAR",
-          "length": 50,
-          "nullable": false,
-          "isPrimaryKey": false,
-          "isAutoIncrement": false,
-          "comment": "用户名",
-          "sortOrder": 2
+          "type": "FOREIGN_KEY",
+          "column": "外键字段",
+          "referencedTable": "引用表",
+          "referencedColumn": "引用字段"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "索引名",
+          "columns": ["字段1", "字段2"],
+          "type": "INDEX",
+          "unique": false
         }
       ]
     }
   ],
-  "confidence": 0.92
+  "relationships": [
+    {
+      "type": "one-to-many",
+      "fromTable": "源表",
+      "fromColumn": "源字段",
+      "toTable": "目标表", 
+      "toColumn": "目标字段"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "idx_name",
+      "table": "表名",
+      "columns": ["字段列表"],
+      "unique": false,
+      "type": "BTREE"
+    }
+  ],
+  "confidence": 0.95
 }
 
-请严格按照以上格式输出，只返回JSON，不要其他文字。`
+## 解析规则
+
+### 1. 表识别规则
+- 识别CREATE TABLE语句
+- 识别Markdown中的表标题（如：#### 1.1 用户表 (users)）
+- 提取表名、显示名称和注释
+
+### 2. 字段解析规则
+- 从SQL DDL语句中提取字段定义
+- 从Markdown表格中提取字段信息
+- 正确识别数据类型（VARCHAR, INT, BIGINT, TEXT, JSON等）
+- 提取字段长度、是否可空、默认值等属性
+- 识别主键、外键、唯一约束
+
+### 3. 约束和索引
+- 识别PRIMARY KEY、FOREIGN KEY、UNIQUE约束
+- 提取INDEX、KEY定义
+- 识别复合索引和单列索引
+
+### 4. 关系识别
+- 从FOREIGN KEY约束中提取表关系
+- 推断一对一、一对多、多对多关系
+
+### 5. 数据类型标准化
+- 统一数据类型命名（如：VARCHAR, INT, BIGINT）
+- 提取类型长度参数
+- 识别枚举类型的可选值
+
+## 质量检查清单
+
+在输出最终结果前，请确保：
+1. ✅ JSON格式正确，语法无误
+2. ✅ 表名和字段名准确提取
+3. ✅ 数据类型正确识别和标准化
+4. ✅ 约束关系正确解析
+5. ✅ 索引信息完整提取
+6. ✅ 注释信息准确获取
+
+## 注意事项
+
+1. 严格遵循JSON格式：输出必须是有效的JSON
+2. 保持信息准确性：如果信息不明确，使用合理的默认值
+3. 统一命名规范：表名使用snake_case，显示名称使用中文
+4. 完整性优先：尽可能提取所有可用信息
+5. 错误处理：如果无法解析某个表，在响应中说明原因
+
+现在请开始解析用户提供的数据库文档内容。`
   }
 
   /**
@@ -797,8 +933,10 @@ class AIParsingService {
   // 解析AI响应
   private parseAIResponse(response: string): any {
     try {
-      console.log('原始AI响应长度:', response.length)
-      console.log('原始AI响应前100字符:', response.substring(0, 100))
+      console.log('🔍 开始解析AI响应...')
+      console.log('📏 原始AI响应长度:', response.length)
+      console.log('📄 原始AI响应前500字符:', response.substring(0, 500))
+      console.log('📄 原始AI响应后100字符:', response.substring(Math.max(0, response.length - 100)))
       
       // 深度清理响应内容
       let cleanedResponse = response
@@ -806,7 +944,7 @@ class AIParsingService {
         .replace(/^[\s\r\n]+/, '') // 移除开头的所有空白字符
         .replace(/[\s\r\n]+$/, '') // 移除结尾的所有空白字符
       
-      console.log('清理后响应前100字符:', cleanedResponse.substring(0, 100))
+      console.log('🧹 清理后响应前200字符:', cleanedResponse.substring(0, 200))
       
       // 移除可能的markdown代码块标记
       cleanedResponse = cleanedResponse
@@ -814,12 +952,15 @@ class AIParsingService {
         .replace(/^```\s*/, '')
         .replace(/\s*```$/, '')
       
+      console.log('🔤 移除markdown后:', cleanedResponse.substring(0, 200))
+      
       // 移除可能的文本说明
       cleanedResponse = cleanedResponse
         .replace(/^[^{\[]*(?=[{\[])/s, '') // 移除JSON/数组前的所有文本
         .replace(/(?<=[}\]])[^}\]]*$/s, '') // 移除JSON/数组后的所有文本
       
-      console.log('最终清理后的响应:', cleanedResponse)
+      console.log('✨ 最终清理后的响应长度:', cleanedResponse.length)
+      console.log('✨ 最终清理后的响应:', cleanedResponse.substring(0, 300) + (cleanedResponse.length > 300 ? '...' : ''))
       
       // 检查是否为空
       if (!cleanedResponse) {
@@ -829,34 +970,54 @@ class AIParsingService {
       // 尝试直接解析
       try {
         const parsed = JSON.parse(cleanedResponse)
-        console.log('直接解析成功:', parsed)
+        console.log('✅ 直接解析成功:', {
+          type: typeof parsed,
+          hasApis: parsed?.hasOwnProperty('apis'),
+          apisLength: Array.isArray(parsed?.apis) ? parsed.apis.length : 'not array',
+          keys: Object.keys(parsed || {})
+        })
         return parsed
       } catch (directError) {
-        console.log('直接解析失败:', directError.message)
+        console.log('❌ 直接解析失败:', directError.message)
       }
       
       // 尝试提取JSON对象（更宽松的匹配）
       const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
+        console.log('🎯 找到JSON对象匹配:', jsonMatch[0].substring(0, 100) + '...')
         try {
           const parsed = JSON.parse(jsonMatch[0])
-          console.log('对象提取解析成功:', parsed)
+          console.log('✅ 对象提取解析成功:', {
+            type: typeof parsed,
+            hasApis: parsed?.hasOwnProperty('apis'),
+            apisLength: Array.isArray(parsed?.apis) ? parsed.apis.length : 'not array',
+            keys: Object.keys(parsed || {})
+          })
           return parsed
         } catch (jsonError) {
-          console.log('对象提取解析失败:', jsonError.message)
+          console.log('❌ 对象提取解析失败:', jsonError.message)
         }
+      } else {
+        console.log('⚠️ 未找到JSON对象匹配')
       }
       
       // 尝试查找数组格式
       const arrayMatch = cleanedResponse.match(/\[[\s\S]*\]/)
       if (arrayMatch) {
+        console.log('🎯 找到数组匹配:', arrayMatch[0].substring(0, 100) + '...')
         try {
           const parsed = JSON.parse(arrayMatch[0])
-          console.log('数组提取解析成功:', parsed)
+          console.log('✅ 数组提取解析成功:', {
+            type: typeof parsed,
+            isArray: Array.isArray(parsed),
+            length: Array.isArray(parsed) ? parsed.length : 'not array'
+          })
           return { apis: parsed }
         } catch (arrayError) {
-          console.log('数组提取解析失败:', arrayError.message)
+          console.log('❌ 数组提取解析失败:', arrayError.message)
         }
+      } else {
+        console.log('⚠️ 未找到数组匹配')
       }
       
       throw new Error('无法从响应中提取有效的JSON')
@@ -872,6 +1033,393 @@ class AIParsingService {
         confidence: 0
       }
     }
+  }
+
+  // 解析数据库文档
+  async parseDatabaseDocument(content: string): Promise<ParsedDatabaseDocument> {
+    try {
+      console.log('🔍 开始解析数据库文档:', {
+        provider: this.config.provider,
+        model: this.config.model,
+        contentLength: content.length
+      })
+      
+      // 如果是模拟模式，使用模拟数据
+      if (this.config.provider === 'mock') {
+        const { mockParseDatabaseDocument } = await import('@/services/mockAiService')
+        return await mockParseDatabaseDocument(content)
+      }
+
+      // 检查是否需要分块处理
+      const chunks = this.chunkDocument(content)
+      
+      if (chunks.length === 1) {
+        // 单块处理
+        return await this.parseSingleDatabaseChunk(chunks[0])
+      } else {
+        // 多块处理
+        return await this.parseMultipleDatabaseChunks(chunks)
+      }
+    } catch (error: any) {
+      console.error('数据库文档解析失败:', error)
+      return {
+        tables: [],
+        relationships: [],
+        indexes: [],
+        success: false,
+        errors: [`数据库文档解析失败: ${error.message}`],
+        confidence: 0
+      }
+    }
+  }
+
+  // 带进度的数据库文档解析
+  async parseDatabaseDocumentWithProgress(
+    content: string,
+    onProgress?: (progress: { current: number; total: number; chunk?: DocumentChunk }) => void
+  ): Promise<ParsedDatabaseDocument> {
+    try {
+      console.log('🔍 开始带进度的数据库文档解析:', {
+        provider: this.config.provider,
+        model: this.config.model,
+        contentLength: content.length
+      })
+      
+      // 如果是模拟模式，使用模拟数据
+      if (this.config.provider === 'mock') {
+        const { mockParseDatabaseDocumentWithProgress } = await import('@/services/mockAiService')
+        return await mockParseDatabaseDocumentWithProgress(content, onProgress)
+      }
+
+      // 检查是否需要分块处理
+      const chunks = this.chunkDocument(content)
+      
+      if (chunks.length === 1) {
+        // 单块处理，直接报告进度
+        onProgress?.({ current: 0, total: 1, chunk: chunks[0] })
+        const result = await this.parseSingleDatabaseChunk(chunks[0])
+        onProgress?.({ current: 1, total: 1 })
+        return result
+      } else {
+        // 多块处理，逐个报告进度
+        return await this.parseMultipleDatabaseChunksWithProgress(chunks, onProgress)
+      }
+    } catch (error: any) {
+      console.error('数据库文档解析失败:', error)
+      return {
+        tables: [],
+        relationships: [],
+        indexes: [],
+        success: false,
+        errors: [`数据库文档解析失败: ${error.message}`],
+        confidence: 0
+      }
+    }
+  }
+
+  // 解析单个数据库文档分块
+  private async parseSingleDatabaseChunk(chunk: DocumentChunk): Promise<ParsedDatabaseDocument> {
+    console.log(`🔍 开始解析数据库分块 ${chunk.index + 1}:`, {
+      title: chunk.title,
+      contentLength: chunk.content.length,
+      estimatedTokens: chunk.estimatedTokens,
+      provider: this.config.provider,
+      model: this.config.model
+    })
+
+    const prompt = this.getDatabaseParsingPrompt()
+    let result: any
+
+    try {
+      if (this.config.provider === 'ollama') {
+        console.log(`📡 调用Ollama API解析数据库...`)
+        result = await this.callOllama(prompt, chunk.content)
+      } else {
+        console.log(`📡 调用在线API解析数据库...`)
+        result = await this.callOnlineAPI(prompt, chunk.content)
+      }
+      
+      console.log(`🤖 数据库AI响应原始结果:`, {
+        hasResult: !!result,
+        resultType: typeof result,
+        hasTables: result?.hasOwnProperty('tables'),
+        tablesLength: Array.isArray(result?.tables) ? result.tables.length : 'not array',
+        hasIndexes: result?.hasOwnProperty('indexes'),
+        indexesLength: Array.isArray(result?.indexes) ? result.indexes.length : 'not array'
+      })
+      
+    } catch (error: any) {
+      console.error(`❌ 数据库分块 ${chunk.index + 1} AI调用异常:`, error)
+      return {
+        tables: [],
+        relationships: [],
+        indexes: [],
+        success: false,
+        errors: [`AI调用异常: ${error.message}`],
+        confidence: 0
+      }
+    }
+    
+    // 检查结果是否包含错误
+    if (!result.success && result.errors) {
+      console.warn(`⚠️ 数据库分块 ${chunk.index + 1} AI解析返回错误:`, result.errors)
+      return {
+        tables: [],
+        relationships: [],
+        indexes: [],
+        success: false,
+        errors: result.errors,
+        confidence: 0
+      }
+    }
+
+    // 处理解析结果
+    const tables = result.tables || []
+    const relationships = result.relationships || []
+    const indexes = result.indexes || []
+
+    console.log(`✅ 数据库分块 ${chunk.index + 1} 解析完成:`, {
+      tablesCount: tables.length,
+      relationshipsCount: relationships.length,
+      indexesCount: indexes.length,
+      success: tables.length > 0
+    })
+
+    return {
+      tables,
+      relationships,
+      indexes,
+      success: tables.length > 0,
+      errors: tables.length === 0 ? ['未能解析到任何数据表'] : [],
+      confidence: result.confidence || 0.8
+    }
+  }
+
+  // 解析多个数据库文档分块并合并结果
+  private async parseMultipleDatabaseChunks(chunks: DocumentChunk[]): Promise<ParsedDatabaseDocument> {
+    console.log(`🔄 数据库文档过长，分为${chunks.length}个块进行处理`)
+    
+    const results: ParsedDatabaseDocument[] = []
+    const errors: string[] = []
+    let successCount = 0
+    let totalConfidence = 0
+
+    // 分组处理，避免并发过多
+    const chunkGroups = []
+    const groupSize = 3
+    for (let i = 0; i < chunks.length; i += groupSize) {
+      chunkGroups.push(chunks.slice(i, i + groupSize))
+    }
+
+    for (const chunkGroup of chunkGroups) {
+      const promises = chunkGroup.map(async (chunk) => {
+        try {
+          console.log(`🔍 处理数据库分块 ${chunk.index + 1}/${chunks.length}: ${chunk.title}`)
+          
+          const result = await this.parseSingleDatabaseChunk(chunk)
+          
+          if (result.success && result.tables.length > 0) {
+            console.log(`✅ 数据库分块 ${chunk.index + 1} 解析成功: ${result.tables.length} 个表`)
+            successCount++
+            totalConfidence += result.confidence
+            return result
+          } else {
+            console.warn(`❌ 数据库分块 ${chunk.index + 1} 解析失败:`, result.errors)
+            errors.push(`分块${chunk.index + 1}解析失败: ${result.errors.join(', ')}`)
+            return result
+          }
+        } catch (error: any) {
+          console.error(`❌ 数据库分块 ${chunk.index + 1} 处理异常:`, error)
+          errors.push(`分块${chunk.index + 1}处理异常: ${error.message}`)
+          return {
+            tables: [],
+            relationships: [],
+            indexes: [],
+            success: false,
+            errors: [error.message],
+            confidence: 0
+          }
+        }
+      })
+
+      const groupResults = await Promise.all(promises)
+      results.push(...groupResults)
+      
+      // 添加延迟避免过于频繁的API调用
+      if (chunkGroups.indexOf(chunkGroup) < chunkGroups.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
+
+    // 合并所有成功的结果
+    const allTables = []
+    const allRelationships = []
+    const allIndexes = []
+
+    for (const result of results) {
+      if (result.success) {
+        allTables.push(...result.tables)
+        allRelationships.push(...result.relationships)
+        allIndexes.push(...result.indexes)
+      }
+    }
+
+    // 去重处理
+    const uniqueTables = this.deduplicateTables(allTables)
+    const uniqueRelationships = this.deduplicateRelationships(allRelationships)
+    const uniqueIndexes = this.deduplicateIndexes(allIndexes)
+
+    console.log(`🎯 数据库多分块解析完成:`, {
+      totalChunks: chunks.length,
+      successfulChunks: successCount,
+      finalTables: uniqueTables.length,
+      finalRelationships: uniqueRelationships.length,
+      finalIndexes: uniqueIndexes.length
+    })
+
+    return {
+      tables: uniqueTables,
+      relationships: uniqueRelationships,
+      indexes: uniqueIndexes,
+      success: uniqueTables.length > 0,
+      errors: uniqueTables.length === 0 ? errors : [],
+      confidence: successCount > 0 ? totalConfidence / successCount : 0
+    }
+  }
+
+  // 带进度的解析多个数据库文档分块并合并结果
+  private async parseMultipleDatabaseChunksWithProgress(
+    chunks: DocumentChunk[],
+    onProgress?: (progress: { current: number; total: number; chunk?: DocumentChunk }) => void
+  ): Promise<ParsedDatabaseDocument> {
+    console.log(`🔄 数据库文档过长，分为${chunks.length}个块进行处理（带进度）`)
+    
+    const results: ParsedDatabaseDocument[] = []
+    const errors: string[] = []
+    let successCount = 0
+    let totalConfidence = 0
+
+    // 逐个处理，保证进度报告的准确性
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i]
+      
+      // 报告当前进度
+      onProgress?.({
+        current: i,
+        total: chunks.length,
+        chunk
+      })
+      
+      try {
+        console.log(`🔍 处理数据库分块 ${i + 1}/${chunks.length}: ${chunk.title}`)
+        
+        const result = await this.parseSingleDatabaseChunk(chunk)
+        
+        if (result.success && result.tables.length > 0) {
+          console.log(`✅ 数据库分块 ${i + 1} 解析成功: ${result.tables.length} 个表`)
+          successCount++
+          totalConfidence += result.confidence
+          results.push(result)
+        } else {
+          console.warn(`❌ 数据库分块 ${i + 1} 解析失败:`, result.errors)
+          errors.push(`分块${i + 1}解析失败: ${result.errors.join(', ')}`)
+          results.push(result)
+        }
+      } catch (error: any) {
+        console.error(`❌ 数据库分块 ${i + 1} 处理异常:`, error)
+        errors.push(`分块${i + 1}处理异常: ${error.message}`)
+        results.push({
+          tables: [],
+          relationships: [],
+          indexes: [],
+          success: false,
+          errors: [error.message],
+          confidence: 0
+        })
+      }
+      
+      // 添加延迟避免过于频繁的API调用
+      if (i < chunks.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+    }
+
+    // 报告完成进度
+    onProgress?.({
+      current: chunks.length,
+      total: chunks.length
+    })
+
+    // 合并所有成功的结果
+    const allTables = []
+    const allRelationships = []
+    const allIndexes = []
+
+    for (const result of results) {
+      if (result.success) {
+        allTables.push(...result.tables)
+        allRelationships.push(...result.relationships)
+        allIndexes.push(...result.indexes)
+      }
+    }
+
+    // 去重处理
+    const uniqueTables = this.deduplicateTables(allTables)
+    const uniqueRelationships = this.deduplicateRelationships(allRelationships)
+    const uniqueIndexes = this.deduplicateIndexes(allIndexes)
+
+    console.log(`🎯 数据库多分块解析完成:`, {
+      totalChunks: chunks.length,
+      successfulChunks: successCount,
+      finalTables: uniqueTables.length,
+      finalRelationships: uniqueRelationships.length,
+      finalIndexes: uniqueIndexes.length
+    })
+
+    return {
+      tables: uniqueTables,
+      relationships: uniqueRelationships,
+      indexes: uniqueIndexes,
+      success: uniqueTables.length > 0,
+      errors: uniqueTables.length === 0 ? errors : [],
+      confidence: successCount > 0 ? totalConfidence / successCount : 0
+    }
+  }
+
+  // 数据库表去重
+  private deduplicateTables(tables: any[]): any[] {
+    const seen = new Set()
+    return tables.filter(table => {
+      const key = table.name.toLowerCase()
+      if (seen.has(key)) {
+        console.log(`🔄 发现重复表定义: ${table.name}，已去重`)
+        return false
+      }
+      seen.add(key)
+      return true
+    })
+  }
+
+  // 关系去重
+  private deduplicateRelationships(relationships: any[]): any[] {
+    const seen = new Set()
+    return relationships.filter(rel => {
+      const key = `${rel.fromTable}.${rel.fromColumn}-${rel.toTable}.${rel.toColumn}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+
+  // 索引去重
+  private deduplicateIndexes(indexes: any[]): any[] {
+    const seen = new Set()
+    return indexes.filter(idx => {
+      const key = `${idx.table}.${idx.name}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
   }
 
   // 解析API文档 - 支持分块处理
@@ -919,18 +1467,53 @@ class AIParsingService {
    * 解析单个分块
    */
   private async parseSingleChunk(chunk: DocumentChunk, projectId: string): Promise<ParsedAPIDocument> {
+    console.log(`🔍 开始解析分块 ${chunk.index + 1}:`, {
+      title: chunk.title,
+      contentLength: chunk.content.length,
+      estimatedTokens: chunk.estimatedTokens,
+      contentPreview: chunk.content.substring(0, 300) + (chunk.content.length > 300 ? '...' : ''),
+      provider: this.config.provider,
+      model: this.config.model
+    })
+
     const prompt = this.getAPIParsingPrompt()
     let result: any
 
-    if (this.config.provider === 'ollama') {
-      result = await this.callOllama(prompt, chunk.content)
-    } else {
-      result = await this.callOnlineAPI(prompt, chunk.content)
+    try {
+      if (this.config.provider === 'ollama') {
+        console.log(`📡 调用Ollama API...`)
+        result = await this.callOllama(prompt, chunk.content)
+      } else {
+        console.log(`📡 调用在线API...`)
+        result = await this.callOnlineAPI(prompt, chunk.content)
+      }
+      
+      console.log(`🤖 AI响应原始结果:`, {
+        hasResult: !!result,
+        resultType: typeof result,
+        hasSuccess: result?.hasOwnProperty('success'),
+        success: result?.success,
+        hasApis: result?.hasOwnProperty('apis'),
+        apisType: typeof result?.apis,
+        apisLength: Array.isArray(result?.apis) ? result.apis.length : 'not array',
+        hasErrors: result?.hasOwnProperty('errors'),
+        errors: result?.errors,
+        rawResultPreview: JSON.stringify(result).substring(0, 500) + '...'
+      })
+      
+    } catch (error: any) {
+      console.error(`❌ 分块 ${chunk.index + 1} AI调用异常:`, error)
+      return {
+        apis: [],
+        success: false,
+        errors: [`AI调用异常: ${error.message}`],
+        confidence: 0
+      }
     }
     
     // 检查结果是否包含错误
     if (!result.success && result.errors) {
-      console.warn('AI解析返回错误:', result.errors)
+      console.warn(`⚠️ 分块 ${chunk.index + 1} AI解析返回错误:`, result.errors)
       return {
         apis: [],
         success: false,
@@ -940,17 +1523,33 @@ class AIParsingService {
     }
 
     // 转换为标准API格式
-    const apis: API[] = result.apis?.map((api: any, index: number) => ({
-      id: `ai-parsed-${Date.now()}-${index}`,
-      projectId,
-      name: api.name || '未命名API',
-      description: api.description || '',
-      method: this.normalizeHTTPMethod(api.method),
-      path: api.path || '/',
-      status: APIStatus.NOT_STARTED,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    })) || []
+    console.log(`🔄 开始转换API格式，原始APIs:`, result.apis)
+    const apis: API[] = result.apis?.map((api: any, index: number) => {
+      console.log(`📝 处理API ${index + 1}:`, {
+        originalApi: api,
+        hasName: !!api.name,
+        hasMethod: !!api.method,
+        hasPath: !!api.path
+      })
+
+      return {
+        id: `ai-parsed-${Date.now()}-${index}`,
+        projectId,
+        name: api.name || '未命名API',
+        description: api.description || '',
+        method: this.normalizeHTTPMethod(api.method),
+        path: api.path || '/',
+        status: APIStatus.NOT_STARTED,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    }) || []
+
+    console.log(`✅ 分块 ${chunk.index + 1} 解析完成:`, {
+      finalApisCount: apis.length,
+      success: apis.length > 0,
+      apisPreview: apis.map(api => ({ name: api.name, method: api.method, path: api.path }))
+    })
 
     return {
       apis,
@@ -1226,6 +1825,12 @@ export const createAIParsingService = (config: AIParsingConfig): AIParsingServic
 
 // 预设配置
 export const AI_PARSING_PRESETS = {
+  // 模拟模式（用于调试）
+  mock: {
+    provider: 'mock' as const,
+    model: 'mock-model',
+    baseUrl: ''
+  },
   // Ollama本地配置
   ollama_qwen: {
     provider: 'ollama' as const,

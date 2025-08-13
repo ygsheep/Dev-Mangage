@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell:*)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma studio:*)",
+      "Bash(sqlite3:*)",
+      "Bash(npm start)",
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx prisma db seed:*)",
+      "WebFetch(domain:steveshao.com)",
+      "Bash(npm run start:http:*)"
+    ],
+    "deny": []
+  }
+}

@@ -1,11 +1,13 @@
 import { Express } from 'express'
 import { config } from '../config'
+import { API_ENDPOINTS } from '../config/api-endpoints'
 import { projectsRouter } from './projects'
 import { apisRouter } from './apis'
 import { tagsRouter } from './tags'
 import { swaggerRouter } from './swagger'
 import { debugRouter } from './debug'
-import { mcpRouter } from './mcp'
+import { mcpRouter, setupIntegratedMCPRoutes } from './mcp'
+import { dataModelsRouter } from './dataModels'
 
 export const setupRoutes = (app: Express): void => {
   const apiPrefix = config.apiPrefix
@@ -20,30 +22,44 @@ export const setupRoutes = (app: Express): void => {
     })
   })
 
-  // API routes
-  app.use(`${apiPrefix}/projects`, projectsRouter)
-  app.use(`${apiPrefix}/apis`, apisRouter)  
-  app.use(`${apiPrefix}/tags`, tagsRouter)
-  app.use(`${apiPrefix}/swagger`, swaggerRouter)
-  app.use(`${apiPrefix}/debug`, debugRouter)
-  app.use(`${apiPrefix}/mcp`, mcpRouter)
+  // API routes - 使用统一配置的端点
+  app.use(API_ENDPOINTS.PROJECTS.BASE, projectsRouter)
+  app.use(API_ENDPOINTS.APIS.BASE, apisRouter)  
+  app.use(API_ENDPOINTS.TAGS.BASE, tagsRouter)
+  app.use(API_ENDPOINTS.DATA_MODELS.BASE, dataModelsRouter)
+  app.use(API_ENDPOINTS.SWAGGER.BASE, swaggerRouter)
+  app.use(API_ENDPOINTS.DEBUG.BASE, debugRouter)
+  app.use(API_ENDPOINTS.MCP.BASE, mcpRouter)
+  
+  // 集成HTTP MCP服务路由
+  setupIntegratedMCPRoutes(app)
   
   // 处理错误的MCP路径（临时修复）
-  app.use('/__mcp', mcpRouter)
+  app.use(API_ENDPOINTS.MCP.LEGACY, mcpRouter)
+  
+  // 添加直接访问 /mcp 的重定向
+  app.get('/mcp', (req, res) => {
+    res.redirect(301, '/api/v1/mcp/status')
+  })
+  
+  app.use('/mcp', (req, res) => {
+    res.redirect(301, `/api/v1/mcp${req.path === '/mcp' ? '/status' : req.path}`)
+  })
 
-  // API documentation
+  // API documentation - 使用统一配置
   app.get(`${apiPrefix}`, (req, res) => {
     res.json({
       name: 'DevAPI Manager API',
       version: '2.0.0',
       description: 'API聚合和项目管理后端服务',
       endpoints: {
-        projects: `${apiPrefix}/projects`,
-        apis: `${apiPrefix}/apis`,
-        tags: `${apiPrefix}/tags`,
-        swagger: `${apiPrefix}/swagger`,
-        debug: `${apiPrefix}/debug`,
-        mcp: `${apiPrefix}/mcp`,
+        projects: API_ENDPOINTS.PROJECTS.BASE,
+        apis: API_ENDPOINTS.APIS.BASE,
+        tags: API_ENDPOINTS.TAGS.BASE,
+        dataModels: API_ENDPOINTS.DATA_MODELS.BASE,
+        swagger: API_ENDPOINTS.SWAGGER.BASE,
+        debug: API_ENDPOINTS.DEBUG.BASE,
+        mcp: API_ENDPOINTS.MCP.BASE,
       },
       documentation: 'https://github.com/devapi-team/devapi-manager',
     })

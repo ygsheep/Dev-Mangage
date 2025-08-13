@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "dev-manage-mcp-stdio": {
+      "command": "node",
+      "args": [
+        "D:\\develop\\Web\\uniapp\\Dev-Mangage\\packages\\mcp-server\\dist\\index.js"
+      ],
+      "transport": "stdio",
+      "env": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": "file: D:/develop/Web/uniapp/Dev-Mangage/packages/backend/prisma/dev.db"
+      }
+    },
+    "dev-manage-mcp-http": {
+      "url": "http://localhost:3001",
+      "transport": "http"
+    },
+    "dev-manage-mcp-http-standalone": {
+      "url": "http://localhost:3004",
+      "transport": "http",
+      "description": "Standalone MCP server for testing"
+    }
+  }
+}

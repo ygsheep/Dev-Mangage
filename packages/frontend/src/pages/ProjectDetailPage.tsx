@@ -50,7 +50,6 @@ const ProjectDetailPage: React.FC = () => {
   const [selectedFeatureModule, setSelectedFeatureModule] = useState<any>(null)
   const [showImportDocModal, setShowImportDocModal] = useState(false)
   const [selectedDataTable, setSelectedDataTable] = useState<DatabaseTable | null>(null)
-  const [dataTables, setDataTables] = useState<DatabaseTable[]>([])
   const [showDataTableModal, setShowDataTableModal] = useState(false)
   const [showAPITestModal, setShowAPITestModal] = useState(false)
   const [testingAPI, setTestingAPI] = useState<API | null>(null)
@@ -78,8 +77,19 @@ const ProjectDetailPage: React.FC = () => {
     enabled: !!id,
   })
 
+  // Fetch data tables
+  const { data: dataTablesData, refetch: refetchDataTables } = useQuery({
+    queryKey: ['dataTables', id],
+    queryFn: () => apiMethods.getDataTables({
+      projectId: id,
+      limit: 100
+    }),
+    enabled: !!id,
+  })
+
   const project = projectData?.data?.project
   const apis = apisData?.data?.apis || []
+  const realDataTables = dataTablesData?.data?.tables || []
 
   // 创建功能模块示例数据，基于现有APIs
   const getFeatureModules = () => {
@@ -185,7 +195,7 @@ const ProjectDetailPage: React.FC = () => {
 
   const featureModules = getFeatureModules()
 
-  // 示例数据表数据
+  // 示例数据表数据（仅在演示时使用）
   const getSampleDataTables = (): DatabaseTable[] => {
     return [
       {
@@ -309,20 +319,12 @@ const ProjectDetailPage: React.FC = () => {
     ]
   }
 
-  const sampleDataTables = getSampleDataTables()
-
   const handleImportDocumentSuccess = (parsedData: any) => {
-    // 将解析的表数据添加到数据表列表
-    const newTables: DatabaseTable[] = parsedData.tables.map((table: any) => ({
-      ...table,
-      projectId: id!,
-      status: DataModelStatus.DRAFT,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }))
-    
-    setDataTables(prev => [...prev, ...newTables])
-    console.log('Imported tables:', newTables)
+    if (parsedData.tables && parsedData.tables.length > 0) {
+      toast.success(`成功导入 ${parsedData.tables.length} 个数据表`)
+      refetchProject()
+      refetchDataTables() // 刷新数据表列表
+    }
   }
 
   const handleTableClick = (table: DatabaseTable) => {
@@ -330,7 +332,8 @@ const ProjectDetailPage: React.FC = () => {
     setShowDataTableModal(true)
   }
 
-  const allDataTables = [...sampleDataTables, ...dataTables]
+  // 直接使用真实数据，不再显示示例数据
+  const allDataTables = realDataTables
 
   // API测试功能处理函数
   const handleTestAPI = (api: API) => {

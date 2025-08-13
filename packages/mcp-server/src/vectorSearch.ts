@@ -161,7 +161,7 @@ export class VectorSearchService {
         this.isInitialized = true;
         return;
         
-      } catch (error) {
+      } catch (error: any) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         console.warn(`❌ 模型 ${model.name} 加载失败: ${errorMsg}`);
         

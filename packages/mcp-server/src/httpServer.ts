@@ -54,7 +54,6 @@ async function initializeSearchIndexes() {
         id: true,
         name: true,
         color: true,
-        description: true,
       },
     }),
   ]);
@@ -483,8 +482,7 @@ class HTTPMCPServer {
     
     try {
       const results = await apiRAGService.searchAPIs(query, {
-        includeRelated,
-        limit
+        includeRelated
       });
       
       return {
@@ -495,8 +493,7 @@ class HTTPMCPServer {
           api: result.api,
           relevanceScore: result.relevanceScore,
           explanation: result.explanation,
-          suggestions: result.suggestions,
-          relatedAPIs: result.relatedAPIs || []
+          suggestions: result.suggestions || []
         })),
         total: results.length
       };
@@ -565,7 +562,8 @@ class HTTPMCPServer {
 export { HTTPMCPServer };
 
 // 如果直接运行此文件，启动服务器
-if (import.meta.url === `file://${process.argv[1]}`) {
+// 直接启动检查
+if (require.main === module) {
   const port = parseInt(process.env.HTTP_MCP_PORT || '3002');
   const server = new HTTPMCPServer(port);
   

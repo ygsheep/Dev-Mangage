@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { X, FileText, Upload, Database, Brain, Code, AlertCircle, CheckCircle, Settings, Download, Clock, Zap } from 'lucide-react'
 import { API, HTTPMethod, APIStatus, APIParameter, APIResponseSchema } from '@shared/types'
-import { createAIParsingService, AIParsingConfig, AI_PARSING_PRESETS, AI_MODEL_LIMITS, DocumentChunk } from '../services/aiParsingService'
+import { createAIParsingService, AIParsingConfig, AI_PARSING_PRESETS, AI_MODEL_LIMITS, DocumentChunk, ParsedDatabaseDocument } from '../services/aiParsingService'
 import { useMutation } from '@tanstack/react-query'
 import { apiMethods } from '../utils/api'
 import AIConfigModal from './AIConfigModal'
@@ -46,6 +46,11 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
   const [parsedAPIs, setParsedAPIs] = useState<ParsedAPI[]>([])
   const [apiParseError, setApiParseError] = useState<string | null>(null)
   const [apiPreviewContent, setApiPreviewContent] = useState<string>('')
+  
+  // 数据库相关状态
+  const [parsedTables, setParsedTables] = useState<any[]>([])
+  const [databaseParseError, setDatabaseParseError] = useState<string | null>(null)
+  const [databasePreviewContent, setDatabasePreviewContent] = useState<string>('')
   const [useAI, setUseAI] = useState(true)
   const [aiConfig, setAiConfig] = useState<AIParsingConfig>(() => {
     const saved = localStorage.getItem('ai-parsing-config')
@@ -84,9 +89,166 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
   const [isParsingDB, setIsParsingDB] = useState(false)
   const [dbParseResult, setDbParseResult] = useState<any>(null)
   const [dbParseError, setDbParseError] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [currentStep, setCurrentStep] = useState<'import' | 'parsing' | 'preview'>('import')
+  const [parsingProgress, setParsingProgress] = useState<{
+    current: number
+    total: number
+    chunk?: { title: string }
+  } | null>(null)
   
   // AI配置弹窗
   const [showAIConfig, setShowAIConfig] = useState(false)
+  
+  /**
+   * 处理数据库文件选择
+   */
+  const handleDatabaseFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setSelectedFile(file)
+      setDatabaseParseError(null)
+      setParsedTables([])
+      
+      // 读取文件内容预览
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const content = e.target?.result as string
+        setDatabasePreviewContent(content.slice(0, 1000) + (content.length > 1000 ? '...' : ''))
+        
+        // 分析文档统计信息
+        const stats = analyzeDocument(content)
+        setDocumentStats(stats)
+      }
+      reader.readAsText(file)
+    }
+  }
+  
+  /**
+   * 处理数据库解析提交
+   */
+  const handleDatabaseParseSubmit = async () => {
+    const content = selectedFile ? await selectedFile.text() : databasePreviewContent.trim()
+    
+    if (!content) {
+      toast.error('请选择文件或输入数据库文档内容')
+      return
+    }
+    
+    setCurrentStep('parsing')
+    setIsParsingDB(true)
+    setDatabaseParseError(null)
+    setParsedTables([])
+    
+    try {
+      console.log('开始解析数据库文档，内容长度:', content.length)
+      
+      const aiService = createAIParsingService(aiConfig)
+      
+      // 检查是否包含Mermaid图表
+      const hasMermaid = content.includes('```mermaid') || content.includes('graph ') || content.includes('flowchart ')
+      if (hasMermaid) {
+        console.log('检测到Mermaid图表格式')
+      }
+      
+      // 分析文档统计信息
+      const stats = documentStats || analyzeDocument(content)
+      
+      let result: ParsedDatabaseDocument
+      if (stats.willNeedChunking) {
+        // 分块解析
+        setParsingProgress({ current: 0, total: stats.chunks })
+        
+        result = await aiService.parseDatabaseDocumentWithProgress?.(content, (progress) => {
+          setParsingProgress({
+            current: progress.current,
+            total: progress.total,
+            chunk: progress.chunk
+          })
+        }) || await aiService.parseDatabaseDocument(content)
+      } else {
+        // 普通解析
+        result = await aiService.parseDatabaseDocument(content)
+      }
+      
+      console.log('数据库解析结果:', result)
+      
+      if (!result.success || (result.errors && result.errors.length > 0)) {
+        const errorMessage = result.errors?.join(', ') || '数据库解析失败'
+        setDatabaseParseError(errorMessage)
+        setCurrentStep('import')
+        toast.error('数据库解析失败: ' + errorMessage)
+        return
+      }
+      
+      if (!result.tables || result.tables.length === 0) {
+        const errorMessage = 'AI未能从文档中解析到任何数据库表结构，请检查文档格式或尝试其他AI模型'
+        setDatabaseParseError(errorMessage)
+        setCurrentStep('import')
+        toast.error(errorMessage)
+        return
+      }
+      
+      setParsedTables(result.tables)
+      setCurrentStep('preview')
+      
+      const confidenceText = result.confidence ? ` (置信度: ${Math.round(result.confidence * 100)}%)` : ''
+      const chunkText = stats.willNeedChunking ? ` (分${stats.chunks}块处理)` : ''
+      const mermaidText = hasMermaid ? ' (包含Mermaid图表)' : ''
+      toast.success(`AI成功解析到 ${result.tables.length} 个数据表${confidenceText}${chunkText}${mermaidText}`)
+      
+    } catch (error: any) {
+      console.error('数据库解析过程中发生异常:', error)
+      const errorMessage = error.message || '数据库解析过程中发生未知错误'
+      setDatabaseParseError(errorMessage)
+      setCurrentStep('import')
+      toast.error('数据库解析失败: ' + errorMessage)
+    } finally {
+      setIsParsingDB(false)
+      setParsingProgress(null)
+    }
+  }
+  
+  /**
+   * 处理数据库导入确认
+   */
+  const handleDatabaseImportConfirm = async () => {
+    if (parsedTables.length === 0) return
+    
+    try {
+      // 将解析的数据表转换为API格式
+      const tableDataList = parsedTables.map(table => ({
+        projectId,
+        name: table.name,
+        displayName: table.displayName || table.name,
+        comment: table.comment || '',
+        engine: table.engine || 'InnoDB',
+        charset: table.charset || 'utf8mb4',
+        collation: table.collation || 'utf8mb4_unicode_ci',
+        status: 'DRAFT', // 导入时设为草稿状态
+        category: table.category || '',
+      }))
+      
+      // 批量创建数据表
+      const result = await apiMethods.createBatchDataTables(tableDataList)
+      
+      toast.success(`成功导入 ${result.data.success} 个数据库表结构`)
+      if (result.data.failed > 0) {
+        toast(`${result.data.failed} 个数据表导入失败`, {
+          icon: '⚠️',
+          style: {
+            borderLeft: '4px solid #f59e0b',
+            background: '#fef3c7',
+            color: '#92400e'
+          }
+        })
+      }
+      
+      handleDatabaseSuccess()
+    } catch (error: any) {
+      toast.error('数据库导入失败: ' + error.message)
+    }
+  }
   
   useEffect(() => {
     setActiveTab(initialTab)
@@ -377,20 +539,28 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
     if (parsedAPIs.length === 0) return
     
     try {
-      for (const parsedAPI of parsedAPIs) {
-        const apiData = {
-          projectId,
-          name: parsedAPI.name,
-          description: parsedAPI.description || '',
-          method: parsedAPI.method,
-          path: parsedAPI.path,
-          status: APIStatus.NOT_STARTED
-        }
-        
-        await apiMethods.createAPI(apiData)
-      }
+      const apiDataList = parsedAPIs.map(parsedAPI => ({
+        projectId,
+        name: parsedAPI.name,
+        description: parsedAPI.description || '',
+        method: parsedAPI.method,
+        path: parsedAPI.path,
+        status: APIStatus.NOT_STARTED
+      }))
       
-      toast.success(`成功导入 ${parsedAPIs.length} 个API接口`)
+      const result = await apiMethods.createBatchAPIs(apiDataList)
+      
+      toast.success(`成功导入 ${result.data.success} 个API接口`)
+      if (result.data.failed > 0) {
+        toast(`${result.data.failed} 个API导入失败`, {
+          icon: '⚠️',
+          style: {
+            borderLeft: '4px solid #f59e0b',
+            background: '#fef3c7',
+            color: '#92400e'
+          }
+        })
+      }
       handleAPIDocSuccess()
     } catch (error: any) {
       toast.error('API导入失败: ' + error.message)
@@ -943,9 +1113,259 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
           {/* 数据库文档导入 */}
           {activeTab === 'database' && (
             <div className="p-6">
-              <div className="text-center py-8">
-                <p className="text-gray-500">数据库文档导入功能开发中...</p>
-              </div>
+              {currentStep === 'import' && (
+                <div className="space-y-6">
+                  {/* 文件上传区域 */}
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                    <div className="text-center">
+                      <Database className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        上传数据库设计文档
+                      </h3>
+                      <p className="text-gray-600 mb-4">
+                        支持 .md、.sql、.txt 格式的数据库设计文档
+                      </p>
+                      
+                      <input
+                        type="file"
+                        accept=".md,.sql,.txt"
+                        onChange={handleDatabaseFileSelect}
+                        className="hidden"
+                        id="database-upload"
+                      />
+                      <label
+                        htmlFor="database-upload"
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 cursor-pointer"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        选择文件
+                      </label>
+                      
+                      {selectedFile && (
+                        <p className="text-sm text-gray-600 mt-2">
+                          已选择: {selectedFile.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 或者直接粘贴内容 */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-300" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-2 bg-white text-gray-500">或者</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <label className="block text-sm font-medium text-gray-700">
+                      直接粘贴数据库文档内容
+                    </label>
+                    <textarea
+                      value={databasePreviewContent}
+                      onChange={(e) => setDatabasePreviewContent(e.target.value)}
+                      placeholder="粘贴您的数据库设计文档、CREATE TABLE语句或Markdown格式的表结构..."
+                      rows={12}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                    />
+                  </div>
+
+                  {/* AI配置显示 */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-start space-x-3">
+                      <Brain className="w-5 h-5 text-blue-600 mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-blue-900">AI智能解析</h4>
+                        <p className="text-sm text-blue-700 mt-1">
+                          使用AI模型自动识别表结构、字段类型、索引和关系
+                        </p>
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="text-xs text-blue-600">
+                            当前使用: {aiConfig.provider === 'ollama' ? 'Ollama本地' : aiConfig.provider === 'deepseek' ? 'DeepSeek在线' : aiConfig.provider === 'openai' ? 'OpenAI在线' : '模拟模式'}
+                          </div>
+                          <button
+                            onClick={() => setShowAIConfig(true)}
+                            className="text-xs text-blue-600 hover:text-blue-800 flex items-center"
+                          >
+                            <Settings className="w-3 h-3 mr-1" />
+                            配置
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 文档统计信息 */}
+                  {documentStats && (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2">文档分析</h4>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">文档大小:</span>
+                          <span className="ml-2 font-medium">{(documentStats.size / 1024).toFixed(1)} KB</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">预估Token:</span>
+                          <span className="ml-2 font-medium">{documentStats.estimatedTokens}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">处理分块:</span>
+                          <span className="ml-2 font-medium">{documentStats.chunks} 个</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">预计耗时:</span>
+                          <span className="ml-2 font-medium">{documentStats.processingTime}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 解析错误显示 */}
+                  {databaseParseError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <div className="flex">
+                        <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                        <div className="ml-3">
+                          <h4 className="text-sm font-medium text-red-800">解析失败</h4>
+                          <p className="text-sm text-red-700 mt-1">{databaseParseError}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 开始解析按钮 */}
+                  <div className="flex justify-end">
+                    <button
+                      onClick={handleDatabaseParseSubmit}
+                      disabled={isParsingAPI || (!selectedFile && !databasePreviewContent.trim())}
+                      className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    >
+                      {isParsingAPI ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>解析中...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Brain className="w-4 h-4" />
+                          <span>开始解析</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 解析进度 */}
+              {currentStep === 'parsing' && parsingProgress && (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">AI正在解析数据库文档</h3>
+                    <p className="text-gray-600">
+                      正在处理第 {parsingProgress.current} / {parsingProgress.total} 个分块
+                    </p>
+                    {parsingProgress.chunk && (
+                      <p className="text-sm text-gray-500 mt-2">
+                        当前: {parsingProgress.chunk.title}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${Math.round((parsingProgress.current / parsingProgress.total) * 100)}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+
+              {/* 解析结果预览 */}
+              {currentStep === 'preview' && parsedTables.length > 0 && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">解析结果预览</h3>
+                      <p className="text-gray-600">共解析出 {parsedTables.length} 个数据表</p>
+                    </div>
+                    <button
+                      onClick={() => setCurrentStep('import')}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      重新解析
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {parsedTables.map((table, index) => (
+                      <div key={table.id || index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-medium text-gray-900">
+                              {table.displayName} ({table.name})
+                            </h4>
+                            {table.comment && (
+                              <p className="text-sm text-gray-600 mt-1">{table.comment}</p>
+                            )}
+                          </div>
+                          <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                            {table.fields.length} 个字段
+                          </span>
+                        </div>
+
+                        <div className="space-y-2">
+                          <h5 className="text-sm font-medium text-gray-700">字段列表:</h5>
+                          <div className="grid gap-2">
+                            {table.fields.slice(0, 5).map((field, fieldIndex) => (
+                              <div key={fieldIndex} className="flex items-center justify-between text-sm bg-gray-50 px-3 py-2 rounded">
+                                <div className="flex items-center space-x-3">
+                                  <span className="font-medium">{field.name}</span>
+                                  <span className="text-gray-600">{field.type}</span>
+                                  {field.primaryKey && (
+                                    <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">PK</span>
+                                  )}
+                                </div>
+                                <span className="text-gray-500 text-xs">
+                                  {field.nullable ? '可空' : '非空'}
+                                </span>
+                              </div>
+                            ))}
+                            {table.fields.length > 5 && (
+                              <div className="text-sm text-gray-500 text-center py-1">
+                                还有 {table.fields.length - 5} 个字段...
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => {
+                        setParsedTables([])
+                        setCurrentStep('import')
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                    >
+                      重新解析
+                    </button>
+                    <button
+                      onClick={handleDatabaseImportConfirm}
+                      className="px-6 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 flex items-center space-x-2"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      <span>确认导入 ({parsedTables.length} 个表)</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
