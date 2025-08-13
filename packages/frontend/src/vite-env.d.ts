@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string | 'http://localhost:3320/api';
+  readonly VITE_API_URL: string | 'http://localhost:3001/api';
   // 可以在这里添加更多环境变量
 }
 
