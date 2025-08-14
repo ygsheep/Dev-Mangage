@@ -8,7 +8,7 @@
       "transport": "stdio",
       "env": {
         "NODE_ENV": "production",
-        "DATABASE_URL": "file: D:/develop/Web/uniapp/Dev-Mangage/packages/backend/prisma/dev.db"
+        "DATABASE_URL": "file:D:/develop/Web/uniapp/Dev-Mangage/packages/backend/prisma/dev.db"
       }
     },
     "dev-manage-mcp-http": {

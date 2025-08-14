@@ -4,7 +4,16 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { prisma } from '@devapi/backend/prisma';
+import { PrismaClient } from '@prisma/client';
+
+// 创建Prisma客户端实例
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL || 'file:../backend/prisma/dev.db'
+    }
+  }
+});
 import Fuse from 'fuse.js';
 import dotenv from 'dotenv';
 import { vectorSearchService } from './vectorSearch.js';
@@ -439,7 +448,7 @@ class DevAPISearchServer {
           query,
           total: results.length,
           results: results.map(result => ({
-            ...result.item,
+            ...(result.item || {}),
             score: result.score
           }))
         }, null, 2)
@@ -493,7 +502,7 @@ class DevAPISearchServer {
           status,
           total: results.length,
           results: results.map(result => ({
-            ...result.item,
+            ...(result.item || {}),
             score: result.score
           }))
         }, null, 2)
@@ -538,7 +547,7 @@ class DevAPISearchServer {
           projectId,
           total: results.length,
           results: results.map(result => ({
-            ...result.item,
+            ...(result.item || {}),
             score: result.score
           }))
         }, null, 2)

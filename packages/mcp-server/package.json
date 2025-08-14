@@ -21,6 +21,7 @@
     "@devapi/shared": "file:../shared",
     "@huggingface/transformers": "^3.7.0",
     "@modelcontextprotocol/sdk": "^0.5.0",
+    "@prisma/client": "^6.14.0",
     "@xenova/transformers": "^2.17.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
