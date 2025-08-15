@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 echo 🚀 构建 DevAPI Manager 桌面应用
 echo.
 

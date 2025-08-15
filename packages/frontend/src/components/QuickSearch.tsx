@@ -48,9 +48,9 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
           case 'all':
             const globalResults = await searchGlobal(searchQuery, ['projects', 'apis', 'tags'], 5)
             searchResults = [
-              ...formatProjectResults(globalResults.projects || []),
-              ...formatAPIResults(globalResults.apis || []),
-              ...formatTagResults(globalResults.tags || [])
+              ...formatProjectResults(globalResults.data?.projects || []),
+              ...formatAPIResults(globalResults.data?.apis || []),
+              ...formatTagResults(globalResults.data?.tags || [])
             ]
             break
           case 'projects':

@@ -21,6 +21,7 @@ model Project {
   tags              Tag[]
   databaseTables    DatabaseTable[]
   dataModelDocuments DataModelDocument[]
+  mindmapLayout     MindmapLayout?
 
   @@map("projects")
 }
@@ -200,6 +201,20 @@ model DataModelDocument {
 
   @@index([projectId])
   @@map("data_model_documents")
+}
+
+// MindmapLayout model for saving mindmap layouts
+model MindmapLayout {
+  id         String   @id @default(uuid())
+  projectId  String   @unique
+  layoutData String   // JSON string containing nodes, edges, and config
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("mindmap_layouts")
 }
 
 // Note: SQLite doesn't support enums, so we use String with validation in application layer

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 class MCPClient {
   private serverUrl: string
 
-  constructor(serverUrl = 'http://localhost:3001') {
+  constructor(serverUrl = 'http://localhost:3002') {
     this.serverUrl = serverUrl
   }
 
