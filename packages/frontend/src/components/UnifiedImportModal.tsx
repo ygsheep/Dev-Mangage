@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { X, FileText, Upload, Database, Brain, Code, AlertCircle, CheckCircle, Settings, Download, Clock, Zap } from 'lucide-react'
-import { API, HTTPMethod, APIStatus, APIParameter, APIResponseSchema } from '@shared/types'
+import { X, FileText, Upload, Database, Brain, Code, AlertCircle, CheckCircle, Settings, Clock, Zap } from 'lucide-react'
+import { HTTPMethod, APIStatus, APIParameter, APIResponseSchema } from '@shared/types'
 import { createAIParsingService, AIParsingConfig, AI_PARSING_PRESETS, AI_MODEL_LIMITS, DocumentChunk, ParsedDatabaseDocument } from '../services/aiParsingService'
 import { useMutation } from '@tanstack/react-query'
 import { apiMethods } from '../utils/api'
@@ -84,11 +84,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
   const [swaggerContent, setSwaggerContent] = useState('')
   const [swaggerImportMethod, setSwaggerImportMethod] = useState<'url' | 'content'>('url')
   
-  // 数据库文档相关状态
-  const [dbFile, setDbFile] = useState<File | null>(null)
-  const [isParsingDB, setIsParsingDB] = useState(false)
-  const [dbParseResult, setDbParseResult] = useState<any>(null)
-  const [dbParseError, setDbParseError] = useState<string | null>(null)
+  // 数据库文档相关状态 - 预留给未来功能
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [currentStep, setCurrentStep] = useState<'import' | 'parsing' | 'preview'>('import')
   const [parsingProgress, setParsingProgress] = useState<{
@@ -136,7 +132,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
     }
     
     setCurrentStep('parsing')
-    setIsParsingDB(true)
+    // setIsParsingDB(true) // TODO: Implement DB parsing state
     setDatabaseParseError(null)
     setParsedTables([])
     
@@ -204,7 +200,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
       setCurrentStep('import')
       toast.error('数据库解析失败: ' + errorMessage)
     } finally {
-      setIsParsingDB(false)
+      // setIsParsingDB(false) // TODO: Implement DB parsing state
       setParsingProgress(null)
     }
   }
@@ -1269,7 +1265,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                     </p>
                     {parsingProgress.chunk && (
                       <p className="text-sm text-gray-500 mt-2">
-                        当前: {parsingProgress.chunk.title}
+                        当前: {parsingProgress.chunk.title || '处理中...'}
                       </p>
                     )}
                   </div>
@@ -1321,7 +1317,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                         <div className="space-y-2">
                           <h5 className="text-sm font-medium text-gray-700">字段列表:</h5>
                           <div className="grid gap-2">
-                            {table.fields.slice(0, 5).map((field, fieldIndex) => (
+                            {table.fields.slice(0, 5).map((field: any, fieldIndex: number) => (
                               <div key={fieldIndex} className="flex items-center justify-between text-sm bg-gray-50 px-3 py-2 rounded">
                                 <div className="flex items-center space-x-3">
                                   <span className="font-medium">{field.name}</span>

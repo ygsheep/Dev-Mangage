@@ -22,7 +22,7 @@ import { useMCPConfig, useMCPConnection } from '../hooks/useMCPConfig'
 const MCPServerControl: React.FC = () => {
   // 使用 MCP 配置管理
   const { config, urls, isValid } = useMCPConfig()
-  const { isConnected, isChecking, checkConnection } = useMCPConnection()
+  const { isConnected, isChecking } = useMCPConnection()
   
   const [serverStatus, setServerStatus] = useState<MCPServerStatus>({
     isRunning: false,

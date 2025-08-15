@@ -624,9 +624,9 @@ class DevAPISearchServer {
     ]);
 
     const suggestions = [
-      ...projects.map(p => ({ type: 'project', text: p.name })),
-      ...apis.map(a => ({ type: 'api', text: a.name, path: a.path })),
-      ...tags.map(t => ({ type: 'tag', text: t.name })),
+      ...projects.map((p: { name: string }) => ({ type: 'project', text: p.name })),
+      ...apis.map((a: { name: string; path: string }) => ({ type: 'api', text: a.name, path: a.path })),
+      ...tags.map((t: { name: string }) => ({ type: 'tag', text: t.name })),
     ].slice(0, limit);
 
     return {

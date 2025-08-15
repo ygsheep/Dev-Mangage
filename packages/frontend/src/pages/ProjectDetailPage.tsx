@@ -15,7 +15,6 @@ import {
   Grid3X3,
   List,
   Sparkles,
-  Database,
   FileText
 } from 'lucide-react'
 import { API, APIStatus, HTTPMethod } from '@shared/types'
@@ -32,6 +31,7 @@ import ProjectStats from '../components/ProjectStats'
 import APITestModal from '../components/APITestModal'
 import ImportAPIDocModal from '../components/ImportAPIDocModal'
 import ProjectSettingsModal from '../components/ProjectSettingsModal'
+import toast from 'react-hot-toast'
 import UnifiedImportModal from '../components/UnifiedImportModal'
 import { API_STATUS_LABELS, HTTP_METHOD_COLORS, DatabaseTable, DataModelStatus, DATA_MODEL_STATUS_COLORS } from '@shared/types'
 
@@ -58,7 +58,7 @@ const ProjectDetailPage: React.FC = () => {
   const [showUnifiedImportModal, setShowUnifiedImportModal] = useState(false)
 
   // Fetch project details
-  const { data: projectData, isLoading: projectLoading } = useQuery({
+  const { data: projectData, isLoading: projectLoading, refetch: refetchProject } = useQuery({
     queryKey: ['project', id],
     queryFn: () => apiMethods.getProject(id!),
     enabled: !!id,
@@ -196,7 +196,7 @@ const ProjectDetailPage: React.FC = () => {
   const featureModules = getFeatureModules()
 
   // 示例数据表数据（仅在演示时使用）
-  const getSampleDataTables = (): DatabaseTable[] => {
+  const _getSampleDataTables = (): DatabaseTable[] => {
     return [
       {
         id: 'table-1',
@@ -758,7 +758,7 @@ const ProjectDetailPage: React.FC = () => {
 
               {/* Data Models */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {allDataTables.map((table) => (
+                {allDataTables.map((table: DatabaseTable) => (
                   <div 
                     key={table.id}
                     className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"

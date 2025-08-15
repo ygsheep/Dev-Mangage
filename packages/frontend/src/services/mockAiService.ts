@@ -179,7 +179,7 @@ function parseAPITable(lines: string[], startIndex: number): any[] {
   
   // 解析表格头部，确定列的位置
   const headerLine = lines[headerIndex].trim()
-  const headers = headerLine.split('|').map(h => h.trim().toLowerCase())
+  const headers = headerLine.split('|').map((h: string) => h.trim().toLowerCase())
   
   const nameIndex = headers.findIndex(h => h.includes('名称') || h.includes('name') || h.includes('接口'))
   const methodIndex = headers.findIndex(h => h.includes('方法') || h.includes('method'))
@@ -196,7 +196,7 @@ function parseAPITable(lines: string[], startIndex: number): any[] {
     const line = lines[i].trim()
     if (!line.includes('|') || line.startsWith('|--')) break
     
-    const cells = line.split('|').map(c => c.trim())
+    const cells = line.split('|').map((c: string) => c.trim())
     if (cells.length < Math.max(methodIndex, pathIndex) + 1) continue
     
     const method = cells[methodIndex]?.toUpperCase()
@@ -248,12 +248,12 @@ function extractDatabaseFromContent(content: string) {
   console.log('🔍 开始分析数据库内容...')
   
   const result = {
-    tables: [],
-    indexes: [],
-    relationships: [],
-    views: [],
-    procedures: [],
-    triggers: []
+    tables: [] as any[],
+    indexes: [] as any[],
+    relationships: [] as any[],
+    views: [] as any[],
+    procedures: [] as any[],
+    triggers: [] as any[]
   }
   
   // 首先尝试解析SQL语句
@@ -362,12 +362,12 @@ function extractTablesFromMarkdown(content: string) {
 }
 
 // 从Markdown中提取单个表的数据
-function extractTableDataFromMarkdown(lines, startIndex, tableName) {
+function extractTableDataFromMarkdown(lines: string[], startIndex: number, _tableName: string) {
   const tableData = {
     comment: '',
-    fields: [],
-    constraints: [],
-    indexes: [],
+    fields: [] as any[],
+    constraints: [] as any[],
+    indexes: [] as any[],
     sqlDefinition: ''
   }
   
@@ -423,7 +423,7 @@ function extractTableDataFromMarkdown(lines, startIndex, tableName) {
 }
 
 // 从SQL定义中解析字段
-function parseFieldsFromSQLDefinition(sqlDefinition) {
+function parseFieldsFromSQLDefinition(sqlDefinition: string) {
   const fields = []
   const lines = sqlDefinition.split('\n')
   
@@ -469,12 +469,12 @@ function parseFieldsFromSQLDefinition(sqlDefinition) {
 }
 
 // 从表格中解析字段（Markdown表格格式）
-function parseFieldsFromTable(lines, headerIndex) {
-  const fields = []
+function parseFieldsFromTable(lines: string[], headerIndex: number) {
+  const fields: any[] = []
   
   // 解析表格头部，确定列的位置
   const headerLine = lines[headerIndex].trim()
-  const headers = headerLine.split('|').map(h => h.trim().toLowerCase())
+  const headers = headerLine.split('|').map((h: string) => h.trim().toLowerCase())
   
   const nameIndex = headers.findIndex(h => h.includes('字段') || h.includes('field') || h.includes('name'))
   const typeIndex = headers.findIndex(h => h.includes('类型') || h.includes('type'))
@@ -491,7 +491,7 @@ function parseFieldsFromTable(lines, headerIndex) {
     const line = lines[i].trim()
     if (!line.includes('|') || line.startsWith('##')) break
     
-    const cells = line.split('|').map(c => c.trim())
+    const cells = line.split('|').map((c: string) => c.trim())
     if (cells.length <= Math.max(nameIndex, typeIndex)) continue
     
     const fieldName = cells[nameIndex] || ''
@@ -515,13 +515,13 @@ function parseFieldsFromTable(lines, headerIndex) {
 }
 
 // 辅助函数：从类型中提取长度
-function extractLengthFromType(type) {
+function extractLengthFromType(type: string) {
   const match = type.match(/\((\d+)\)/)
   return match ? parseInt(match[1]) : null
 }
 
 // 辅助函数：提取默认值
-function extractDefaultValue(constraints) {
+function extractDefaultValue(constraints: string) {
   const match = constraints.match(/DEFAULT\s+([^,\s]+)/i)
   if (match) {
     const value = match[1]
@@ -533,20 +533,20 @@ function extractDefaultValue(constraints) {
 }
 
 // 辅助函数：提取注释
-function extractCommentFromConstraints(constraints) {
+function extractCommentFromConstraints(constraints: string) {
   const match = constraints.match(/COMMENT\s+['"](.*?)['"]/i)
   return match ? match[1] : ''
 }
 
 // 提取表注释
-function extractTableCommentFromSQL(content, tableName) {
+function extractTableCommentFromSQL(content: string, tableName: string) {
   const regex = new RegExp(`CREATE\\s+TABLE\\s+${tableName}[\\s\\S]*?COMMENT\\s*=\\s*['"](.*?)['"]`, 'i')
   const match = content.match(regex)
   return match ? match[1] : ''
 }
 
 // 解析约束
-function parseConstraintsFromSQLDefinition(sqlDefinition) {
+function parseConstraintsFromSQLDefinition(sqlDefinition: string) {
   const constraints = []
   const lines = sqlDefinition.split('\n')
   
@@ -575,7 +575,7 @@ function parseConstraintsFromSQLDefinition(sqlDefinition) {
 }
 
 // 解析索引
-function parseIndexesFromSQLDefinition(sqlDefinition) {
+function parseIndexesFromSQLDefinition(sqlDefinition: string) {
   const indexes = []
   const lines = sqlDefinition.split('\n')
   
@@ -587,7 +587,7 @@ function parseIndexesFromSQLDefinition(sqlDefinition) {
       if (indexMatch) {
         indexes.push({
           name: indexMatch[2],
-          columns: indexMatch[3].split(',').map(c => c.trim()),
+          columns: indexMatch[3].split(',').map((c: string) => c.trim()),
           type: 'INDEX'
         })
       }
@@ -598,7 +598,7 @@ function parseIndexesFromSQLDefinition(sqlDefinition) {
 }
 
 // 提取索引信息
-function extractIndexesFromContent(content) {
+function extractIndexesFromContent(content: string) {
   const indexes = []
   
   // 匹配CREATE INDEX语句
@@ -609,7 +609,7 @@ function extractIndexesFromContent(content) {
     indexes.push({
       name: match[1],
       table: match[2],
-      columns: match[3].split(',').map(c => c.trim()),
+      columns: match[3].split(',').map((c: string) => c.trim()),
       unique: match[0].includes('UNIQUE')
     })
   }
@@ -618,7 +618,7 @@ function extractIndexesFromContent(content) {
 }
 
 // 提取表关系
-function extractRelationshipsFromContent(content) {
+function extractRelationshipsFromContent(content: string) {
   const relationships = []
   
   // 从FOREIGN KEY约束中提取关系
@@ -638,7 +638,7 @@ function extractRelationshipsFromContent(content) {
 }
 
 // 去重处理
-function deduplicateTables(tables) {
+function deduplicateTables(tables: any[]) {
   const seen = new Set()
   return tables.filter(table => {
     const key = table.name.toLowerCase()
@@ -651,7 +651,7 @@ function deduplicateTables(tables) {
 }
 
 // 提取表字段信息
-function extractTableFields(lines: string[], startIndex: number) {
+function _extractTableFields(lines: string[], startIndex: number) {
   const fields: any[] = []
   
   // 查找字段表格
@@ -661,7 +661,7 @@ function extractTableFields(lines: string[], startIndex: number) {
     // 找到字段表格头部
     if (line.includes('|') && (line.includes('字段') || line.includes('Field'))) {
       // 解析表格
-      const headers = line.split('|').map(h => h.trim().toLowerCase())
+      const headers = line.split('|').map((h: string) => h.trim().toLowerCase())
       const nameIndex = headers.findIndex(h => h.includes('字段') || h.includes('field') || h.includes('name'))
       const typeIndex = headers.findIndex(h => h.includes('类型') || h.includes('type'))
       const commentIndex = headers.findIndex(h => h.includes('说明') || h.includes('comment') || h.includes('描述'))
@@ -672,7 +672,7 @@ function extractTableFields(lines: string[], startIndex: number) {
           const dataLine = lines[j].trim()
           if (!dataLine.includes('|') || dataLine.startsWith('##')) break
           
-          const cells = dataLine.split('|').map(c => c.trim())
+          const cells = dataLine.split('|').map((c: string) => c.trim())
           if (cells.length > Math.max(nameIndex, typeIndex)) {
             fields.push({
               name: cells[nameIndex] || '',
@@ -692,8 +692,8 @@ function extractTableFields(lines: string[], startIndex: number) {
 }
 
 // 从Mermaid图表中提取表定义
-function extractTablesFromMermaid(content: string) {
-  const tables = []
+function _extractTablesFromMermaid(content: string) {
+  const tables: any[] = []
   
   // 查找Mermaid代码块
   const mermaidBlocks = content.match(/```mermaid[\s\S]*?```/gi)
@@ -742,12 +742,13 @@ function extractTablesFromMermaidER(mermaidContent: string) {
   
   // 为每个实体创建表定义
   for (const entityName of entities) {
+    const entityNameStr = entityName as string
     const table = {
-      id: `mermaid-er-${entityName.toLowerCase()}-${Date.now()}`,
-      name: entityName.toLowerCase(),
-      displayName: entityName,
-      comment: `从Mermaid ER图解析的${entityName}实体`,
-      fields: generateDefaultFieldsForEntity(entityName),
+      id: `mermaid-er-${entityNameStr.toLowerCase()}-${Date.now()}`,
+      name: entityNameStr.toLowerCase(),
+      displayName: entityNameStr,
+      comment: `从Mermaid ER图解析的${entityNameStr}实体`,
+      fields: generateDefaultFieldsForEntity(entityNameStr),
       constraints: [],
       indexes: [],
       source: 'mermaid-er'
@@ -761,10 +762,10 @@ function extractTablesFromMermaidER(mermaidContent: string) {
 
 // 从Mermaid流程图中提取表定义
 function extractTablesFromMermaidFlowchart(mermaidContent: string) {
-  const tables = []
+  const tables: any[] = []
   
   // 匹配流程图节点定义，查找可能的数据库表
-  const nodeRegex = /(\w+)\[([^\]]+)\]/g
+  const _nodeRegex = /(\w+)\[([^\]]+)\]/g
   const subgraphRegex = /subgraph\s+"([^"]+)"/g
   
   let match
@@ -838,7 +839,7 @@ function generateDefaultFieldsForEntity(entityName: string) {
       {
         name: 'username',
         type: 'VARCHAR',
-        length: 50,
+        length: null,
         nullable: false,
         primaryKey: false,
         autoIncrement: false,
@@ -849,7 +850,7 @@ function generateDefaultFieldsForEntity(entityName: string) {
       {
         name: 'email',
         type: 'VARCHAR',
-        length: 100,
+        length: null,
         nullable: true,
         primaryKey: false,
         autoIncrement: false,
@@ -863,7 +864,7 @@ function generateDefaultFieldsForEntity(entityName: string) {
       {
         name: 'order_number',
         type: 'VARCHAR',
-        length: 32,
+        length: null,
         nullable: false,
         primaryKey: false,
         autoIncrement: false,
@@ -879,7 +880,7 @@ function generateDefaultFieldsForEntity(entityName: string) {
         primaryKey: false,
         autoIncrement: false,
         unique: false,
-        defaultValue: '0.00',
+        defaultValue: null,
         comment: '订单总金额'
       }
     )
@@ -889,7 +890,7 @@ function generateDefaultFieldsForEntity(entityName: string) {
       {
         name: 'name',
         type: 'VARCHAR',
-        length: 100,
+        length: null,
         nullable: false,
         primaryKey: false,
         autoIncrement: false,
@@ -921,7 +922,7 @@ function generateDefaultFieldsForEntity(entityName: string) {
       primaryKey: false,
       autoIncrement: false,
       unique: false,
-      defaultValue: 'CURRENT_TIMESTAMP',
+      defaultValue: null,
       comment: '创建时间'
     },
     {
@@ -932,7 +933,7 @@ function generateDefaultFieldsForEntity(entityName: string) {
       primaryKey: false,
       autoIncrement: false,
       unique: false,
-      defaultValue: 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      defaultValue: null,
       comment: '更新时间'
     }
   )
@@ -954,7 +955,7 @@ export async function mockParseDatabaseDocumentWithProgress(
   const estimatedTokens = content.length * 0.75
   const chunks = Math.ceil(estimatedTokens / 3000) // 假设每块3000 tokens
   
-  const allTables = []
+  const allTables: any[] = []
   
   for (let i = 0; i < chunks; i++) {
     // 更新进度
@@ -991,7 +992,7 @@ export async function mockParseDatabaseDocumentWithProgress(
   console.log('🎭 模拟数据库分块解析完成:', {
     totalChunks: chunks,
     extractedTables: uniqueTables.length,
-    tables: uniqueTables.map(t => t.name)
+    tables: uniqueTables.map((t: any) => t.name)
   })
   
   return {

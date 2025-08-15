@@ -65,7 +65,7 @@ export interface ParsedAPIDocument {
 }
 
 export interface ParsedDatabaseDocument {
-  tables: DatabaseTable[]
+  tables: ParsedDatabaseTable[]
   relationships: DatabaseRelationship[]
   indexes: DatabaseIndex[]
   success: boolean
@@ -73,7 +73,7 @@ export interface ParsedDatabaseDocument {
   confidence: number
 }
 
-export interface DatabaseTable {
+export interface ParsedDatabaseTable {
   id: string
   name: string
   displayName: string
