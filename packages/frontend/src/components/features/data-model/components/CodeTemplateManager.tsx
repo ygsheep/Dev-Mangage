@@ -34,6 +34,7 @@ import {
   exportCodeTemplates
 } from '../../../../utils/api'
 import { toast } from 'react-hot-toast'
+import CodeHighlight from '../../../common/CodeHighlight'
 
 interface CodeTemplate {
   id: string
@@ -869,9 +870,13 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       <h4 className="font-medium text-gray-900">模板内容</h4>
                     </div>
                     <div className="p-4">
-                      <pre className="bg-gray-50 p-4 rounded text-sm font-mono overflow-x-auto whitespace-pre-wrap">
-                        {selectedTemplate.content}
-                      </pre>
+                      <CodeHighlight
+                        code={selectedTemplate.content}
+                        language="sql"
+                        showLineNumbers={true}
+                        showCopyButton={true}
+                        maxHeight="400px"
+                      />
                     </div>
                   </div>
                 </div>
@@ -906,9 +911,13 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                 </button>
               </div>
               <div className="p-4 overflow-y-auto max-h-[calc(80vh-120px)]">
-                <pre className="bg-gray-50 p-4 rounded text-sm font-mono overflow-x-auto whitespace-pre-wrap">
-                  {previewResult}
-                </pre>
+                <CodeHighlight
+                  code={previewResult}
+                  language="sql"
+                  showLineNumbers={true}
+                  showCopyButton={true}
+                  maxHeight="600px"
+                />
               </div>
               <div className="flex justify-end space-x-3 p-4 border-t border-gray-200">
                 <button

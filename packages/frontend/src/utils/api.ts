@@ -10,7 +10,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || mcpConfig.getBackendBaseUrl
  */
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 60000, // 增加到60秒，给AI解析更多时间
 })
 
 // 请求拦截器
@@ -165,31 +165,47 @@ export const getTableRelationships = async (projectId: string) => {
 
 // AI服务相关API
 export const getAIServiceHealth = async () => {
-  return apiClient.get('/api/v1/ai/health')
+  return apiClient.get('/ai/health')
 }
 
 export const getAIProviders = async () => {
-  return apiClient.get('/api/v1/ai/providers')
+  return apiClient.get('/ai/providers')
+}
+
+// 获取详细的AI提供者信息
+export const getAIProvidersDetailed = async () => {
+  return apiClient.get('/ai/providers/detailed')
+}
+
+// 获取可用模型列表
+export const getAIModels = async (provider?: string) => {
+  const params = provider ? { provider } : {}
+  return apiClient.get('/ai/models', { params })
+}
+
+// 自动选择最佳模型
+export const autoSelectBestModel = async (provider?: string) => {
+  return apiClient.post('/ai/models/auto-select', { provider })
 }
 
 export const setDefaultAIProvider = async (provider: string) => {
-  return apiClient.post('/api/v1/ai/provider/default', { provider })
+  return apiClient.post('/ai/provider/default', { provider })
 }
 
 export const getAIUsageStats = async () => {
-  return apiClient.get('/api/v1/ai/usage')
+  return apiClient.get('/ai/usage')
 }
 
 export const getAIConfiguration = async () => {
-  return apiClient.get('/api/v1/ai/config')
+  return apiClient.get('/ai/config')
 }
 
 export const updateAIConfiguration = async (config: any) => {
-  return apiClient.put('/api/v1/ai/config', config)
+  return apiClient.put('/ai/config', config)
 }
 
 export const reloadAIConfiguration = async () => {
-  return apiClient.post('/api/v1/ai/config/reload')
+  return apiClient.post('/ai/config/reload')
 }
 
 export const testAIProvider = async (providerId: string) => {
@@ -209,7 +225,7 @@ export const createAIProvider = async (data: {
   isDefault: boolean
   isEnabled: boolean
 }) => {
-  return apiClient.post('/api/v1/ai/providers', data)
+  return apiClient.post('/ai/providers', data)
 }
 
 export const updateAIProvider = async (providerId: string, data: any) => {
@@ -233,7 +249,7 @@ export const parseDocument = async (data: {
   provider?: string
   [key: string]: any
 }) => {
-  return apiClient.post('/api/v1/ai/parse/document', data)
+  return apiClient.post('/ai/parse/document', data)
 }
 
 export const batchParseDocuments = async (data: {
@@ -246,7 +262,7 @@ export const batchParseDocuments = async (data: {
   provider?: string
   [key: string]: any
 }) => {
-  return apiClient.post('/api/v1/ai/parse/batch', data)
+  return apiClient.post('/ai/parse/batch', data)
 }
 
 export const getParseHistory = async (projectId: string, limit?: number) => {
@@ -265,7 +281,7 @@ export const createBatchImportJob = async (data: {
   }>
   options?: any
 }) => {
-  return apiClient.post('/api/v1/ai/batch/import', data)
+  return apiClient.post('/ai/batch/import', data)
 }
 
 export const getBatchImportJobStatus = async (jobId: string) => {
@@ -273,7 +289,7 @@ export const getBatchImportJobStatus = async (jobId: string) => {
 }
 
 export const getBatchImportJobs = async () => {
-  return apiClient.get('/api/v1/ai/batch/jobs')
+  return apiClient.get('/ai/batch/jobs')
 }
 
 export const cancelBatchImportJob = async (jobId: string) => {
@@ -291,7 +307,7 @@ export const generateSQL = async (data: {
   provider?: string
   [key: string]: any
 }) => {
-  return apiClient.post('/api/v1/ai/generate/sql', data)
+  return apiClient.post('/ai/generate/sql', data)
 }
 
 export const generateMigrationScript = async (data: {
@@ -300,11 +316,11 @@ export const generateMigrationScript = async (data: {
   oldModel?: any
   options?: any
 }) => {
-  return apiClient.post('/api/v1/ai/generate/migration', data)
+  return apiClient.post('/ai/generate/migration', data)
 }
 
 export const generateMigrationPlan = async (migrations: any[]) => {
-  return apiClient.post('/api/v1/ai/generate/migration-plan', { migrations })
+  return apiClient.post('/ai/generate/migration-plan', { migrations })
 }
 
 export const generateRollbackScript = async (migrationId: string, data: {
@@ -331,7 +347,7 @@ export const validateModel = async (data: {
   model: any
   options?: any
 }) => {
-  return apiClient.post('/api/v1/ai/validate/model', data)
+  return apiClient.post('/ai/validate/model', data)
 }
 
 export const validateAndCorrectModel = async (data: {
@@ -340,21 +356,133 @@ export const validateAndCorrectModel = async (data: {
   enableAutoCorrection?: boolean
   correctionMode?: string
 }) => {
-  return apiClient.post('/api/v1/ai/validate/correct', data)
+  return apiClient.post('/ai/validate/correct', data)
 }
 
 export const smartCorrectModel = async (data: {
   model: any
   options?: any
 }) => {
-  return apiClient.post('/api/v1/ai/correct/smart', data)
+  return apiClient.post('/ai/correct/smart', data)
 }
 
 export const generateQualityReport = async (data: {
   model: any
   validationResult?: any
 }) => {
-  return apiClient.post('/api/v1/ai/report/quality', data)
+  return apiClient.post('/ai/report/quality', data)
+}
+
+// 协作管理API
+export const getComments = async (projectId: string, params?: {
+  targetType?: string
+  targetId?: string
+  limit?: number
+  offset?: number
+}) => {
+  return apiClient.get(`/collaboration/${projectId}/comments`, { params })
+}
+
+export const createComment = async (projectId: string, data: {
+  content: string
+  targetType: string
+  targetId: string
+  targetName: string
+  parentId?: string
+  mentions?: string[]
+}) => {
+  return apiClient.post(`/collaboration/${projectId}/comments`, data)
+}
+
+export const updateComment = async (projectId: string, commentId: string, data: {
+  content: string
+}) => {
+  return apiClient.put(`/collaboration/${projectId}/comments/${commentId}`, data)
+}
+
+export const deleteComment = async (projectId: string, commentId: string) => {
+  return apiClient.delete(`/collaboration/${projectId}/comments/${commentId}`)
+}
+
+export const resolveComment = async (projectId: string, commentId: string, isResolved: boolean) => {
+  return apiClient.patch(`/collaboration/${projectId}/comments/${commentId}/resolve`, { isResolved })
+}
+
+export const getCommentStats = async (projectId: string) => {
+  return apiClient.get(`/collaboration/${projectId}/comments/stats`)
+}
+
+// 权限管理API
+export const getTeamMembers = async (projectId: string, params?: {
+  role?: string
+  status?: string
+  search?: string
+}) => {
+  return apiClient.get(`/permissions/${projectId}/members`, { params })
+}
+
+export const inviteMember = async (projectId: string, data: {
+  email: string
+  role: string
+  message?: string
+}) => {
+  return apiClient.post(`/permissions/${projectId}/members/invite`, data)
+}
+
+export const updateMemberRole = async (projectId: string, memberId: string, role: string) => {
+  return apiClient.patch(`/permissions/${projectId}/members/${memberId}/role`, { role })
+}
+
+export const removeMember = async (projectId: string, memberId: string) => {
+  return apiClient.delete(`/permissions/${projectId}/members/${memberId}`)
+}
+
+export const getRolesAndPermissions = async (projectId: string) => {
+  return apiClient.get(`/permissions/${projectId}/roles`)
+}
+
+export const checkPermission = async (projectId: string, params: {
+  permission: string
+  userId?: string
+}) => {
+  return apiClient.get(`/permissions/${projectId}/permissions/check`, { params })
+}
+
+export const getPermissionStats = async (projectId: string) => {
+  return apiClient.get(`/permissions/${projectId}/permissions/stats`)
+}
+
+// 功能模块管理API
+export const getFeatureModules = async (projectId: string, params?: {
+  status?: 'planned' | 'in-progress' | 'completed'
+  search?: string
+}) => {
+  return apiClient.get(`/features/${projectId}/modules`, { params })
+}
+
+export const getFeatureModule = async (projectId: string, moduleId: string) => {
+  return apiClient.get(`/features/${projectId}/modules/${moduleId}`)
+}
+
+export const createFeatureModule = async (projectId: string, data: {
+  name: string
+  description?: string
+  category?: string
+  tags?: string[]
+}) => {
+  return apiClient.post(`/features/${projectId}/modules`, data)
+}
+
+export const updateFeatureModule = async (projectId: string, moduleId: string, data: any) => {
+  return apiClient.put(`/features/${projectId}/modules/${moduleId}`, data)
+}
+
+export const deleteFeatureModule = async (projectId: string, moduleId: string) => {
+  return apiClient.delete(`/features/${projectId}/modules/${moduleId}`)
+}
+
+export const getFeatureModuleStats = async (projectId: string) => {
+  return apiClient.get(`/features/${projectId}/modules/stats`)
 }
 
 // 代码模板管理API
@@ -364,7 +492,7 @@ export const getCodeTemplates = async (filters?: {
   tags?: string
   search?: string
 }) => {
-  return apiClient.get('/api/v1/ai/templates', { params: filters })
+  return apiClient.get('/ai/templates', { params: filters })
 }
 
 export const getCodeTemplate = async (templateId: string) => {
@@ -393,7 +521,7 @@ export const createCodeTemplate = async (template: {
   isPublic: boolean
   tags?: string[]
 }) => {
-  return apiClient.post('/api/v1/ai/templates', template)
+  return apiClient.post('/ai/templates', template)
 }
 
 export const updateCodeTemplate = async (templateId: string, updates: any) => {
@@ -405,21 +533,21 @@ export const deleteCodeTemplate = async (templateId: string) => {
 }
 
 export const exportTemplateCollection = async (templateIds: string[]) => {
-  return apiClient.post('/api/v1/ai/templates/export', { templateIds })
+  return apiClient.post('/ai/templates/export', { templateIds })
 }
 
 export const importTemplateCollection = async (collection: any) => {
-  return apiClient.post('/api/v1/ai/templates/import', { collection })
+  return apiClient.post('/ai/templates/import', { collection })
 }
 
 export const exportCodeTemplates = async (templateIds: string[]) => {
-  return apiClient.post('/api/v1/ai/templates/export', { templateIds })
+  return apiClient.post('/ai/templates/export', { templateIds })
 }
 
 export const importCodeTemplates = async (file: File) => {
   const formData = new FormData()
   formData.append('file', file)
-  return apiClient.post('/api/v1/ai/templates/import', formData, {
+  return apiClient.post('/ai/templates/import', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -462,6 +590,9 @@ export const apiMethods = {
   // AI服务相关
   getAIServiceHealth,
   getAIProviders,
+  getAIProvidersDetailed,
+  getAIModels,
+  autoSelectBestModel,
   setDefaultAIProvider,
   getAIUsageStats,
   getAIConfiguration,
@@ -496,6 +627,13 @@ export const apiMethods = {
   validateAndCorrectModel,
   smartCorrectModel,
   generateQualityReport,
+  // 功能模块管理
+  getFeatureModules,
+  getFeatureModule,
+  createFeatureModule,
+  updateFeatureModule,
+  deleteFeatureModule,
+  getFeatureModuleStats,
   // 代码模板管理
   getCodeTemplates,
   getCodeTemplate,

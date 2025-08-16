@@ -26,6 +26,7 @@ import {
   renderCodeTemplate
 } from '../../../../utils/api'
 import { toast } from 'react-hot-toast'
+import SQLPreview from '../../../common/SQLPreview'
 
 interface SQLGeneratorProps {
   projectId: string
@@ -462,8 +463,14 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         
         const tableName = selectedDialect === 'mysql' ? `\`${table.name}\`` : `"${table.name}"`
         const indexName = selectedDialect === 'mysql' ? `\`${index.name}\`` : `"${index.name}"`
-        const fields = index.fields.map(field => 
-          selectedDialect === 'mysql' ? `\`${field}\`` : `"${field}"`
+        
+        // 处理索引字段，支持新的数据结构
+        const indexFields = index.fields || []
+        const fieldNames = indexFields.map((field: any) => 
+          typeof field === 'string' ? field : field.fieldName
+        )
+        const fields = fieldNames.map(fieldName => 
+          selectedDialect === 'mysql' ? `\`${fieldName}\`` : `"${fieldName}"`
         ).join(', ')
         
         let indexSQL = 'CREATE '
@@ -1006,9 +1013,13 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                   </div>
                 )}
                 
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto max-h-96 overflow-y-auto">
-                  <code>{generatedSQL}</code>
-                </pre>
+                <SQLPreview
+                  sql={generatedSQL}
+                  dialect={dialectConfigs[selectedDialect].name}
+                  title="生成的SQL代码"
+                  showLineNumbers={true}
+                  maxHeight="400px"
+                />
               </div>
             ) : (
               <div className="text-center py-12">

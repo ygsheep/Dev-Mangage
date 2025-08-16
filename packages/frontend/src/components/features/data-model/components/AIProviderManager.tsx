@@ -599,7 +599,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                     </button>
                     <button
                       onClick={() => handleDeleteProvider(selectedProvider)}
-                      className="btn-outline text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                      className="btn-outline flex text-red-600 hover:bg-red-50 flex items-center space-x-2"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>删除</span>

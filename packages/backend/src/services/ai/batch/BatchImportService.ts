@@ -551,7 +551,7 @@ export class BatchImportService extends EventEmitter {
     try {
       // 这里可以调用现有的数据模型保存服务
       // 暂时记录到解析历史中
-      await prisma.aiParseHistory.create({
+      await prisma.aIParseHistory.create({
         data: {
           projectId: job.projectId,
           fileName: `${job.name}_merged.json`,

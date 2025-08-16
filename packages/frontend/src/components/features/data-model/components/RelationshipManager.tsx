@@ -13,9 +13,13 @@ import {
   Settings,
   Eye,
   Copy,
-  X
+  X,
+  Network,
+  GitBranch,
+  Database
 } from 'lucide-react'
 import { DatabaseTable, TableRelationship } from '@shared/types'
+import RelationshipEditModal from './modals/RelationshipEditModal'
 
 interface RelationshipManagerProps {
   projectId: string
@@ -39,6 +43,8 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingRelationship, setEditingRelationship] = useState<TableRelationship | null>(null)
   const [selectedTables, setSelectedTables] = useState<Set<string>>(new Set())
+  const [showRelationshipDetails, setShowRelationshipDetails] = useState<string | null>(null)
+  const [showConstraintValidation, setShowConstraintValidation] = useState(false)
 
   // 过滤关系
   const filteredRelationships = useMemo(() => {
@@ -72,6 +78,58 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
     return filtered
   }, [relationships, searchQuery, selectedType, selectedTables, tables])
 
+  // 检测循环依赖
+  const detectCircularDependencies = (relationships: TableRelationship[], tables: DatabaseTable[]): number => {
+    const graph = new Map<string, string[]>()
+    
+    // 构建依赖图
+    tables.forEach(table => {
+      graph.set(table.id, [])
+    })
+
+    relationships.forEach(rel => {
+      const deps = graph.get(rel.fromTableId) || []
+      deps.push(rel.toTableId)
+      graph.set(rel.fromTableId, deps)
+    })
+
+    // DFS检测循环
+    const visited = new Set<string>()
+    const recStack = new Set<string>()
+    let circularCount = 0
+
+    const hasCycle = (node: string): boolean => {
+      if (recStack.has(node)) {
+        circularCount++
+        return true
+      }
+      if (visited.has(node)) {
+        return false
+      }
+
+      visited.add(node)
+      recStack.add(node)
+
+      const neighbors = graph.get(node) || []
+      for (const neighbor of neighbors) {
+        if (hasCycle(neighbor)) {
+          return true
+        }
+      }
+
+      recStack.delete(node)
+      return false
+    }
+
+    for (const node of graph.keys()) {
+      if (!visited.has(node)) {
+        hasCycle(node)
+      }
+    }
+
+    return circularCount
+  }
+
   // 关系统计
   const relationshipStats = useMemo(() => {
     const stats = {
@@ -79,7 +137,9 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
       oneToOne: 0,
       oneToMany: 0,
       manyToMany: 0,
-      issues: 0
+      issues: 0,
+      circularDependencies: 0,
+      orphanedRelationships: 0
     }
 
     relationships.forEach(rel => {
@@ -99,10 +159,90 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
       if (!rel.fromFieldId || !rel.toFieldId) {
         stats.issues++
       }
+
+      // 检查孤立关系（表不存在）
+      const fromTableExists = tables.some(t => t.id === rel.fromTableId)
+      const toTableExists = tables.some(t => t.id === rel.toTableId)
+      if (!fromTableExists || !toTableExists) {
+        stats.orphanedRelationships++
+      }
     })
 
+    // 检查循环依赖
+    stats.circularDependencies = detectCircularDependencies(relationships, tables)
+
     return stats
-  }, [relationships])
+  }, [relationships, tables])
+
+  // 验证关系完整性
+  const validateRelationshipIntegrity = () => {
+    const issues: Array<{
+      relationshipId: string
+      type: 'missing_table' | 'missing_field' | 'type_mismatch' | 'circular_dependency'
+      message: string
+    }> = []
+
+    relationships.forEach(rel => {
+      const fromTable = tables.find(t => t.id === rel.fromTableId)
+      const toTable = tables.find(t => t.id === rel.toTableId)
+
+      // 检查表是否存在
+      if (!fromTable) {
+        issues.push({
+          relationshipId: rel.id,
+          type: 'missing_table',
+          message: `源表不存在: ${rel.fromTableId}`
+        })
+      }
+
+      if (!toTable) {
+        issues.push({
+          relationshipId: rel.id,
+          type: 'missing_table',
+          message: `目标表不存在: ${rel.toTableId}`
+        })
+      }
+
+      // 检查字段是否存在
+      if (fromTable && rel.fromFieldId) {
+        const fromField = fromTable.fields?.find(f => f.id === rel.fromFieldId)
+        if (!fromField) {
+          issues.push({
+            relationshipId: rel.id,
+            type: 'missing_field',
+            message: `源字段不存在: ${rel.fromFieldId}`
+          })
+        }
+      }
+
+      if (toTable && rel.toFieldId) {
+        const toField = toTable.fields?.find(f => f.id === rel.toFieldId)
+        if (!toField) {
+          issues.push({
+            relationshipId: rel.id,
+            type: 'missing_field',
+            message: `目标字段不存在: ${rel.toFieldId}`
+          })
+        }
+      }
+
+      // 检查类型匹配
+      if (fromTable && toTable && rel.fromFieldId && rel.toFieldId) {
+        const fromField = fromTable.fields?.find(f => f.id === rel.fromFieldId)
+        const toField = toTable.fields?.find(f => f.id === rel.toFieldId)
+        
+        if (fromField && toField && fromField.type !== toField.type) {
+          issues.push({
+            relationshipId: rel.id,
+            type: 'type_mismatch',
+            message: `字段类型不匹配: ${fromField.type} vs ${toField.type}`
+          })
+        }
+      }
+    })
+
+    return issues
+  }
 
   const getRelationshipIcon = (type: string) => {
     switch (type) {
@@ -148,14 +288,43 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
     setEditingRelationship(relationship)
   }
 
+  const handleViewRelationshipDetails = (relationshipId: string) => {
+    setShowRelationshipDetails(relationshipId)
+  }
+
+  const handleCopyRelationship = (relationship: TableRelationship) => {
+    // 复制关系逻辑
+    const copiedRelationship: Omit<TableRelationship, 'id'> = {
+      projectId: relationship.projectId,
+      name: `${relationship.name}_copy`,
+      fromTableId: relationship.fromTableId,
+      toTableId: relationship.toTableId,
+      fromFieldId: relationship.fromFieldId,
+      toFieldId: relationship.toFieldId,
+      relationshipType: relationship.relationshipType,
+      onUpdate: relationship.onUpdate,
+      onDelete: relationship.onDelete,
+      comment: relationship.comment ? `${relationship.comment} (复制)` : '复制的关系',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+    onRelationshipCreate(copiedRelationship)
+  }
+
   const hasIssues = (relationship: TableRelationship) => {
-    return !relationship.fromFieldId || !relationship.toFieldId
+    const fromTable = tables.find(t => t.id === relationship.fromTableId)
+    const toTable = tables.find(t => t.id === relationship.toTableId)
+    
+    return !relationship.fromFieldId || 
+           !relationship.toFieldId || 
+           !fromTable || 
+           !toTable
   }
 
   return (
     <div className="space-y-6">
       {/* 统计卡片 */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -205,8 +374,18 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
+              <p className="text-sm font-medium text-gray-600">循环依赖</p>
+              <p className="text-2xl font-bold text-orange-600">{relationshipStats.circularDependencies}</p>
+            </div>
+            <GitBranch className="w-8 h-8 text-orange-400" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <div>
               <p className="text-sm font-medium text-gray-600">需要修复</p>
-              <p className="text-2xl font-bold text-red-600">{relationshipStats.issues}</p>
+              <p className="text-2xl font-bold text-red-600">{relationshipStats.issues + relationshipStats.orphanedRelationships}</p>
             </div>
             <AlertTriangle className="w-8 h-8 text-red-400" />
           </div>
@@ -249,6 +428,14 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
           </div>
 
           <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setShowConstraintValidation(true)}
+              className="btn-outline flex items-center space-x-2"
+            >
+              <CheckCircle className="w-4 h-4" />
+              <span>验证约束</span>
+            </button>
+            
             <button
               onClick={handleCreateRelationship}
               className="btn-primary flex items-center space-x-2"
@@ -419,7 +606,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                         </button>
                         
                         <button
-                          onClick={() => {/* TODO: 查看关系详情 */}}
+                          onClick={() => handleViewRelationshipDetails(relationship.id)}
                           className="text-gray-600 hover:text-gray-900"
                           title="查看详情"
                         >
@@ -427,7 +614,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                         </button>
                         
                         <button
-                          onClick={() => {/* TODO: 复制关系 */}}
+                          onClick={() => handleCopyRelationship(relationship)}
                           className="text-gray-600 hover:text-gray-900"
                           title="复制关系"
                         >
@@ -481,6 +668,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
           isOpen={true}
           relationship={editingRelationship}
           tables={tables}
+          mode={editingRelationship ? 'edit' : 'create'}
           onClose={() => {
             setShowCreateModal(false)
             setEditingRelationship(null)
@@ -494,241 +682,145 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
             setShowCreateModal(false)
             setEditingRelationship(null)
           }}
+          onDelete={editingRelationship ? (relationshipId: string) => {
+            onRelationshipDelete(relationshipId)
+            setEditingRelationship(null)
+          } : undefined}
+        />
+      )}
+
+      {/* 约束验证模态框 */}
+      {showConstraintValidation && (
+        <ConstraintValidationModal
+          isOpen={true}
+          relationships={relationships}
+          tables={tables}
+          onClose={() => setShowConstraintValidation(false)}
+          onFixIssue={(relationshipId, fixes) => {
+            // 自动修复逻辑
+            console.log('Fix issues for relationship:', relationshipId, fixes)
+          }}
+        />
+      )}
+
+      {/* 关系详情模态框 */}
+      {showRelationshipDetails && (
+        <RelationshipDetailsModal
+          isOpen={true}
+          relationshipId={showRelationshipDetails}
+          relationships={relationships}
+          tables={tables}
+          onClose={() => setShowRelationshipDetails(null)}
+          onEdit={(relationship) => {
+            setShowRelationshipDetails(null)
+            setEditingRelationship(relationship)
+          }}
         />
       )}
     </div>
   )
 }
 
-// 关系编辑模态框组件
-interface RelationshipEditModalProps {
+// 约束验证模态框
+interface ConstraintValidationModalProps {
   isOpen: boolean
-  relationship?: TableRelationship | null
+  relationships: TableRelationship[]
   tables: DatabaseTable[]
   onClose: () => void
-  onSave: (data: Omit<TableRelationship, 'id' | 'projectId'>) => void
+  onFixIssue: (relationshipId: string, fixes: any) => void
 }
 
-const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
+const ConstraintValidationModal: React.FC<ConstraintValidationModalProps> = ({
   isOpen,
-  relationship,
+  relationships,
   tables,
   onClose,
-  onSave
+  onFixIssue
 }) => {
-  const [formData, setFormData] = useState({
-    name: relationship?.name || '',
-    fromTableId: relationship?.fromTableId || '',
-    toTableId: relationship?.toTableId || '',
-    fromFieldId: relationship?.fromFieldId || '',
-    toFieldId: relationship?.toFieldId || '',
-    relationshipType: relationship?.relationshipType || 'ONE_TO_MANY' as const,
-    onUpdate: relationship?.onUpdate || 'RESTRICT' as const,
-    onDelete: relationship?.onDelete || 'RESTRICT' as const,
-    comment: relationship?.comment || ''
-  })
-
-  const fromTable = tables.find(t => t.id === formData.fromTableId)
-  const toTable = tables.find(t => t.id === formData.toTableId)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSave(formData)
-  }
-
   if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">
+            约束验证报告
+          </h2>
+          <button onClick={onClose} className="btn-ghost">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="text-gray-600">约束验证功能正在开发中...</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// 关系详情模态框
+interface RelationshipDetailsModalProps {
+  isOpen: boolean
+  relationshipId: string
+  relationships: TableRelationship[]
+  tables: DatabaseTable[]
+  onClose: () => void
+  onEdit: (relationship: TableRelationship) => void
+}
+
+const RelationshipDetailsModal: React.FC<RelationshipDetailsModalProps> = ({
+  isOpen,
+  relationshipId,
+  relationships,
+  tables,
+  onClose,
+  onEdit
+}) => {
+  if (!isOpen) return null
+
+  const relationship = relationships.find(r => r.id === relationshipId)
+  if (!relationship) return null
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            {relationship ? '编辑关系' : '创建关系'}
+            关系详情
           </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="btn-ghost">
             <X className="w-5 h-5" />
           </button>
         </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="p-6">
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                关系名称
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="input w-full"
-                placeholder="自动生成或手动输入"
-              />
+              <label className="text-sm font-medium text-gray-700">关系名称</label>
+              <p className="text-gray-900">{relationship.name}</p>
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                关系类型
-              </label>
-              <select
-                value={formData.relationshipType}
-                onChange={(e) => setFormData({ ...formData, relationshipType: e.target.value as any })}
-                className="input w-full"
-              >
-                <option value="ONE_TO_ONE">一对一 (1:1)</option>
-                <option value="ONE_TO_MANY">一对多 (1:N)</option>
-                <option value="MANY_TO_MANY">多对多 (N:M)</option>
-              </select>
+              <label className="text-sm font-medium text-gray-700">类型</label>
+              <p className="text-gray-900">{relationship.relationshipType}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">约束行为</label>
+              <p className="text-gray-900">
+                更新: {relationship.onUpdate}, 删除: {relationship.onDelete}
+              </p>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                源表
-              </label>
-              <select
-                value={formData.fromTableId}
-                onChange={(e) => setFormData({ ...formData, fromTableId: e.target.value, fromFieldId: '' })}
-                className="input w-full"
-                required
-              >
-                <option value="">选择源表</option>
-                {tables.map(table => (
-                  <option key={table.id} value={table.id}>
-                    {table.displayName || table.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                目标表
-              </label>
-              <select
-                value={formData.toTableId}
-                onChange={(e) => setFormData({ ...formData, toTableId: e.target.value, toFieldId: '' })}
-                className="input w-full"
-                required
-              >
-                <option value="">选择目标表</option>
-                {tables.map(table => (
-                  <option key={table.id} value={table.id}>
-                    {table.displayName || table.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                源表字段
-              </label>
-              <select
-                value={formData.fromFieldId}
-                onChange={(e) => setFormData({ ...formData, fromFieldId: e.target.value })}
-                className="input w-full"
-                disabled={!fromTable}
-                required
-              >
-                <option value="">选择字段</option>
-                {fromTable?.fields?.map(field => (
-                  <option key={field.id} value={field.id}>
-                    {field.name} ({field.type})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                目标表字段
-              </label>
-              <select
-                value={formData.toFieldId}
-                onChange={(e) => setFormData({ ...formData, toFieldId: e.target.value })}
-                className="input w-full"
-                disabled={!toTable}
-                required
-              >
-                <option value="">选择字段</option>
-                {toTable?.fields?.map(field => (
-                  <option key={field.id} value={field.id}>
-                    {field.name} ({field.type})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                更新时
-              </label>
-              <select
-                value={formData.onUpdate}
-                onChange={(e) => setFormData({ ...formData, onUpdate: e.target.value as any })}
-                className="input w-full"
-              >
-                <option value="RESTRICT">RESTRICT (限制)</option>
-                <option value="CASCADE">CASCADE (级联)</option>
-                <option value="SET_NULL">SET NULL (设为空)</option>
-                <option value="NO_ACTION">NO ACTION (无操作)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                删除时
-              </label>
-              <select
-                value={formData.onDelete}
-                onChange={(e) => setFormData({ ...formData, onDelete: e.target.value as any })}
-                className="input w-full"
-              >
-                <option value="RESTRICT">RESTRICT (限制)</option>
-                <option value="CASCADE">CASCADE (级联)</option>
-                <option value="SET_NULL">SET NULL (设为空)</option>
-                <option value="NO_ACTION">NO ACTION (无操作)</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              关系说明
-            </label>
-            <textarea
-              value={formData.comment}
-              onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-              className="input w-full"
-              rows={3}
-              placeholder="描述这个关系的业务含义..."
-            />
-          </div>
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-outline"
-            >
-              取消
+          <div className="flex justify-end space-x-3 mt-6">
+            <button onClick={onClose} className="btn-outline">
+              关闭
             </button>
-            <button
-              type="submit"
+            <button 
+              onClick={() => onEdit(relationship)}
               className="btn-primary"
             >
-              {relationship ? '更新' : '创建'}
+              编辑
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )

@@ -59,8 +59,28 @@ export class OllamaAdapter extends BaseAIAdapter {
       }
     })
 
-    // 初始化时检查模型可用性
-    this.checkModelAvailability()
+    // 初始化时检测可用模型并选择最佳模型
+    this.initializeWithAutoDetection()
+  }
+
+  /**
+   * 初始化时自动检测模型
+   */
+  private async initializeWithAutoDetection(): Promise<void> {
+    try {
+      await this.detectAvailableModels()
+      // 如果配置中没有指定模型，自动选择最佳模型
+      if (!this.config.model) {
+        const bestModel = this.autoSelectBestModel()
+        if (bestModel) {
+          this.config.model = bestModel
+          logger.info('自动设置最佳模型', { model: bestModel })
+        }
+      }
+      await this.checkModelAvailability()
+    } catch (error) {
+      logger.warn('模型自动检测初始化失败', { error: error.message })
+    }
   }
 
   getProviderName(): string {
@@ -68,7 +88,65 @@ export class OllamaAdapter extends BaseAIAdapter {
   }
 
   getModelVersion(): string {
-    return this.config.model || 'qwen2.5:14b'
+    return this.config.model || this.autoSelectBestModel() || 'qwen2.5-coder:7b'
+  }
+
+  /**
+   * 自动选择最佳可用模型
+   */
+  private autoSelectBestModel(): string | null {
+    if (this.lastDetectedModels && this.lastDetectedModels.length > 0) {
+      // 模型优先级：coder > chat > base，大参数 > 小参数
+      const modelPriority = [
+        'qwen2.5-coder:14b', 'qwen2.5-coder:7b', 'qwen2.5-coder:1.5b',
+        'qwen2.5:14b', 'qwen2.5:7b', 'qwen2.5:1.5b', 
+        'deepseek-coder:33b', 'deepseek-coder:6.7b', 'deepseek-coder:1.3b',
+        'codellama:34b', 'codellama:13b', 'codellama:7b',
+        'llama3:70b', 'llama3:8b',
+        'gpt-4', 'gpt-3.5-turbo'
+      ]
+      
+      for (const preferredModel of modelPriority) {
+        if (this.lastDetectedModels.some(model => 
+          model.name === preferredModel || model.name.startsWith(preferredModel.split(':')[0])
+        )) {
+          logger.info('自动选择模型', { selectedModel: preferredModel })
+          return preferredModel
+        }
+      }
+      
+      // 如果没有找到优先模型，选择第一个可用的
+      const fallbackModel = this.lastDetectedModels[0]?.name
+      if (fallbackModel) {
+        logger.info('使用回退模型', { fallbackModel })
+        return fallbackModel
+      }
+    }
+    
+    return null
+  }
+
+  private lastDetectedModels: any[] = []
+
+  /**
+   * 检测可用模型列表
+   */
+  async detectAvailableModels(): Promise<any[]> {
+    try {
+      const response = await this.client.get('/api/tags')
+      const models = response.data?.models || []
+      this.lastDetectedModels = models
+      
+      logger.info('检测到可用模型', { 
+        totalModels: models.length,
+        models: models.map((m: any) => m.name)
+      })
+      
+      return models
+    } catch (error) {
+      logger.warn('检测模型失败', { error: error.message })
+      return []
+    }
   }
 
   async isAvailable(): Promise<boolean> {

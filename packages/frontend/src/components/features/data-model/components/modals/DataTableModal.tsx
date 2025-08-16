@@ -12,6 +12,7 @@ import {
   Search
 } from 'lucide-react'
 import { DatabaseTable, DatabaseFieldType, DATA_MODEL_STATUS_COLORS } from '@shared/types'
+import SQLPreview from '../../../../common/SQLPreview'
 
 interface DataTableModalProps {
   table: DatabaseTable | null
@@ -117,7 +118,12 @@ const DataTableModal: React.FC<DataTableModalProps> = ({
     indexes.forEach(index => {
       if (index.type !== 'PRIMARY') {
         const indexType = index.isUnique ? 'UNIQUE INDEX' : 'INDEX'
-        fieldDefinitions.push(`  ${indexType} ${index.name} (${index.fields.join(', ')})`)
+        // 处理索引字段，支持新的数据结构
+        const indexFields = index.fields || []
+        const fieldNames = indexFields.map((field: any) => 
+          typeof field === 'string' ? field : field.fieldName
+        )
+        fieldDefinitions.push(`  ${indexType} ${index.name} (${fieldNames.join(', ')})`)
       }
     })
     
@@ -409,9 +415,13 @@ ${fieldDefinitions.join(',\n')}
                   复制SQL
                 </button>
               </div>
-              <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
-                <code>{generateCreateTableSQL()}</code>
-              </pre>
+              <SQLPreview
+                sql={generateCreateTableSQL()}
+                dialect="MySQL"
+                title="CREATE TABLE语句"
+                showLineNumbers={true}
+                maxHeight="400px"
+              />
             </div>
           )}
         </div>

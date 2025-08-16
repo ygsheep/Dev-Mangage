@@ -77,8 +77,17 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
   const [showMiniMap, setShowMiniMap] = useState(true)
   const [showBackground, setShowBackground] = useState(true)
 
+  // 添加调试日志
+  console.log('ERDiagramDesigner render:', {
+    projectId,
+    tablesCount: tables.length,
+    relationshipsCount: relationships.length,
+    tables: tables.map(t => ({ id: t.id, name: t.name, fieldsCount: t.fields?.length || 0 }))
+  })
+
   // 初始化节点和边
   const initializeNodes = useCallback(() => {
+    console.log('Initializing nodes with tables:', tables.length)
     const tableNodes: Node[] = tables.map((table, index) => ({
       id: table.id,
       type: 'tableNode',
@@ -96,6 +105,7 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
       dragHandle: '.table-drag-handle'
     }))
 
+    console.log('Created table nodes:', tableNodes.length)
     setNodes(tableNodes)
   }, [tables, selectedTable, onTableUpdate, onTableDelete, setNodes])
 
@@ -247,8 +257,32 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
 
   const proOptions = { hideAttribution: true }
 
+  // 空状态检查
+  if (!tables || tables.length === 0) {
+    return (
+      <div className="h-full bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Database className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            暂无数据表
+          </h3>
+          <p className="text-gray-600 mb-6">
+            开始创建数据表来设计您的数据库结构
+          </p>
+          <button
+            onClick={handleAddTable}
+            className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>创建第一个数据表</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="h-full bg-white relative">
+    <div className="h-full bg-white relative" style={{ width: '100%', height: '100%' }}>
       {/* 工具栏 */}
       <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center space-x-2 p-3">
@@ -355,6 +389,7 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
         attributionPosition="bottom-left"
         proOptions={proOptions}
         className="bg-gray-50"
+        style={{ width: '100%', height: '100%' }}
       >
         {showBackground && (
           <Background

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { API, HTTPMethod, HTTP_METHOD_COLORS, APITestRequest, APITestResponse } from '@shared/types'
 import toast from 'react-hot-toast'
+import CodeHighlight from '../../../../common/CodeHighlight'
 
 interface APITestModalProps {
   api: API | null
@@ -465,9 +466,13 @@ const APITestModal: React.FC<APITestModalProps> = ({
                   {/* Response Data */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-2">响应数据</h4>
-                    <pre className="bg-gray-50 rounded-lg p-4 text-sm overflow-x-auto border">
-                      <code>{formatJSON(testResponse.data)}</code>
-                    </pre>
+                    <CodeHighlight
+                      code={formatJSON(testResponse.data)}
+                      language="json"
+                      showLineNumbers={false}
+                      showCopyButton={true}
+                      maxHeight="300px"
+                    />
                   </div>
                 </div>
               ) : testError ? (

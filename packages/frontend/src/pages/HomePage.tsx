@@ -8,11 +8,12 @@ import { useDebugComponent } from '../debug'
 const HomePage: React.FC = () => {
   const navigate = useNavigate()
   
-  const { data: projects = [] } = useQuery({
+  const { data: projectsResponse = {} } = useQuery({
     queryKey: ['projects'],
     queryFn: apiMethods.getProjects,
   })
 
+  const projects = projectsResponse?.data?.projects || projectsResponse?.projects || []
   const projectsArray = Array.isArray(projects) ? projects : []
   const recentProjects = projectsArray.slice(0, 6)
 

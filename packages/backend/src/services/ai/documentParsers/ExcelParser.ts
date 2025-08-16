@@ -266,6 +266,7 @@ export class ExcelParser {
         comment: commentIndex !== -1 ? row[commentIndex]?.trim() : undefined,
         nullable: nullableIndex !== -1 ? this.parseBoolean(row[nullableIndex]) : true,
         isPrimaryKey: primaryKeyIndex !== -1 ? this.parseBoolean(row[primaryKeyIndex]) : false,
+        isAutoIncrement: false, // 从类型字符串中解析，默认为false
         defaultValue: defaultIndex !== -1 ? row[defaultIndex]?.trim() : undefined
       }
 

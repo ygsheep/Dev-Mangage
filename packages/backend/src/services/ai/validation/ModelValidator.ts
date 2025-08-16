@@ -1,4 +1,4 @@
-import { ParsedModel, ParsedTable, ParsedField, ValidationResult, SQLDialect } from '../types'
+import { ParsedModel, ParsedTable, ParsedField, SQLDialect } from '../types'
 import logger from '../../../utils/logger'
 
 export interface ValidationOptions {

@@ -14,6 +14,9 @@ import tableRelationshipsRouter from './tableRelationships'
 import modelVersionsRouter from './modelVersions'
 import tableStatisticsRouter from './tableStatistics'
 import aiRouter from './ai'
+import collaborationRouter from './collaboration'
+import permissionsRouter from './permissions'
+import { featuresRouter } from './features'
 
 export const setupRoutes = (app: Express): void => {
   const apiPrefix = config.apiPrefix
@@ -46,6 +49,13 @@ export const setupRoutes = (app: Express): void => {
   
   // AI服务相关API
   app.use(`${apiPrefix}/ai`, aiRouter)
+  
+  // 协作和权限管理API
+  app.use(`${apiPrefix}/collaboration`, collaborationRouter)
+  app.use(`${apiPrefix}/permissions`, permissionsRouter)
+  
+  // 功能模块管理API
+  app.use(`${apiPrefix}/features`, featuresRouter)
   
   // 集成HTTP MCP服务路由
   setupIntegratedMCPRoutes(app)
@@ -82,6 +92,9 @@ export const setupRoutes = (app: Express): void => {
         modelVersions: `${apiPrefix}/model-versions`,
         tableStatistics: `${apiPrefix}/table-statistics`,
         ai: `${apiPrefix}/ai`,
+        collaboration: `${apiPrefix}/collaboration`,
+        permissions: `${apiPrefix}/permissions`,
+        features: `${apiPrefix}/features`,
       },
       documentation: 'https://github.com/devapi-team/devapi-manager',
     })

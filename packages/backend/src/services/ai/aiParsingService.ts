@@ -128,7 +128,7 @@ export class AIParsingService {
         includeIndexes: true,
         includeConstraints: true,
         includeForeignKeys: true,
-        formatStyle: 'pretty',
+        formatStyle: 'compact',
         ...options
       })
 
@@ -136,15 +136,12 @@ export class AIParsingService {
         success: true,
         data: {
           dialect,
-          statements: sqlResult.statements.map(stmt => stmt.sql),
+          statements: sqlResult.statements,
           metadata: sqlResult.metadata
         },
         metadata: {
           provider: 'SQLDialectManager',
-          timestamp: new Date(),
-          dialect,
-          tablesCount: model.tables.length,
-          statementsCount: sqlResult.statements.length
+          timestamp: new Date()
         }
       }
 
@@ -166,8 +163,7 @@ export class AIParsingService {
         error: error.message,
         metadata: {
           provider: options.provider || 'SQLDialectManager',
-          timestamp: new Date(),
-          dialect
+          timestamp: new Date()
         }
       }
     }
@@ -189,7 +185,7 @@ export class AIParsingService {
         include: {
           fields: {
             include: {
-              enumValuesList: true
+              enumValues: true
             }
           },
           indexes: {
@@ -236,7 +232,7 @@ export class AIParsingService {
           isAutoIncrement: field.isAutoIncrement,
           isUnique: field.isUnique,
           isIndex: field.isIndex,
-          enumValues: field.enumValuesList?.map(ev => ev.value) || []
+          enumValues: field.enumValues?.map(ev => ev.value) || []
         })),
         indexes: table.indexes?.map(index => ({
           name: index.name,
@@ -298,7 +294,7 @@ export class AIParsingService {
         include: {
           fields: {
             include: {
-              enumValuesList: true
+              enumValues: true
             }
           },
           indexes: true
@@ -327,7 +323,7 @@ export class AIParsingService {
           isAutoIncrement: field.isAutoIncrement,
           isUnique: field.isUnique,
           isIndex: field.isIndex,
-          enumValues: field.enumValuesList?.map(ev => ev.value) || []
+          enumValues: field.enumValues?.map(ev => ev.value) || []
         }))
       }
 
@@ -461,7 +457,7 @@ export class AIParsingService {
    */
   async getParseHistory(projectId: string, limit: number = 20): Promise<any[]> {
     try {
-      const history = await prisma.aiParseHistory.findMany({
+      const history = await prisma.aIParseHistory.findMany({
         where: { projectId },
         orderBy: { createdAt: 'desc' },
         take: limit
@@ -498,7 +494,7 @@ export class AIParsingService {
     try {
       const status = parseResult.success ? 'SUCCESS' : 'FAILED'
       
-      const historyRecord = await prisma.aiParseHistory.create({
+      const historyRecord = await prisma.aIParseHistory.create({
         data: {
           projectId,
           fileName,

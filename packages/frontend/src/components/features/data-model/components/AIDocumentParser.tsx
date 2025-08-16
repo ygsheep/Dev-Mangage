@@ -16,10 +16,13 @@ import {
 import { DatabaseTable, DatabaseField } from '@shared/types'
 import { 
   parseDocument, 
-  getAIProviders, 
-  getAIServiceHealth 
+  getAIProvidersDetailed, 
+  getAIServiceHealth,
+  getAIModels,
+  autoSelectBestModel
 } from '../../../../utils/api'
 import { toast } from 'react-hot-toast'
+import SQLPreview from '../../../common/SQLPreview'
 
 interface ParsedTableResult {
   name: string
@@ -54,6 +57,23 @@ interface ParseResult {
   }
 }
 
+interface AIProvider {
+  id: string
+  name: string
+  displayName: string
+  description: string
+  icon: string
+  enabled: boolean
+  model: string
+  status: 'healthy' | 'degraded' | 'unhealthy'
+}
+
+interface AIModel {
+  name: string
+  size?: number
+  modified_at?: string
+}
+
 interface AIDocumentParserProps {
   projectId: string
   onTablesImported: (tables: ParsedTableResult[]) => void
@@ -70,9 +90,11 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
   const [isUploading, setIsUploading] = useState(false)
   const [isParsing, setIsParsing] = useState(false)
   const [selectedProvider, setSelectedProvider] = useState<string>('')
+  const [selectedModel, setSelectedModel] = useState<string>('')
+  const [availableModels, setAvailableModels] = useState<AIModel[]>([])
   const [selectedTables, setSelectedTables] = useState<Set<string>>(new Set())
   const [showPreview, setShowPreview] = useState(false)
-  const [availableProviders, setAvailableProviders] = useState<any[]>([])
+  const [availableProviders, setAvailableProviders] = useState<AIProvider[]>([])
   const [serviceHealth, setServiceHealth] = useState<any>(null)
 
   const supportedFileTypes = {
@@ -91,9 +113,10 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
   useEffect(() => {
     const loadAIInfo = async () => {
       try {
-        const [providers, health] = await Promise.all([
-          getAIProviders(),
-          getAIServiceHealth()
+        const [providers, health, models] = await Promise.all([
+          getAIProvidersDetailed(),
+          getAIServiceHealth(),
+          getAIModels() // 获取所有提供者的模型列表
         ])
         
         setAvailableProviders(providers.data || [])
@@ -101,8 +124,20 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
         
         // 设置默认提供者
         if (providers.data && providers.data.length > 0) {
-          setSelectedProvider(providers.data[0].id || providers.data[0].name)
+          const defaultProvider = providers.data[0].name
+          handleProviderChange(defaultProvider)
         }
+        
+        // 显示模型信息
+        if (models.data && models.data.length > 0) {
+          const totalModels = models.data.reduce((total, provider) => total + provider.models.length, 0)
+          console.log('检测到可用模型:', { 
+            providers: models.data.length, 
+            totalModels,
+            details: models.data 
+          })
+        }
+        
       } catch (error) {
         console.error('加载AI服务信息失败:', error)
         toast.error('加载AI服务信息失败')
@@ -111,6 +146,40 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
 
     loadAIInfo()
   }, [])
+
+  // 处理提供商变更
+  const handleProviderChange = async (providerName: string) => {
+    setSelectedProvider(providerName)
+    setSelectedModel('')
+    setAvailableModels([])
+    
+    try {
+      // 获取该提供商的模型列表
+      const modelsResponse = await getAIModels(providerName)
+      if (modelsResponse.success && modelsResponse.data) {
+        const providerModels = modelsResponse.data.find(p => p.provider === providerName)
+        if (providerModels && providerModels.models.length > 0) {
+          setAvailableModels(providerModels.models)
+          // 自动选择第一个模型
+          setSelectedModel(providerModels.models[0].name)
+        }
+      }
+      
+      // 尝试自动选择最佳模型
+      try {
+        const bestModelResponse = await autoSelectBestModel(providerName)
+        if (bestModelResponse.success && bestModelResponse.data) {
+          setSelectedModel(bestModelResponse.data.selectedModel)
+          toast.success(`已自动选择最佳模型: ${bestModelResponse.data.selectedModel}`)
+        }
+      } catch (error) {
+        console.warn('自动选择模型失败:', error)
+      }
+    } catch (error) {
+      console.error('获取模型列表失败:', error)
+      toast.error('获取模型列表失败')
+    }
+  }
 
   const handleFileSelect = useCallback((selectedFile: File) => {
     setFile(selectedFile)
@@ -161,6 +230,7 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
         type: documentType,
         filename: file.name,
         provider: selectedProvider,
+        model: selectedModel,
         strictMode: false,
         confidenceThreshold: 0.7
       })
@@ -372,38 +442,47 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                     
                     {availableProviders.length > 0 ? (
                       <div className="grid grid-cols-1 gap-3">
-                        {availableProviders.map((provider) => {
-                          const isHealthy = serviceHealth?.providers?.find(p => p.provider === provider.name)?.status === 'healthy'
-                          return (
-                            <label
-                              key={provider.name}
-                              className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                                selectedProvider === provider.name
-                                  ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              } ${!isHealthy ? 'opacity-50' : ''}`}
-                            >
-                              <div className="flex items-center space-x-3">
-                                <input
-                                  type="radio"
-                                  name="provider"
-                                  value={provider.name}
-                                  checked={selectedProvider === provider.name}
-                                  onChange={(e) => setSelectedProvider(e.target.value)}
-                                  disabled={!isHealthy}
-                                  className="rounded border-gray-300"
+                        {availableProviders.map((provider, index) => (
+                          <label
+                            key={provider.id || provider.name || index}
+                            className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-colors ${
+                              selectedProvider === provider.name
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            } ${provider.status !== 'healthy' ? 'opacity-50' : ''}`}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <input
+                                type="radio"
+                                name="provider"
+                                value={provider.name}
+                                checked={selectedProvider === provider.name}
+                                onChange={(e) => handleProviderChange(e.target.value)}
+                                disabled={provider.status !== 'healthy'}
+                                className="rounded border-gray-300"
+                              />
+                              {provider.icon && (
+                                <img 
+                                  src={provider.icon} 
+                                  alt={provider.displayName} 
+                                  className="w-8 h-8 object-contain"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none'
+                                  }}
                                 />
-                                <div>
-                                  <span className="font-medium text-sm">{provider.displayName || provider.name}</span>
-                                  {provider.description && (
-                                    <p className="text-xs text-gray-500 mt-1">{provider.description}</p>
-                                  )}
-                                </div>
+                              )}
+                              <div>
+                                <span className="font-medium text-sm">{provider.displayName}</span>
+                                <p className="text-xs text-gray-500 mt-1">{provider.description}</p>
+                                <p className="text-xs text-gray-400">模型: {provider.model}</p>
                               </div>
-                              <div className={`w-2 h-2 rounded-full ${isHealthy ? 'bg-green-500' : 'bg-red-500'}`} />
-                            </label>
-                          )
-                        })}
+                            </div>
+                            <div className={`w-2 h-2 rounded-full ${
+                              provider.status === 'healthy' ? 'bg-green-500' : 
+                              provider.status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
+                            }`} />
+                          </label>
+                        ))}
                       </div>
                     ) : (
                       <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
@@ -412,9 +491,30 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                     )}
                   </div>
                   
+                  {/* 模型选择 */}
+                  {selectedProvider && availableModels.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        模型选择
+                      </label>
+                      <select
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">请选择模型</option>
+                        {availableModels.map((model, index) => (
+                          <option key={model.name || index} value={model.name}>
+                            {model.name} {model.size ? `(${(model.size / 1024 / 1024 / 1024).toFixed(1)}GB)` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  
                   <button
                     onClick={handleFileUpload}
-                    disabled={isUploading || isParsing || !selectedProvider}
+                    disabled={isUploading || isParsing || !selectedProvider || !selectedModel}
                     className="w-full btn-primary flex items-center justify-center space-x-2"
                   >
                     {isUploading ? (
@@ -516,34 +616,36 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                     </div>
                     
                     {showPreview && (
-                      <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto">
-                        <pre>
-                          {parseResult.tables
-                            .filter(table => selectedTables.has(table.name))
-                            .map(table => {
-                              const fieldDefs = table.fields.map(field => {
-                                let def = `  ${field.name} ${field.type}`
-                                if (field.length) def += `(${field.length})`
-                                if (!field.nullable) def += ' NOT NULL'
-                                if (field.isAutoIncrement) def += ' AUTO_INCREMENT'
-                                if (field.defaultValue) def += ` DEFAULT ${field.defaultValue}`
-                                if (field.comment) def += ` COMMENT '${field.comment}'`
-                                return def
-                              })
-                              
-                              const primaryKeys = table.fields
-                                .filter(f => f.isPrimaryKey)
-                                .map(f => f.name)
-                              
-                              if (primaryKeys.length > 0) {
-                                fieldDefs.push(`  PRIMARY KEY (${primaryKeys.join(', ')})`)
-                              }
-                              
-                              return `CREATE TABLE ${table.name} (\n${fieldDefs.join(',\n')}\n)${table.comment ? ` COMMENT='${table.comment}'` : ''};`
+                      <SQLPreview
+                        sql={parseResult.tables
+                          .filter(table => selectedTables.has(table.name))
+                          .map(table => {
+                            const fieldDefs = table.fields.map(field => {
+                              let def = `  ${field.name} ${field.type}`
+                              if (field.length) def += `(${field.length})`
+                              if (!field.nullable) def += ' NOT NULL'
+                              if (field.isAutoIncrement) def += ' AUTO_INCREMENT'
+                              if (field.defaultValue) def += ` DEFAULT ${field.defaultValue}`
+                              if (field.comment) def += ` COMMENT '${field.comment}'`
+                              return def
                             })
-                            .join('\n\n')}
-                        </pre>
-                      </div>
+                            
+                            const primaryKeys = table.fields
+                              .filter(f => f.isPrimaryKey)
+                              .map(f => f.name)
+                            
+                            if (primaryKeys.length > 0) {
+                              fieldDefs.push(`  PRIMARY KEY (${primaryKeys.join(', ')})`)
+                            }
+                            
+                            return `CREATE TABLE ${table.name} (\n${fieldDefs.join(',\n')}\n)${table.comment ? ` COMMENT='${table.comment}'` : ''};`
+                          })
+                          .join('\n\n')}
+                        dialect="MySQL"
+                        title="生成的SQL代码"
+                        showLineNumbers={true}
+                        maxHeight="300px"
+                      />
                     )}
                     
                     <div className="flex justify-end space-x-3">

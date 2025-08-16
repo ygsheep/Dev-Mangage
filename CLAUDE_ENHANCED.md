@@ -466,3 +466,8 @@ This enhanced codebase emphasizes modern TypeScript patterns, comprehensive erro
 - Secure storage of conversation history and context
 
 This comprehensive guide provides the foundation for robust, scalable, and secure development practices when working with the DevAPI Manager platform.
+
+
+# replay in chinese
+
+No matter what language the input content involves (such as English, Japanese, etc.), do not translate proper nouns. Please reply in Simplified Chinese throughout, ensure that the output is purely in Chinese, and avoid mixing in vocabulary or code from other languages.

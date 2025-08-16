@@ -61,7 +61,7 @@ export class AIServiceManager {
         provider: 'ollama',
         enabled: process.env.OLLAMA_ENABLED === 'true' || true,
         apiUrl: process.env.OLLAMA_API_URL || 'http://localhost:11434',
-        model: process.env.OLLAMA_MODEL || 'qwen2.5:14b',
+        model: process.env.OLLAMA_MODEL || 'qwen2.5-coder:7b',
         timeout: parseInt(process.env.OLLAMA_TIMEOUT || '60000'),
         maxRetries: parseInt(process.env.OLLAMA_MAX_RETRIES || '3'),
         temperature: parseFloat(process.env.OLLAMA_TEMPERATURE || '0.1')
@@ -129,6 +129,83 @@ export class AIServiceManager {
   // 获取可用的提供者列表
   getAvailableProviders(): string[] {
     return Array.from(this.providers.keys())
+  }
+
+  // 获取详细的提供者信息
+  async getAvailableProvidersWithDetails(): Promise<Array<{
+    id: string,
+    name: string,
+    displayName: string,
+    description: string,
+    icon: string,
+    enabled: boolean,
+    model: string,
+    status: 'healthy' | 'degraded' | 'unhealthy'
+  }>> {
+    const providers = []
+    
+    for (const [providerId, adapter] of this.providers.entries()) {
+      const config = this.configs.get(providerId)
+      if (!config) continue
+
+      // 获取提供者健康状态
+      let status: 'healthy' | 'degraded' | 'unhealthy' = 'unhealthy'
+      try {
+        const health = await adapter.healthCheck()
+        status = health.status
+      } catch (error) {
+        status = 'unhealthy'
+      }
+
+      // 构建提供者信息
+      const providerInfo = {
+        id: providerId,
+        name: providerId,
+        displayName: this.getProviderDisplayName(providerId),
+        description: this.getProviderDescription(providerId),
+        icon: this.getProviderIcon(providerId),
+        enabled: config.enabled,
+        model: adapter.getModelVersion(),
+        status
+      }
+
+      providers.push(providerInfo)
+    }
+
+    return providers
+  }
+
+  private getProviderDisplayName(providerId: string): string {
+    const displayNames = {
+      'ollama': 'Ollama Local',
+      'openai': 'OpenAI GPT',
+      'deepseek': 'DeepSeek Coder',
+      'claude': 'Claude AI',
+      'qwen': 'Qwen Models'
+    }
+    return displayNames[providerId] || providerId
+  }
+
+  private getProviderDescription(providerId: string): string {
+    const descriptions = {
+      'ollama': '本地AI模型服务，支持多种开源模型',
+      'openai': 'OpenAI官方API服务，包括GPT-4等模型',
+      'deepseek': 'DeepSeek专业代码生成模型',
+      'claude': 'Anthropic Claude AI助手',
+      'qwen': '阿里通义千问系列模型'
+    }
+    return descriptions[providerId] || '第三方AI服务提供商'
+  }
+
+  private getProviderIcon(providerId: string): string {
+    const icons = {
+      'ollama': '/static/images/Ollama.png',
+      'openai': '/static/images/openai.png',
+      'deepseek': '/static/images/deepseek.png',
+      'claude': '/static/images/Claude.png',
+      'qwen': '/static/images/qwen.png'
+    }
+    return icons[providerId] || '/static/images/default-ai.png'
   }
 
   // 获取默认提供者
@@ -200,6 +277,57 @@ export class AIServiceManager {
     }
 
     return results
+  }
+
+  // 获取可用模型列表
+  async getAvailableModels(provider?: string): Promise<Array<{
+    provider: string,
+    models: Array<{ name: string, size?: number, modified_at?: string }>
+  }>> {
+    const results = []
+    const providersToCheck = provider ? [provider] : Array.from(this.providers.keys())
+
+    for (const providerName of providersToCheck) {
+      const adapter = this.providers.get(providerName)
+      if (adapter && typeof (adapter as any).detectAvailableModels === 'function') {
+        try {
+          const models = await (adapter as any).detectAvailableModels()
+          results.push({
+            provider: providerName,
+            models: models.map((model: any) => ({
+              name: model.name,
+              size: model.size,
+              modified_at: model.modified_at
+            }))
+          })
+        } catch (error) {
+          logger.warn(`获取${providerName}模型列表失败`, { error: error.message })
+          results.push({
+            provider: providerName,
+            models: []
+          })
+        }
+      }
+    }
+
+    return results
+  }
+
+  // 自动选择最佳模型
+  async autoSelectBestModel(provider?: string): Promise<string | null> {
+    const targetProvider = provider || this.defaultProvider
+    const adapter = this.providers.get(targetProvider)
+    
+    if (adapter && typeof (adapter as any).autoSelectBestModel === 'function') {
+      try {
+        await (adapter as any).detectAvailableModels()
+        return (adapter as any).autoSelectBestModel()
+      } catch (error) {
+        logger.warn(`自动选择${targetProvider}最佳模型失败`, { error: error.message })
+      }
+    }
+    
+    return null
   }
 
   // 文档解析
@@ -483,10 +611,8 @@ export class AIServiceManager {
     }
   }
 
-  /**
-   * 获取可用的AI提供者列表
-   */
-  async getAvailableProviders(): Promise<Array<{ name: string, available: boolean, model: string }>> {
+  // 获取可用的提供者列表 (详细信息)
+  async getAvailableProvidersDetailed(): Promise<Array<{ name: string, available: boolean, model: string }>> {
     const providers = []
     
     for (const [name, provider] of this.providers) {
@@ -547,11 +673,13 @@ export class AIServiceManager {
       for (const [providerName, providerConfig] of Object.entries(configUpdate.providers)) {
         if (this.configs.has(providerName)) {
           const currentConfig = this.configs.get(providerName)
-          const updatedConfig = { ...currentConfig, ...providerConfig }
-          this.configs.set(providerName, updatedConfig)
+          if (currentConfig && providerConfig && typeof providerConfig === 'object') {
+            const updatedConfig = { ...currentConfig, ...providerConfig as Partial<AIServiceConfig> }
+            this.configs.set(providerName, updatedConfig)
 
-          // 重新初始化提供者
-          await this.initializeProvider(providerName, updatedConfig)
+            // 重新初始化提供者
+            await this.initializeProvider(providerName, updatedConfig)
+          }
         }
       }
     }

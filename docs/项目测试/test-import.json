@@ -1,0 +1,99 @@
+{
+  "tables": [
+    {
+      "projectId": "637c402f-5e0d-4f12-bb00-e6ac0b1c582d",
+      "name": "news",
+      "displayName": "资讯内容",
+      "comment": "存储新闻文章的基本信息",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "status": "DRAFT",
+      "category": "",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INT",
+          "length": 11,
+          "nullable": false,
+          "defaultValue": null,
+          "comment": "新闻ID，主键",
+          "isPrimaryKey": true,
+          "isAutoIncrement": true,
+          "enumValues": [],
+          "sortOrder": 0
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR",
+          "length": 255,
+          "nullable": false,
+          "defaultValue": null,
+          "comment": "新闻标题",
+          "isPrimaryKey": false,
+          "isAutoIncrement": false,
+          "enumValues": [],
+          "sortOrder": 1
+        },
+        {
+          "name": "status",
+          "type": "ENUM",
+          "nullable": true,
+          "defaultValue": "draft",
+          "comment": "新闻状态（draft, published, archived）",
+          "isPrimaryKey": false,
+          "isAutoIncrement": false,
+          "enumValues": ["draft", "published", "archived"],
+          "sortOrder": 5
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_title",
+          "type": "INDEX",
+          "fields": ["title"],
+          "isUnique": false,
+          "comment": ""
+        }
+      ]
+    },
+    {
+      "projectId": "637c402f-5e0d-4f12-bb00-e6ac0b1c582d",
+      "name": "authors",
+      "displayName": "作者",
+      "comment": "存储作者的基本信息",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_unicode_ci",
+      "status": "DRAFT",
+      "category": "",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INT",
+          "length": 11,
+          "nullable": false,
+          "defaultValue": null,
+          "comment": "作者ID，主键",
+          "isPrimaryKey": true,
+          "isAutoIncrement": true,
+          "enumValues": [],
+          "sortOrder": 0
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "length": 255,
+          "nullable": false,
+          "defaultValue": null,
+          "comment": "作者姓名",
+          "isPrimaryKey": false,
+          "isAutoIncrement": false,
+          "enumValues": [],
+          "sortOrder": 1
+        }
+      ],
+      "indexes": []
+    }
+  ]
+}

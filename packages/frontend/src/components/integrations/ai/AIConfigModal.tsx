@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { X, Brain, Settings, Zap, Globe, AlertCircle, CheckCircle, Download, Loader2, RefreshCw } from 'lucide-react'
-import { AIParsingConfig, AI_PARSING_PRESETS } from '../../../services/aiParsingService'
+import { X, Brain, Settings, AlertCircle, CheckCircle, Download, Loader2, RefreshCw } from 'lucide-react'
+import { AIParsingConfig } from '../../../services/aiParsingService'
 import OllamaService, { OllamaModel, RECOMMENDED_MODELS, DEEPSEEK_MODELS, OPENAI_MODELS } from '../../../services/ollamaService'
 import toast from 'react-hot-toast'
 
@@ -83,14 +83,25 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
 
   if (!isOpen) return null
 
-  const handlePresetSelect = (presetKey: keyof typeof AI_PARSING_PRESETS) => {
-    const preset = AI_PARSING_PRESETS[presetKey]
-    setConfig({ ...preset })
-    setConnectionStatus(null)
-  }
-
   const handleConfigChange = (field: keyof AIParsingConfig, value: string) => {
-    setConfig(prev => ({ ...prev, [field]: value }))
+    setConfig(prev => {
+      const newConfig = { ...prev, [field]: value }
+      
+      // 如果切换到deepseek，清空baseUrl
+      if (field === 'provider' && value === 'deepseek') {
+        newConfig.baseUrl = ''
+      }
+      // 如果切换到openai，可以保持baseUrl为空或现有值
+      else if (field === 'provider' && value === 'openai') {
+        // 保持现有的baseUrl或为空
+      }
+      // 如果切换到ollama，设置默认的baseUrl
+      else if (field === 'provider' && value === 'ollama' && !newConfig.baseUrl) {
+        newConfig.baseUrl = 'http://localhost:11434'
+      }
+      
+      return newConfig
+    })
     setConnectionStatus(null)
   }
 
@@ -109,7 +120,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
           break
 
         case 'deepseek':
-          testUrl = `${config.baseUrl || 'https://api.deepseek.com'}/v1/models`
+          testUrl = 'https://api.deepseek.com/v1/models'
           testHeaders = {
             'Authorization': `Bearer ${config.apiKey}`,
             'Content-Type': 'application/json'
@@ -167,25 +178,28 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
     switch (provider) {
       case 'ollama':
         return {
-          name: 'Ollama (本地)',
-          description: '本地部署，数据安全，无网络费用',
-          icon: <Zap className="w-5 h-5 text-blue-600" />,
+          name: 'Ollama Local',
+          displayName: 'Ollama Local',
+          description: '本地AI模型服务，支持多种开源模型',
+          icon: '/static/images/Ollama.png',
           pros: ['完全本地运行', '数据安全', '无API费用', '支持离线使用'],
           cons: ['需要本地安装', '占用计算资源']
         }
       case 'deepseek':
         return {
-          name: 'DeepSeek (在线)',
-          description: '性价比高的在线AI服务，专门优化代码理解',
-          icon: <Brain className="w-5 h-5 text-purple-600" />,
+          name: 'DeepSeek Coder',
+          displayName: 'DeepSeek Coder',
+          description: 'DeepSeek专业代码生成模型',
+          icon: '/static/images/deepseek.png',
           pros: ['性价比极高', '代码理解能力强', '中文支持好', '响应速度快'],
           cons: ['需要网络连接', '按使用量付费']
         }
       case 'openai':
         return {
-          name: 'OpenAI (在线)',
-          description: '业界领先的AI服务，理解能力最强',
-          icon: <Globe className="w-5 h-5 text-green-600" />,
+          name: 'OpenAI GPT',
+          displayName: 'OpenAI GPT',
+          description: 'OpenAI官方API服务，包括GPT-4等模型',
+          icon: '/static/images/openai.png',
           pros: ['理解能力最强', '稳定性好', '生态完善'],
           cons: ['价格较高', '需要网络连接', '国内访问限制']
         }
@@ -200,10 +214,13 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
           <div className="flex items-center space-x-3">
-            <Brain className="w-6 h-6 text-purple-600" />
-            <h2 className="text-xl font-semibold text-gray-900">AI解析配置</h2>
+            <Brain className="w-8 h-8 text-blue-500" />
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">AI解析配置</h2>
+              <p className="text-gray-600">配置AI服务提供商和模型参数</p>
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -214,59 +231,72 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
         </div>
 
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {/* 快速预设 */}
-          <div className="mb-8">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">推荐配置</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(AI_PARSING_PRESETS).map(([key, preset]) => {
-                const info = getProviderInfo(preset.provider)
-                return (
-                  <button
-                    key={key}
-                    onClick={() => handlePresetSelect(key as keyof typeof AI_PARSING_PRESETS)}
-                    className={`p-4 border rounded-lg text-left transition-all hover:shadow-md ${
-                      config.provider === preset.provider && config.model === preset.model
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2 mb-2">
-                      {info?.icon}
-                      <span className="font-medium text-gray-900">{info?.name}</span>
-                    </div>
-                    <div className="text-sm text-gray-600 mb-2">{preset.model}</div>
-                    <div className="text-xs text-gray-500">{info?.description}</div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
           {/* 详细配置 */}
           <div className="space-y-6">
-            <h3 className="text-lg font-medium text-gray-900">详细配置</h3>
 
             {/* AI提供商选择 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                AI提供商
+                AI服务提供商
               </label>
-              <select
-                value={config.provider}
-                onChange={(e) => handleConfigChange('provider', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="ollama">Ollama (本地)</option>
-                <option value="deepseek">DeepSeek (在线)</option>
-                <option value="openai">OpenAI (在线)</option>
-              </select>
+              
+              <div className="grid grid-cols-1 gap-3">
+                {['ollama', 'deepseek', 'openai'].map((provider) => {
+                  const info = getProviderInfo(provider)
+                  return (
+                    <label
+                      key={provider}
+                      className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-colors ${
+                        config.provider === provider
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="radio"
+                          name="provider"
+                          value={provider}
+                          checked={config.provider === provider}
+                          onChange={(e) => handleConfigChange('provider', e.target.value)}
+                          className="rounded border-gray-300"
+                        />
+                        {info?.icon && (
+                          <img 
+                            src={info.icon} 
+                            alt={info.displayName} 
+                            className="w-8 h-8 object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none'
+                            }}
+                          />
+                        )}
+                        <div>
+                          <span className="font-medium text-sm">{info?.displayName}</span>
+                          <p className="text-xs text-gray-500 mt-1">{info?.description}</p>
+                        </div>
+                      </div>
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                    </label>
+                  )
+                })}
+              </div>
             </div>
 
             {/* 提供商信息展示 */}
             {providerInfo && (
               <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center space-x-2 mb-3">
-                  {providerInfo.icon}
+                <div className="flex items-center space-x-3 mb-3">
+                  {providerInfo.icon && (
+                    <img 
+                      src={providerInfo.icon} 
+                      alt={providerInfo.displayName} 
+                      className="w-8 h-8 object-contain"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
+                  )}
                   <span className="font-medium text-gray-900">{providerInfo.name}</span>
                 </div>
                 <p className="text-sm text-gray-600 mb-3">{providerInfo.description}</p>
@@ -355,22 +385,29 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
             </div>
 
             {/* Base URL */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Base URL
-              </label>
-              <input
-                type="url"
-                value={config.baseUrl || ''}
-                onChange={(e) => handleConfigChange('baseUrl', e.target.value)}
-                placeholder={
-                  config.provider === 'ollama' ? 'http://localhost:11434' :
-                  config.provider === 'deepseek' ? 'https://api.deepseek.com' :
-                  'https://api.openai.com'
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+            {config.provider !== 'deepseek' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Base URL
+                </label>
+                <input
+                  type="url"
+                  value={config.baseUrl || ''}
+                  onChange={(e) => handleConfigChange('baseUrl', e.target.value)}
+                  placeholder={
+                    config.provider === 'ollama' ? 'http://localhost:11434' :
+                    config.provider === 'openai' ? '留空使用默认地址' :
+                    ''
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {config.provider === 'openai' && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    留空将使用默认的 OpenAI API 地址
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* API密钥 */}
             {config.provider !== 'ollama' && (
@@ -436,13 +473,13 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
           <div className="flex items-center space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="btn-outline"
             >
               取消
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              className="btn-primary"
             >
               保存配置
             </button>

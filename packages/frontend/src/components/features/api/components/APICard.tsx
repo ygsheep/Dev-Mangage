@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { API, HTTPMethod, APIStatus, HTTP_METHOD_COLORS, API_STATUS_COLORS, API_STATUS_LABELS } from '@shared/types'
 import { useMutation } from '@tanstack/react-query'
 import { apiMethods } from '../../../../utils/api'
+import CodeHighlight from '../../../common/CodeHighlight'
 
 interface APICardProps {
   api: API
@@ -182,35 +183,23 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
           {/* 代码内容 */}
           <div className="relative">
             {activeCodeTab === 'frontend' && api.frontendCode && (
-              <div className="relative">
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
-                  <code>{api.frontendCode}</code>
-                </pre>
-                <CopyToClipboard
-                  text={api.frontendCode}
-                  onCopy={() => handleCopy(api.frontendCode!, '前端')}
-                >
-                  <button className="absolute top-2 right-2 p-2 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors">
-                    <Copy className="h-4 w-4 text-gray-300" />
-                  </button>
-                </CopyToClipboard>
-              </div>
+              <CodeHighlight
+                code={api.frontendCode}
+                language="javascript"
+                showLineNumbers={false}
+                showCopyButton={true}
+                maxHeight="300px"
+              />
             )}
 
             {activeCodeTab === 'backend' && api.backendCode && (
-              <div className="relative">
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
-                  <code>{api.backendCode}</code>
-                </pre>
-                <CopyToClipboard
-                  text={api.backendCode}
-                  onCopy={() => handleCopy(api.backendCode!, '后端')}
-                >
-                  <button className="absolute top-2 right-2 p-2 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors">
-                    <Copy className="h-4 w-4 text-gray-300" />
-                  </button>
-                </CopyToClipboard>
-              </div>
+              <CodeHighlight
+                code={api.backendCode}
+                language="javascript"
+                showLineNumbers={false}
+                showCopyButton={true}
+                maxHeight="300px"
+              />
             )}
           </div>
         </div>

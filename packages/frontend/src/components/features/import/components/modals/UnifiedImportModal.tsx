@@ -206,13 +206,54 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
   }
   
   /**
+   * 从注释中提取ENUM值
+   */
+  const extractEnumValues = (comment: string): string[] => {
+    // 尝试从注释中提取ENUM值
+    // 例如: "可选值：'rss', 'api', 'crawler'" 或 "新闻状态（draft, published, archived）"
+    const patterns = [
+      /可选值[：:]\s*'([^']+)'/g,
+      /可选值[：:]\s*"([^"]+)"/g,
+      /\(([^)]+)\)/g, // 括号中的内容
+      /（([^）]+)）/g // 中文括号中的内容
+    ]
+    
+    for (const pattern of patterns) {
+      const matches = [...comment.matchAll(pattern)]
+      if (matches.length > 0) {
+        const values = matches.map(match => match[1])
+          .join(',')
+          .split(/[,，]/)
+          .map(val => val.trim().replace(/['"]/g, ''))
+          .filter(val => val.length > 0)
+        
+        if (values.length > 0) {
+          return values
+        }
+      }
+    }
+    
+    return []
+  }
+
+  /**
    * 处理数据库导入确认
    */
   const handleDatabaseImportConfirm = async () => {
     if (parsedTables.length === 0) return
     
+    // 验证项目ID
+    if (!projectId || projectId.trim() === '') {
+      toast.error('项目ID无效，请重新选择项目')
+      console.error('无效的项目ID:', projectId)
+      return
+    }
+    
     try {
-      // 将解析的数据表转换为API格式
+      console.log('开始导入数据表，项目ID:', projectId)
+      console.log('待导入的表数量:', parsedTables.length)
+      
+      // 将解析的数据表转换为API格式，包含字段和索引信息
       const tableDataList = parsedTables.map(table => ({
         projectId,
         name: table.name,
@@ -223,12 +264,78 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
         collation: table.collation || 'utf8mb4_unicode_ci',
         status: 'DRAFT', // 导入时设为草稿状态
         category: table.category || '',
+        // 添加字段信息
+        fields: table.fields ? table.fields.map((field: any, index: number) => ({
+          name: field.name,
+          type: field.type,
+          // 处理length - 确保是数字类型，DECIMAL类型不使用length
+          length: field.type === 'DECIMAL' || (field.length && typeof field.length === 'string' && field.length.includes(',')) 
+            ? undefined // DECIMAL类型不使用length
+            : field.length ? parseInt(field.length.toString()) : undefined,
+          // 处理DECIMAL类型的precision和scale
+          precision: field.type === 'DECIMAL' && field.length && typeof field.length === 'string' && field.length.includes(',')
+            ? parseInt(field.length.split(',')[0])
+            : field.precision ? parseInt(field.precision.toString()) : undefined,
+          scale: field.type === 'DECIMAL' && field.length && typeof field.length === 'string' && field.length.includes(',')
+            ? parseInt(field.length.split(',')[1])
+            : field.scale ? parseInt(field.scale.toString()) : undefined,
+          nullable: field.nullable !== false, // 默认为true
+          defaultValue: field.defaultValue ? field.defaultValue.toString() : undefined,
+          comment: field.comment || '',
+          isPrimaryKey: field.primaryKey || field.isPrimaryKey || false,
+          isAutoIncrement: field.autoIncrement || field.isAutoIncrement || false,
+          // 处理ENUM类型的值
+          enumValues: field.type === 'ENUM' && field.comment ? 
+            extractEnumValues(field.comment) : (field.enumValues || []),
+          sortOrder: index
+        })) : [],
+        // 添加索引信息
+        indexes: table.indexes ? table.indexes.map((index: any) => {
+          // 映射索引类型到后端期望的枚举值
+          const mapIndexType = (type: string): string => {
+            const typeUpper = (type || '').toString().toUpperCase()
+            switch (typeUpper) {
+              case 'BTREE':
+              case 'HASH':
+              case 'NORMAL':
+                return 'INDEX'
+              case 'UNIQUE':
+                return 'UNIQUE'
+              case 'PRIMARY':
+              case 'PRIMARY KEY':
+                return 'PRIMARY'
+              case 'FULLTEXT':
+                return 'FULLTEXT'
+              case 'FOREIGN':
+              case 'FOREIGN KEY':
+                return 'FOREIGN'
+              default:
+                return 'INDEX'
+            }
+          }
+          
+          return {
+            name: index.name,
+            type: mapIndexType(index.type),
+            fields: Array.isArray(index.columns) ? index.columns : 
+                    Array.isArray(index.fields) ? index.fields : [index.column || index.field],
+            isUnique: index.unique || index.isUnique || false,
+            comment: index.comment || ''
+          }
+        }) : []
       }))
+      
+      console.log('准备导入的表数据:', tableDataList)
       
       // 批量创建数据表
       const result = await apiMethods.createBatchDataTables(tableDataList)
       
-      toast.success(`成功导入 ${result.data.success} 个数据库表结构`)
+      console.log('导入结果:', result)
+      
+      if (result.data.success > 0) {
+        toast.success(`成功导入 ${result.data.success} 个数据库表结构`)
+      }
+      
       if (result.data.failed > 0) {
         toast(`${result.data.failed} 个数据表导入失败`, {
           icon: '⚠️',
@@ -238,11 +345,24 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
             color: '#92400e'
           }
         })
+        console.error('导入失败的详情:', result.data.errors)
       }
       
-      handleDatabaseSuccess()
+      // 只有在有成功导入的表时才关闭模态框
+      if (result.data.success > 0) {
+        handleDatabaseSuccess()
+      }
     } catch (error: any) {
-      toast.error('数据库导入失败: ' + error.message)
+      console.error('数据库导入失败:', error)
+      
+      // 检查是否是外键约束错误
+      if (error.message && error.message.includes('Foreign key constraint')) {
+        toast.error('项目ID不存在，请确认选择了正确的项目')
+      } else if (error.response?.data?.error) {
+        toast.error('数据库导入失败: ' + error.response.data.error)
+      } else {
+        toast.error('数据库导入失败: ' + error.message)
+      }
     }
   }
   

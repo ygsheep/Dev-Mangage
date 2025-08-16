@@ -1,6 +1,6 @@
-# CLAUDE.md
+# CLAUDE Enhanced Development Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This comprehensive guide provides detailed instructions for Claude Code (claude.ai/code) when working with the DevAPI Manager codebase, including best practices, troubleshooting, and advanced development patterns.
 
 ## Project Overview
 
@@ -141,6 +141,34 @@ The platform now includes comprehensive AI-driven capabilities:
 - Real-time job monitoring and progress tracking
 - Template management interface
 
+## Claude Code Workflow Guidelines
+
+### Code Review and Recommendation Patterns
+- **Architecture Analysis First**: Always analyze existing architecture and design patterns before suggesting modifications
+- **Multiple Solution Approaches**: Provide multiple implementation options with clear pros/cons analysis
+- **Maintainability Focus**: Prioritize code maintainability, performance, and security in all recommendations
+- **Consistency Adherence**: Follow existing coding standards and architectural decisions in the project
+
+### Incremental Implementation Strategy
+- **Feature Decomposition**: Break large features into small, testable incremental updates
+- **Core-First Approach**: Implement core functionality first, then add auxiliary features
+- **Testing Integration**: Provide testing suggestions and verification steps after each modification
+- **Progressive Enhancement**: Build features incrementally with clear rollback points
+
+### Code Quality Standards
+
+#### TypeScript Best Practices
+- **Strict Typing**: Use strict type definitions, avoid `any` type usage
+- **Generic Utilization**: Leverage generics for improved code reusability
+- **Interface Design**: Follow open-closed principle in interface design
+- **Error Type Management**: Define and handle error types explicitly
+
+#### Security Considerations
+- **API Key Security**: Secure storage and rotation of AI API keys
+- **Input Validation**: Comprehensive user input validation and sanitization
+- **SQL Injection Prevention**: Implement robust SQL injection protection measures
+- **Sensitive Data Encryption**: Encrypt sensitive data at rest and in transit
+
 ## Development Patterns
 
 ### API Development
@@ -193,7 +221,166 @@ The platform now includes comprehensive AI-driven capabilities:
 - SSE support for real-time client connections
 - Multiple transport types (HTTP, STDIO, WebSocket planning)
 
-## Configuration Files
+## AI Service Integration Standards
+
+### New AI Provider Integration Workflow
+1. **Interface Implementation**: Implement the `AIProvider` interface with all required methods
+2. **Configuration Validation**: Add configuration validation and health check endpoints
+3. **Error Handling**: Implement comprehensive error handling and retry mechanisms
+4. **Usage Tracking**: Add usage statistics and cost tracking capabilities
+5. **Testing Suite**: Write unit tests and integration tests for the new provider
+
+### Prompt Engineering Best Practices
+- **Structured Template Design**: Create reusable, structured prompt templates
+- **Context Length Management**: Implement strategies for managing context window limits
+- **Response Format Standardization**: Ensure consistent response formats across providers
+- **Multi-turn Conversation**: Manage state for multi-turn conversations effectively
+
+## Troubleshooting and Problem Resolution
+
+### Common Development Issues
+
+#### Environment Setup Problems
+- **Port Conflicts**: 
+  ```bash
+  # Check port usage
+  netstat -ano | findstr ":3001"
+  # Kill process using port
+  taskkill /PID <PID> /F
+  ```
+- **Dependency Installation Failures**:
+  ```bash
+  # Clear npm cache
+  npm cache clean --force
+  # Delete node_modules and reinstall
+  rm -rf node_modules package-lock.json
+  npm install
+  ```
+- **Database Connection Issues**:
+  ```bash
+  # Reset database
+  npm run db:push --force-reset
+  # Regenerate Prisma client
+  npm run db:generate
+  ```
+- **MCP Service Unresponsive**:
+  ```bash
+  # Check MCP service status
+  curl http://localhost:3001/health
+  # Restart MCP service
+  npm run dev:mcp
+  ```
+
+#### Performance Optimization Guidelines
+- **Database Query Optimization**: Use Prisma query optimization and proper indexing
+- **React Component Performance**: Implement React.memo, useMemo, and useCallback appropriately
+- **MCP Search Index Optimization**: Regular index refresh and efficient search algorithms
+- **AI Service Response Time**: Implement caching and request batching for AI services
+
+### Error Handling Strategies
+- **Graceful Degradation**: Implement fallback mechanisms for all critical services
+- **Circuit Breaker Pattern**: Prevent cascading failures with circuit breakers
+- **Comprehensive Logging**: Use structured logging with correlation IDs
+- **User-Friendly Error Messages**: Provide clear, actionable error messages to users
+
+## Scalability and Extension Guidelines
+
+### Plugin Architecture Design
+- **Standardized MCP Tool Development**: Follow consistent patterns for new MCP tools
+- **Third-party Integration Interface**: Design clean APIs for external integrations
+- **Configuration-driven Feature Flags**: Enable/disable features through configuration
+- **Hot-swappable Component Support**: Design components for runtime replacement
+
+### Database Evolution Strategy
+- **Version Control and Migration**: Implement robust database version control
+- **Sharding and Index Optimization**: Plan for horizontal scaling with proper indexing
+- **Caching Layer Design**: Implement multi-level caching strategies
+- **Read-Write Separation**: Configure read replicas for improved performance
+
+## Production Deployment Guide
+
+### Docker Containerization
+```dockerfile
+# Multi-stage build optimization
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+EXPOSE 3001
+CMD ["npm", "start"]
+```
+
+### Environment Variable Management
+```bash
+# Production environment variables
+NODE_ENV=production
+DATABASE_URL=file:./prod.db
+AI_SERVICE_ENDPOINT=https://api.openai.com
+LOG_LEVEL=info
+```
+
+### Health Check Configuration
+```javascript
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    services: {
+      database: 'connected',
+      ai: 'available',
+      mcp: 'running'
+    }
+  });
+});
+```
+
+### Monitoring and Alerting
+- **Key Performance Indicators (KPIs)**: Define and monitor critical metrics
+- **Error Rate and Response Time Monitoring**: Set up comprehensive monitoring
+- **Resource Usage Tracking**: Monitor CPU, memory, and disk usage
+- **Automated Alert Configuration**: Configure alerts for critical thresholds
+
+## Team Collaboration Standards
+
+### Git Workflow
+- **Branch Naming Convention**: 
+  - `feature/feature-name` for new features
+  - `bugfix/issue-description` for bug fixes
+  - `hotfix/critical-issue` for production fixes
+- **Commit Message Format**:
+  ```
+  type(scope): description
+  
+  - feat: new feature
+  - fix: bug fix
+  - docs: documentation changes
+  - style: formatting changes
+  - refactor: code refactoring
+  - test: adding tests
+  - chore: maintenance tasks
+  ```
+
+### Code Review Checklist
+- [ ] Code follows project style guidelines
+- [ ] All tests pass and coverage is maintained
+- [ ] Documentation is updated appropriately
+- [ ] Security considerations are addressed
+- [ ] Performance implications are considered
+- [ ] Breaking changes are properly documented
+
+### Documentation Maintenance
+- **API Documentation**: Auto-generate API docs from code annotations
+- **Architecture Decision Records (ADR)**: Document significant architectural decisions
+- **Changelog Maintenance**: Keep detailed changelog for all releases
+- **User Manual Updates**: Maintain user-facing documentation
+
+## Configuration Management
 
 ### Environment Setup
 - Backend: `packages/backend/.env.development`
@@ -213,7 +400,7 @@ Cursor IDE configuration in `.cursor/mcp.json`:
 }
 ```
 
-## Key Debugging Notes
+## Advanced Debugging and Monitoring
 
 ### Port Management
 - Backend auto-detects available ports starting from 3001
@@ -221,7 +408,7 @@ Cursor IDE configuration in `.cursor/mcp.json`:
 - MCP servers use 3004+ to avoid conflicts
 - Use `netstat -ano | findstr ":300"` to check port usage
 
-### Common Issues
+### Common Issues Resolution
 - **Toast errors**: Use `toast.error()` not `toast.warning()` (react-hot-toast limitation)
 - **Database sync**: Run `npm run db:push` after schema changes
 - **MCP connection**: Check SSE headers and CORS settings for client compatibility
@@ -250,7 +437,37 @@ Cursor IDE configuration in `.cursor/mcp.json`:
 - Search accuracy testing with sample datasets
 - Performance testing for vector search operations
 
-This codebase emphasizes modern TypeScript patterns, comprehensive error handling, and scalable architecture suitable for both individual developers and team collaboration.
+### AI Service Testing
+- Mock AI provider responses for consistent testing
+- Test prompt template rendering and validation
+- Verify error handling and fallback mechanisms
+- Performance testing for batch operations
 
-# replay 
-replay chinese for me
+This enhanced codebase emphasizes modern TypeScript patterns, comprehensive error handling, scalable architecture, robust security practices, and efficient team collaboration workflows suitable for both individual developers and large-scale team environments.
+
+## Security Best Practices
+
+### API Security
+- Implement rate limiting for all public endpoints
+- Use HTTPS for all communications
+- Validate and sanitize all user inputs
+- Implement proper authentication and authorization
+
+### Data Protection
+- Encrypt sensitive data at rest and in transit
+- Implement proper access controls
+- Regular security audits and dependency updates
+- Secure API key management and rotation
+
+### AI Service Security
+- Validate AI responses before processing
+- Implement content filtering for AI-generated content
+- Monitor AI service usage and costs
+- Secure storage of conversation history and context
+
+This comprehensive guide provides the foundation for robust, scalable, and secure development practices when working with the DevAPI Manager platform.
+
+
+# replay in chinese
+
+No matter what language the input content involves (such as English, Japanese, etc.), do not translate proper nouns. Please reply in Simplified Chinese throughout, ensure that the output is purely in Chinese, and avoid mixing in vocabulary or code from other languages.

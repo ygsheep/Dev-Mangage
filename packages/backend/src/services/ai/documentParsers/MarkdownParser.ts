@@ -172,7 +172,8 @@ export class MarkdownParser {
         type: this.normalizeFieldType(fieldType),
         comment: commentIndex !== -1 ? row[commentIndex]?.trim() : undefined,
         nullable: nullableIndex !== -1 ? this.parseBoolean(row[nullableIndex]) : true,
-        isPrimaryKey: primaryKeyIndex !== -1 ? this.parseBoolean(row[primaryKeyIndex]) : false
+        isPrimaryKey: primaryKeyIndex !== -1 ? this.parseBoolean(row[primaryKeyIndex]) : false,
+        isAutoIncrement: false // 从类型字符串中解析，默认为false
       }
 
       // 解析字段类型详细信息
@@ -245,7 +246,9 @@ export class MarkdownParser {
     const field: ParsedField = {
       name: name.replace(/[`'"]/g, ''),
       type: 'VARCHAR(255)',
-      nullable: true
+      nullable: true,
+      isPrimaryKey: false,
+      isAutoIncrement: false
     }
 
     // 提取数据类型

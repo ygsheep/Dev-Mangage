@@ -29,7 +29,7 @@ const createFieldSchema = z.object({
   precision: z.number().int().positive().optional(),
   scale: z.number().int().min(0).optional(),
   nullable: z.boolean().default(true),
-  defaultValue: z.string().optional(),
+  defaultValue: z.string().nullable().optional(),
   comment: z.string().max(500).optional(),
   isPrimaryKey: z.boolean().default(false),
   isAutoIncrement: z.boolean().default(false),
@@ -190,7 +190,13 @@ router.get(
             referencedField: { select: { id: true, name: true } },
           },
         },
-        indexes: true,
+        indexes: {
+          include: {
+            fields: {
+              orderBy: { sortOrder: 'asc' }
+            }
+          }
+        },
         fromRelations: {
           include: {
             toTable: { select: { id: true, name: true } },
@@ -330,22 +336,43 @@ router.post(
         // Create fields if provided
         if (fields && fields.length > 0) {
           await prisma.databaseField.createMany({
-            data: fields.map((field, index) => ({
-              ...field,
-              tableId: table.id,
-              sortOrder: field.sortOrder ?? index,
-            })),
+            data: fields.map((field, index) => {
+              // 过滤掉数据库模型中不存在的字段
+              const { enumValues, ...validFieldData } = field
+              return {
+                ...validFieldData,
+                tableId: table.id,
+                sortOrder: field.sortOrder ?? index,
+              }
+            }),
           })
         }
         
         // Create indexes if provided
         if (indexes && indexes.length > 0) {
-          await prisma.databaseIndex.createMany({
-            data: indexes.map(index => ({
-              ...index,
-              tableId: table.id,
-            })),
-          })
+          for (const indexData of indexes) {
+            const { fields, ...indexInfo } = indexData
+            
+            // Create the index
+            const createdIndex = await prisma.databaseIndex.create({
+              data: {
+                ...indexInfo,
+                tableId: table.id,
+              },
+            })
+            
+            // Create index fields if provided
+            if (fields && fields.length > 0) {
+              await prisma.indexField.createMany({
+                data: fields.map((fieldName: string, index: number) => ({
+                  indexId: createdIndex.id,
+                  fieldName,
+                  sortOrder: index,
+                  order: 'ASC',
+                })),
+              })
+            }
+          }
         }
         
         // Get complete table with relations

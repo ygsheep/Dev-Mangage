@@ -3,6 +3,7 @@ import { X, Code2, FileText, Send, Play } from 'lucide-react'
 import { API } from '@shared/types'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import toast from 'react-hot-toast'
+import CodeHighlight from '../../../../common/CodeHighlight'
 
 interface APIDetailModalProps {
   api: API
@@ -205,9 +206,13 @@ app.${api.method.toLowerCase()}('${api.path}', async (req, res) => {
                   </button>
                 </CopyToClipboard>
               </div>
-              <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
-                <code>{frontendCode}</code>
-              </pre>
+              <CodeHighlight
+                code={frontendCode}
+                language="javascript"
+                showLineNumbers={false}
+                showCopyButton={true}
+                maxHeight="400px"
+              />
             </div>
           )}
 
@@ -224,9 +229,13 @@ app.${api.method.toLowerCase()}('${api.path}', async (req, res) => {
                   </button>
                 </CopyToClipboard>
               </div>
-              <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
-                <code>{backendCode}</code>
-              </pre>
+              <CodeHighlight
+                code={backendCode}
+                language="javascript"
+                showLineNumbers={false}
+                showCopyButton={true}
+                maxHeight="400px"
+              />
             </div>
           )}
 

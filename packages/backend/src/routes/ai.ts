@@ -22,7 +22,7 @@ router.get('/health', async (req, res, next) => {
       data: healthStatus
     })
   } catch (error) {
-    next(new AppError('AI服务健康检查失败', 500, error.message))
+    next(new AppError(`AI服务健康检查失败: ${error.message}`, 500))
   }
 })
 
@@ -35,7 +35,62 @@ router.get('/providers', async (req, res, next) => {
       data: providers
     })
   } catch (error) {
-    next(new AppError('获取AI提供者列表失败', 500, error.message))
+    next(new AppError(`获取AI提供者列表失败: ${error.message}`, 500))
+  }
+})
+
+// 获取详细的AI提供者信息
+router.get('/providers/detailed', async (req, res, next) => {
+  try {
+    const providers = await aiServiceManager.getAvailableProvidersWithDetails()
+    res.json({
+      success: true,
+      data: providers
+    })
+  } catch (error) {
+    next(new AppError(`获取AI提供者详细信息失败: ${error.message}`, 500))
+  }
+})
+
+// 获取可用模型列表
+router.get('/models', [
+  query('provider').optional().isString().withMessage('提供者名称必须是字符串'),
+  validateRequest()
+], async (req, res, next) => {
+  try {
+    const { provider } = req.query
+    const models = await aiServiceManager.getAvailableModels(provider as string)
+    res.json({
+      success: true,
+      data: models
+    })
+  } catch (error) {
+    next(new AppError(`获取模型列表失败: ${error.message}`, 500))
+  }
+})
+
+// 自动选择最佳模型
+router.post('/models/auto-select', [
+  body('provider').optional().isString().withMessage('提供者名称必须是字符串'),
+  validateRequest()
+], async (req, res, next) => {
+  try {
+    const { provider } = req.body
+    const bestModel = await aiServiceManager.autoSelectBestModel(provider)
+    
+    if (!bestModel) {
+      return next(new AppError('无法找到合适的模型', 404))
+    }
+
+    res.json({
+      success: true,
+      data: {
+        provider: provider || aiServiceManager.getDefaultProvider(),
+        selectedModel: bestModel
+      }
+    })
+  } catch (error) {
+    next(new AppError(`自动选择模型失败: ${error.message}`, 500))
   }
 })
 
@@ -48,14 +103,14 @@ router.get('/usage', async (req, res, next) => {
       data: stats
     })
   } catch (error) {
-    next(new AppError('获取使用统计失败', 500, error.message))
+    next(new AppError('获取使用统计失败: ' + error.message, 500))
   }
 })
 
 // 切换默认AI提供者
 router.post('/provider/default', [
   body('provider').isString().notEmpty().withMessage('提供者名称不能为空'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { provider } = req.body
@@ -71,7 +126,7 @@ router.post('/provider/default', [
       message: `默认AI提供者已切换为 ${provider}`
     })
   } catch (error) {
-    next(new AppError('切换默认提供者失败', 500, error.message))
+    next(new AppError('切换默认提供者失败: ' + error.message, 500))
   }
 })
 
@@ -88,7 +143,7 @@ router.post('/parse/document', [
   body('provider').optional().isString(),
   body('strictMode').optional().isBoolean(),
   body('confidenceThreshold').optional().isFloat({ min: 0, max: 1 }),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { projectId, content, type, filename, provider, ...options } = req.body
@@ -106,7 +161,7 @@ router.post('/parse/document', [
       data: result
     })
   } catch (error) {
-    next(new AppError('文档解析失败', 500, error.message))
+    next(new AppError('文档解析失败: ' + error.message, 500))
   }
 })
 
@@ -117,7 +172,7 @@ router.post('/parse/batch', [
   body('documents.*.content').isString().notEmpty().withMessage('文档内容不能为空'),
   body('documents.*.type').isIn(Object.values(DocumentType)).withMessage('文档类型无效'),
   body('provider').optional().isString(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { projectId, documents, provider, ...options } = req.body
@@ -133,7 +188,7 @@ router.post('/parse/batch', [
       data: results
     })
   } catch (error) {
-    next(new AppError('批量文档解析失败', 500, error.message))
+    next(new AppError('批量文档解析失败: ' + error.message, 500))
   }
 })
 
@@ -149,7 +204,7 @@ router.post('/batch/import', [
   body('documents.*.content').isString().notEmpty().withMessage('文档内容不能为空'),
   body('documents.*.type').isIn(Object.values(DocumentType)).withMessage('文档类型无效'),
   body('options').optional().isObject(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { projectId, documents, options = {} } = req.body
@@ -162,14 +217,14 @@ router.post('/batch/import', [
       data: { jobId }
     })
   } catch (error) {
-    next(new AppError('创建批量导入任务失败', 500, error.message))
+    next(new AppError('创建批量导入任务失败: ' + error.message, 500))
   }
 })
 
 // 获取批量导入任务状态
 router.get('/batch/status/:jobId', [
   param('jobId').isString().notEmpty().withMessage('任务ID不能为空'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { jobId } = req.params
@@ -186,7 +241,7 @@ router.get('/batch/status/:jobId', [
       data: job
     })
   } catch (error) {
-    next(new AppError('获取任务状态失败', 500, error.message))
+    next(new AppError('获取任务状态失败: ' + error.message, 500))
   }
 })
 
@@ -201,14 +256,14 @@ router.get('/batch/jobs', async (req, res, next) => {
       data: jobs
     })
   } catch (error) {
-    next(new AppError('获取任务列表失败', 500, error.message))
+    next(new AppError('获取任务列表失败: ' + error.message, 500))
   }
 })
 
 // 取消批量导入任务
 router.post('/batch/cancel/:jobId', [
   param('jobId').isString().notEmpty().withMessage('任务ID不能为空'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { jobId } = req.params
@@ -225,14 +280,14 @@ router.post('/batch/cancel/:jobId', [
       message: '任务已取消'
     })
   } catch (error) {
-    next(new AppError('取消任务失败', 500, error.message))
+    next(new AppError('取消任务失败: ' + error.message, 500))
   }
 })
 
 // 获取批量导入任务报告
 router.get('/batch/report/:jobId', [
   param('jobId').isString().notEmpty().withMessage('任务ID不能为空'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { jobId } = req.params
@@ -256,7 +311,7 @@ router.get('/batch/report/:jobId', [
       }
     })
   } catch (error) {
-    next(new AppError('获取任务报告失败', 500, error.message))
+    next(new AppError('获取任务报告失败: ' + error.message, 500))
   }
 })
 
@@ -272,7 +327,7 @@ router.post('/generate/sql', [
   body('provider').optional().isString(),
   body('includeIndexes').optional().isBoolean(),
   body('includeConstraints').optional().isBoolean(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { model, dialect, provider, ...options } = req.body
@@ -288,7 +343,7 @@ router.post('/generate/sql', [
       data: result
     })
   } catch (error) {
-    next(new AppError('SQL代码生成失败', 500, error.message))
+    next(new AppError('SQL代码生成失败: ' + error.message, 500))
   }
 })
 
@@ -298,7 +353,7 @@ router.post('/generate/migration', [
   body('dialect').isIn(Object.values(SQLDialect)).withMessage('SQL方言无效'),
   body('oldModel').optional().isObject(),
   body('options').optional().isObject(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { model, oldModel, dialect, options = {} } = req.body
@@ -328,14 +383,14 @@ router.post('/generate/migration', [
       data: migration
     })
   } catch (error) {
-    next(new AppError('迁移脚本生成失败', 500, error.message))
+    next(new AppError('迁移脚本生成失败: ' + error.message, 500))
   }
 })
 
 // 生成迁移计划
 router.post('/generate/migration-plan', [
   body('migrations').isArray().withMessage('迁移列表必须是数组'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { migrations } = req.body
@@ -348,7 +403,7 @@ router.post('/generate/migration-plan', [
       data: plan
     })
   } catch (error) {
-    next(new AppError('迁移计划生成失败', 500, error.message))
+    next(new AppError('迁移计划生成失败: ' + error.message, 500))
   }
 })
 
@@ -357,7 +412,7 @@ router.post('/generate/rollback/:migrationId', [
   param('migrationId').isString().notEmpty().withMessage('迁移ID不能为空'),
   body('migration').isObject().withMessage('迁移对象必须是对象'),
   body('targetVersion').optional().isString(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { migrationId } = req.params
@@ -375,7 +430,7 @@ router.post('/generate/rollback/:migrationId', [
       }
     })
   } catch (error) {
-    next(new AppError('回滚脚本生成失败', 500, error.message))
+    next(new AppError('回滚脚本生成失败: ' + error.message, 500))
   }
 })
 
@@ -390,7 +445,7 @@ router.post('/optimize/schema/:projectId', [
   body('analysisDepth').optional().isIn(['basic', 'standard', 'advanced']),
   body('targetEnvironment').optional().isIn(['development', 'staging', 'production']),
   body('provider').optional().isString(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { projectId } = req.params
@@ -406,7 +461,7 @@ router.post('/optimize/schema/:projectId', [
       data: result
     })
   } catch (error) {
-    next(new AppError('数据库模式优化失败', 500, error.message))
+    next(new AppError('数据库模式优化失败: ' + error.message, 500))
   }
 })
 
@@ -415,7 +470,7 @@ router.post('/suggest/indexes/:tableId', [
   param('tableId').isUUID().withMessage('表ID格式无效'),
   body('queryPatterns').optional().isArray(),
   body('provider').optional().isString(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { tableId } = req.params
@@ -432,7 +487,7 @@ router.post('/suggest/indexes/:tableId', [
       data: suggestions
     })
   } catch (error) {
-    next(new AppError('索引建议生成失败', 500, error.message))
+    next(new AppError('索引建议生成失败: ' + error.message, 500))
   }
 })
 
@@ -446,7 +501,7 @@ router.post('/validate/model', [
   body('model.name').isString().notEmpty().withMessage('模型名称不能为空'),
   body('model.tables').isArray().withMessage('表定义必须是数组'),
   body('options').optional().isObject(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { model, options = {} } = req.body
@@ -459,7 +514,7 @@ router.post('/validate/model', [
       data: result
     })
   } catch (error) {
-    next(new AppError('模型验证失败', 500, error.message))
+    next(new AppError('模型验证失败: ' + error.message, 500))
   }
 })
 
@@ -471,7 +526,7 @@ router.post('/validate/correct', [
   body('options').optional().isObject(),
   body('enableAutoCorrection').optional().isBoolean(),
   body('correctionMode').optional().isIn(['conservative', 'aggressive', 'custom']),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { model, options = {} } = req.body
@@ -484,7 +539,7 @@ router.post('/validate/correct', [
       data: result
     })
   } catch (error) {
-    next(new AppError('模型验证和修正失败', 500, error.message))
+    next(new AppError('模型验证和修正失败: ' + error.message, 500))
   }
 })
 
@@ -494,7 +549,7 @@ router.post('/correct/smart', [
   body('model.name').isString().notEmpty().withMessage('模型名称不能为空'),
   body('model.tables').isArray().withMessage('表定义必须是数组'),
   body('options').optional().isObject(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { model, options = {} } = req.body
@@ -507,7 +562,7 @@ router.post('/correct/smart', [
       data: result
     })
   } catch (error) {
-    next(new AppError('智能模型修正失败', 500, error.message))
+    next(new AppError('智能模型修正失败: ' + error.message, 500))
   }
 })
 
@@ -515,7 +570,7 @@ router.post('/correct/smart', [
 router.post('/report/quality', [
   body('model').isObject().withMessage('数据模型必须是对象'),
   body('validationResult').optional().isObject(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { model, validationResult } = req.body
@@ -537,7 +592,7 @@ router.post('/report/quality', [
       }
     })
   } catch (error) {
-    next(new AppError('生成质量报告失败', 500, error.message))
+    next(new AppError('生成质量报告失败: ' + error.message, 500))
   }
 })
 
@@ -549,7 +604,7 @@ router.post('/report/quality', [
 router.get('/history/:projectId', [
   param('projectId').isUUID().withMessage('项目ID格式无效'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('限制数量必须在1-100之间'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { projectId } = req.params
@@ -562,7 +617,7 @@ router.get('/history/:projectId', [
       data: history
     })
   } catch (error) {
-    next(new AppError('获取解析历史失败', 500, error.message))
+    next(new AppError('获取解析历史失败: ' + error.message, 500))
   }
 })
 
@@ -576,7 +631,7 @@ router.get('/templates', [
   query('dialect').optional().isIn(Object.values(SQLDialect)),
   query('tags').optional().isString(),
   query('search').optional().isString(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { category, dialect, tags, search } = req.query
@@ -595,14 +650,14 @@ router.get('/templates', [
       data: templates
     })
   } catch (error) {
-    next(new AppError('获取模板列表失败', 500, error.message))
+    next(new AppError('获取模板列表失败: ' + error.message, 500))
   }
 })
 
 // 获取模板详情
 router.get('/templates/:templateId', [
   param('templateId').isString().notEmpty().withMessage('模板ID不能为空'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { templateId } = req.params
@@ -619,7 +674,7 @@ router.get('/templates/:templateId', [
       data: template
     })
   } catch (error) {
-    next(new AppError('获取模板详情失败', 500, error.message))
+    next(new AppError('获取模板详情失败: ' + error.message, 500))
   }
 })
 
@@ -629,7 +684,7 @@ router.post('/templates/:templateId/render', [
   body('context').isObject().withMessage('渲染上下文必须是对象'),
   body('context.model').isObject().withMessage('数据模型必须是对象'),
   body('context.dialect').isIn(Object.values(SQLDialect)).withMessage('SQL方言无效'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { templateId } = req.params
@@ -646,7 +701,7 @@ router.post('/templates/:templateId/render', [
       }
     })
   } catch (error) {
-    next(new AppError('模板渲染失败', 500, error.message))
+    next(new AppError('模板渲染失败: ' + error.message, 500))
   }
 })
 
@@ -656,7 +711,7 @@ router.post('/templates/:templateId/preview', [
   body('context').isObject().withMessage('渲染上下文必须是对象'),
   body('context.model').isObject().withMessage('数据模型必须是对象'),
   body('context.dialect').isIn(Object.values(SQLDialect)).withMessage('SQL方言无效'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { templateId } = req.params
@@ -670,7 +725,7 @@ router.post('/templates/:templateId/preview', [
       data: result
     })
   } catch (error) {
-    next(new AppError('模板预览失败', 500, error.message))
+    next(new AppError('模板预览失败: ' + error.message, 500))
   }
 })
 
@@ -683,7 +738,7 @@ router.post('/templates', [
   body('template').isString().notEmpty().withMessage('模板内容不能为空'),
   body('variables').isArray().withMessage('变量定义必须是数组'),
   body('tags').optional().isArray(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const templateData = req.body
@@ -699,7 +754,7 @@ router.post('/templates', [
       }
     })
   } catch (error) {
-    next(new AppError('创建模板失败', 500, error.message))
+    next(new AppError('创建模板失败: ' + error.message, 500))
   }
 })
 
@@ -711,7 +766,7 @@ router.put('/templates/:templateId', [
   body('template').optional().isString(),
   body('variables').optional().isArray(),
   body('tags').optional().isArray(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { templateId } = req.params
@@ -725,14 +780,14 @@ router.put('/templates/:templateId', [
       message: '模板更新成功'
     })
   } catch (error) {
-    next(new AppError('更新模板失败', 500, error.message))
+    next(new AppError('更新模板失败: ' + error.message, 500))
   }
 })
 
 // 删除模板
 router.delete('/templates/:templateId', [
   param('templateId').isString().notEmpty().withMessage('模板ID不能为空'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { templateId } = req.params
@@ -745,14 +800,14 @@ router.delete('/templates/:templateId', [
       message: '模板删除成功'
     })
   } catch (error) {
-    next(new AppError('删除模板失败', 500, error.message))
+    next(new AppError('删除模板失败: ' + error.message, 500))
   }
 })
 
 // 导出模板集合
 router.post('/templates/export', [
   body('templateIds').isArray().withMessage('模板ID列表必须是数组'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { templateIds } = req.body
@@ -765,7 +820,7 @@ router.post('/templates/export', [
       data: collection
     })
   } catch (error) {
-    next(new AppError('导出模板集合失败', 500, error.message))
+    next(new AppError('导出模板集合失败: ' + error.message, 500))
   }
 })
 
@@ -773,7 +828,7 @@ router.post('/templates/export', [
 router.post('/templates/import', [
   body('collection').isObject().withMessage('模板集合必须是对象'),
   body('collection.templates').isArray().withMessage('模板列表必须是数组'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { collection } = req.body
@@ -789,7 +844,7 @@ router.post('/templates/import', [
       }
     })
   } catch (error) {
-    next(new AppError('导入模板集合失败', 500, error.message))
+    next(new AppError('导入模板集合失败: ' + error.message, 500))
   }
 })
 
@@ -806,7 +861,7 @@ router.get('/config', async (req, res, next) => {
       data: config
     })
   } catch (error) {
-    next(new AppError('获取配置失败', 500, error.message))
+    next(new AppError('获取配置失败: ' + error.message, 500))
   }
 })
 
@@ -815,7 +870,7 @@ router.put('/config', [
   body('providers').optional().isObject(),
   body('defaultProvider').optional().isString(),
   body('globalSettings').optional().isObject(),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const configUpdate = req.body
@@ -831,7 +886,7 @@ router.put('/config', [
       message: 'AI服务配置更新成功'
     })
   } catch (error) {
-    next(new AppError('更新配置失败', 500, error.message))
+    next(new AppError('更新配置失败: ' + error.message, 500))
   }
 })
 
@@ -849,14 +904,14 @@ router.post('/config/reload', async (req, res, next) => {
       message: 'AI服务配置重新加载成功'
     })
   } catch (error) {
-    next(new AppError('重新加载配置失败', 500, error.message))
+    next(new AppError('重新加载配置失败: ' + error.message, 500))
   }
 })
 
 // 测试AI服务连接
 router.post('/test/:provider', [
   param('provider').isString().notEmpty().withMessage('提供者名称不能为空'),
-  validateRequest
+  validateRequest()
 ], async (req, res, next) => {
   try {
     const { provider } = req.params
@@ -867,7 +922,7 @@ router.post('/test/:provider', [
       data: testResult
     })
   } catch (error) {
-    next(new AppError('AI服务连接测试失败', 500, error.message))
+    next(new AppError('AI服务连接测试失败: ' + error.message, 500))
   }
 })
 

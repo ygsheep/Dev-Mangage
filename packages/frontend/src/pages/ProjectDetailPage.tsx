@@ -29,7 +29,6 @@ import TailwindAPICard from '../components/features/api/components/TailwindAPICa
 import APITestModal from '../components/features/api/components/modals/APITestModal'
 
 // 导入功能组件
-import ImportDocumentModal from '../components/features/import/components/modals/ImportDocumentModal'
 import ImportAPIDocModal from '../components/features/import/components/modals/ImportAPIDocModal'
 import UnifiedImportModal from '../components/features/import/components/modals/UnifiedImportModal'
 
@@ -60,7 +59,6 @@ const ProjectDetailPage: React.FC = () => {
   const [useEnhancedComponents, setUseEnhancedComponents] = useState(true)
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card')
   const [selectedFeatureModule, setSelectedFeatureModule] = useState<any>(null)
-  const [showImportDocModal, setShowImportDocModal] = useState(false)
   const [selectedDataTable, setSelectedDataTable] = useState<DatabaseTable | null>(null)
   const [showDataTableModal, setShowDataTableModal] = useState(false)
   const [showAPITestModal, setShowAPITestModal] = useState(false)
@@ -103,109 +101,14 @@ const ProjectDetailPage: React.FC = () => {
   const apis = apisData?.data?.apis || []
   const realDataTables = dataTablesData?.data?.tables || []
 
-  // 创建功能模块示例数据，基于现有APIs
-  const getFeatureModules = () => {
-    // 为每个功能模块生成对应的CRUD APIs
-    const generateCRUDAPIs = (moduleName: string, baseEndpoint: string) => {
-      const moduleId = moduleName.toLowerCase().replace(/\s+/g, '-')
-      
-      const frontendAPIs: API[] = [
-        {
-          id: `${moduleId}-get-list`,
-          projectId: id!,
-          name: `获取${moduleName}列表`,
-          description: `获取${moduleName}的分页列表数据`,
-          method: HTTPMethod.GET,
-          path: `${baseEndpoint}`,
-          status: APIStatus.COMPLETED,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: `${moduleId}-get-detail`,
-          projectId: id!,
-          name: `获取${moduleName}详情`,
-          description: `根据ID获取${moduleName}的详细信息`,
-          method: HTTPMethod.GET,
-          path: `${baseEndpoint}/{id}`,
-          status: APIStatus.COMPLETED,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
-      ]
+  // 获取功能模块数据（使用真实API）
+  const { data: featureModulesData, refetch: refetchFeatureModules } = useQuery({
+    queryKey: ['featureModules', id],
+    queryFn: () => apiMethods.getFeatureModules(id!),
+    enabled: !!id,
+  })
 
-      const backendAPIs: API[] = [
-        {
-          id: `${moduleId}-create`,
-          projectId: id!,
-          name: `创建${moduleName}`,
-          description: `创建新的${moduleName}记录`,
-          method: HTTPMethod.POST,
-          path: `${baseEndpoint}`,
-          status: APIStatus.COMPLETED,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: `${moduleId}-update`,
-          projectId: id!,
-          name: `更新${moduleName}`,
-          description: `根据ID更新${moduleName}信息`,
-          method: HTTPMethod.PUT,
-          path: `${baseEndpoint}/{id}`,
-          status: APIStatus.COMPLETED,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: `${moduleId}-delete`,
-          projectId: id!,
-          name: `删除${moduleName}`,
-          description: `根据ID删除${moduleName}记录`,
-          method: HTTPMethod.DELETE,
-          path: `${baseEndpoint}/{id}`,
-          status: APIStatus.COMPLETED,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
-      ]
-
-      return { frontendAPIs, backendAPIs }
-    }
-
-    const userManagementAPIs = generateCRUDAPIs('用户', '/api/v1/users')
-    const permissionAPIs = generateCRUDAPIs('权限', '/api/v1/permissions')
-    const fileAPIs = generateCRUDAPIs('文件', '/api/v1/files')
-
-    return [
-      {
-        id: 'user-management',
-        name: '用户登录',
-        description: '用户注册、登录、密码重置等基础认证功能',
-        status: 'completed',
-        tags: ['JWT认证', '邮箱验证'],
-        ...userManagementAPIs
-      },
-      {
-        id: 'permission-management',
-        name: '权限管理',
-        description: '角色权限控制、菜单权限、数据权限等',
-        status: 'in-progress',
-        tags: ['RBAC', '菜单控制'],
-        ...permissionAPIs
-      },
-      {
-        id: 'file-management',
-        name: '文件管理',
-        description: '文件上传、下载、预览等文件操作功能',
-        status: 'planned',
-        tags: ['OSS存储', '缩略图'],
-        ...fileAPIs
-      }
-    ]
-  }
-
-  const featureModules = getFeatureModules()
+  const featureModules = featureModulesData?.data?.modules || []
 
   // 示例数据表数据（仅在演示时使用）
   const _getSampleDataTables = (): DatabaseTable[] => {
@@ -329,14 +232,6 @@ const ProjectDetailPage: React.FC = () => {
         relationshipCount: 0
       }
     ]
-  }
-
-  const handleImportDocumentSuccess = (parsedData: any) => {
-    if (parsedData.tables && parsedData.tables.length > 0) {
-      toast.success(`成功导入 ${parsedData.tables.length} 个数据表`)
-      refetchProject()
-      refetchDataTables() // 刷新数据表列表
-    }
   }
 
   const handleTableClick = (table: DatabaseTable) => {
@@ -721,8 +616,8 @@ const ProjectDetailPage: React.FC = () => {
                     ))}
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
-                    <span>前端API: {module.frontendAPIs.length}</span>
-                    <span>后端API: {module.backendAPIs.length}</span>
+                    <span>API数量: {module.apis?.length || 0}</span>
+                    <span>类别: {module.category || '通用'}</span>
                     <span className="text-blue-600 font-medium">点击查看</span>
                   </div>
                 </div>
@@ -752,37 +647,11 @@ const ProjectDetailPage: React.FC = () => {
               </p>
             </div>
             <div className="max-w-4xl mx-auto">
-              {/* Import Documentation Section - Only show when no data exists */}
-              {allDataTables.length === 0 && (
-                <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">导入数据库设计文档</h4>
-                  <p className="text-gray-600 mb-4">
-                    支持导入Markdown格式的数据库设计文档，自动解析表结构和字段信息
-                  </p>
-                  <div className="flex items-center justify-center">
-                    <button 
-                      onClick={() => setShowImportDocModal(true)}
-                      className="btn-primary flex items-center space-x-2"
-                    >
-                      <Upload className="w-4 h-4" />
-                      <span>导入文档</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {/* Quick action when data exists */}
               {allDataTables.length > 0 && (
                 <div className="flex items-center justify-between mb-6">
                   <h4 className="text-lg font-semibold text-gray-900">数据模型 ({allDataTables.length})</h4>
                   <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={() => setShowImportDocModal(true)}
-                      className="btn-outline flex items-center space-x-2 text-sm"
-                    >
-                      <Upload className="w-4 h-4" />
-                      <span>导入更多</span>
-                    </button>
                     <button className="btn-outline flex items-center space-x-2 text-sm">
                       <Plus className="w-4 h-4" />
                       <span>新建表</span>
@@ -906,13 +775,6 @@ const ProjectDetailPage: React.FC = () => {
           onClose={() => setSelectedFeatureModule(null)}
         />
       )}
-
-      {/* Import Document Modal */}
-      <ImportDocumentModal
-        isOpen={showImportDocModal}
-        onClose={() => setShowImportDocModal(false)}
-        onSuccess={handleImportDocumentSuccess}
-      />
 
       {/* Data Table Modal */}
       <DataTableModal
