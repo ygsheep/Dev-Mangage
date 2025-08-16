@@ -12,7 +12,7 @@ import {
   Code,
   Download
 } from 'lucide-react'
-import MCPServerControl from '../components/MCPServerControl'
+import MCPServerControl from '../components/integrations/mcp/MCPServerControl'
 import { debug, useDebugComponent } from '../debug'
 import { useMCPConfig } from '../hooks/useMCPConfig'
 

@@ -4,9 +4,11 @@ import { Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import ProjectsPage from './pages/ProjectsPage'
 import ProjectDetailPage from './pages/ProjectDetailPage'
+import MindmapPage from './pages/MindmapPage'
 import SwaggerImportPage from './pages/SwaggerImportPage'
 import DocumentsImportPage from './pages/DocumentsImportPage'
 import SettingsPage from './pages/SettingsPage'
+import DataModelPage from './pages/DataModelPage'
 
 // 布局组件
 import Layout from './components/Layout'
@@ -22,6 +24,8 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="projects/:id" element={<ProjectDetailPage />} />
+          <Route path="projects/:projectId/mindmap" element={<MindmapPage />} />
+          <Route path="projects/:projectId/data-model" element={<DataModelPage />} />
           <Route path="import/swagger" element={<SwaggerImportPage />} />
           <Route path="import" element={<DocumentsImportPage />} />
           <Route path="import/documents" element={<DocumentsImportPage />} />

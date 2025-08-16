@@ -9,7 +9,7 @@ const router = Router()
 
 // Validation schemas
 const createAPISchema = z.object({
-  projectId: z.string().uuid(),
+  projectId: z.string().min(1),
   name: z.string().min(1).max(100),
   method: z.nativeEnum(HTTPMethod),
   path: z.string().min(1).max(200),
@@ -29,7 +29,7 @@ const apiParamsSchema = z.object({
 })
 
 const apiQuerySchema = z.object({
-  projectId: z.string().uuid().optional(),
+  projectId: z.string().min(1).optional(),
   status: z.nativeEnum(APIStatus).optional(),
   method: z.nativeEnum(HTTPMethod).optional(),
   search: z.string().optional(),

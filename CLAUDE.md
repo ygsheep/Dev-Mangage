@@ -113,6 +113,34 @@ The project implements Model Context Protocol in two ways:
 - **TF-IDF**: Text analysis for content similarity
 - **RAG Integration**: Document parsing with multiple AI providers
 
+### AI Integration Architecture (Phase 2-3 Complete)
+The platform now includes comprehensive AI-driven capabilities:
+
+**AI Service Framework:**
+- Multi-provider adapter system (OpenAI, DeepSeek, Ollama, etc.)
+- Unified API abstraction layer with consistent interfaces
+- Dynamic provider switching and health monitoring
+- Usage statistics and cost tracking
+
+**Document Intelligence:**
+- Smart document parsing for Markdown, SQL, Excel, Word, PDF, JSON
+- Result validation and auto-correction mechanisms
+- Batch import workflow with job queue management
+- Event-driven processing with real-time progress tracking
+
+**SQL Code Generation:**
+- Multi-database dialect support (MySQL, PostgreSQL, SQLite, SQL Server, Oracle)
+- AI-enhanced SQL generation with context awareness
+- Migration script generation with rollback support
+- Code template management system with built-in and custom templates
+- Database optimization suggestions and index recommendations
+
+**Frontend Integration:**
+- React components for AI document parsing and batch import
+- Enhanced SQL generator with AI capabilities
+- Real-time job monitoring and progress tracking
+- Template management interface
+
 ## Development Patterns
 
 ### API Development
@@ -121,11 +149,37 @@ The project implements Model Context Protocol in two ways:
 - Request validation using express-validator and Zod
 - Comprehensive logging with Winston (Chinese descriptions)
 
+**AI Service API Endpoints:**
+- `/api/v1/ai/health` - AI service health status
+- `/api/v1/ai/providers` - Available AI providers
+- `/api/v1/ai/parse/document` - Single document parsing
+- `/api/v1/ai/parse/batch` - Batch document parsing
+- `/api/v1/ai/batch/import` - Create batch import job
+- `/api/v1/ai/batch/status/:jobId` - Job status monitoring
+- `/api/v1/ai/generate/sql` - AI-enhanced SQL generation
+- `/api/v1/ai/generate/migration` - Migration script generation
+- `/api/v1/ai/templates/*` - Code template management
+- `/api/v1/ai/optimize/schema/:projectId` - Database optimization
+- `/api/v1/ai/validate/model` - Data model validation
+
 ### Frontend Patterns
 - Page components in `src/pages/` 
 - Reusable UI components in `src/components/`
 - API integration via React Query in `src/utils/api.ts`
 - Unified import modal handles both Swagger and database document parsing
+
+**AI Component Architecture:**
+- `AIDocumentParser` - Smart document analysis with provider selection
+- `BatchImportManager` - Multi-document processing with job monitoring
+- `SQLGenerator` - Enhanced with AI generation and template support
+- `CodeTemplateManager` - Template creation, editing, and rendering
+
+### AI Development Patterns
+- Adapter pattern for multiple AI provider integration
+- Event-driven architecture for long-running batch operations
+- Template engine with variable substitution and conditional logic
+- Comprehensive error handling with fallback mechanisms
+- Real-time progress tracking with WebSocket/SSE support
 
 ### Database Patterns
 - UUID primary keys for all entities
@@ -197,3 +251,6 @@ Cursor IDE configuration in `.cursor/mcp.json`:
 - Performance testing for vector search operations
 
 This codebase emphasizes modern TypeScript patterns, comprehensive error handling, and scalable architecture suitable for both individual developers and team collaboration.
+
+# replay 
+replay chinese for me

@@ -8,6 +8,12 @@ import { swaggerRouter } from './swagger'
 import { debugRouter } from './debug'
 import { mcpRouter, setupIntegratedMCPRoutes } from './mcp'
 import { dataModelsRouter } from './dataModels'
+import { mindmapRouter } from './mindmap'
+import fieldEnumValuesRouter from './fieldEnumValues'
+import tableRelationshipsRouter from './tableRelationships'
+import modelVersionsRouter from './modelVersions'
+import tableStatisticsRouter from './tableStatistics'
+import aiRouter from './ai'
 
 export const setupRoutes = (app: Express): void => {
   const apiPrefix = config.apiPrefix
@@ -27,9 +33,19 @@ export const setupRoutes = (app: Express): void => {
   app.use(API_ENDPOINTS.APIS.BASE, apisRouter)  
   app.use(API_ENDPOINTS.TAGS.BASE, tagsRouter)
   app.use(API_ENDPOINTS.DATA_MODELS.BASE, dataModelsRouter)
+  app.use(API_ENDPOINTS.MINDMAP.BASE, mindmapRouter)
   app.use(API_ENDPOINTS.SWAGGER.BASE, swaggerRouter)
   app.use(API_ENDPOINTS.DEBUG.BASE, debugRouter)
   app.use(API_ENDPOINTS.MCP.BASE, mcpRouter)
+  
+  // 新增的数据模型相关API
+  app.use(`${apiPrefix}/field-enum-values`, fieldEnumValuesRouter)
+  app.use(`${apiPrefix}/table-relationships`, tableRelationshipsRouter)
+  app.use(`${apiPrefix}/model-versions`, modelVersionsRouter)
+  app.use(`${apiPrefix}/table-statistics`, tableStatisticsRouter)
+  
+  // AI服务相关API
+  app.use(`${apiPrefix}/ai`, aiRouter)
   
   // 集成HTTP MCP服务路由
   setupIntegratedMCPRoutes(app)
@@ -57,9 +73,15 @@ export const setupRoutes = (app: Express): void => {
         apis: API_ENDPOINTS.APIS.BASE,
         tags: API_ENDPOINTS.TAGS.BASE,
         dataModels: API_ENDPOINTS.DATA_MODELS.BASE,
+        mindmap: API_ENDPOINTS.MINDMAP.BASE,
         swagger: API_ENDPOINTS.SWAGGER.BASE,
         debug: API_ENDPOINTS.DEBUG.BASE,
         mcp: API_ENDPOINTS.MCP.BASE,
+        fieldEnumValues: `${apiPrefix}/field-enum-values`,
+        tableRelationships: `${apiPrefix}/table-relationships`,
+        modelVersions: `${apiPrefix}/model-versions`,
+        tableStatistics: `${apiPrefix}/table-statistics`,
+        ai: `${apiPrefix}/ai`,
       },
       documentation: 'https://github.com/devapi-team/devapi-manager',
     })

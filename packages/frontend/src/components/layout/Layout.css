@@ -1,0 +1,148 @@
+/* Layout 组件的增强样式 */
+
+/* 侧边栏折叠/展开动画 */
+.sidebar-transition {
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 内容区域动画 */
+.content-transition {
+  transition: padding-left 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 折叠按钮悬停效果 */
+.sidebar-toggle-btn {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+}
+
+.sidebar-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* 文本淡入淡出动画 */
+.text-fade-in {
+  opacity: 1;
+  transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.text-fade-out {
+  opacity: 0;
+  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 导航项目悬停效果 */
+.nav-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  transition: left 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item:hover::before {
+  left: 100%;
+}
+
+/* 搜索按钮特殊效果 */
+.search-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.search-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 300ms ease-out, height 300ms ease-out;
+}
+
+.search-button:hover::after {
+  width: 200%;
+  height: 200%;
+}
+
+/* Logo 动画效果 */
+.logo-icon {
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-container:hover .logo-icon {
+  transform: rotate(5deg) scale(1.05);
+}
+
+/* 响应式动画调整 */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-transition,
+  .content-transition,
+  .sidebar-toggle-btn,
+  .text-fade-in,
+  .text-fade-out,
+  .nav-item::before,
+  .search-button::after,
+  .logo-icon {
+    transition: none !important;
+  }
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .sidebar-transition {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar-transition.open {
+    transform: translateX(0);
+  }
+  
+  .content-transition {
+    padding-left: 0 !important;
+  }
+}
+
+/* 暗黑模式支持 */
+@media (prefers-color-scheme: dark) {
+  .sidebar-toggle-btn {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(75, 85, 99, 0.6);
+  }
+  
+  .nav-item::before {
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+  }
+  
+  .search-button::after {
+    background: rgba(59, 130, 246, 0.3);
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .sidebar-toggle-btn {
+    border-width: 2px;
+  }
+  
+  .nav-item:hover {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}

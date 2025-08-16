@@ -31,7 +31,8 @@ npm install reactflow zustand react-hot-toast
 ### 后端依赖
 ```bash
 cd packages/backend
-# 无需额外依赖，使用现有Prisma和Express
+# 安装tsx用于TypeScript执行（如果未安装）
+npm install tsx --save-dev
 ```
 
 ## 🗄️ 数据库迁移
@@ -50,7 +51,22 @@ npx prisma migrate dev --name add-mindmap-layout
 
 ## 🔧 后端集成
 
-### 1. 注册mindmap路由
+### 1. 添加mindmap端点配置
+编辑 `packages/backend/src/config/api-endpoints.ts`:
+
+```typescript
+// 在API_ENDPOINTS中添加mindmap配置
+MINDMAP: {
+  BASE: `${API_CONFIG.PREFIX}/mindmap`,
+  GET_DATA: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}`,
+  SAVE_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
+  GET_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
+  DELETE_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
+  GET_STATS: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/stats`,
+},
+```
+
+### 2. 注册mindmap路由
 编辑 `packages/backend/src/routes/index.ts`:
 
 ```typescript
@@ -59,12 +75,54 @@ import { mindmapRouter } from './mindmap'
 export const setupRoutes = (app: Express): void => {
   // ... 现有路由
   
-  // 添加mindmap路由
-  app.use('/api/v1/mindmap', mindmapRouter)
+  // 添加mindmap路由（注意顺序）
+  app.use(API_ENDPOINTS.MINDMAP.BASE, mindmapRouter)
+  
+  // 在API documentation的endpoints中添加
+  endpoints: {
+    // ... 其他端点
+    mindmap: API_ENDPOINTS.MINDMAP.BASE,
+  }
 }
 ```
 
-### 2. 扩展API工具函数
+### 3. 添加数据模型关系端点
+编辑 `packages/backend/src/routes/dataModels.ts`:
+
+```typescript
+// 在文件开头添加（必须在参数化路由之前）
+const relationshipsQuerySchema = z.object({
+  projectId: z.string().uuid(),
+})
+
+router.get(
+  '/relationships',
+  validateQuery(relationshipsQuerySchema),
+  asyncHandler(async (req, res) => {
+    const { projectId } = req.query as any
+
+    const relationships = await prisma.tableRelationship.findMany({
+      where: {
+        OR: [
+          { fromTable: { projectId } },
+          { toTable: { projectId } }
+        ]
+      },
+      include: {
+        fromTable: { select: { id: true, name: true, displayName: true } },
+        toTable: { select: { id: true, name: true, displayName: true } }
+      }
+    })
+
+    res.json({
+      success: true,
+      data: { relationships }
+    })
+  })
+)
+```
+
+### 4. 扩展API工具函数
 编辑 `packages/frontend/src/utils/api.ts`:
 
 ```typescript
@@ -73,12 +131,20 @@ export const getMindmapData = async (projectId: string) => {
   return apiClient.get(`/mindmap/${projectId}`)
 }
 
-export const saveMindmapLayout = async (data: any) => {
-  return apiClient.post(`/mindmap/${data.projectId}/layout`, data)
+export const saveMindmapLayout = async (projectId: string, data: any) => {
+  return apiClient.post(`/mindmap/${projectId}/layout`, data)
 }
 
 export const getMindmapLayout = async (projectId: string) => {
   return apiClient.get(`/mindmap/${projectId}/layout`)
+}
+
+export const deleteMindmapLayout = async (projectId: string) => {
+  return apiClient.delete(`/mindmap/${projectId}/layout`)
+}
+
+export const getMindmapStats = async (projectId: string) => {
+  return apiClient.get(`/mindmap/${projectId}/stats`)
 }
 
 export const getTableRelationships = async (projectId: string) => {
@@ -91,6 +157,8 @@ export const apiMethods = {
   getMindmapData,
   saveMindmapLayout,
   getMindmapLayout,
+  deleteMindmapLayout,
+  getMindmapStats,
   getTableRelationships,
 }
 ```
@@ -102,41 +170,48 @@ export const apiMethods = {
 
 ```typescript
 import MindmapViewer from '../components/MindmapViewer'
+import { GitBranch } from 'lucide-react'
 
-// 在组件中添加新的Tab
-const [activeTab, setActiveTab] = useState<'apis' | 'models' | 'mindmap'>('apis')
+// 在组件中添加新的Tab（注意更新类型）
+const [activeTab, setActiveTab] = useState<'apis' | 'features' | 'models' | 'mindmap'>('apis')
 
-// 在Tab导航中添加
+// 在Tab导航中添加mindmap按钮
 <button
   onClick={() => setActiveTab('mindmap')}
-  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+  className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
     activeTab === 'mindmap'
-      ? 'border-blue-500 text-blue-600'
-      : 'border-transparent text-gray-500 hover:text-gray-700'
+      ? 'border-blue-500 text-blue-600 bg-blue-50'
+      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
   }`}
 >
   <GitBranch className="w-4 h-4 mr-2" />
   关系图谱
 </button>
 
-// 在内容区域添加
-{activeTab === 'mindmap' && (
-  <div className="h-[calc(100vh-200px)]">
+// 在内容区域的条件渲染中添加（注意修正ternary结构）
+) : activeTab === 'models' ? (
+  /* Data Models Tab Content */
+  <div className="card">
+    {/* ... 数据模型内容 */}
+  </div>
+) : activeTab === 'mindmap' ? (
+  /* Mindmap Tab Content */
+  <div className="h-[calc(100vh-300px)]">
     <MindmapViewer
-      projectId={projectId}
+      projectId={id!}
       onNodeSelect={(node) => {
         if (node?.data.entityType === 'table') {
-          // 处理表节点选择
           console.log('Selected table:', node.data.entityId)
+          // 可以在这里添加表节点选择的处理逻辑
         }
       }}
       onEdgeSelect={(edge) => {
-        // 处理关系选择
         console.log('Selected relationship:', edge?.data.relationshipId)
+        // 可以在这里添加关系选择的处理逻辑
       }}
     />
   </div>
-)}
+) : null}
 ```
 
 ### 2. 添加到导航菜单
@@ -164,29 +239,111 @@ const [activeTab, setActiveTab] = useState<'apis' | 'models' | 'mindmap'>('apis'
 
 ```typescript
 import React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { ArrowLeft, GitBranch } from 'lucide-react'
+import { apiMethods } from '../utils/api'
 import MindmapViewer from '../components/MindmapViewer'
 
 const MindmapPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>()
 
+  // Fetch project details for title
+  const { data: projectData, isLoading: projectLoading } = useQuery({
+    queryKey: ['project', projectId],
+    queryFn: () => apiMethods.getProject(projectId!),
+    enabled: !!projectId,
+  })
+
+  const project = projectData?.data?.project
+
   if (!projectId) {
-    return <div>Project ID is required</div>
+    return (
+      <div className="card text-center py-12">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          项目ID缺失
+        </h3>
+        <p className="text-gray-600 mb-6">
+          请通过有效的项目链接访问
+        </p>
+        <Link to="/projects" className="btn-primary">
+          返回项目列表
+        </Link>
+      </div>
+    )
+  }
+
+  if (projectLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          <div className="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>
+          <div className="w-48 h-8 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+        <div className="w-full h-screen bg-gray-200 rounded animate-pulse"></div>
+      </div>
+    )
+  }
+
+  if (!project) {
+    return (
+      <div className="card text-center py-12">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          项目不存在
+        </h3>
+        <p className="text-gray-600 mb-6">
+          请检查项目ID是否正确
+        </p>
+        <Link to="/projects" className="btn-primary">
+          返回项目列表
+        </Link>
+      </div>
+    )
   }
 
   return (
-    <div className="h-screen">
-      <MindmapViewer
-        projectId={projectId}
-        height="100vh"
-        className="w-full"
-        onNodeSelect={(node) => {
-          // 处理节点选择
-        }}
-        onEdgeSelect={(edge) => {
-          // 处理边选择
-        }}
-      />
+    <div className="h-screen flex flex-col">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center space-x-4">
+          <Link
+            to={`/projects/${projectId}`}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div className="flex items-center space-x-3">
+            <GitBranch className="w-6 h-6 text-blue-600" />
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">
+                {project.name} - 关系图谱
+              </h1>
+              <p className="text-sm text-gray-600">
+                数据表关系可视化展示
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mindmap Viewer */}
+      <div className="flex-1 overflow-hidden">
+        <MindmapViewer
+          projectId={projectId}
+          height="100%"
+          className="w-full"
+          onNodeSelect={(node) => {
+            if (node?.data.entityType === 'table') {
+              console.log('Selected table:', node.data.entityId)
+              // 可以在这里添加表节点选择的处理逻辑
+            }
+          }}
+          onEdgeSelect={(edge) => {
+            console.log('Selected relationship:', edge?.data.relationshipId)
+            // 可以在这里添加关系选择的处理逻辑
+          }}
+        />
+      </div>
     </div>
   )
 }
@@ -194,7 +351,121 @@ const MindmapPage: React.FC = () => {
 export default MindmapPage
 ```
 
-### 4. 更新路由配置
+### 4. 创建缺失的边组件
+创建 `packages/frontend/src/components/MindmapViewer/edges/ForeignKeyEdge.tsx`:
+
+```typescript
+import React from 'react'
+import { EdgeProps, getBezierPath } from 'reactflow'
+
+const ForeignKeyEdge: React.FC<EdgeProps> = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  data,
+}) => {
+  const [edgePath] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  })
+
+  return (
+    <>
+      <path
+        id={id}
+        style={{
+          ...style,
+          stroke: '#f59e0b',
+          strokeWidth: 2,
+          strokeDasharray: '5,5',
+        }}
+        className="react-flow__edge-path"
+        d={edgePath}
+      />
+      {data?.label && (
+        <text
+          x={(sourceX + targetX) / 2}
+          y={(sourceY + targetY) / 2}
+          className="text-xs fill-gray-600"
+          textAnchor="middle"
+          dy={-5}
+        >
+          {data.label}
+        </text>
+      )}
+    </>
+  )
+}
+
+export default ForeignKeyEdge
+```
+
+创建 `packages/frontend/src/components/MindmapViewer/edges/ReferenceEdge.tsx`:
+
+```typescript
+import React from 'react'
+import { EdgeProps, getBezierPath } from 'reactflow'
+
+const ReferenceEdge: React.FC<EdgeProps> = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  data,
+}) => {
+  const [edgePath] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  })
+
+  return (
+    <>
+      <path
+        id={id}
+        style={{
+          ...style,
+          stroke: '#10b981',
+          strokeWidth: 2,
+        }}
+        className="react-flow__edge-path"
+        d={edgePath}
+      />
+      {data?.label && (
+        <text
+          x={(sourceX + targetX) / 2}
+          y={(sourceY + targetY) / 2}
+          className="text-xs fill-gray-600"
+          textAnchor="middle"
+          dy={-5}
+        >
+          {data.label}
+        </text>
+      )}
+    </>
+  )
+}
+
+export default ReferenceEdge
+```
+
+### 5. 更新路由配置
 编辑 `packages/frontend/src/App.tsx` 或路由配置文件:
 
 ```typescript
@@ -371,7 +642,49 @@ npm run dev
 
 ### 常见问题排查
 
-#### 1. 数据不显示
+#### 1. ReactFlow 警告: Unknown event handler property `onViewportChange`
+**问题**: React DevTools 显示 `onViewportChange` 警告
+**解决方案**: 移除 ReactFlow 组件中的 `onViewportChange` 属性，新版本不再需要
+
+```typescript
+// 错误的写法 ❌
+<ReactFlow
+  onViewportChange={onViewportChange}
+  // ...
+/>
+
+// 正确的写法 ✅
+<ReactFlow
+  // 移除 onViewportChange 属性
+  // ...
+/>
+```
+
+#### 2. API 400 错误: `/data-models/relationships` 端点不存在
+**问题**: 前端请求 relationships 端点时返回 400 错误
+**解决方案**: 在 dataModels 路由中添加 relationships 端点，**必须放在参数化路由之前**
+
+```typescript
+// 在 packages/backend/src/routes/dataModels.ts 的开头添加
+router.get('/relationships', validateQuery(relationshipsQuerySchema), ...)
+// 然后才是其他路由
+router.get('/:id', ...)
+```
+
+#### 3. 后端编译错误: 重复声明 `relationshipsQuerySchema`
+**问题**: tsx 编译时报错重复声明
+**解决方案**: 确保只声明一次 schema，检查是否有重复的导入或声明
+
+#### 4. tsx 命令未找到错误
+**问题**: `'tsx' is not recognized as an internal or external command`
+**解决方案**: 安装 tsx 依赖
+
+```bash
+cd packages/backend
+npm install tsx --save-dev
+```
+
+#### 5. 数据不显示
 ```typescript
 // 检查数据加载
 const { isLoading, nodes, edges } = useMindmapStore()
@@ -380,7 +693,7 @@ console.log('Nodes:', nodes.length)
 console.log('Edges:', edges.length)
 ```
 
-#### 2. 布局异常
+#### 6. 布局异常
 ```typescript
 // 检查布局配置
 const { config } = useMindmapStore()
@@ -391,10 +704,13 @@ const { applyLayout } = useMindmapStore()
 applyLayout('hierarchical')
 ```
 
-#### 3. API错误
+#### 7. API错误调试
 ```bash
 # 检查后端路由注册
 curl http://localhost:3001/api/v1/mindmap/PROJECT_ID
+
+# 检查 relationships 端点
+curl "http://localhost:3001/api/v1/data-models/relationships?projectId=PROJECT_ID"
 
 # 检查数据库连接
 npx prisma studio
@@ -515,5 +831,42 @@ const exportToExcel = async (nodes: MindmapNode[], edges: MindmapEdge[]) => {
 2. 查看网络请求是否正常
 3. 确认数据库表结构正确
 4. 参考示例代码和配置
+
+## 🚀 快速开始
+
+### 开发环境启动
+```bash
+# 启动完整开发环境
+npm run dev
+
+# 或者分别启动
+npm run dev:backend   # 后端 (localhost:3001)
+npm run dev:frontend  # 前端 (localhost:5173)
+```
+
+### 访问Mindmap功能
+1. **项目详情页集成**:
+   - 访问: `http://localhost:5173/projects/{PROJECT_ID}`
+   - 点击"关系图谱"标签页
+
+2. **独立全屏页面**:
+   - 访问: `http://localhost:5173/projects/{PROJECT_ID}/mindmap`
+
+### 验证功能
+```bash
+# 检查后端API
+curl "http://localhost:3001/api/v1/mindmap/PROJECT_ID"
+curl "http://localhost:3001/api/v1/data-models/relationships?projectId=PROJECT_ID"
+
+# 检查项目列表获取有效PROJECT_ID
+curl "http://localhost:3001/api/v1/projects"
+```
+
+### 当前状态
+- ✅ 数据库包含 mindmap_layouts 表
+- ✅ 后端 API 端点已就绪 
+- ✅ 前端组件已集成
+- ✅ 路由配置完成
+- ✅ 所有已知问题已修复
 
 **完整的Mindmap可视化组件已准备就绪，可以开始集成和使用！**

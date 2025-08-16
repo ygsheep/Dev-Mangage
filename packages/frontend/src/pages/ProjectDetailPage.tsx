@@ -15,24 +15,36 @@ import {
   Grid3X3,
   List,
   Sparkles,
-  FileText
+  FileText,
+  GitBranch
 } from 'lucide-react'
 import { API, APIStatus, HTTPMethod } from '@shared/types'
 import { apiMethods } from '../utils/api'
-import APICard from '../components/APICard'
-import CreateAPIModal from '../components/CreateAPIModal'
-import ImportSwaggerModal from '../components/ImportSwaggerModal'
-import APIDetailModal from '../components/APIDetailModal'
-import TailwindAPICard from '../components/TailwindAPICard'
-import FeatureModuleModal from '../components/FeatureModuleModal'
-import ImportDocumentModal from '../components/ImportDocumentModal'
-import DataTableModal from '../components/DataTableModal'
-import ProjectStats from '../components/ProjectStats'
-import APITestModal from '../components/APITestModal'
-import ImportAPIDocModal from '../components/ImportAPIDocModal'
-import ProjectSettingsModal from '../components/ProjectSettingsModal'
+// API管理组件
+import APICard from '../components/features/api/components/APICard'
+import CreateAPIModal from '../components/features/api/components/modals/CreateAPIModal'
+import ImportSwaggerModal from '../components/features/import/components/modals/ImportSwaggerModal'
+import APIDetailModal from '../components/features/api/components/modals/APIDetailModal'
+import TailwindAPICard from '../components/features/api/components/TailwindAPICard'
+import APITestModal from '../components/features/api/components/modals/APITestModal'
+
+// 导入功能组件
+import ImportDocumentModal from '../components/features/import/components/modals/ImportDocumentModal'
+import ImportAPIDocModal from '../components/features/import/components/modals/ImportAPIDocModal'
+import UnifiedImportModal from '../components/features/import/components/modals/UnifiedImportModal'
+
+// 数据模型组件
+import FeatureModuleModal from '../components/features/data-model/components/modals/FeatureModuleModal'
+import DataTableModal from '../components/features/data-model/components/modals/DataTableModal'
+
+// 项目管理组件
+import ProjectStats from '../components/features/project/components/ProjectStats'
+import ProjectSettingsModal from '../components/features/project/components/modals/ProjectSettingsModal'
+
+// 关系图谱组件
+import MindmapViewer from '../components/features/mindmap/components/MindmapViewer'
+
 import toast from 'react-hot-toast'
-import UnifiedImportModal from '../components/UnifiedImportModal'
 import { API_STATUS_LABELS, HTTP_METHOD_COLORS, DatabaseTable, DataModelStatus, DATA_MODEL_STATUS_COLORS } from '@shared/types'
 
 const ProjectDetailPage: React.FC = () => {
@@ -43,7 +55,7 @@ const ProjectDetailPage: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
   const [showStats, setShowStats] = useState(false)
-  const [activeTab, setActiveTab] = useState<'apis' | 'features' | 'models'>('apis')
+  const [activeTab, setActiveTab] = useState<'apis' | 'features' | 'models' | 'mindmap'>('apis')
   const [selectedAPI, setSelectedAPI] = useState<API | null>(null)
   const [useEnhancedComponents, setUseEnhancedComponents] = useState(true)
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card')
@@ -532,6 +544,17 @@ const ProjectDetailPage: React.FC = () => {
             <Grid3X3 className="w-4 h-4 mr-2" />
             数据模型
           </button>
+          <button
+            onClick={() => setActiveTab('mindmap')}
+            className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'mindmap'
+                ? 'border-blue-500 text-blue-600 bg-blue-50'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <GitBranch className="w-4 h-4 mr-2" />
+            关系图谱
+          </button>
         </div>
       </div>
 
@@ -707,15 +730,27 @@ const ProjectDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'models' ? (
         /* Data Models Tab Content */
         <div className="card">
           <div className="text-center py-12">
             <Grid3X3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">数据模型</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">数据模型管理</h3>
             <p className="text-gray-600 mb-6">
-              管理项目的数据表结构，支持导入数据库设计文档并生成数据模型
+              设计和管理数据库表结构，支持ER图设计、AI文档解析、SQL生成等完整功能
             </p>
+            <div className="space-y-4">
+              <Link
+                to={`/projects/${id}/data-model`}
+                className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                <Grid3X3 className="w-5 h-5" />
+                <span>打开数据模型设计器</span>
+              </Link>
+              <p className="text-sm text-gray-500">
+                包含ER图设计、关系管理、SQL生成、版本控制等强大功能
+              </p>
+            </div>
             <div className="max-w-4xl mx-auto">
               {/* Import Documentation Section - Only show when no data exists */}
               {allDataTables.length === 0 && (
@@ -807,7 +842,26 @@ const ProjectDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
+      ) : activeTab === 'mindmap' ? (
+        /* Mindmap Tab Content */
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 240px)' }}>
+          <MindmapViewer
+            projectId={id!}
+            height="100%"
+            className="w-full h-full"
+            onNodeSelect={(node) => {
+              if (node?.data.entityType === 'table') {
+                console.log('Selected table:', node.data.entityId)
+                // 可以在这里添加表节点选择的处理逻辑
+              }
+            }}
+            onEdgeSelect={(edge) => {
+              console.log('Selected relationship:', edge?.data.relationshipId)
+              // 可以在这里添加关系选择的处理逻辑
+            }}
+          />
+        </div>
+      ) : null}
 
       {/* Modals */}
       {showCreateModal && (

@@ -170,10 +170,25 @@ export interface DatabaseField extends BaseEntity {
   comment?: string
   isPrimaryKey: boolean
   isAutoIncrement: boolean
+  isUnique?: boolean
+  isIndex?: boolean
   enumValues?: string[]
   referencedTableId?: string
   referencedFieldId?: string
   sortOrder: number
+  table?: DatabaseTable
+  enumValuesList?: FieldEnumValue[]
+}
+
+// 字段枚举值接口
+export interface FieldEnumValue extends BaseEntity {
+  fieldId: string
+  value: string
+  label?: string
+  description?: string
+  sortOrder: number
+  isDefault: boolean
+  field?: DatabaseField
 }
 
 // 数据库索引接口
@@ -200,6 +215,9 @@ export interface DatabaseTable extends BaseEntity {
   fields?: DatabaseField[]
   indexes?: DatabaseIndex[]
   relationshipCount?: number
+  fromRelations?: TableRelationship[]
+  toRelations?: TableRelationship[]
+  project?: Project
 }
 
 // 数据模型文档接口
@@ -222,9 +240,17 @@ export interface TableRelationship extends BaseEntity {
   toTableId: string
   fromFieldId: string
   toFieldId: string
-  relationshipType: 'ONE_TO_ONE' | 'ONE_TO_MANY' | 'MANY_TO_MANY'
+  relationshipType: 'ONE_TO_ONE' | 'ONE_TO_MANY' | 'MANY_TO_ONE' | 'MANY_TO_MANY'
   name?: string
   description?: string
+  comment?: string
+  onUpdate?: 'CASCADE' | 'SET_NULL' | 'SET_DEFAULT' | 'RESTRICT' | 'NO_ACTION'
+  onDelete?: 'CASCADE' | 'SET_NULL' | 'SET_DEFAULT' | 'RESTRICT' | 'NO_ACTION'
+  isDeferrable?: boolean
+  isEnforced?: boolean
+  constraintName?: string
+  fromTable?: DatabaseTable
+  toTable?: DatabaseTable
 }
 
 // 查询构建器接口（为未来实时查询功能预留）

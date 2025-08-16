@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, FileText, Database, Brain, Code } from 'lucide-react'
 import { apiMethods } from '../utils/api'
-import UnifiedImportModal from '../components/UnifiedImportModal'
+import UnifiedImportModal from '../components/features/import/components/modals/UnifiedImportModal'
 
 type ImportTab = 'api-doc' | 'swagger' | 'database'
 

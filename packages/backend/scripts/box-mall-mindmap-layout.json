@@ -1,0 +1,333 @@
+{
+  "projectId": "box-mall-system",
+  "layoutType": "hierarchical",
+  "nodes": [
+    {
+      "id": "project-root",
+      "type": "project",
+      "position": {
+        "x": 400,
+        "y": 50
+      },
+      "data": {
+        "id": "box-mall-system",
+        "name": "Box次元盲盒商城",
+        "description": "综合性盲盒电商平台",
+        "nodeType": "project"
+      }
+    },
+    {
+      "id": "category-user-management",
+      "type": "category",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "id": "user-management",
+        "name": "用户管理模块",
+        "description": "用户注册、认证、权限、会员等功能",
+        "color": "#3B82F6",
+        "nodeType": "category"
+      }
+    },
+    {
+      "id": "category-product-catalog",
+      "type": "category",
+      "position": {
+        "x": 300,
+        "y": 200
+      },
+      "data": {
+        "id": "product-catalog",
+        "name": "商品目录管理",
+        "description": "商品分类、库存、价格、盲盒配置等",
+        "color": "#10B981",
+        "nodeType": "category"
+      }
+    },
+    {
+      "id": "category-order-transaction",
+      "type": "category",
+      "position": {
+        "x": 500,
+        "y": 200
+      },
+      "data": {
+        "id": "order-transaction",
+        "name": "订单交易系统",
+        "description": "订单流程、支付处理、物流管理等",
+        "color": "#F59E0B",
+        "nodeType": "category"
+      }
+    },
+    {
+      "id": "category-gaming-rewards",
+      "type": "category",
+      "position": {
+        "x": 700,
+        "y": 200
+      },
+      "data": {
+        "id": "gaming-rewards",
+        "name": "游戏奖励机制",
+        "description": "盲盒抽奖、概率控制、奖品管理等",
+        "color": "#8B5CF6",
+        "nodeType": "category"
+      }
+    },
+    {
+      "id": "table-box_user",
+      "type": "table",
+      "position": {
+        "x": 25,
+        "y": 350
+      },
+      "data": {
+        "id": "box_user",
+        "name": "用户信息表",
+        "tableName": "box_user",
+        "description": "核心用户表，包含注册信息、财务状态、会员等级、分销关系等完整用户数据",
+        "fieldCount": 31,
+        "status": "ACTIVE",
+        "nodeType": "table"
+      }
+    },
+    {
+      "id": "table-box_goods",
+      "type": "table",
+      "position": {
+        "x": 375,
+        "y": 350
+      },
+      "data": {
+        "id": "box_goods",
+        "name": "商品信息表",
+        "tableName": "box_goods",
+        "description": "商城商品目录表，支持实物和虚拟商品，包含价格体系、库存管理、分销配置等",
+        "fieldCount": 20,
+        "status": "ACTIVE",
+        "nodeType": "table"
+      }
+    },
+    {
+      "id": "table-box_boxfl",
+      "type": "table",
+      "position": {
+        "x": 625,
+        "y": 450
+      },
+      "data": {
+        "id": "box_boxfl",
+        "name": "盲盒配置表",
+        "tableName": "box_boxfl",
+        "description": "盲盒核心配置表，包含概率设置、价格策略、限购规则、特殊玩法等游戏机制",
+        "fieldCount": 35,
+        "status": "ACTIVE",
+        "nodeType": "table"
+      }
+    },
+    {
+      "id": "table-box_order",
+      "type": "table",
+      "position": {
+        "x": 575,
+        "y": 450
+      },
+      "data": {
+        "id": "box_order",
+        "name": "盲盒订单表",
+        "tableName": "box_order",
+        "description": "盲盒购买订单核心表，支持多种支付方式、优惠券、代付、送礼等功能",
+        "fieldCount": 35,
+        "status": "ACTIVE",
+        "nodeType": "table"
+      }
+    },
+    {
+      "id": "table-box_prize_record",
+      "type": "table",
+      "position": {
+        "x": 625,
+        "y": 550
+      },
+      "data": {
+        "id": "box_prize_record",
+        "name": "中奖记录表",
+        "tableName": "box_prize_record",
+        "description": "用户开盒中奖记录表，包含奖品信息、状态流转、物流处理等完整生命周期",
+        "fieldCount": 26,
+        "status": "ACTIVE",
+        "nodeType": "table"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-project-user-management",
+      "source": "project-root",
+      "target": "category-user-management",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-project-product-catalog",
+      "source": "project-root",
+      "target": "category-product-catalog",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-project-order-transaction",
+      "source": "project-root",
+      "target": "category-order-transaction",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-project-gaming-rewards",
+      "source": "project-root",
+      "target": "category-gaming-rewards",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-category-box_user",
+      "source": "category-user-management",
+      "target": "table-box_user",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-category-box_goods",
+      "source": "category-product-catalog",
+      "target": "table-box_goods",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-category-box_boxfl",
+      "source": "category-gaming-rewards",
+      "target": "table-box_boxfl",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-category-box_order",
+      "source": "category-order-transaction",
+      "target": "table-box_order",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-category-box_prize_record",
+      "source": "category-gaming-rewards",
+      "target": "table-box_prize_record",
+      "type": "hierarchy",
+      "data": {
+        "type": "hierarchy",
+        "style": "solid"
+      }
+    },
+    {
+      "id": "edge-rel-user-order",
+      "source": "table-box_user",
+      "target": "table-box_order",
+      "type": "foreignKey",
+      "data": {
+        "type": "foreignKey",
+        "style": "dashed",
+        "label": "用户-订单关系"
+      }
+    },
+    {
+      "id": "edge-rel-order-prize",
+      "source": "table-box_order",
+      "target": "table-box_prize_record",
+      "type": "foreignKey",
+      "data": {
+        "type": "foreignKey",
+        "style": "dashed",
+        "label": "订单-中奖记录"
+      }
+    },
+    {
+      "id": "edge-rel-boxfl-order",
+      "source": "table-box_boxfl",
+      "target": "table-box_order",
+      "type": "foreignKey",
+      "data": {
+        "type": "foreignKey",
+        "style": "dashed",
+        "label": "盲盒-订单关系"
+      }
+    },
+    {
+      "id": "edge-rel-goods-prize",
+      "source": "table-box_goods",
+      "target": "table-box_prize_record",
+      "type": "foreignKey",
+      "data": {
+        "type": "foreignKey",
+        "style": "dashed",
+        "label": "商品-中奖记录"
+      }
+    },
+    {
+      "id": "edge-rel-user-agent-hierarchy",
+      "source": "table-box_user",
+      "target": "table-box_user",
+      "type": "foreignKey",
+      "data": {
+        "type": "foreignKey",
+        "style": "dashed",
+        "label": "用户分销层级"
+      }
+    }
+  ],
+  "config": {
+    "layout": {
+      "type": "hierarchical",
+      "direction": "TB"
+    },
+    "display": {
+      "showLabels": true,
+      "compactMode": false
+    },
+    "filters": {
+      "nodeTypes": [
+        "project",
+        "category",
+        "table"
+      ],
+      "edgeTypes": [
+        "hierarchy",
+        "foreignKey"
+      ]
+    }
+  }
+}

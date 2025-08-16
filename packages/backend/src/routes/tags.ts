@@ -10,7 +10,7 @@ const router = Router()
 const createTagSchema = z.object({
   name: z.string().min(1).max(50),
   color: z.string().regex(/^#[0-9A-F]{6}$/i).default('#3B82F6'),
-  projectId: z.string().uuid(),
+  projectId: z.string().min(1),
 })
 
 const updateTagSchema = createTagSchema.partial().omit({ projectId: true })
@@ -20,7 +20,7 @@ const tagParamsSchema = z.object({
 })
 
 const tagQuerySchema = z.object({
-  projectId: z.string().uuid().optional(),
+  projectId: z.string().min(1).optional(),
   search: z.string().optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(50),
@@ -192,7 +192,7 @@ router.delete(
 // Get tags by project
 router.get(
   '/project/:projectId',
-  validateParams(z.object({ projectId: z.string().uuid() })),
+  validateParams(z.object({ projectId: z.string().min(1) })),
   asyncHandler(async (req, res) => {
     const { projectId } = req.params
 
@@ -259,7 +259,7 @@ router.get(
 router.post(
   '/bulk',
   validateBody(z.object({
-    projectId: z.string().uuid(),
+    projectId: z.string().min(1),
     tags: z.array(z.object({
       name: z.string().min(1).max(50),
       color: z.string().regex(/^#[0-9A-F]{6}$/i).default('#3B82F6'),

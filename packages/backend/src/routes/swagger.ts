@@ -17,7 +17,7 @@ const validateSwaggerSchema = z.object({
 })
 
 const importSwaggerSchema = z.object({
-  projectId: z.string().uuid(),
+  projectId: z.string().min(1),
   url: z.string().url().optional(),
   content: z.string().optional(),
   options: z.object({

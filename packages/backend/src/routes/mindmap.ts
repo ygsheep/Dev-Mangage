@@ -10,7 +10,7 @@ const router = Router()
 
 // 验证模式
 const mindmapLayoutSchema = z.object({
-  projectId: z.string().uuid(),
+  projectId: z.string().min(1),
   nodes: z.array(z.object({
     id: z.string(),
     type: z.string(),
@@ -36,7 +36,7 @@ const mindmapLayoutSchema = z.object({
 })
 
 const projectParamsSchema = z.object({
-  projectId: z.string().uuid()
+  projectId: z.string().min(1)
 })
 
 // 获取项目的mindmap数据

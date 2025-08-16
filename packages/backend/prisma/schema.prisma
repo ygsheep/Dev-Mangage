@@ -13,6 +13,7 @@ model Project {
   name        String
   description String?
   status      String @default("ACTIVE")
+  baseUrl     String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -22,6 +23,8 @@ model Project {
   databaseTables    DatabaseTable[]
   dataModelDocuments DataModelDocument[]
   mindmapLayout     MindmapLayout?
+  modelVersions     ModelVersion[]
+  aiParseHistory    AIParseHistory[]
 
   @@map("projects")
 }
@@ -79,7 +82,7 @@ model APITag {
   @@map("api_tags")
 }
 
-// DatabaseTable model for data models
+// Enhanced DatabaseTable model based on design docs
 model DatabaseTable {
   id            String   @id @default(uuid())
   projectId     String
@@ -91,6 +94,21 @@ model DatabaseTable {
   collation     String   @default("utf8mb4_unicode_ci")
   status        String   @default("DRAFT")
   category      String?
+  
+  // Extended attributes
+  tablespace    String?
+  autoIncrement Int?
+  rowFormat     String?
+  dataLength    Int      @default(0)
+  indexLength   Int      @default(0)
+  avgRowLength  Int      @default(0)
+  checksum      Boolean  @default(false)
+  
+  // Metadata
+  createdBy     String?
+  lastModifiedBy String?
+  version       Int      @default(1)
+  
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -101,13 +119,17 @@ model DatabaseTable {
   fromRelations   TableRelationship[] @relation("FromTable")
   toRelations     TableRelationship[] @relation("ToTable")
   referencedByFields DatabaseField[] @relation("FieldReference")
+  statistics      TableStatistics[]
 
   @@index([projectId])
+  @@index([status])
+  @@index([category])
+  @@index([updatedAt])
   @@unique([name, projectId])
   @@map("database_tables")
 }
 
-// DatabaseField model for table fields
+// Enhanced DatabaseField model based on design docs
 model DatabaseField {
   id                String   @id @default(uuid())
   tableId           String
@@ -121,45 +143,126 @@ model DatabaseField {
   comment           String?
   isPrimaryKey      Boolean  @default(false)
   isAutoIncrement   Boolean  @default(false)
-  enumValues        String?  // JSON string array for enum values
+  sortOrder         Int      @default(0)
+  
+  // String field attributes
+  characterSet      String?
+  collation         String?
+  
+  // Numeric field attributes
+  isUnsigned        Boolean  @default(false)
+  zerofill          Boolean  @default(false)
+  
+  // Constraint attributes
+  isUnique          Boolean  @default(false)
+  isIndex           Boolean  @default(false)
+  checkConstraint   String?
+  
+  // Foreign key attributes
   referencedTableId String?
   referencedFieldId String?
-  sortOrder         Int      @default(0)
+  onUpdate          String   @default("RESTRICT")
+  onDelete          String   @default("RESTRICT")
+  
+  // Business attributes
+  isBusinessKey     Boolean  @default(false)
+  isRequired        Boolean  @default(false)
+  fieldGroup        String?
+  displayOrder      Int?
+  
+  // Metadata
+  createdBy         String?
+  lastModifiedBy    String?
+  version           Int      @default(1)
+  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   // Relations
-  table             DatabaseTable @relation("TableFields", fields: [tableId], references: [id], onDelete: Cascade)
-  referencedTable   DatabaseTable? @relation("FieldReference", fields: [referencedTableId], references: [id])
-  referencedField   DatabaseField? @relation("FieldToField", fields: [referencedFieldId], references: [id])
-  referencingFields DatabaseField[] @relation("FieldToField")
+  table             DatabaseTable     @relation("TableFields", fields: [tableId], references: [id], onDelete: Cascade)
+  referencedTable   DatabaseTable?    @relation("FieldReference", fields: [referencedTableId], references: [id])
+  referencedField   DatabaseField?    @relation("FieldToField", fields: [referencedFieldId], references: [id])
+  referencingFields DatabaseField[]   @relation("FieldToField")
+  enumValues        FieldEnumValue[]
 
   @@index([tableId])
+  @@index([name])
+  @@index([type])
+  @@index([isPrimaryKey])
+  @@index([referencedTableId])
+  @@index([tableId, sortOrder])
   @@unique([name, tableId])
   @@map("database_fields")
 }
 
-// DatabaseIndex model for table indexes
+// Field enum values model
+model FieldEnumValue {
+  id        String   @id @default(uuid())
+  fieldId   String
+  value     String
+  label     String?
+  description String?
+  sortOrder Int      @default(0)
+  isDefault Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  color     String?  // For UI display
+  createdAt DateTime @default(now())
+
+  // Relations
+  field     DatabaseField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@index([fieldId])
+  @@index([fieldId, sortOrder])
+  @@unique([fieldId, value])
+  @@map("field_enum_values")
+}
+
+// Enhanced DatabaseIndex model
 model DatabaseIndex {
   id        String   @id @default(uuid())
   tableId   String
   name      String
   type      String   @default("INDEX")
-  fields    String   // JSON string array of field names
   isUnique  Boolean  @default(false)
   comment   String?
+  
+  // Extended attributes
+  indexMethod String @default("BTREE")
+  keyBlockSize Int?
+  parser      String?
+  visibility  String @default("VISIBLE")
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
   table     DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  fields    IndexField[]
 
   @@index([tableId])
   @@unique([name, tableId])
   @@map("database_indexes")
 }
 
-// TableRelationship model for table relationships
+// Index fields model
+model IndexField {
+  id         String @id @default(uuid())
+  indexId    String
+  fieldName  String
+  sortOrder  Int    @default(0)
+  order      String @default("ASC")
+  length     Int?
+  
+  // Relations
+  index      DatabaseIndex @relation(fields: [indexId], references: [id], onDelete: Cascade)
+  
+  @@index([indexId])
+  @@index([indexId, sortOrder])
+  @@unique([indexId, fieldName])
+  @@map("index_fields")
+}
+
+// Enhanced TableRelationship model
 model TableRelationship {
   id               String   @id @default(uuid())
   fromTableId      String
@@ -169,6 +272,11 @@ model TableRelationship {
   relationshipType String   @default("ONE_TO_MANY")
   name             String?
   description      String?
+  onUpdate         String   @default("RESTRICT")
+  onDelete         String   @default("RESTRICT")
+  isDeferrable     Boolean  @default(false)
+  isEnforced       Boolean  @default(true)
+  constraintName   String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -178,7 +286,80 @@ model TableRelationship {
 
   @@index([fromTableId])
   @@index([toTableId])
+  @@index([fromFieldId])
+  @@index([toFieldId])
   @@map("table_relationships")
+}
+
+// Table statistics model
+model TableStatistics {
+  id           String    @id @default(uuid())
+  tableId      String
+  rowCount     Int       @default(0)
+  dataSize     Int       @default(0)
+  indexSize    Int       @default(0)
+  fragmentSize Int       @default(0)
+  lastAnalyzed DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  table        DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@index([tableId])
+  @@map("table_statistics")
+}
+
+// ModelVersion model for data model version control
+model ModelVersion {
+  id                 String   @id @default(uuid())
+  projectId          String
+  versionNumber      String
+  changeDescription  String?
+  changeType         String   @default("MANUAL")
+  createdBy          String?
+  createdAt          DateTime @default(now())
+  schemaSnapshot     String   // JSON string containing complete schema at this version
+  isActive           Boolean  @default(false)
+  tags               String?  // JSON array of version tags
+  parentVersionId    String?
+  branchName         String   @default("main")
+
+  // Relations
+  project            Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentVersion      ModelVersion? @relation("VersionTree", fields: [parentVersionId], references: [id])
+  childVersions      ModelVersion[] @relation("VersionTree")
+
+  @@index([projectId])
+  @@index([isActive])
+  @@index([createdAt])
+  @@unique([projectId, versionNumber])
+  @@map("model_versions")
+}
+
+// AIParseHistory model for tracking AI document parsing
+model AIParseHistory {
+  id             String   @id @default(uuid())
+  projectId      String
+  fileName       String
+  fileType       String
+  aiProvider     String
+  parseResult    String   // JSON string containing parsed data
+  status         String   @default("PENDING")
+  errorMessage   String?
+  confidence     Float?   // AI parsing confidence score
+  tokensUsed     Int?     // For tracking AI API usage
+  processingTime Int?     // Processing time in milliseconds
+  createdAt      DateTime @default(now())
+
+  // Relations
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
+  @@index([aiProvider])
+  @@index([createdAt])
+  @@map("ai_parse_history")
 }
 
 // DataModelDocument model for imported documents
@@ -200,6 +381,7 @@ model DataModelDocument {
   project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
+  @@index([parseStatus])
   @@map("data_model_documents")
 }
 
@@ -222,5 +404,16 @@ model MindmapLayout {
 // APIStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "NOT_TESTED" | "TESTED" | "DEPRECATED"
 // HTTPMethod: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS"
 // DataModelStatus: "DRAFT" | "ACTIVE" | "DEPRECATED"
-// DatabaseFieldType: "VARCHAR" | "INT" | "BIGINT" | "TEXT" | etc.
+// DatabaseFieldType: "VARCHAR" | "CHAR" | "TEXT" | "LONGTEXT" | "MEDIUMTEXT" | "TINYTEXT" |
+//                    "INT" | "TINYINT" | "SMALLINT" | "MEDIUMINT" | "BIGINT" |
+//                    "DECIMAL" | "NUMERIC" | "FLOAT" | "DOUBLE" |
+//                    "DATE" | "TIME" | "DATETIME" | "TIMESTAMP" | "YEAR" |
+//                    "BOOLEAN" | "BIT" | "JSON" | "ENUM" | "SET" |
+//                    "BINARY" | "VARBINARY" | "BLOB" | "LONGBLOB" | "MEDIUMBLOB" | "TINYBLOB"
 // DatabaseIndexType: "PRIMARY" | "UNIQUE" | "INDEX" | "FULLTEXT" | "FOREIGN"
+// ModelVersionChangeType: "MANUAL" | "AUTO_IMPORT" | "AI_GENERATED" | "MIGRATION"
+// AIParseStatus: "PENDING" | "SUCCESS" | "FAILED" | "PARTIAL"
+// RelationshipConstraint: "CASCADE" | "SET_NULL" | "SET_DEFAULT" | "RESTRICT" | "NO_ACTION"
+// RelationshipType: "ONE_TO_ONE" | "ONE_TO_MANY" | "MANY_TO_ONE" | "MANY_TO_MANY"
+// IndexMethod: "BTREE" | "HASH" | "RTREE" | "FULLTEXT"
+// RowFormat: "DYNAMIC" | "FIXED" | "COMPRESSED" | "REDUNDANT" | "COMPACT"

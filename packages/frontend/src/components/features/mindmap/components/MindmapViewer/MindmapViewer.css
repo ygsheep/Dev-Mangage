@@ -1,0 +1,234 @@
+/* MindmapViewer 组件样式 */
+.mindmap-viewer {
+  /* 确保组件占满可用空间 */
+  width: 100%;
+  height: 100%;
+  
+  /* React Flow 样式覆盖 */
+  .react-flow {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* React Flow 控制面板样式 */
+  .react-flow__controls {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .react-flow__controls button {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 8px;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    &:hover {
+      background: #f3f4f6;
+    }
+  }
+  
+  /* React Flow 小地图样式 */
+  .react-flow__minimap {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* React Flow 节点样式 */
+  .react-flow__node {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  /* React Flow 边样式 */
+  .react-flow__edge {
+    stroke-width: 2px;
+  }
+  
+  /* React Flow 选择框样式 */
+  .react-flow__selection {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px dashed #3b82f6;
+  }
+  
+  /* React Flow 背景样式 */
+  .react-flow__background {
+    background-color: #f9fafb;
+  }
+  
+  /* 工具栏样式 */
+  .mindmap-toolbar {
+    z-index: 10;
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+  
+  /* 侧边栏样式 */
+  .mindmap-sidebar {
+    z-index: 5;
+    background: #ffffff;
+    
+    /* 滚动条样式 */
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+/* 响应式样式 */
+@media (max-width: 1024px) {
+  .mindmap-viewer {
+    .mindmap-sidebar {
+      width: 320px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .mindmap-viewer {
+    flex-direction: column;
+    
+    .mindmap-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+      
+      .flex {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+    
+    .mindmap-sidebar {
+      width: 100%;
+      max-height: 200px;
+      border-right: none;
+      border-bottom: 1px solid #e5e7eb;
+    }
+  }
+}
+
+/* 加载动画 */
+@keyframes mindmap-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.mindmap-loading {
+  animation: mindmap-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 过渡动画 */
+.mindmap-viewer .react-flow__node {
+  transition: all 0.2s ease-in-out;
+}
+
+.mindmap-viewer .react-flow__node:hover {
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.mindmap-viewer .react-flow__edge {
+  transition: all 0.2s ease-in-out;
+}
+
+.mindmap-viewer .react-flow__edge:hover {
+  stroke-width: 3px;
+}
+
+/* 自定义节点样式基础类 */
+.mindmap-node {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+  font-size: 14px;
+  line-height: 1.4;
+  
+  &.selected {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  &.project {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  }
+  
+  &.category {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #fef3c7, #fed7aa);
+  }
+  
+  &.table {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  }
+  
+  &.field-group {
+    border-color: #8b5cf6;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  }
+}
+
+/* 自定义边样式基础类 */
+.mindmap-edge {
+  &.hierarchy {
+    stroke: #6b7280;
+    stroke-dasharray: none;
+  }
+  
+  &.foreign-key {
+    stroke: #f59e0b;
+    stroke-dasharray: 5,5;
+  }
+  
+  &.reference {
+    stroke: #10b981;
+    stroke-dasharray: none;
+  }
+  
+  &.dependency {
+    stroke: #8b5cf6;
+    stroke-dasharray: 3,3;
+  }
+}
+
+/* 提示面板样式 */
+.mindmap-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  
+  &.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

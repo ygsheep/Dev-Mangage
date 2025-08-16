@@ -8,7 +8,7 @@ const router = Router()
 
 // Validation schemas
 const createTableSchema = z.object({
-  projectId: z.string().uuid(),
+  projectId: z.string().min(1),
   name: z.string().min(1).max(64),
   displayName: z.string().max(100).optional(),
   comment: z.string().max(500).optional(),
@@ -53,7 +53,7 @@ const createIndexSchema = z.object({
 const updateIndexSchema = createIndexSchema.partial().omit({ tableId: true })
 
 const createDocumentSchema = z.object({
-  projectId: z.string().uuid(),
+  projectId: z.string().min(1),
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   content: z.string(),
@@ -77,12 +77,43 @@ const documentParamsSchema = z.object({
 })
 
 const tableQuerySchema = z.object({
-  projectId: z.string().uuid().optional(),
+  projectId: z.string().min(1).optional(),
   status: z.enum(['DRAFT', 'ACTIVE', 'DEPRECATED']).optional(),
   category: z.string().optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
 })
+
+// Get table relationships for a project (must be before parameterized routes)
+const relationshipsQuerySchema = z.object({
+  projectId: z.string().min(1),
+})
+
+router.get(
+  '/relationships',
+  validateQuery(relationshipsQuerySchema),
+  asyncHandler(async (req, res) => {
+    const { projectId } = req.query as any
+
+    const relationships = await prisma.tableRelationship.findMany({
+      where: {
+        OR: [
+          { fromTable: { projectId } },
+          { toTable: { projectId } }
+        ]
+      },
+      include: {
+        fromTable: { select: { id: true, name: true, displayName: true } },
+        toTable: { select: { id: true, name: true, displayName: true } }
+      }
+    })
+
+    res.json({
+      success: true,
+      data: { relationships }
+    })
+  })
+)
 
 // Get all database tables
 router.get(
@@ -356,6 +387,115 @@ router.post(
         errors
       },
     })
+  })
+)
+
+// Document management endpoints
+// Get all documents
+router.get(
+  '/documents',
+  asyncHandler(async (req, res) => {
+    const { projectId } = req.query
+    
+    const where = projectId ? { projectId: projectId as string } : {}
+    
+    const documents = await prisma.dataModelDocument.findMany({
+      where,
+      include: {
+        project: { select: { id: true, name: true } },
+      },
+      orderBy: { updatedAt: 'desc' },
+    })
+
+    res.json({
+      success: true,
+      data: { documents },
+    })
+  })
+)
+
+// Get document by ID
+router.get(
+  '/documents/:id',
+  validateParams(documentParamsSchema),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    const document = await prisma.dataModelDocument.findUnique({
+      where: { id },
+      include: {
+        project: { select: { id: true, name: true } },
+      },
+    })
+
+    if (!document) {
+      throw new AppError('Document not found', 404)
+    }
+
+    res.json({
+      success: true,
+      data: { document },
+    })
+  })
+)
+
+// Create document
+router.post(
+  '/documents',
+  validateBody(createDocumentSchema),
+  asyncHandler(async (req, res) => {
+    const documentData = req.body
+
+    const document = await prisma.dataModelDocument.create({
+      data: documentData,
+      include: {
+        project: { select: { id: true, name: true } },
+      },
+    })
+
+    res.status(201).json({
+      success: true,
+      data: { document },
+    })
+  })
+)
+
+// Update document
+router.put(
+  '/documents/:id',
+  validateParams(documentParamsSchema),
+  validateBody(createDocumentSchema.partial().omit({ projectId: true })),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const updateData = req.body
+
+    const document = await prisma.dataModelDocument.update({
+      where: { id },
+      data: updateData,
+      include: {
+        project: { select: { id: true, name: true } },
+      },
+    })
+
+    res.json({
+      success: true,
+      data: { document },
+    })
+  })
+)
+
+// Delete document
+router.delete(
+  '/documents/:id',
+  validateParams(documentParamsSchema),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    await prisma.dataModelDocument.delete({
+      where: { id },
+    })
+
+    res.status(204).send()
   })
 )
 

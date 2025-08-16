@@ -12,7 +12,8 @@
       "Bash(npm run build:*)",
       "Bash(npx prisma db seed:*)",
       "WebFetch(domain:steveshao.com)",
-      "Bash(npm run start:http:*)"
+      "Bash(npm run start:http:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": []
   }

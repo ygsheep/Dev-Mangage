@@ -1035,43 +1035,6 @@ class AIParsingService {
     }
   }
 
-  // 解析数据库文档
-  async parseDatabaseDocument(content: string): Promise<ParsedDatabaseDocument> {
-    try {
-      console.log('🔍 开始解析数据库文档:', {
-        provider: this.config.provider,
-        model: this.config.model,
-        contentLength: content.length
-      })
-      
-      // 如果是模拟模式，使用模拟数据
-      if (this.config.provider === 'mock') {
-        const { mockParseDatabaseDocument } = await import('@/services/mockAiService')
-        return await mockParseDatabaseDocument(content)
-      }
-
-      // 检查是否需要分块处理
-      const chunks = this.chunkDocument(content)
-      
-      if (chunks.length === 1) {
-        // 单块处理
-        return await this.parseSingleDatabaseChunk(chunks[0])
-      } else {
-        // 多块处理
-        return await this.parseMultipleDatabaseChunks(chunks)
-      }
-    } catch (error: any) {
-      console.error('数据库文档解析失败:', error)
-      return {
-        tables: [],
-        relationships: [],
-        indexes: [],
-        success: false,
-        errors: [`数据库文档解析失败: ${error.message}`],
-        confidence: 0
-      }
-    }
-  }
 
   // 带进度的数据库文档解析
   async parseDatabaseDocumentWithProgress(

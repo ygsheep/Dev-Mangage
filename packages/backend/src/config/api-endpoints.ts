@@ -85,6 +85,16 @@ export const API_ENDPOINTS = {
     BATCH_CREATE: `${API_CONFIG.PREFIX}/data-models/batch`,
   },
 
+  // 思维导图
+  MINDMAP: {
+    BASE: `${API_CONFIG.PREFIX}/mindmap`,
+    GET_DATA: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}`,
+    SAVE_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
+    GET_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
+    DELETE_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
+    GET_STATS: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/stats`,
+  },
+
   // 调试工具
   DEBUG: {
     BASE: `${API_CONFIG.PREFIX}/debug`,
