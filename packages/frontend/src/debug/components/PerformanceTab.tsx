@@ -56,7 +56,7 @@ const PerformanceTab: React.FC = () => {
       case 'memory': return 'text-purple-600 bg-purple-50'
       case 'timing': return 'text-green-600 bg-green-50'
       case 'counter': return 'text-blue-600 bg-blue-50'
-      default: return 'text-gray-600 bg-gray-50'
+      default: return 'text-text-secondary bg-gray-50'
     }
   }
 
@@ -182,7 +182,7 @@ const PerformanceTab: React.FC = () => {
             <div className="text-lg font-semibold text-blue-800">{stats.counter}</div>
           </div>
           <div className="bg-gray-50 p-2 rounded border">
-            <div className="text-gray-600">唯一</div>
+            <div className="text-text-secondary">唯一</div>
             <div className="text-lg font-semibold text-gray-800">{Object.keys(metricsByName).length}</div>
           </div>
         </div>
@@ -225,7 +225,7 @@ const PerformanceTab: React.FC = () => {
 
                 {/* 最新值 */}
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600">
+                  <span className="text-text-secondary">
                     最新: <span className="font-semibold">{formatValue(metrics[metrics.length - 1].value, metrics[metrics.length - 1].unit)}</span>
                   </span>
                   <span className="text-gray-400">
@@ -269,7 +269,7 @@ const PerformanceTab: React.FC = () => {
                 <h4 className="text-sm font-medium text-gray-800">指标详情</h4>
                 <button
                   onClick={() => setSelectedMetric(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-text-secondary"
                 >
                   ✕
                 </button>

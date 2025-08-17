@@ -86,9 +86,9 @@ export const ThemeSettings: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-theme-md flex items-center justify-center">
               {isDark ? (
-                <Moon className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                <Moon className="w-4 h-4 text-text-secondary dark:text-gray-300" />
               ) : (
-                <Sun className="w-4 h-4 text-gray-600" />
+                <Sun className="w-4 h-4 text-text-secondary" />
               )}
             </div>
             <div>

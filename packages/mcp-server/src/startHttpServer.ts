@@ -14,12 +14,12 @@ async function startHTTPMCPServer() {
   console.log('🚀 启动 HTTP MCP 服务器...');
   console.log('📋 服务信息:');
   console.log('   • 协议: HTTP REST API');
-  console.log('   • 端口: 3002 (可通过 HTTP_MCP_PORT 环境变量配置)');
+  console.log('   • 端口: 3001 (可通过 HTTP_MCP_PORT 环境变量配置)');
   console.log('   • 功能: 12个 MCP 工具的 HTTP 接口');
   console.log('   • 兼容: 支持直接 URL 连接');
   console.log('');
   
-  const port = parseInt(process.env.HTTP_MCP_PORT || '3002');
+  const port = parseInt(process.env.HTTP_MCP_PORT || '3001');
   const server = new HTTPMCPServer(port);
   
   try {
@@ -39,7 +39,7 @@ async function startHTTPMCPServer() {
     console.log('                    -d \'{"arguments":{"query":"用户认证"}}\'');
     console.log('');
     console.log('🔧 前端集成:');
-    console.log('   const response = await fetch(\'http://localhost:3002/mcp/tools/global_search\', {');
+    console.log('   const response = await fetch(\'http://localhost:3001/mcp/tools/global_search\', {');
     console.log('     method: \'POST\',');
     console.log('     headers: { \'Content-Type\': \'application/json\' },');
     console.log('     body: JSON.stringify({ arguments: { query: \'用户API\' } })');

@@ -208,8 +208,8 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
           <div className="flex items-center space-x-4">
             <BarChart className="w-8 h-8 text-blue-600" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">数据统计仪表板</h1>
-              <p className="text-gray-600">
+              <h1 className="text-2xl font-bold text-text-primary">数据统计仪表板</h1>
+              <p className="text-text-secondary">
                 {projectName || '项目'} - 数据模型分析和性能指标
               </p>
             </div>
@@ -251,8 +251,8 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">数据表总数</p>
-              <p className="text-3xl font-bold text-gray-900">{summary.overview.tablesCount}</p>
+              <p className="text-sm font-medium text-text-secondary">数据表总数</p>
+              <p className="text-3xl font-bold text-text-primary">{summary.overview.tablesCount}</p>
               <p className="text-sm text-gray-500">
                 {summary.overview.hasStatistics} 个已分析
               </p>
@@ -264,8 +264,8 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">总数据量</p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-text-secondary">总数据量</p>
+              <p className="text-3xl font-bold text-text-primary">
                 {formatBytes(summary.overview.totalDataSize)}
               </p>
               <p className="text-sm text-gray-500">
@@ -279,8 +279,8 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">总记录数</p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-text-secondary">总记录数</p>
+              <p className="text-3xl font-bold text-text-primary">
                 {formatNumber(summary.overview.totalRowCount)}
               </p>
               <p className="text-sm text-gray-500">
@@ -294,7 +294,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">健康度评分</p>
+              <p className="text-sm font-medium text-text-secondary">健康度评分</p>
               <p className={`text-3xl font-bold ${getHealthColor(healthScore).split(' ')[0]}`}>
                 {healthScore}%
               </p>
@@ -342,7 +342,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
               <div>
                 <button
                   onClick={() => toggleSection('categories')}
-                  className="flex items-center space-x-2 text-lg font-medium text-gray-900 hover:text-gray-700"
+                  className="flex items-center space-x-2 text-lg font-medium text-text-primary hover:text-gray-700"
                 >
                   {expandedSections.has('categories') ? (
                     <ChevronDown className="w-5 h-5" />
@@ -356,20 +356,20 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                   <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                     {Object.entries(summary.categoryBreakdown).map(([category, stats]) => (
                       <div key={category} className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-2">
+                        <h4 className="font-medium text-text-primary mb-2">
                           {category === 'uncategorized' ? '未分类' : category}
                         </h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-gray-600">表数:</span>
+                            <span className="text-text-secondary">表数:</span>
                             <span className="font-medium">{stats.tablesCount}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">记录:</span>
+                            <span className="text-text-secondary">记录:</span>
                             <span className="font-medium">{formatNumber(stats.rowCount)}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">数据量:</span>
+                            <span className="text-text-secondary">数据量:</span>
                             <span className="font-medium">{formatBytes(stats.dataSize)}</span>
                           </div>
                         </div>
@@ -383,7 +383,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
               <div>
                 <button
                   onClick={() => toggleSection('status')}
-                  className="flex items-center space-x-2 text-lg font-medium text-gray-900 hover:text-gray-700"
+                  className="flex items-center space-x-2 text-lg font-medium text-text-primary hover:text-gray-700"
                 >
                   {expandedSections.has('status') ? (
                     <ChevronDown className="w-5 h-5" />
@@ -400,7 +400,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(status)}`}>
                           {status}
                         </span>
-                        <span className="text-gray-600">{count}</span>
+                        <span className="text-text-secondary">{count}</span>
                       </div>
                     ))}
                   </div>
@@ -409,7 +409,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
 
               {/* 最大表排行 */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">数据量排行</h3>
+                <h3 className="text-lg font-medium text-text-primary mb-4">数据量排行</h3>
                 <div className="space-y-3">
                   {summary.largestTables.slice(0, 5).map((table, index) => (
                     <div key={table.tableId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -418,7 +418,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                           {index + 1}
                         </div>
                         <div>
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-text-primary">
                             {table.displayName || table.tableName}
                           </div>
                           <div className="text-sm text-gray-500">
@@ -427,7 +427,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-text-primary">
                           {formatNumber(table.rowCount)} 行
                         </div>
                         <div className="text-sm text-gray-500">
@@ -510,7 +510,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                         <tr key={stat.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div>
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm font-medium text-text-primary">
                                 {stat.tableDisplayName || stat.tableName}
                               </div>
                               <div className="text-sm text-gray-500">
@@ -519,15 +519,15 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                             </div>
                           </td>
                           
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
                             {formatNumber(stat.rowCount)}
                           </td>
                           
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
                             {formatBytes(stat.dataSize)}
                           </td>
                           
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
                             {formatBytes(stat.indexSize)}
                           </td>
                           
@@ -541,7 +541,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                           </td>
                           
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
+                            <div className="text-sm text-text-primary">
                               {new Date(stat.lastAnalyzed).toLocaleDateString()}
                             </div>
                             <div className={`text-xs ${daysSinceAnalysis > 7 ? 'text-red-600' : 'text-gray-500'}`}>
@@ -570,10 +570,10 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
             <div className="space-y-6">
               <div className="text-center py-8">
                 <Zap className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <h3 className="text-lg font-medium text-text-primary mb-2">
                   性能分析
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-text-secondary">
                   性能分析功能正在开发中，敬请期待
                 </p>
               </div>
@@ -584,10 +584,10 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
             <div className="space-y-6">
               <div className="text-center py-8">
                 <TrendingUp className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <h3 className="text-lg font-medium text-text-primary mb-2">
                   趋势分析
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-text-secondary">
                   趋势分析功能正在开发中，敬请期待
                 </p>
               </div>
@@ -600,7 +600,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
       {summary.recentlyUpdated.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 flex items-center">
+            <h3 className="text-lg font-medium text-text-primary flex items-center">
               <Clock className="w-5 h-5 mr-2" />
               最近更新
             </h3>
@@ -613,7 +613,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                   <div className="flex items-center space-x-3">
                     <Table className="w-4 h-4 text-gray-400" />
                     <div>
-                      <div className="font-medium text-gray-900">
+                      <div className="font-medium text-text-primary">
                         {table.displayName || table.tableName}
                       </div>
                       <div className="text-sm text-gray-500">
@@ -622,7 +622,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-text-primary">
                       {formatNumber(table.rowCount)} 行
                     </div>
                     <div className="text-sm text-gray-500">

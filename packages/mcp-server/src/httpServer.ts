@@ -90,7 +90,7 @@ class HTTPMCPServer {
   private port: number;
   private mcpServer: Server;
 
-  constructor(port: number = 3002) {
+  constructor(port: number = 3001) {
     this.port = port;
     this.app = express();
     this.mcpServer = new Server(
@@ -564,7 +564,7 @@ export { HTTPMCPServer };
 // 如果直接运行此文件，启动服务器
 // 直接启动检查
 if (require.main === module) {
-  const port = parseInt(process.env.HTTP_MCP_PORT || '3002');
+  const port = parseInt(process.env.HTTP_MCP_PORT || '3001');
   const server = new HTTPMCPServer(port);
   
   // 优雅关闭处理

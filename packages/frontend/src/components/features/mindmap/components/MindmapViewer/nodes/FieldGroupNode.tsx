@@ -47,7 +47,7 @@ const FieldGroupNode: React.FC<FieldGroupNodeProps> = ({ data, selected }) => {
               className="w-3 h-3 flex-shrink-0" 
               style={{ color: nodeColor }} 
             />
-            <h4 className="text-xs font-medium text-gray-900 truncate">
+            <h4 className="text-xs font-medium text-text-primary truncate">
               {data.label}
             </h4>
           </div>

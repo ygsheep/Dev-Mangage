@@ -1,8 +1,8 @@
 import axios from 'axios'
-import { mcpConfig } from '../config/mcpConfig'
+import { getBackendBaseUrl } from '../config/env'
 
-// 获取 API 基础 URL，优先使用环境变量，否则使用配置管理
-const API_BASE_URL = import.meta.env.VITE_API_URL || mcpConfig.getBackendBaseUrl()
+// 获取 API 基础 URL，使用统一的环境配置管理
+const API_BASE_URL = getBackendBaseUrl()
 
 /**
  * 创建 axios 实例

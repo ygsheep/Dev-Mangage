@@ -87,7 +87,7 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
               style={{ color: nodeColor }} 
             />
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-semibold text-gray-900 truncate">
+              <h3 className="text-sm font-semibold text-text-primary truncate">
                 {data.label}
               </h3>
               {data.entityId && (
@@ -119,7 +119,7 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
         <div className="p-3">
           {/* 描述 */}
           {data.description && !data.isCollapsed && (
-            <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+            <p className="text-xs text-text-secondary mb-3 line-clamp-2">
               {data.description}
             </p>
           )}
@@ -128,21 +128,21 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
           <div className="grid grid-cols-2 gap-2">
             <div className="flex items-center space-x-2">
               <Key className="w-4 h-4 text-gray-400" />
-              <span className="text-xs text-gray-600">
+              <span className="text-xs text-text-secondary">
                 {data.fieldCount || 0} 字段
               </span>
             </div>
             
             <div className="flex items-center space-x-2">
               <Hash className="w-4 h-4 text-gray-400" />
-              <span className="text-xs text-gray-600">
+              <span className="text-xs text-text-secondary">
                 {data.indexCount || 0} 索引
               </span>
             </div>
             
             <div className="flex items-center space-x-2">
               <Link className="w-4 h-4 text-gray-400" />
-              <span className="text-xs text-gray-600">
+              <span className="text-xs text-text-secondary">
                 {data.relationshipCount || 0} 关联
               </span>
             </div>
@@ -164,7 +164,7 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
                 {Object.entries(data.metadata).slice(0, 3).map(([key, value]) => (
                   <span 
                     key={key}
-                    className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded"
+                    className="px-2 py-1 text-xs bg-gray-100 text-text-secondary rounded"
                   >
                     {key}: {String(value)}
                   </span>

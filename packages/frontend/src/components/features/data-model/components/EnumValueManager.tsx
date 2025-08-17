@@ -224,12 +224,12 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <Type className="w-6 h-6 text-gray-600" />
+            <Type className="w-6 h-6 text-text-secondary" />
             <div>
-              <h2 className="text-lg font-medium text-gray-900">
+              <h2 className="text-lg font-medium text-text-primary">
                 枚举值管理 - {field?.name || '字段'}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-secondary">
                 管理字段的可选值和默认值设置
               </p>
             </div>
@@ -238,23 +238,23 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
           <div className="flex items-center space-x-4">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-gray-900">{enumStats.total}</div>
-                <div className="text-xs text-gray-600">总数</div>
+                <div className="text-2xl font-bold text-text-primary">{enumStats.total}</div>
+                <div className="text-xs text-text-secondary">总数</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-blue-600">{enumStats.defaults}</div>
-                <div className="text-xs text-gray-600">默认值</div>
+                <div className="text-xs text-text-secondary">默认值</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-600">{enumStats.withDescriptions}</div>
-                <div className="text-xs text-gray-600">有描述</div>
+                <div className="text-xs text-text-secondary">有描述</div>
               </div>
             </div>
           </div>
         </div>
 
         {field && (
-          <div className="flex items-center space-x-4 text-sm text-gray-600">
+          <div className="flex items-center space-x-4 text-sm text-text-secondary">
             <span>字段类型: {field.type}</span>
             <span>表: {field.table?.name}</span>
             {field.nullable && <span className="text-amber-600">可为空</span>}
@@ -324,7 +324,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       {/* 添加表单 */}
       {showAddForm && !readonly && (
         <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">添加新枚举值</h3>
+          <h3 className="text-lg font-medium text-text-primary mb-4">添加新枚举值</h3>
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
@@ -404,7 +404,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       {/* 枚举值列表 */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+          <h3 className="text-lg font-medium text-text-primary">
             枚举值列表 ({filteredAndSortedValues.length})
           </h3>
         </div>
@@ -441,7 +441,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
-                      <span className="text-sm text-gray-600">{enumValue.sortOrder}</span>
+                      <span className="text-sm text-text-secondary">{enumValue.sortOrder}</span>
                     </div>
                   </td>
                   
@@ -474,7 +474,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                         className="input w-full text-sm"
                       />
                     ) : (
-                      <span className="text-sm text-gray-900">
+                      <span className="text-sm text-text-primary">
                         {enumValue.label || enumValue.value}
                       </span>
                     )}
@@ -489,7 +489,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                         rows={2}
                       />
                     ) : (
-                      <span className="text-sm text-gray-600 max-w-xs truncate">
+                      <span className="text-sm text-text-secondary max-w-xs truncate">
                         {enumValue.description || '-'}
                       </span>
                     )}
@@ -523,7 +523,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           </button>
                           <button
                             onClick={() => setEditingValue(null)}
-                            className="text-gray-600 hover:text-gray-900"
+                            className="text-text-secondary hover:text-text-primary"
                             title="取消"
                           >
                             <X className="w-4 h-4" />
@@ -534,7 +534,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           <button
                             onClick={() => handleMoveValue(enumValue.id, 'up')}
                             disabled={index === 0}
-                            className={`${index === 0 ? 'text-gray-300' : 'text-gray-600 hover:text-gray-900'}`}
+                            className={`${index === 0 ? 'text-gray-300' : 'text-text-secondary hover:text-text-primary'}`}
                             title="上移"
                           >
                             <ArrowUp className="w-4 h-4" />
@@ -543,7 +543,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           <button
                             onClick={() => handleMoveValue(enumValue.id, 'down')}
                             disabled={index === filteredAndSortedValues.length - 1}
-                            className={`${index === filteredAndSortedValues.length - 1 ? 'text-gray-300' : 'text-gray-600 hover:text-gray-900'}`}
+                            className={`${index === filteredAndSortedValues.length - 1 ? 'text-gray-300' : 'text-text-secondary hover:text-text-primary'}`}
                             title="下移"
                           >
                             <ArrowDown className="w-4 h-4" />
@@ -551,7 +551,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           
                           <button
                             onClick={() => handleSetDefault(enumValue.id, !enumValue.isDefault)}
-                            className={enumValue.isDefault ? 'text-yellow-600 hover:text-yellow-900' : 'text-gray-600 hover:text-gray-900'}
+                            className={enumValue.isDefault ? 'text-yellow-600 hover:text-yellow-900' : 'text-text-secondary hover:text-text-primary'}
                             title={enumValue.isDefault ? '取消默认' : '设为默认'}
                           >
                             {enumValue.isDefault ? <Star className="w-4 h-4 fill-current" /> : <StarOff className="w-4 h-4" />}
@@ -567,7 +567,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           
                           <button
                             onClick={() => handleDuplicateValue(enumValue)}
-                            className="text-gray-600 hover:text-gray-900"
+                            className="text-text-secondary hover:text-text-primary"
                             title="复制"
                           >
                             <Copy className="w-4 h-4" />
@@ -593,10 +593,10 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
         {filteredAndSortedValues.length === 0 && (
           <div className="text-center py-12">
             <List className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-text-primary mb-2">
               {searchQuery || filterType !== 'ALL' ? '没有找到匹配的枚举值' : '暂无枚举值'}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-text-secondary mb-6">
               {searchQuery || filterType !== 'ALL'
                 ? '请尝试调整搜索条件'
                 : '为字段添加可选的枚举值'
@@ -676,7 +676,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">批量导入枚举值</h2>
+          <h2 className="text-xl font-semibold text-text-primary">批量导入枚举值</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -688,7 +688,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
         <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-200px)]">
           {/* 配置选项 */}
           <div className="space-y-4">
-            <h3 className="font-medium text-gray-900">导入配置</h3>
+            <h3 className="font-medium text-text-primary">导入配置</h3>
             
             <div className="grid grid-cols-3 gap-4">
               <div>
@@ -732,7 +732,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
               </div>
             </div>
 
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-text-secondary">
               <p>格式说明：</p>
               <ul className="list-disc list-inside mt-1 space-y-1">
                 <li>每行一个枚举值</li>
@@ -765,7 +765,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
           {/* 预览 */}
           {previewValues.length > 0 && (
             <div>
-              <h3 className="font-medium text-gray-900 mb-3">
+              <h3 className="font-medium text-text-primary mb-3">
                 预览 ({previewValues.length} 项)
               </h3>
               
@@ -784,8 +784,8 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
                         <td className="px-4 py-2 text-sm">
                           <code className="px-2 py-1 bg-gray-100 rounded">{value.value}</code>
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-900">{value.label}</td>
-                        <td className="px-4 py-2 text-sm text-gray-600">{value.description || '-'}</td>
+                        <td className="px-4 py-2 text-sm text-text-primary">{value.label}</td>
+                        <td className="px-4 py-2 text-sm text-text-secondary">{value.description || '-'}</td>
                       </tr>
                     ))}
                   </tbody>

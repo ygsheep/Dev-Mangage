@@ -56,7 +56,7 @@ const FeatureAPICard: React.FC<FeatureAPICardProps> = ({
           <span className={`px-2 py-1 rounded text-xs font-mono font-medium ${getMethodColor(api.method as HTTPMethod)}`}>
             {api.method}
           </span>
-          <span className="text-sm font-medium text-gray-900">{api.name}</span>
+          <span className="text-sm font-medium text-text-primary">{api.name}</span>
         </div>
         
         <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -101,11 +101,11 @@ const FeatureAPICard: React.FC<FeatureAPICardProps> = ({
                 api.method === 'POST' ? 'text-green-600' :
                 api.method === 'PUT' ? 'text-orange-600' :
                 api.method === 'DELETE' ? 'text-red-600' :
-                'text-gray-600'
+                'text-text-secondary'
               }`}>
                 {api.method}
               </span>
-              <span className="text-gray-600 ml-2">{api.path}</span>
+              <span className="text-text-secondary ml-2">{api.path}</span>
             </code>
             
             <div className="opacity-0 group-hover/endpoint:opacity-100 transition-opacity">
@@ -122,7 +122,7 @@ const FeatureAPICard: React.FC<FeatureAPICardProps> = ({
       {/* API 描述 */}
       {api.description && !compact && (
         <div className="mb-3">
-          <p className="text-sm text-gray-600 line-clamp-2">{api.description}</p>
+          <p className="text-sm text-text-secondary line-clamp-2">{api.description}</p>
         </div>
       )}
 

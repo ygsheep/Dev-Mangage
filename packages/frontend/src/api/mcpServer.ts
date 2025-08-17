@@ -1,5 +1,6 @@
 import { debug } from '../debug'
 import { mcpConfig } from '../config/mcpConfig'
+import { ENV_CONFIG } from '../config/env'
 
 export interface MCPServerStatus {
   isRunning: boolean
@@ -46,7 +47,7 @@ class MCPServerAPI {
       // 返回默认状态
       return {
         isRunning: false,
-        port: 3001,
+        port: ENV_CONFIG.backend.port,
         uptime: 0,
         requestCount: 0,
         lastActivity: null,

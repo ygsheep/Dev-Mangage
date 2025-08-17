@@ -3,16 +3,18 @@
  * 统一管理前端调用 MCP server 的地址配置
  */
 
-// 环境变量配置
+import { ENV_CONFIG, getBackendBaseUrl, getMCPHttpUrl, getMCPWebSocketUrl } from './env'
+
+// 环境变量配置（保持向后兼容）
 const getEnvConfig = () => {
   return {
-    // 从环境变量获取配置，提供默认值
-    BACKEND_HOST: import.meta.env.VITE_BACKEND_HOST || 'localhost',
-    BACKEND_PORT: import.meta.env.VITE_BACKEND_PORT || '3002',
-    MCP_HTTP_HOST: import.meta.env.VITE_MCP_HTTP_HOST || 'localhost',
-    MCP_HTTP_PORT: import.meta.env.VITE_MCP_HTTP_PORT || '3001',
-    MCP_WS_HOST: import.meta.env.VITE_MCP_WS_HOST || 'localhost',
-    MCP_WS_PORT: import.meta.env.VITE_MCP_WS_PORT || '3001',
+    // 从环境变量获取配置，使用新的环境配置系统
+    BACKEND_HOST: ENV_CONFIG.backend.host,
+    BACKEND_PORT: ENV_CONFIG.backend.port.toString(),
+    MCP_HTTP_HOST: ENV_CONFIG.mcp.http.host,
+    MCP_HTTP_PORT: ENV_CONFIG.mcp.http.port.toString(),
+    MCP_WS_HOST: ENV_CONFIG.mcp.ws.host,
+    MCP_WS_PORT: ENV_CONFIG.mcp.ws.port.toString(),
   }
 }
 

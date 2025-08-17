@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react'
+import { mcpConfig } from '../config/mcpConfig'
 
 // MCP客户端模拟接口
 class MCPClient {
   private serverUrl: string
 
-  constructor(serverUrl = 'http://localhost:3002') {
-    this.serverUrl = serverUrl
+  constructor(serverUrl?: string) {
+    this.serverUrl = serverUrl || mcpConfig.getBackendBaseUrl().replace('/api/v1', '')
   }
 
   async callTool(name: string, args: any) {

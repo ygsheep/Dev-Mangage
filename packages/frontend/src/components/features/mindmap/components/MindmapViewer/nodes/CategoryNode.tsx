@@ -47,7 +47,7 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({ data, selected }) => {
               className="w-4 h-4 flex-shrink-0" 
               style={{ color: nodeColor }} 
             />
-            <h3 className="text-sm font-medium text-gray-900 truncate">
+            <h3 className="text-sm font-medium text-text-primary truncate">
               {data.label}
             </h3>
           </div>
@@ -74,7 +74,7 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({ data, selected }) => {
           <div className="px-3 pb-3">
             {/* 描述 */}
             {data.description && (
-              <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+              <p className="text-xs text-text-secondary mb-2 line-clamp-2">
                 {data.description}
               </p>
             )}

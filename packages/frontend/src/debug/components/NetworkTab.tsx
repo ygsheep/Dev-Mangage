@@ -42,7 +42,7 @@ const NetworkTab: React.FC = () => {
       case 'PUT': return 'text-yellow-600 bg-yellow-50'
       case 'DELETE': return 'text-red-600 bg-red-50'
       case 'PATCH': return 'text-purple-600 bg-purple-50'
-      default: return 'text-gray-600 bg-gray-50'
+      default: return 'text-text-secondary bg-gray-50'
     }
   }
 
@@ -212,7 +212,7 @@ const NetworkTab: React.FC = () => {
                 <h4 className="text-sm font-medium text-gray-800">请求详情</h4>
                 <button
                   onClick={() => setSelectedRequest(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-text-secondary"
                 >
                   ✕
                 </button>

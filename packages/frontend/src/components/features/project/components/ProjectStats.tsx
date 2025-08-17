@@ -59,7 +59,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({ projectId }) => {
       case 'DEPRECATED':
         return 'text-red-600'
       default:
-        return 'text-gray-600'
+        return 'text-text-secondary'
     }
   }
 
@@ -67,7 +67,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({ projectId }) => {
     <div className="card">
       <div className="flex items-center space-x-2 mb-6">
         <BarChart3 className="w-5 h-5 text-primary-600" />
-        <h3 className="text-lg font-semibold text-gray-900">项目统计</h3>
+        <h3 className="text-lg font-semibold text-text-primary">项目统计</h3>
       </div>
 
       {/* Overview Stats */}
@@ -111,7 +111,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({ projectId }) => {
       {/* Status Breakdown */}
       {stats.statusCounts && Object.keys(stats.statusCounts).length > 0 && (
         <div>
-          <h4 className="text-md font-medium text-gray-900 mb-4">API状态分布</h4>
+          <h4 className="text-md font-medium text-text-primary mb-4">API状态分布</h4>
           <div className="space-y-3">
             {Object.entries(stats.statusCounts).map(([status, count]) => {
               const percentage = stats.totalAPIs > 0 ? (Number(count) / stats.totalAPIs * 100) : 0
