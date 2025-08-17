@@ -246,16 +246,16 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
         {/* 头部 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary bg-gradient-header">
           <div className="flex items-center space-x-3">
             <Table className="w-8 h-8 text-blue-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-text-primary">
                 {table.displayName || table.name} ({table.name})
               </h2>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-4 text-sm text-text-secondary">
                 <span className="flex items-center">
                   <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
                   {table.status === 'ACTIVE' ? '已创建' : table.status}
@@ -295,7 +295,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
             
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -303,7 +303,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
         </div>
 
         {/* 标签页导航 */}
-        <div className="flex border-b border-gray-200 bg-gray-50">
+        <div className="flex border-b border-border-primary bg-bg-tertiary">
           {[
             { key: 'info', label: '表信息', icon: Database },
             { key: 'fields', label: '字段结构', icon: Table },
@@ -316,8 +316,8 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
               onClick={() => setActiveTab(key as TabType)}
               className={`flex items-center space-x-2 px-6 py-3 border-b-2 transition-colors ${
                 activeTab === key
-                  ? 'border-blue-500 text-blue-600 bg-white'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                  ? 'border-primary-500 text-primary-600 bg-bg-paper'
+                  : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border-primary'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -334,7 +334,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
                       表名 *
                     </label>
                     {editing ? (
@@ -345,14 +345,14 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         className="input w-full"
                       />
                     ) : (
-                      <div className="text-gray-900 font-mono bg-gray-50 px-3 py-2 rounded border">
+                      <div className="text-text-primary font-mono bg-bg-tertiary px-3 py-2 rounded border">
                         {tableInfo.name}
                       </div>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
                       显示名称
                     </label>
                     {editing ? (
@@ -364,14 +364,14 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         placeholder="用户友好的表名"
                       />
                     ) : (
-                      <div className="text-gray-900 px-3 py-2 bg-gray-50 rounded border">
+                      <div className="text-text-primary px-3 py-2 bg-bg-tertiary rounded border">
                         {tableInfo.displayName || '-'}
                       </div>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
                       存储引擎
                     </label>
                     {editing ? (
@@ -385,14 +385,14 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         <option value="Memory">Memory</option>
                       </select>
                     ) : (
-                      <div className="text-gray-900 px-3 py-2 bg-gray-50 rounded border">
+                      <div className="text-text-primary px-3 py-2 bg-bg-tertiary rounded border">
                         {tableInfo.engine}
                       </div>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
                       字符集
                     </label>
                     {editing ? (
@@ -406,7 +406,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         <option value="latin1">latin1</option>
                       </select>
                     ) : (
-                      <div className="text-gray-900 px-3 py-2 bg-gray-50 rounded border">
+                      <div className="text-text-primary px-3 py-2 bg-bg-tertiary rounded border">
                         {tableInfo.charset}
                       </div>
                     )}
@@ -415,7 +415,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
                       排序规则
                     </label>
                     {editing ? (
@@ -429,14 +429,14 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         <option value="utf8_unicode_ci">utf8_unicode_ci</option>
                       </select>
                     ) : (
-                      <div className="text-gray-900 px-3 py-2 bg-gray-50 rounded border">
+                      <div className="text-text-primary px-3 py-2 bg-bg-tertiary rounded border">
                         {tableInfo.collation}
                       </div>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-secondary mb-1">
                       分类
                     </label>
                     {editing ? (
@@ -448,14 +448,14 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         placeholder="如: 用户管理、订单管理"
                       />
                     ) : (
-                      <div className="text-gray-900 px-3 py-2 bg-gray-50 rounded border">
+                      <div className="text-text-primary px-3 py-2 bg-bg-tertiary rounded border">
                         {tableInfo.category || '-'}
                       </div>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-text-secondary">
                       表统计信息
                     </label>
                     <div className="grid grid-cols-2 gap-4 text-sm">
@@ -477,7 +477,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-text-secondary mb-1">
                   表说明
                 </label>
                 {editing ? (
@@ -489,14 +489,14 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                     placeholder="描述这个表的用途和存储的数据类型..."
                   />
                 ) : (
-                  <div className="text-gray-900 px-3 py-2 bg-gray-50 rounded border min-h-[100px]">
+                  <div className="text-text-primary px-3 py-2 bg-bg-tertiary rounded border min-h-[100px]">
                     {tableInfo.comment || '暂无说明'}
                   </div>
                 )}
               </div>
 
               {editing && (
-                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                <div className="flex justify-end space-x-3 pt-4 border-t border-border-primary">
                   <button
                     onClick={() => {
                       setEditing(false)
@@ -530,11 +530,11 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
           {activeTab === 'fields' && (
             <div className="h-full flex flex-col">
               {/* 字段工具栏 */}
-              <div className="p-4 border-b border-gray-200 bg-gray-50">
+              <div className="p-4 border-b border-border-primary bg-bg-tertiary">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                   <div className="flex items-center space-x-3">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary w-4 h-4" />
                       <input
                         type="text"
                         placeholder="搜索字段..."
@@ -556,7 +556,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                     </select>
 
                     {selectedFields.size > 0 && (
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-text-secondary">
                         已选择 {selectedFields.size} 个字段
                       </span>
                     )}
@@ -577,12 +577,12 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
               {/* 字段列表 */}
               <div className="flex-1 overflow-y-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50 sticky top-0">
+                  <thead className="bg-bg-tertiary sticky top-0">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider">
                         <input
                           type="checkbox"
-                          className="rounded border-gray-300"
+                          className="rounded border-border-primary"
                           checked={selectedFields.size === filteredFields.length && filteredFields.length > 0}
                           onChange={(e) => {
                             if (e.target.checked) {
@@ -594,7 +594,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         />
                       </th>
                       <th
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider cursor-pointer hover:bg-bg-tertiary"
                         onClick={() => handleSort('name')}
                       >
                         <div className="flex items-center">
@@ -607,7 +607,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         </div>
                       </th>
                       <th
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider cursor-pointer hover:bg-bg-tertiary"
                         onClick={() => handleSort('type')}
                       >
                         <div className="flex items-center">
@@ -619,27 +619,27 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                           )}
                         </div>
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider">
                         约束
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider">
                         默认值
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider">
                         说明
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-text-tertiary uppercase tracking-wider">
                         操作
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-bg-paper divide-y divide-gray-200">
                     {filteredFields.map((field) => (
-                      <tr key={field.id} className="hover:bg-gray-50">
+                      <tr key={field.id} className="hover:bg-bg-tertiary">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input
                             type="checkbox"
-                            className="rounded border-gray-300"
+                            className="rounded border-border-primary"
                             checked={selectedFields.has(field.id)}
                             onChange={() => handleFieldSelect(field.id)}
                           />
@@ -651,7 +651,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                               <Key className="w-4 h-4 text-yellow-500 mr-2" />
                             )}
                             <div>
-                              <div className="text-sm font-medium text-gray-900 font-mono">
+                              <div className="text-sm font-medium text-text-primary font-mono">
                                 {field.name}
                               </div>
                               {field.isPrimaryKey && (
@@ -662,7 +662,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                         </td>
                         
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-bg-tertiary text-text-primary">
                             {field.type}
                             {field.length && `(${field.length})`}
                           </span>
@@ -688,12 +688,12 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                           </div>
                         </td>
                         
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary font-mono">
                           {field.defaultValue || '-'}
                         </td>
                         
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 max-w-xs truncate">
+                          <div className="text-sm text-text-primary max-w-xs truncate">
                             {field.comment || '-'}
                           </div>
                         </td>
@@ -728,10 +728,10 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                 {filteredFields.length === 0 && (
                   <div className="text-center py-12">
                     <Table className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-lg font-medium text-text-primary mb-2">
                       {searchQuery || fieldTypeFilter !== 'ALL' ? '没有找到匹配的字段' : '暂无字段'}
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-text-secondary mb-6">
                       {searchQuery || fieldTypeFilter !== 'ALL' ? 
                         '请尝试调整搜索条件' : 
                         '添加字段来定义表结构'
@@ -753,10 +753,10 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
           {activeTab === 'indexes' && (
             <div className="h-full flex flex-col">
               {/* 索引工具栏 */}
-              <div className="p-4 border-b border-gray-200 bg-gray-50">
+              <div className="p-4 border-b border-border-primary bg-bg-tertiary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <h3 className="text-lg font-medium text-gray-900">
+                    <h3 className="text-lg font-medium text-text-primary">
                       索引管理 ({table.indexes?.length || 0})
                     </h3>
                   </div>
@@ -791,37 +791,37 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
               <div className="flex-1 overflow-y-auto">
                 {(table.indexes?.length || 0) > 0 ? (
                   <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50 sticky top-0">
+                    <thead className="bg-bg-tertiary sticky top-0">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider">
                           索引名称
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider">
                           类型
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider">
                           字段
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider">
                           唯一性
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-right text-xs font-medium text-text-tertiary uppercase tracking-wider">
                           操作
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-bg-paper divide-y divide-gray-200">
                       {(table.indexes || []).map((index) => (
-                        <tr key={index.id} className="hover:bg-gray-50">
+                        <tr key={index.id} className="hover:bg-bg-tertiary">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <Key className="w-4 h-4 text-gray-400 mr-2" />
+                              <Key className="w-4 h-4 text-text-tertiary mr-2" />
                               <div>
-                                <div className="text-sm font-medium text-gray-900 font-mono">
+                                <div className="text-sm font-medium text-text-primary font-mono">
                                   {index.name}
                                 </div>
                                 {index.comment && (
-                                  <div className="text-xs text-gray-500">
+                                  <div className="text-xs text-text-tertiary">
                                     {index.comment}
                                   </div>
                                 )}
@@ -834,7 +834,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                               index.type === 'PRIMARY' ? 'bg-blue-100 text-blue-800' :
                               index.type === 'UNIQUE' ? 'bg-green-100 text-green-800' :
                               index.type === 'FULLTEXT' ? 'bg-purple-100 text-purple-800' :
-                              'bg-gray-100 text-gray-800'
+                              'bg-bg-tertiary text-text-primary'
                             }`}>
                               {index.type || 'BTREE'}
                             </span>
@@ -845,7 +845,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                               {(index.fields || []).map((field: any, idx: number) => (
                                 <span
                                   key={idx}
-                                  className="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700"
+                                  className="inline-flex items-center px-2 py-1 rounded text-xs bg-bg-tertiary text-text-secondary"
                                 >
                                   {typeof field === 'string' ? field : field.fieldName}
                                 </span>
@@ -858,7 +858,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                               {index.isUnique ? (
                                 <CheckCircle className="w-4 h-4 text-green-500" />
                               ) : (
-                                <span className="text-gray-400">-</span>
+                                <span className="text-text-tertiary">-</span>
                               )}
                             </div>
                           </td>
@@ -892,10 +892,10 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                 ) : (
                   <div className="text-center py-12">
                     <Key className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-lg font-medium text-text-primary mb-2">
                       暂无索引
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-text-secondary mb-6">
                       添加索引可以提高查询性能
                     </p>
                     <div className="flex justify-center space-x-3">
@@ -931,13 +931,13 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
               <div className="space-y-4">
                 {tableRelationships.length > 0 ? (
                   tableRelationships.map(rel => (
-                    <div key={rel.id} className="border border-gray-200 rounded-lg p-4">
+                    <div key={rel.id} className="border border-border-primary rounded-lg p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium text-gray-900">{rel.name}</h4>
-                          <p className="text-sm text-gray-600">{rel.relationshipType}</p>
+                          <h4 className="font-medium text-text-primary">{rel.name}</h4>
+                          <p className="text-sm text-text-secondary">{rel.relationshipType}</p>
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-text-tertiary">
                           {rel.onUpdate} / {rel.onDelete}
                         </div>
                       </div>
@@ -946,10 +946,10 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                 ) : (
                   <div className="text-center py-12">
                     <Link className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-lg font-medium text-text-primary mb-2">
                       暂无关联关系
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-text-secondary">
                       此表尚未与其他表建立关联关系
                     </p>
                   </div>
@@ -962,7 +962,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
             <div className="p-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-gray-900">建表SQL语句</h3>
+                  <h3 className="text-lg font-medium text-text-primary">建表SQL语句</h3>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(generateCreateTableSQL(table))
@@ -988,9 +988,9 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
         </div>
 
         {/* 底部说明栏 */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="px-6 py-4 border-t border-border-primary bg-bg-tertiary">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-text-secondary">
               <span className="font-medium">说明:</span> {table.comment || '存储表的基础数据信息'}
             </div>
             <button
@@ -1085,9 +1085,9 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-md">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary">
+          <h2 className="text-xl font-semibold text-text-primary">
             {field ? '编辑字段' : '添加字段'}
           </h2>
           <button onClick={onClose} className="btn-ghost">
@@ -1097,7 +1097,7 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-secondary mb-1">
               字段名 *
             </label>
             <input
@@ -1111,7 +1111,7 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 类型 *
               </label>
               <select
@@ -1132,7 +1132,7 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 长度
               </label>
               <input
@@ -1150,9 +1150,9 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
                 type="checkbox"
                 checked={formData.isPrimaryKey}
                 onChange={(e) => setFormData(prev => ({ ...prev, isPrimaryKey: e.target.checked }))}
-                className="rounded border-gray-300"
+                className="rounded border-border-primary"
               />
-              <span className="text-sm text-gray-700">主键</span>
+              <span className="text-sm text-text-secondary">主键</span>
             </label>
 
             <label className="flex items-center space-x-2">
@@ -1160,9 +1160,9 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
                 type="checkbox"
                 checked={!formData.isNullable}
                 onChange={(e) => setFormData(prev => ({ ...prev, isNullable: !e.target.checked }))}
-                className="rounded border-gray-300"
+                className="rounded border-border-primary"
               />
-              <span className="text-sm text-gray-700">不允许为空</span>
+              <span className="text-sm text-text-secondary">不允许为空</span>
             </label>
 
             <label className="flex items-center space-x-2">
@@ -1170,9 +1170,9 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
                 type="checkbox"
                 checked={formData.isUnique}
                 onChange={(e) => setFormData(prev => ({ ...prev, isUnique: e.target.checked }))}
-                className="rounded border-gray-300"
+                className="rounded border-border-primary"
               />
-              <span className="text-sm text-gray-700">唯一约束</span>
+              <span className="text-sm text-text-secondary">唯一约束</span>
             </label>
 
             <label className="flex items-center space-x-2">
@@ -1180,14 +1180,14 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
                 type="checkbox"
                 checked={formData.autoIncrement}
                 onChange={(e) => setFormData(prev => ({ ...prev, autoIncrement: e.target.checked }))}
-                className="rounded border-gray-300"
+                className="rounded border-border-primary"
               />
-              <span className="text-sm text-gray-700">自动递增</span>
+              <span className="text-sm text-text-secondary">自动递增</span>
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-secondary mb-1">
               默认值
             </label>
             <input
@@ -1200,7 +1200,7 @@ const FieldEditModal: React.FC<FieldEditModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-secondary mb-1">
               字段说明
             </label>
             <textarea

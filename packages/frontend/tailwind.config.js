@@ -4,21 +4,47 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
+        // 使用CSS变量的主题色
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          50: 'var(--color-primary-50)',
+          100: 'var(--color-primary-100)',
+          200: 'var(--color-primary-200)',
+          300: 'var(--color-primary-300)',
+          400: 'var(--color-primary-400)',
+          500: 'var(--color-primary-500)',
+          600: 'var(--color-primary-600)',
+          700: 'var(--color-primary-700)',
+          800: 'var(--color-primary-800)',
+          900: 'var(--color-primary-900)',
         },
+        // 主题背景色
+        'bg-primary': 'var(--color-bg-primary)',
+        'bg-secondary': 'var(--color-bg-secondary)',
+        'bg-tertiary': 'var(--color-bg-tertiary)',
+        'bg-paper': 'var(--color-bg-paper)',
+        'bg-elevated': 'var(--color-bg-elevated)',
+        // 主题文字色
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'text-tertiary': 'var(--color-text-tertiary)',
+        'text-inverse': 'var(--color-text-inverse)',
+        'text-link': 'var(--color-text-link)',
+        // 主题边框色
+        'border-primary': 'var(--color-border-primary)',
+        'border-secondary': 'var(--color-border-secondary)',
+        'border-focus': 'var(--color-border-focus)',
+        'border-error': 'var(--color-border-error)',
+        'border-success': 'var(--color-border-success)',
+        // 状态色
+        'status-success': 'var(--color-status-success)',
+        'status-warning': 'var(--color-status-warning)',
+        'status-error': 'var(--color-status-error)',
+        'status-info': 'var(--color-status-info)',
+        // 保留原有颜色用于兼容性
         gray: {
           50: '#f9fafb',
           100: '#f3f4f6',
@@ -31,6 +57,35 @@ export default {
           800: '#1f2937',
           900: '#111827',
         },
+      },
+      // 确保背景色正确映射
+      backgroundColor: {
+        'bg-primary': 'var(--color-bg-primary)',
+        'bg-secondary': 'var(--color-bg-secondary)',
+        'bg-tertiary': 'var(--color-bg-tertiary)',
+        'bg-paper': 'var(--color-bg-paper)',
+        'bg-elevated': 'var(--color-bg-elevated)',
+      },
+      // 添加主题圆角
+      borderRadius: {
+        'theme-sm': 'var(--radius-sm)',
+        'theme-md': 'var(--radius-md)',
+        'theme-lg': 'var(--radius-lg)',
+        'theme-xl': 'var(--radius-xl)',
+        'theme-2xl': 'var(--radius-2xl)',
+        'theme-full': 'var(--radius-full)',
+      },
+      // 添加主题阴影
+      boxShadow: {
+        'theme-sm': '0 1px 2px 0 var(--color-shadow-sm)',
+        'theme-md': '0 4px 6px -1px var(--color-shadow-md), 0 2px 4px -2px var(--color-shadow-md)',
+        'theme-lg': '0 10px 15px -3px var(--color-shadow-lg), 0 4px 6px -4px var(--color-shadow-lg)',
+        'theme-xl': '0 20px 25px -5px var(--color-shadow-xl), 0 8px 10px -6px var(--color-shadow-xl)',
+        'theme-card': 'var(--card-shadow)',
+      },
+      backgroundImage: {
+        'gradient-header': 'linear-gradient(to right, var(--gradient-header-from), var(--gradient-header-to))',
+        'gradient-card': 'linear-gradient(to bottom right, var(--gradient-card-from), var(--gradient-card-to))',
       },
       fontFamily: {
         sans: ['OPPO Sans', 'Inter', 'system-ui', 'sans-serif'],

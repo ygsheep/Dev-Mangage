@@ -268,31 +268,31 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
 
   // 获取性能评分颜色
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 60) return 'text-yellow-600'
-    return 'text-red-600'
+    if (score >= 80) return 'text-success-600'
+    if (score >= 60) return 'text-warning-600'
+    return 'text-danger-600'
   }
 
   // 获取优先级颜色
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'HIGH': return 'bg-red-100 text-red-800'
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800'
-      case 'LOW': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'HIGH': return 'bg-danger-100 text-danger-800'
+      case 'MEDIUM': return 'bg-warning-100 text-warning-800'
+      case 'LOW': return 'bg-success-100 text-success-800'
+      default: return 'bg-bg-tertiary text-text-secondary'
     }
   }
 
   return (
     <div className="space-y-6">
       {/* 分析控制面板 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-bg-paper rounded-lg border border-border-primary p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <Brain className="w-8 h-8 text-blue-500" />
+            <Brain className="w-8 h-8 text-primary-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">AI索引性能分析器</h2>
-              <p className="text-gray-600">基于AI的智能索引优化建议</p>
+              <h2 className="text-xl font-semibold text-text-primary">AI索引性能分析器</h2>
+              <p className="text-text-secondary">基于AI的智能索引优化建议</p>
             </div>
           </div>
           
@@ -311,7 +311,7 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               选择分析表
             </label>
             <select
@@ -329,7 +329,7 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               查询模式 (可选)
             </label>
             <div className="flex space-x-2">
@@ -363,12 +363,12 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
                 {queryPatterns.map((pattern, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded"
+                    className="inline-flex items-center px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded"
                   >
                     {pattern}
                     <button
                       onClick={() => setQueryPatterns(prev => prev.filter((_, i) => i !== index))}
-                      className="ml-1 text-blue-500 hover:text-blue-700"
+                      className="ml-1 text-primary-500 hover:text-primary-700"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -382,92 +382,92 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
 
       {/* 性能概览 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">总表数</p>
-              <p className="text-2xl font-bold text-gray-900">{tables.length}</p>
+              <p className="text-sm font-medium text-text-secondary">总表数</p>
+              <p className="text-2xl font-bold text-text-primary">{tables.length}</p>
             </div>
-            <Database className="w-8 h-8 text-gray-400" />
+            <Database className="w-8 h-8 text-text-tertiary" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">已优化表</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-sm font-medium text-text-secondary">已优化表</p>
+              <p className="text-2xl font-bold text-success-600">
                 {metrics.filter(m => m.performanceScore >= 80).length}
               </p>
             </div>
-            <CheckCircle className="w-8 h-8 text-green-400" />
+            <CheckCircle className="w-8 h-8 text-success-500" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">需要优化</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-sm font-medium text-text-secondary">需要优化</p>
+              <p className="text-2xl font-bold text-danger-600">
                 {metrics.filter(m => m.performanceScore < 60).length}
               </p>
             </div>
-            <AlertTriangle className="w-8 h-8 text-red-400" />
+            <AlertTriangle className="w-8 h-8 text-danger-500" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">AI建议数</p>
-              <p className="text-2xl font-bold text-blue-600">{suggestions.length}</p>
+              <p className="text-sm font-medium text-text-secondary">AI建议数</p>
+              <p className="text-2xl font-bold text-primary-600">{suggestions.length}</p>
             </div>
-            <Lightbulb className="w-8 h-8 text-blue-400" />
+            <Lightbulb className="w-8 h-8 text-primary-500" />
           </div>
         </div>
       </div>
 
       {/* 表性能列表 */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">表性能评估</h3>
+      <div className="bg-bg-paper rounded-lg border border-border-primary">
+        <div className="px-6 py-4 border-b border-border-primary">
+          <h3 className="text-lg font-medium text-text-primary">表性能评估</h3>
         </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-bg-secondary">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   表名
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   当前索引
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   性能评分
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   查询效率
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   建议数量
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">
                   操作
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-bg-paper divide-y divide-gray-200">
               {metrics.map((metric) => (
-                <tr key={metric.tableId} className="hover:bg-gray-50">
+                <tr key={metric.tableId} className="hover:bg-bg-tertiary">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <Database className="w-4 h-4 text-gray-400 mr-2" />
+                      <Database className="w-4 h-4 text-text-tertiary mr-2" />
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-text-primary">
                           {metric.tableName}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-text-secondary">
                           {tables.find(t => t.id === metric.tableId)?.fields?.length || 0} 字段
                         </div>
                       </div>
@@ -476,9 +476,9 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
                   
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-900">{metric.currentIndexes}</span>
+                      <span className="text-sm text-text-primary">{metric.currentIndexes}</span>
                       {metric.missingIndexes > 0 && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-danger-100 text-danger-800">
                           缺少 {metric.missingIndexes}
                         </span>
                       )}
@@ -490,11 +490,11 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
                       <div className={`text-sm font-medium ${getScoreColor(metric.performanceScore)}`}>
                         {metric.performanceScore}%
                       </div>
-                      <div className="ml-2 w-16 bg-gray-200 rounded-full h-2">
+                      <div className="ml-2 w-16 bg-bg-tertiary rounded-full h-2">
                         <div
                           className={`h-2 rounded-full ${
-                            metric.performanceScore >= 80 ? 'bg-green-500' :
-                            metric.performanceScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                            metric.performanceScore >= 80 ? 'bg-success-500' :
+                            metric.performanceScore >= 60 ? 'bg-warning-500' : 'bg-danger-500'
                           }`}
                           style={{ width: `${metric.performanceScore}%` }}
                         />
@@ -504,7 +504,7 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
                   
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <TrendingUp className="w-4 h-4 text-gray-400 mr-1" />
+                      <TrendingUp className="w-4 h-4 text-text-tertiary mr-1" />
                       <span className={`text-sm ${getScoreColor(metric.queryEfficiency)}`}>
                         {metric.queryEfficiency}%
                       </span>
@@ -512,7 +512,7 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
                   </td>
                   
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
                       {metric.recommendations} 个建议
                     </span>
                   </td>
@@ -521,7 +521,7 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
                     <button
                       onClick={() => analyzeIndexes(metric.tableId)}
                       disabled={loading}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-primary-600 hover:text-primary-700"
                     >
                       分析
                     </button>
@@ -535,9 +535,9 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
 
       {/* AI索引建议 */}
       {suggestions.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">
+        <div className="bg-bg-paper rounded-lg border border-border-primary">
+          <div className="px-6 py-4 border-b border-border-primary flex items-center justify-between">
+            <h3 className="text-lg font-medium text-text-primary">
               AI索引优化建议 ({suggestions.length})
             </h3>
             <button
@@ -561,28 +561,28 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
             {suggestions.map((suggestion) => (
               <div
                 key={suggestion.id}
-                className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                className="border border-border-primary rounded-lg p-4 hover:border-primary-300 transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <h4 className="font-medium text-gray-900">{suggestion.indexName}</h4>
+                      <h4 className="font-medium text-text-primary">{suggestion.indexName}</h4>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(suggestion.priority)}`}>
                         {suggestion.priority === 'HIGH' ? '高优先级' : 
                          suggestion.priority === 'MEDIUM' ? '中优先级' : '低优先级'}
                       </span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-bg-tertiary text-text-secondary">
                         {suggestion.indexType}
                       </span>
                     </div>
                     
-                    <div className="text-sm text-gray-600 mb-2">
+                    <div className="text-sm text-text-secondary mb-2">
                       <span className="font-medium">字段:</span> {suggestion.fields.join(', ')}
                     </div>
                     
-                    <p className="text-sm text-gray-700 mb-3">{suggestion.reasoning}</p>
+                    <p className="text-sm text-text-primary mb-3">{suggestion.reasoning}</p>
                     
-                    <div className="flex items-center space-x-6 text-sm text-gray-500">
+                    <div className="flex items-center space-x-6 text-sm text-text-secondary">
                       <div className="flex items-center space-x-1">
                         <TrendingUp className="w-4 h-4" />
                         <span>预期提升: {suggestion.estimatedImprovement}%</span>
@@ -598,12 +598,12 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
                     </div>
 
                     {suggestion.conflicts && suggestion.conflicts.length > 0 && (
-                      <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                      <div className="mt-3 p-3 bg-warning-50 border border-warning-200 rounded">
                         <div className="flex items-center space-x-2">
-                          <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                          <span className="text-sm font-medium text-yellow-800">潜在冲突</span>
+                          <AlertTriangle className="w-4 h-4 text-warning-600" />
+                          <span className="text-sm font-medium text-warning-800">潜在冲突</span>
                         </div>
-                        <ul className="mt-1 text-sm text-yellow-700">
+                        <ul className="mt-1 text-sm text-warning-700">
                           {suggestion.conflicts.map((conflict, index) => (
                             <li key={index}>• {conflict}</li>
                           ))}
@@ -631,11 +631,11 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
 
                 {/* 详细信息展开 */}
                 {showDetails === suggestion.id && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h5 className="font-medium text-gray-900 mb-2">相关查询模式</h5>
+                  <div className="mt-4 pt-4 border-t border-border-primary">
+                    <h5 className="font-medium text-text-primary mb-2">相关查询模式</h5>
                     <div className="space-y-2">
                       {suggestion.queryPatterns.map((pattern, index) => (
-                        <div key={index} className="bg-gray-50 rounded p-2 font-mono text-xs">
+                        <div key={index} className="bg-bg-secondary rounded p-2 font-mono text-xs">
                           {pattern}
                         </div>
                       ))}

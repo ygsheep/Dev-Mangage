@@ -216,16 +216,16 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* 头部 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary bg-gradient-header">
           <div className="flex items-center space-x-3">
             <Link className="w-8 h-8 text-blue-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-text-primary">
                 {mode === 'edit' ? '编辑关系' : '创建关系'}
               </h2>
-              <p className="text-gray-600">管理表间的外键关系和约束行为</p>
+              <p className="text-text-secondary">管理表间的外键关系和约束行为</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -240,7 +240,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -253,7 +253,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* 关系名称 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   关系名称 *
                 </label>
                 <div className="flex space-x-2">
@@ -278,7 +278,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
 
               {/* 关系类型 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   关系类型 *
                 </label>
                 <select
@@ -298,8 +298,8 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
             </div>
 
             {/* 表和字段选择 */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-medium text-gray-900 mb-4 flex items-center">
+            <div className="bg-bg-tertiary rounded-lg p-4">
+              <h3 className="font-medium text-text-primary mb-4 flex items-center">
                 <Database className="w-5 h-5 mr-2" />
                 表和字段关联
               </h3>
@@ -307,7 +307,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
                 {/* 源表 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-text-secondary mb-2">
                     源表 *
                   </label>
                   <select
@@ -330,7 +330,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
                   
                   {formData.fromTableId && (
                     <div className="mt-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-text-secondary mb-1">
                         源字段 *
                       </label>
                       <select
@@ -354,8 +354,8 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
                 {/* 关系箭头 */}
                 <div className="flex justify-center items-center">
                   <div className="text-center">
-                    <ArrowRight className="w-8 h-8 text-gray-400 mx-auto" />
-                    <span className="text-xs text-gray-500 mt-1">
+                    <ArrowRight className="w-8 h-8 text-text-tertiary mx-auto" />
+                    <span className="text-xs text-text-tertiary mt-1">
                       {formData.relationshipType === 'ONE_TO_ONE' && '1:1'}
                       {formData.relationshipType === 'ONE_TO_MANY' && '1:N'}
                       {formData.relationshipType === 'MANY_TO_MANY' && 'M:N'}
@@ -365,7 +365,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
 
                 {/* 目标表 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-text-secondary mb-2">
                     目标表 *
                   </label>
                   <select
@@ -388,7 +388,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
                   
                   {formData.toTableId && (
                     <div className="mt-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-text-secondary mb-1">
                         目标字段 *
                       </label>
                       <select
@@ -443,7 +443,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
             {/* 级联操作配置 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   更新时动作 (ON UPDATE)
                 </label>
                 <select
@@ -459,7 +459,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   删除时动作 (ON DELETE)
                 </label>
                 <select
@@ -480,21 +480,21 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900"
+                className="flex items-center space-x-2 text-sm text-text-secondary hover:text-text-primary"
               >
                 <Settings className="w-4 h-4" />
                 <span>高级配置</span>
               </button>
               
               {showAdvanced && (
-                <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-4 space-y-4 p-4 bg-bg-tertiary rounded-lg">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <label className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={formData.isEnforced}
                         onChange={(e) => setFormData(prev => ({ ...prev, isEnforced: e.target.checked }))}
-                        className="rounded border-gray-300"
+                        className="rounded border-border-primary"
                       />
                       <span className="text-sm">强制约束</span>
                     </label>
@@ -504,7 +504,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
                         type="checkbox"
                         checked={formData.deferrable}
                         onChange={(e) => setFormData(prev => ({ ...prev, deferrable: e.target.checked }))}
-                        className="rounded border-gray-300"
+                        className="rounded border-border-primary"
                       />
                       <span className="text-sm">可延迟约束</span>
                     </label>
@@ -515,7 +515,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
 
             {/* 说明 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 关系说明
               </label>
               <textarea
@@ -567,7 +567,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
             )}
 
             {/* 操作按钮 */}
-            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+            <div className="flex justify-end space-x-3 pt-4 border-t border-border-primary">
               <button
                 type="button"
                 onClick={onClose}

@@ -51,9 +51,9 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
       case 'in-progress':
         return 'bg-yellow-100 text-yellow-800'
       case 'planned':
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-bg-tertiary text-text-primary'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-bg-tertiary text-text-primary'
     }
   }
 
@@ -79,7 +79,7 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
       case '文件管理':
         return <Upload className="w-8 h-8 text-green-500" />
       default:
-        return <Settings className="w-8 h-8 text-gray-500" />
+        return <Settings className="w-8 h-8 text-text-tertiary" />
     }
   }
 
@@ -87,15 +87,19 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
   const getFilteredAPIs = () => {
     let apis: API[] = []
     
+    // 确保API数组存在，否则使用空数组
+    const frontendAPIs = module.frontendAPIs || []
+    const backendAPIs = module.backendAPIs || []
+    
     switch (activeTab) {
       case 'frontend':
-        apis = module.frontendAPIs
+        apis = frontendAPIs
         break
       case 'backend':
-        apis = module.backendAPIs
+        apis = backendAPIs
         break
       case 'all':
-        apis = [...module.frontendAPIs, ...module.backendAPIs]
+        apis = [...frontendAPIs, ...backendAPIs]
         break
     }
 
@@ -126,14 +130,14 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary bg-gradient-header">
           <div className="flex items-center space-x-4">
             {getModuleIcon(module.name)}
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">{module.name}</h2>
-              <p className="text-gray-600">{module.description}</p>
+              <h2 className="text-2xl font-semibold text-text-primary">{module.name}</h2>
+              <p className="text-text-secondary">{module.description}</p>
             </div>
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(module.status)}`}>
               {getStatusText(module.status)}
@@ -141,35 +145,35 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 p-6 border-b border-gray-200 bg-gray-50">
+        <div className="grid grid-cols-3 gap-4 p-6 border-b border-border-primary bg-bg-tertiary">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{module.frontendAPIs.length}</div>
-            <div className="text-sm text-gray-500">前端API</div>
+            <div className="text-2xl font-bold text-blue-600">{module.frontendAPIs?.length || 0}</div>
+            <div className="text-sm text-text-tertiary">前端API</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{module.backendAPIs.length}</div>
-            <div className="text-sm text-gray-500">后端API</div>
+            <div className="text-2xl font-bold text-green-600">{module.backendAPIs?.length || 0}</div>
+            <div className="text-sm text-text-tertiary">后端API</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">{module.frontendAPIs.length + module.backendAPIs.length}</div>
-            <div className="text-sm text-gray-500">总计API</div>
+            <div className="text-2xl font-bold text-purple-600">{(module.frontendAPIs?.length || 0) + (module.backendAPIs?.length || 0)}</div>
+            <div className="text-sm text-text-tertiary">总计API</div>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-border-primary">
           <div className="flex items-center justify-between mb-4">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="w-4 h-4 text-gray-400" />
+                <Search className="w-4 h-4 text-text-tertiary" />
               </div>
               <input
                 type="text"
@@ -200,44 +204,44 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+          <div className="flex space-x-1 bg-bg-tertiary p-1 rounded-lg">
             <button
               onClick={() => setActiveTab('all')}
               className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                 activeTab === 'all'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-bg-paper text-text-primary shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               <span className="flex items-center justify-center space-x-2">
                 <FileText className="w-4 h-4" />
-                <span>全部API ({module.frontendAPIs.length + module.backendAPIs.length})</span>
+                <span>全部API ({(module.frontendAPIs?.length || 0) + (module.backendAPIs?.length || 0)})</span>
               </span>
             </button>
             <button
               onClick={() => setActiveTab('frontend')}
               className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                 activeTab === 'frontend'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-bg-paper text-blue-600 shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               <span className="flex items-center justify-center space-x-2">
                 <Code2 className="w-4 h-4" />
-                <span>前端API ({module.frontendAPIs.length})</span>
+                <span>前端API ({module.frontendAPIs?.length || 0})</span>
               </span>
             </button>
             <button
               onClick={() => setActiveTab('backend')}
               className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                 activeTab === 'backend'
-                  ? 'bg-white text-green-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-bg-paper text-green-600 shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               <span className="flex items-center justify-center space-x-2">
                 <Database className="w-4 h-4" />
-                <span>后端API ({module.backendAPIs.length})</span>
+                <span>后端API ({module.backendAPIs?.length || 0})</span>
               </span>
             </button>
           </div>
@@ -256,13 +260,13 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
           )}
           {filteredAPIs.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16 bg-bg-tertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                <Eye className="w-8 h-8 text-text-tertiary" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-text-primary mb-2">
                 {searchQuery ? '没有找到匹配的API' : '暂无API'}
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-text-secondary mb-6">
                 {searchQuery ? '请尝试调整搜索条件' : '开始为这个功能模块添加API接口'}
               </p>
               <button className="btn-primary">
@@ -284,14 +288,14 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between p-6 border-t border-border-primary bg-bg-tertiary">
           <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-text-tertiary">
               共显示 {filteredAPIs.length} 个API
             </div>
             {module.tags.length > 0 && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">标签：</span>
+                <span className="text-sm text-text-tertiary">标签：</span>
                 {module.tags.map(tag => (
                   <span key={tag} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
                     {tag}

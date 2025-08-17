@@ -165,7 +165,7 @@ const PerformanceTab: React.FC = () => {
 
         {/* 统计信息 */}
         <div className="grid grid-cols-5 gap-4 text-xs">
-          <div className="bg-white p-2 rounded border">
+          <div className="bg-bg-paper p-2 rounded border">
             <div className="text-gray-500">总计</div>
             <div className="text-lg font-semibold text-gray-800">{stats.total}</div>
           </div>
@@ -309,7 +309,7 @@ const PerformanceTab: React.FC = () => {
                     <label className="text-gray-500 font-medium">历史:</label>
                     <div className="mt-1 space-y-1 max-h-32 overflow-auto">
                       {metricsByName[selectedMetric.name].slice(-10).reverse().map((metric) => (
-                        <div key={metric.id} className="flex justify-between text-xs font-mono-nerd bg-white p-1 rounded">
+                        <div key={metric.id} className="flex justify-between text-xs font-mono-nerd bg-bg-paper p-1 rounded">
                           <span>{formatValue(metric.value, metric.unit)}</span>
                           <span className="text-gray-400">{formatTime(metric.timestamp)}</span>
                         </div>

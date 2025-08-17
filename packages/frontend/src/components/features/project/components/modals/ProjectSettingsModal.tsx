@@ -119,17 +119,17 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary">
           <div className="flex items-center space-x-3">
             <Settings className="w-6 h-6 text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-900">项目设置</h2>
+            <h2 className="text-xl font-semibold text-text-primary">项目设置</h2>
           </div>
           <button
             onClick={handleClose}
             disabled={isSaving}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors disabled:opacity-50"
           >
             <X className="w-5 h-5" />
           </button>
@@ -138,11 +138,11 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         <div className="p-6 space-y-6">
           {/* 项目基本信息 */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">基本信息</h3>
+            <h3 className="text-lg font-medium text-text-primary">基本信息</h3>
             
             {/* 项目名称 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 项目名称 <span className="text-red-500">*</span>
               </label>
               <input
@@ -150,7 +150,7 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.name ? 'border-red-300' : 'border-gray-300'
+                  errors.name ? 'border-red-300' : 'border-border-primary'
                 }`}
                 placeholder="输入项目名称"
                 disabled={isSaving}
@@ -165,14 +165,14 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
             {/* 项目描述 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 项目描述
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
+                className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
                 placeholder="输入项目描述（可选）"
                 disabled={isSaving}
               />
@@ -181,14 +181,14 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
           {/* API测试配置 */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900 flex items-center space-x-2">
+            <h3 className="text-lg font-medium text-text-primary flex items-center space-x-2">
               <Globe className="w-5 h-5 text-blue-600" />
               <span>API测试配置</span>
             </h3>
             
             {/* Base URL */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Base URL
               </label>
               <div className="flex space-x-2">
@@ -197,7 +197,7 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                   value={baseUrl}
                   onChange={(e) => setBaseUrl(e.target.value)}
                   className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.baseUrl ? 'border-red-300' : 'border-gray-300'
+                    errors.baseUrl ? 'border-red-300' : 'border-border-primary'
                   }`}
                   placeholder="https://api.example.com/v1"
                   disabled={isSaving}
@@ -216,7 +216,7 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                   <span>{errors.baseUrl}</span>
                 </p>
               )}
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-text-tertiary">
                 设置API测试的基础URL，将与接口路径组合成完整的请求地址
               </p>
             </div>
@@ -234,9 +234,9 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
             {/* 示例URL预览 */}
             {baseUrl && (
-              <div className="bg-gray-50 rounded-lg p-3">
-                <div className="text-sm text-gray-600 mb-1">示例完整URL:</div>
-                <div className="font-mono text-sm text-gray-800">
+              <div className="bg-bg-tertiary rounded-lg p-3">
+                <div className="text-sm text-text-secondary mb-1">示例完整URL:</div>
+                <div className="font-mono text-sm text-text-primary">
                   {baseUrl.replace(/\/$/, '')}/users/123
                 </div>
               </div>
@@ -245,15 +245,15 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between p-6 border-t border-border-primary bg-bg-tertiary">
+          <div className="text-sm text-text-secondary">
             项目ID: {project.id}
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={handleClose}
               disabled={isSaving}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-text-secondary bg-bg-paper border border-border-primary rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               取消
             </button>

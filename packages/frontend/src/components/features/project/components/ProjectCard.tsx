@@ -62,51 +62,51 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onDelete }) 
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-primary-600 transition-colors">
+          <h3 className="text-lg font-semibold text-text-primary truncate group-hover:text-primary-600 transition-colors">
             {project.name}
           </h3>
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-700 mt-2">
             {PROJECT_STATUS_LABELS[project.status]}
           </span>
         </div>
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={handleMenuClick}
-            className="p-1 hover:bg-gray-100 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+            className="p-1 hover:bg-bg-tertiary rounded opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <MoreVertical className="w-4 h-4 text-gray-400" />
+            <MoreVertical className="w-4 h-4 text-text-tertiary" />
           </button>
           
           {/* Dropdown Menu */}
           {showDropdown && (
-            <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+            <div className="absolute right-0 top-8 w-48 bg-bg-paper rounded-lg shadow-theme-lg border border-border-primary z-50">
               <div className="py-1">
                 {onEdit && (
                   <button
                     onClick={handleEdit}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    className="flex items-center w-full px-4 py-2 text-sm text-text-secondary hover:bg-bg-tertiary transition-colors"
                   >
-                    <Edit3 className="w-4 h-4 mr-3 text-gray-500" />
+                    <Edit3 className="w-4 h-4 mr-3 text-text-tertiary" />
                     编辑项目
                   </button>
                 )}
                 
                 <button
                   onClick={handleArchive}
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="flex items-center w-full px-4 py-2 text-sm text-text-secondary hover:bg-bg-tertiary transition-colors"
                 >
-                  <Archive className="w-4 h-4 mr-3 text-gray-500" />
+                  <Archive className="w-4 h-4 mr-3 text-text-tertiary" />
                   归档项目
                 </button>
                 
-                <div className="border-t border-gray-100 my-1"></div>
+                <div className="border-t border-border-secondary my-1"></div>
                 
                 {onDelete && (
                   <button
                     onClick={handleDelete}
-                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className="flex items-center w-full px-4 py-2 text-sm text-status-error hover:bg-status-error hover:bg-opacity-10 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4 mr-3 text-red-500" />
+                    <Trash2 className="w-4 h-4 mr-3 text-status-error" />
                     删除项目
                   </button>
                 )}
@@ -118,7 +118,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onDelete }) 
 
       {/* Description */}
       {project.description && (
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        <p className="text-text-secondary text-sm mb-4 line-clamp-2">
           {project.description}
         </p>
       )}
@@ -126,27 +126,27 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onDelete }) 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="flex items-center space-x-2">
-          <Code2 className="w-4 h-4 text-blue-500" />
+          <Code2 className="w-4 h-4 text-primary-500" />
           <div>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-text-primary">
               {project._count?.apis || 0}
             </p>
-            <p className="text-xs text-gray-600">APIs</p>
+            <p className="text-xs text-text-secondary">APIs</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Tag className="w-4 h-4 text-green-500" />
+          <Tag className="w-4 h-4 text-status-success" />
           <div>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-text-primary">
               {project._count?.tags || 0}
             </p>
-            <p className="text-xs text-gray-600">标签</p>
+            <p className="text-xs text-text-secondary">标签</p>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-100">
+      <div className="flex items-center justify-between text-xs text-text-tertiary pt-4 border-t border-border-primary">
         <div className="flex items-center space-x-1">
           <Calendar className="w-3 h-3" />
           <span>

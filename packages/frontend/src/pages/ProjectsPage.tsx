@@ -60,8 +60,8 @@ const ProjectsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">项目管理</h1>
-          <p className="text-gray-600">管理你的所有API项目</p>
+          <h1 className="text-2xl font-bold text-text-primary">项目管理</h1>
+          <p className="text-text-secondary">管理你的所有API项目</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
@@ -78,7 +78,7 @@ const ProjectsPage: React.FC = () => {
           {/* Search */}
           <div className="flex-1 max-w-md">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary w-4 h-4" />
               <input
                 type="text"
                 placeholder="搜索项目..."
@@ -91,7 +91,7 @@ const ProjectsPage: React.FC = () => {
 
           {/* Status Filter */}
           <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+            <Filter className="w-4 h-4 text-text-tertiary" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | '')}
@@ -107,13 +107,13 @@ const ProjectsPage: React.FC = () => {
           </div>
 
           {/* View Mode */}
-          <div className="flex items-center space-x-1 border border-gray-300 rounded-lg p-1">
+          <div className="flex items-center space-x-1 border border-border-primary rounded-lg p-1">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded ${
                 viewMode === 'grid'
                   ? 'bg-primary-100 text-primary-600'
-                  : 'text-gray-400 hover:text-gray-600'
+                  : 'text-text-tertiary hover:text-text-secondary'
               }`}
             >
               <Grid className="w-4 h-4" />
@@ -123,7 +123,7 @@ const ProjectsPage: React.FC = () => {
               className={`p-2 rounded ${
                 viewMode === 'list'
                   ? 'bg-primary-100 text-primary-600'
-                  : 'text-gray-400 hover:text-gray-600'
+                  : 'text-text-tertiary hover:text-text-secondary'
               }`}
             >
               <List className="w-4 h-4" />
@@ -138,28 +138,28 @@ const ProjectsPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="card animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                <div className="h-6 bg-bg-tertiary rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-bg-tertiary rounded w-full mb-2"></div>
+                <div className="h-4 bg-bg-tertiary rounded w-2/3"></div>
               </div>
             ))}
           </div>
         ) : error ? (
           <div className="card text-center py-12">
-            <p className="text-red-600 mb-4">加载项目失败</p>
+            <p className="text-error-600 mb-4">加载项目失败</p>
             <button onClick={() => refetch()} className="btn-primary">
               重试
             </button>
           </div>
         ) : projects.length === 0 ? (
           <div className="card text-center py-12">
-            <div className="text-gray-400 mb-4">
+            <div className="text-text-tertiary mb-4">
               <Plus className="w-12 h-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-text-primary mb-2">
               还没有项目
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-text-secondary mb-6">
               创建你的第一个项目开始管理API
             </p>
             <button
@@ -188,30 +188,30 @@ const ProjectsPage: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">
+                  <tr className="border-b border-border-secondary">
+                    <th className="text-left py-3 px-4 font-medium text-text-primary">
                       项目名称
                     </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">
+                    <th className="text-left py-3 px-4 font-medium text-text-primary">
                       描述
                     </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">
+                    <th className="text-left py-3 px-4 font-medium text-text-primary">
                       API数量
                     </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">
+                    <th className="text-left py-3 px-4 font-medium text-text-primary">
                       状态
                     </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">
+                    <th className="text-left py-3 px-4 font-medium text-text-primary">
                       更新时间
                     </th>
-                    <th className="text-right py-3 px-4 font-medium text-gray-900">
+                    <th className="text-right py-3 px-4 font-medium text-text-primary">
                       操作
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {projects.map((project: Project) => (
-                    <tr key={project.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={project.id} className="border-b border-border-tertiary hover:bg-bg-secondary">
                       <td className="py-3 px-4">
                         <Link
                           to={`/projects/${project.id}`}
@@ -220,18 +220,18 @@ const ProjectsPage: React.FC = () => {
                           {project.name}
                         </Link>
                       </td>
-                      <td className="py-3 px-4 text-gray-600">
+                      <td className="py-3 px-4 text-text-secondary">
                         {project.description || '-'}
                       </td>
-                      <td className="py-3 px-4 text-gray-600">
+                      <td className="py-3 px-4 text-text-secondary">
                         {project._count?.apis || 0}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="status-badge bg-green-100 text-green-800">
+                        <span className="status-badge bg-success-100 text-success-800">
                           {PROJECT_STATUS_LABELS[project.status]}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-gray-600">
+                      <td className="py-3 px-4 text-text-secondary">
                         {new Date(project.updatedAt).toLocaleDateString('zh-CN')}
                       </td>
                       <td className="py-3 px-4 text-right">
@@ -241,7 +241,7 @@ const ProjectsPage: React.FC = () => {
                               e.preventDefault()
                               handleEditProject(project)
                             }}
-                            className="text-sm text-blue-600 hover:text-blue-800"
+                            className="text-sm text-primary-600 hover:text-primary-800"
                           >
                             编辑
                           </button>
@@ -250,7 +250,7 @@ const ProjectsPage: React.FC = () => {
                               e.preventDefault()
                               handleDeleteProject(project)
                             }}
-                            className="text-sm text-red-600 hover:text-red-800"
+                            className="text-sm text-error-600 hover:text-error-800"
                           >
                             删除
                           </button>

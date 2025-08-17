@@ -181,7 +181,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
           name: 'Ollama Local',
           displayName: 'Ollama Local',
           description: '本地AI模型服务，支持多种开源模型',
-          icon: '/static/images/Ollama.png',
+          icon: '/images/Ollama.png',
           pros: ['完全本地运行', '数据安全', '无API费用', '支持离线使用'],
           cons: ['需要本地安装', '占用计算资源']
         }
@@ -190,7 +190,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
           name: 'DeepSeek Coder',
           displayName: 'DeepSeek Coder',
           description: 'DeepSeek专业代码生成模型',
-          icon: '/static/images/deepseek.png',
+          icon: '/images/deepseek.png',
           pros: ['性价比极高', '代码理解能力强', '中文支持好', '响应速度快'],
           cons: ['需要网络连接', '按使用量付费']
         }
@@ -199,7 +199,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
           name: 'OpenAI GPT',
           displayName: 'OpenAI GPT',
           description: 'OpenAI官方API服务，包括GPT-4等模型',
-          icon: '/static/images/openai.png',
+          icon: '/images/openai.png',
           pros: ['理解能力最强', '稳定性好', '生态完善'],
           cons: ['价格较高', '需要网络连接', '国内访问限制']
         }
@@ -212,19 +212,19 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary bg-gradient-header">
           <div className="flex items-center space-x-3">
-            <Brain className="w-8 h-8 text-blue-500" />
+            <Brain className="w-8 h-8 text-primary-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">AI解析配置</h2>
-              <p className="text-gray-600">配置AI服务提供商和模型参数</p>
+              <h2 className="text-xl font-semibold text-text-primary">AI解析配置</h2>
+              <p className="text-text-secondary">配置AI服务提供商和模型参数</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -236,7 +236,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
 
             {/* AI提供商选择 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 AI服务提供商
               </label>
               
@@ -248,8 +248,8 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
                       key={provider}
                       className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-colors ${
                         config.provider === provider
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-primary-500 bg-primary-50'
+                          : 'border-border-primary hover:border-primary-300'
                       }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -259,7 +259,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
                           value={provider}
                           checked={config.provider === provider}
                           onChange={(e) => handleConfigChange('provider', e.target.value)}
-                          className="rounded border-gray-300"
+                          className="rounded border-border-primary text-primary-600 focus:ring-primary-500 bg-bg-paper"
                         />
                         {info?.icon && (
                           <img 
@@ -273,7 +273,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
                         )}
                         <div>
                           <span className="font-medium text-sm">{info?.displayName}</span>
-                          <p className="text-xs text-gray-500 mt-1">{info?.description}</p>
+                          <p className="text-xs text-text-tertiary mt-1">{info?.description}</p>
                         </div>
                       </div>
                       <div className="w-2 h-2 rounded-full bg-green-500" />
@@ -285,7 +285,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
 
             {/* 提供商信息展示 */}
             {providerInfo && (
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-bg-tertiary rounded-lg p-4">
                 <div className="flex items-center space-x-3 mb-3">
                   {providerInfo.icon && (
                     <img 
@@ -297,9 +297,9 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
                       }}
                     />
                   )}
-                  <span className="font-medium text-gray-900">{providerInfo.name}</span>
+                  <span className="font-medium text-text-primary">{providerInfo.name}</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-3">{providerInfo.description}</p>
+                <p className="text-sm text-text-secondary mb-3">{providerInfo.description}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <div className="font-medium text-green-700 mb-1">优势:</div>
@@ -324,14 +324,14 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
             {/* 模型选择 */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-text-secondary">
                   模型选择
                 </label>
                 {config.provider === 'ollama' && (
                   <button
                     onClick={loadOllamaModels}
                     disabled={isLoadingModels}
-                    className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                    className="flex items-center space-x-1 text-xs text-primary-600 hover:text-primary-800 disabled:opacity-50"
                   >
                     <RefreshCw className={`w-3 h-3 ${isLoadingModels ? 'animate-spin' : ''}`} />
                     <span>刷新</span>
@@ -340,15 +340,15 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
               </div>
               
               {isLoadingModels ? (
-                <div className="flex items-center justify-center py-8 border border-gray-300 rounded-lg">
-                  <Loader2 className="w-5 h-5 animate-spin text-blue-600 mr-2" />
-                  <span className="text-sm text-gray-600">加载模型列表...</span>
+                <div className="flex items-center justify-center py-8 border border-border-primary rounded-lg">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary-600 mr-2" />
+                  <span className="text-sm text-text-secondary">加载模型列表...</span>
                 </div>
               ) : (
                 <select
                   value={config.model}
                   onChange={(e) => handleConfigChange('model', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-bg-paper text-text-primary"
                 >
                   {availableModels.map((model) => (
                     <option key={model.name || model.model} value={model.name || model.model}>
@@ -387,7 +387,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
             {/* Base URL */}
             {config.provider !== 'deepseek' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   Base URL
                 </label>
                 <input
@@ -399,10 +399,10 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
                     config.provider === 'openai' ? '留空使用默认地址' :
                     ''
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-bg-paper text-text-primary"
                 />
                 {config.provider === 'openai' && (
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-text-tertiary">
                     留空将使用默认的 OpenAI API 地址
                   </p>
                 )}
@@ -412,7 +412,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
             {/* API密钥 */}
             {config.provider !== 'ollama' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   API密钥
                 </label>
                 <input
@@ -420,9 +420,9 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
                   value={config.apiKey || ''}
                   onChange={(e) => handleConfigChange('apiKey', e.target.value)}
                   placeholder="请输入API密钥"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-bg-paper text-text-primary"
                 />
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-text-tertiary">
                   API密钥将安全存储在本地，不会上传到服务器
                 </p>
               </div>
@@ -433,11 +433,11 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
               <button
                 onClick={testConnection}
                 disabled={isTestingConnection}
-                className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                className="px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-lg hover:bg-primary-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
               >
                 {isTestingConnection ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
                     <span>测试中...</span>
                   </>
                 ) : (
@@ -466,8 +466,8 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between p-6 border-t border-border-primary bg-bg-tertiary">
+          <div className="text-sm text-text-secondary">
             配置将保存在本地，用于API文档和数据库文档的智能解析
           </div>
           <div className="flex items-center space-x-3">

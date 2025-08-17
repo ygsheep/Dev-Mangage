@@ -128,8 +128,8 @@ export class AIParsingService {
         includeIndexes: true,
         includeConstraints: true,
         includeForeignKeys: true,
-        formatStyle: 'compact',
-        ...options
+        ...options,
+        formatStyle: 'pretty'
       })
 
       const result: GenerateResult = {

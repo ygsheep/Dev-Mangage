@@ -565,26 +565,41 @@ router.post('/table/:tableId/analyze', [
       lastAnalyzed: new Date()
     }
 
-    // 更新或创建统计信息
-    const statistics = await prisma.tableStatistics.upsert({
-      where: { 
-        tableId: tableId 
-      },
-      update: mockAnalysis,
-      create: {
-        tableId,
-        ...mockAnalysis
-      },
-      include: {
-        table: {
-          select: {
-            id: true,
-            name: true,
-            displayName: true
-          }
-        }
-      }
+    // 查找现有统计信息
+    const existingStats = await prisma.tableStatistics.findFirst({
+      where: { tableId }
     })
+
+    // 更新或创建统计信息
+    const statistics = existingStats 
+      ? await prisma.tableStatistics.update({
+          where: { id: existingStats.id },
+          data: mockAnalysis,
+          include: {
+            table: {
+              select: {
+                id: true,
+                name: true,
+                displayName: true
+              }
+            }
+          }
+        })
+      : await prisma.tableStatistics.create({
+          data: {
+            tableId,
+            ...mockAnalysis
+          },
+          include: {
+            table: {
+              select: {
+                id: true,
+                name: true,
+                displayName: true
+              }
+            }
+          }
+        })
 
     logger.info('表分析完成', {
       tableId,
@@ -647,13 +662,22 @@ router.post('/project/:projectId/analyze-all', [
     }))
 
     // 批量更新统计信息
-    const updatePromises = analysisResults.map(result =>
-      prisma.tableStatistics.upsert({
-        where: { tableId: result.tableId },
-        update: result,
-        create: result
+    const updatePromises = analysisResults.map(async (result) => {
+      const existing = await prisma.tableStatistics.findFirst({
+        where: { tableId: result.tableId }
       })
-    )
+      
+      if (existing) {
+        return prisma.tableStatistics.update({
+          where: { id: existing.id },
+          data: result
+        })
+      } else {
+        return prisma.tableStatistics.create({
+          data: result
+        })
+      }
+    })
 
     await Promise.all(updatePromises)
 

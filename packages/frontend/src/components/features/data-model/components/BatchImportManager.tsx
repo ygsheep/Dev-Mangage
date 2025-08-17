@@ -308,14 +308,14 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
         {/* 头部 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-header">
           <div className="flex items-center space-x-3">
             <Users className="w-8 h-8 text-purple-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">批量导入管理器</h2>
-              <p className="text-gray-600">智能批量解析多个文档，高效管理导入流程</p>
+              <h2 className="text-xl font-semibold text-text-primary">批量导入管理器</h2>
+              <p className="text-text-secondary">智能批量解析多个文档，高效管理导入流程</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -341,7 +341,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
             <div className="space-y-6">
               {/* 文档上传区域 */}
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+                <h3 className="font-medium text-text-primary mb-3 flex items-center">
                   <Upload className="w-5 h-5 mr-2" />
                   添加文档文件
                 </h3>
@@ -356,7 +356,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                   onDragOver={(e) => e.preventDefault()}
                 >
                   <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-600 mb-1">点击选择文件或拖拽到此处</p>
+                  <p className="text-text-secondary mb-1">点击选择文件或拖拽到此处</p>
                   <p className="text-sm text-gray-500">支持 MD, SQL, Excel, Word, PDF, JSON 等格式</p>
                   
                   <input
@@ -375,7 +375,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                 
                 {documents.length > 0 && (
                   <div className="flex justify-between items-center mt-4">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-text-secondary">
                       已添加 {documents.length} 个文档
                     </span>
                     <button
@@ -390,7 +390,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
 
               {/* 处理配置 */}
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+                <h3 className="font-medium text-text-primary mb-3 flex items-center">
                   <Settings className="w-5 h-5 mr-2" />
                   处理配置
                 </h3>
@@ -484,9 +484,9 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
 
               {/* 文档列表 */}
               {documents.length > 0 && (
-                <div className="bg-white rounded-lg border border-gray-200">
+                <div className="bg-bg-paper rounded-lg border border-gray-200">
                   <div className="px-4 py-3 border-b border-gray-200">
-                    <h3 className="font-medium text-gray-900">文档列表</h3>
+                    <h3 className="font-medium text-text-primary">文档列表</h3>
                   </div>
                   <div className="max-h-64 overflow-y-auto">
                     {documents.map((doc, index) => (
@@ -494,7 +494,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                         <div className="flex items-center space-x-3 flex-1 min-w-0">
                           <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm text-gray-900 truncate">
+                            <p className="font-medium text-sm text-text-primary truncate">
                               {doc.filename}
                             </p>
                             <p className="text-xs text-gray-500">
@@ -562,26 +562,26 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                   
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-600">状态：</span>
+                      <span className="text-text-secondary">状态：</span>
                       <span className="font-medium">{getStatusText(currentJob.status)}</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">进度：</span>
+                      <span className="text-text-secondary">进度：</span>
                       <span className="font-medium">{currentJob.processedDocuments}/{currentJob.totalDocuments}</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">成功：</span>
+                      <span className="text-text-secondary">成功：</span>
                       <span className="font-medium text-green-600">{currentJob.successfulDocuments}</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">失败：</span>
+                      <span className="text-text-secondary">失败：</span>
                       <span className="font-medium text-red-600">{currentJob.failedDocuments}</span>
                     </div>
                   </div>
 
                   {/* 进度条 */}
                   <div className="mt-4">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <div className="flex justify-between text-sm text-text-secondary mb-1">
                       <span>处理进度</span>
                       <span>{calculateProgress()}%</span>
                     </div>
@@ -594,7 +594,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                   </div>
 
                   {currentJob.currentDocument && (
-                    <div className="mt-3 text-sm text-gray-600">
+                    <div className="mt-3 text-sm text-text-secondary">
                       正在处理：{currentJob.currentDocument}
                     </div>
                   )}
@@ -602,9 +602,9 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
 
                 {/* 结果详情 */}
                 {currentJob.results && (
-                  <div className="bg-white rounded-lg border border-gray-200">
+                  <div className="bg-bg-paper rounded-lg border border-gray-200">
                     <div className="px-4 py-3 border-b border-gray-200">
-                      <h3 className="font-medium text-gray-900 flex items-center">
+                      <h3 className="font-medium text-text-primary flex items-center">
                         <BarChart3 className="w-5 h-5 mr-2" />
                         处理结果
                       </h3>
@@ -612,15 +612,15 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                     <div className="p-4">
                       <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                         <div>
-                          <span className="text-gray-600">总表数：</span>
+                          <span className="text-text-secondary">总表数：</span>
                           <span className="font-medium">{currentJob.results.report.totalTables}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">成功率：</span>
+                          <span className="text-text-secondary">成功率：</span>
                           <span className="font-medium">{currentJob.results.report.successRate}%</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">处理时间：</span>
+                          <span className="text-text-secondary">处理时间：</span>
                           <span className="font-medium">{currentJob.results.report.processingTime}ms</span>
                         </div>
                       </div>
@@ -637,7 +637,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                               )}
                               <span className="text-sm font-medium">{doc.filename}</span>
                             </div>
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-text-secondary">
                               {doc.status === 'success' ? `${doc.tablesFound} 张表` : doc.error}
                             </div>
                           </div>
@@ -650,10 +650,10 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
             ) : (
               <div className="text-center py-12">
                 <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <h3 className="text-lg font-medium text-text-primary mb-2">
                   批量导入监控
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-text-secondary mb-6">
                   添加文档并配置选项后开始批量导入，这里将显示实时进度
                 </p>
               </div>
@@ -661,9 +661,9 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
 
             {/* 任务历史 */}
             {showJobHistory && allJobs.length > 0 && (
-              <div className="mt-6 bg-white rounded-lg border border-gray-200">
+              <div className="mt-6 bg-bg-paper rounded-lg border border-gray-200">
                 <div className="px-4 py-3 border-b border-gray-200">
-                  <h3 className="font-medium text-gray-900">任务历史</h3>
+                  <h3 className="font-medium text-text-primary">任务历史</h3>
                 </div>
                 <div className="max-h-40 overflow-y-auto">
                   {allJobs.slice(0, 10).map((job) => (
@@ -677,7 +677,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                           </p>
                         </div>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-text-secondary">
                         {job.successfulDocuments}/{job.totalDocuments}
                       </div>
                     </div>

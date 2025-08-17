@@ -1,21 +1,45 @@
 import { Router } from 'express'
-import { validateRequest } from '../middleware/validation'
-import { body, param, query } from 'express-validator'
+import { z } from 'zod'
+import { asyncHandler } from '../middleware/errorHandler'
+import { validateBody, validateParams, validateQuery } from '../middleware/validation'
 
 const router = Router()
+
+// Validation schemas
+const projectParamsSchema = z.object({
+  projectId: z.string().min(1),
+})
+
+const moduleParamsSchema = z.object({
+  projectId: z.string().min(1),
+  moduleId: z.string().min(1),
+})
+
+const moduleQuerySchema = z.object({
+  status: z.enum(['planned', 'in-progress', 'completed']).optional(),
+  search: z.string().optional(),
+})
+
+const createModuleSchema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  category: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+})
+
+const updateModuleSchema = createModuleSchema.partial().extend({
+  status: z.enum(['planned', 'in-progress', 'completed']).optional(),
+})
 
 /**
  * 获取项目功能模块
  */
-router.get('/:projectId/modules', [
-  param('projectId').isUUID().withMessage('项目ID必须是有效的UUID'),
-  query('status').optional().isIn(['planned', 'in-progress', 'completed']).withMessage('状态值无效'),
-  query('search').optional().isString().withMessage('搜索关键词必须是字符串'),
-  validateRequest
-], async (req, res, next) => {
-  try {
+router.get('/:projectId/modules',
+  validateParams(projectParamsSchema),
+  validateQuery(moduleQuerySchema),
+  asyncHandler(async (req, res) => {
     const { projectId } = req.params
-    const { status, search } = req.query
+    const { status, search } = req.query as any
 
     // 模拟功能模块数据 - 基于真实项目需求
     const allModules = [
@@ -213,20 +237,15 @@ router.get('/:projectId/modules', [
       },
       message: '功能模块获取成功'
     })
-  } catch (error) {
-    next(error)
-  }
-})
+  })
+)
 
 /**
  * 获取功能模块详情
  */
-router.get('/:projectId/modules/:moduleId', [
-  param('projectId').isUUID().withMessage('项目ID必须是有效的UUID'),
-  param('moduleId').isString().withMessage('模块ID必须是字符串'),
-  validateRequest
-], async (req, res, next) => {
-  try {
+router.get('/:projectId/modules/:moduleId',
+  validateParams(moduleParamsSchema),
+  asyncHandler(async (req, res) => {
     const { projectId, moduleId } = req.params
 
     // 模拟单个功能模块详情数据
@@ -271,23 +290,16 @@ router.get('/:projectId/modules/:moduleId', [
       data: moduleDetails,
       message: '功能模块详情获取成功'
     })
-  } catch (error) {
-    next(error)
-  }
-})
+  })
+)
 
 /**
  * 创建功能模块
  */
-router.post('/:projectId/modules', [
-  param('projectId').isUUID().withMessage('项目ID必须是有效的UUID'),
-  body('name').isString().isLength({ min: 1, max: 100 }).withMessage('模块名称长度必须在1-100之间'),
-  body('description').optional().isString().isLength({ max: 500 }).withMessage('描述长度不能超过500字符'),
-  body('category').optional().isString().withMessage('分类必须是字符串'),
-  body('tags').optional().isArray().withMessage('标签必须是数组'),
-  validateRequest
-], async (req, res, next) => {
-  try {
+router.post('/:projectId/modules',
+  validateParams(projectParamsSchema),
+  validateBody(createModuleSchema),
+  asyncHandler(async (req, res) => {
     const { projectId } = req.params
     const { name, description, category, tags } = req.body
 
@@ -309,23 +321,16 @@ router.post('/:projectId/modules', [
       data: newModule,
       message: '功能模块创建成功'
     })
-  } catch (error) {
-    next(error)
-  }
-})
+  })
+)
 
 /**
  * 更新功能模块
  */
-router.put('/:projectId/modules/:moduleId', [
-  param('projectId').isUUID().withMessage('项目ID必须是有效的UUID'),
-  param('moduleId').isString().withMessage('模块ID必须是字符串'),
-  body('name').optional().isString().isLength({ min: 1, max: 100 }).withMessage('模块名称长度必须在1-100之间'),
-  body('description').optional().isString().isLength({ max: 500 }).withMessage('描述长度不能超过500字符'),
-  body('status').optional().isIn(['planned', 'in-progress', 'completed']).withMessage('状态值无效'),
-  validateRequest
-], async (req, res, next) => {
-  try {
+router.put('/:projectId/modules/:moduleId',
+  validateParams(moduleParamsSchema),
+  validateBody(updateModuleSchema),
+  asyncHandler(async (req, res) => {
     const { projectId, moduleId } = req.params
     const updateData = req.body
 
@@ -341,37 +346,28 @@ router.put('/:projectId/modules/:moduleId', [
       data: updatedModule,
       message: '功能模块更新成功'
     })
-  } catch (error) {
-    next(error)
-  }
-})
+  })
+)
 
 /**
  * 删除功能模块
  */
-router.delete('/:projectId/modules/:moduleId', [
-  param('projectId').isUUID().withMessage('项目ID必须是有效的UUID'),
-  param('moduleId').isString().withMessage('模块ID必须是字符串'),
-  validateRequest
-], async (req, res, next) => {
-  try {
+router.delete('/:projectId/modules/:moduleId',
+  validateParams(moduleParamsSchema),
+  asyncHandler(async (req, res) => {
     res.json({
       success: true,
       message: '功能模块删除成功'
     })
-  } catch (error) {
-    next(error)
-  }
-})
+  })
+)
 
 /**
  * 获取功能模块统计信息
  */
-router.get('/:projectId/modules/stats', [
-  param('projectId').isUUID().withMessage('项目ID必须是有效的UUID'),
-  validateRequest
-], async (req, res, next) => {
-  try {
+router.get('/:projectId/modules/stats',
+  validateParams(projectParamsSchema),
+  asyncHandler(async (req, res) => {
     const stats = {
       totalModules: 5,
       completedModules: 2,
@@ -392,9 +388,7 @@ router.get('/:projectId/modules/stats', [
       data: stats,
       message: '功能模块统计信息获取成功'
     })
-  } catch (error) {
-    next(error)
-  }
-})
+  })
+)
 
 export { router as featuresRouter }

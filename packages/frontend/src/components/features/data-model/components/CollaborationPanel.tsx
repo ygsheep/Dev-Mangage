@@ -213,7 +213,7 @@ const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <MessageSquare className="w-6 h-6 text-blue-500" />
-          <h3 className="text-lg font-medium text-gray-900">
+          <h3 className="text-lg font-medium text-text-primary">
             协作讨论 ({filteredComments.length})
           </h3>
         </div>
@@ -295,15 +295,15 @@ const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
         {isLoading ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4" />
-            <p className="text-gray-600">加载评论中...</p>
+            <p className="text-text-secondary">加载评论中...</p>
           </div>
         ) : filteredComments.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h4 className="text-lg font-medium text-gray-900 mb-2">
+            <h4 className="text-lg font-medium text-text-primary mb-2">
               {searchQuery || filter !== 'all' ? '没有找到相关评论' : '暂无评论'}
             </h4>
-            <p className="text-gray-600">
+            <p className="text-text-secondary">
               {searchQuery || filter !== 'all' 
                 ? '请尝试调整搜索条件或筛选器' 
                 : '成为第一个发表评论的人'}
@@ -378,7 +378,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
           
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-medium text-gray-900">{comment.authorName}</span>
+              <span className="font-medium text-text-primary">{comment.authorName}</span>
               {comment.isResolved && (
                 <CheckCircle className="w-4 h-4 text-green-500" title="已解决" />
               )}
@@ -400,7 +400,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowActions(!showActions)}
-            className="p-1 text-gray-400 hover:text-gray-600 rounded"
+            className="p-1 text-gray-400 hover:text-text-secondary rounded"
           >
             <MoreHorizontal className="w-4 h-4" />
           </button>
@@ -501,7 +501,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             </div>
           </div>
         ) : (
-          <div className="text-gray-900 whitespace-pre-wrap">{comment.content}</div>
+          <div className="text-text-primary whitespace-pre-wrap">{comment.content}</div>
         )}
       </div>
 
@@ -550,7 +550,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-medium">
                     {reply.authorName.charAt(0)}
                   </div>
-                  <span className="font-medium text-gray-900 text-sm">{reply.authorName}</span>
+                  <span className="font-medium text-text-primary text-sm">{reply.authorName}</span>
                   <span className="text-xs text-gray-500">{formatTime(reply.createdAt)}</span>
                 </div>
                 
@@ -563,7 +563,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   </button>
                 )}
               </div>
-              <div className="text-gray-900 text-sm whitespace-pre-wrap">{reply.content}</div>
+              <div className="text-text-primary text-sm whitespace-pre-wrap">{reply.content}</div>
             </div>
           ))}
         </div>

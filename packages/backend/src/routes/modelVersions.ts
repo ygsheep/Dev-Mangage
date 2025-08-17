@@ -597,9 +597,9 @@ router.get('/:id/compare/:compareId', [
     for (const [tableId, table] of tables2Map) {
       if (!tables1Map.has(tableId)) {
         comparison.differences.tables.added.push({
-          id: table.id,
-          name: table.name,
-          displayName: table.displayName
+          id: (table as any).id,
+          name: (table as any).name,
+          displayName: (table as any).displayName
         })
       }
     }
@@ -608,9 +608,9 @@ router.get('/:id/compare/:compareId', [
     for (const [tableId, table] of tables1Map) {
       if (!tables2Map.has(tableId)) {
         comparison.differences.tables.removed.push({
-          id: table.id,
-          name: table.name,
-          displayName: table.displayName
+          id: (table as any).id,
+          name: (table as any).name,
+          displayName: (table as any).displayName
         })
       }
     }
@@ -620,16 +620,16 @@ router.get('/:id/compare/:compareId', [
       const table2 = tables2Map.get(tableId)
       if (table2) {
         // 简单的差异检测（可以根据需要扩展）
-        if (table1.name !== table2.name || 
-            table1.displayName !== table2.displayName ||
-            table1.fields.length !== table2.fields.length) {
+        if ((table1 as any).name !== (table2 as any).name || 
+            (table1 as any).displayName !== (table2 as any).displayName ||
+            (table1 as any).fields.length !== (table2 as any).fields.length) {
           comparison.differences.tables.modified.push({
             id: tableId,
-            name: table2.name,
+            name: (table2 as any).name,
             changes: {
-              nameChanged: table1.name !== table2.name,
-              displayNameChanged: table1.displayName !== table2.displayName,
-              fieldsCountChanged: table1.fields.length !== table2.fields.length
+              nameChanged: (table1 as any).name !== (table2 as any).name,
+              displayNameChanged: (table1 as any).displayName !== (table2 as any).displayName,
+              fieldsCountChanged: (table1 as any).fields.length !== (table2 as any).fields.length
             }
           })
         }

@@ -107,7 +107,7 @@ const DraggableWindow: React.FC<DraggableWindowProps> = ({
   return (
     <div
       ref={windowRef}
-      className={`fixed bg-white border border-gray-300 shadow-lg rounded-lg overflow-hidden z-50 ${className}`}
+      className={`fixed bg-bg-paper border border-gray-300 shadow-lg rounded-lg overflow-hidden z-50 ${className}`}
       style={{
         left: position.x,
         top: position.y,

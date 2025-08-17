@@ -77,7 +77,7 @@ const APITestModal: React.FC<APITestModalProps> = ({
   if (!isOpen || !api) return null
 
   const getMethodColor = (method: HTTPMethod) => {
-    return HTTP_METHOD_COLORS[method] || 'bg-gray-100 text-gray-800'
+    return HTTP_METHOD_COLORS[method] || 'bg-bg-tertiary text-text-primary'
   }
 
   const addCustomHeader = () => {
@@ -229,51 +229,51 @@ const APITestModal: React.FC<APITestModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary bg-gradient-header">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <span className={`px-3 py-1 rounded text-sm font-mono font-medium ${getMethodColor(api.method as HTTPMethod)}`}>
                 {api.method}
               </span>
-              <span className="text-lg font-semibold text-gray-900">{api.name}</span>
+              <span className="text-lg font-semibold text-text-primary">{api.name}</span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Base URL Configuration */}
-        <div className="p-4 bg-gray-50 border-b border-gray-200">
+        <div className="p-4 bg-bg-tertiary border-b border-border-primary">
           <div className="flex items-center space-x-3">
-            <Settings className="w-4 h-4 text-gray-500" />
-            <label className="text-sm font-medium text-gray-700">Base URL:</label>
+            <Settings className="w-4 h-4 text-text-tertiary" />
+            <label className="text-sm font-medium text-text-secondary">Base URL:</label>
             <input
               type="text"
               value={baseUrl}
               onChange={(e) => handleBaseUrlChange(e.target.value)}
               placeholder="https://api.example.com/v1"
-              className="flex-1 px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-3 py-1 border border-border-primary rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-text-tertiary">
               完整URL: {testRequest.url}
             </div>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 bg-gray-50">
+        <div className="flex border-b border-border-primary bg-bg-tertiary">
           <button
             onClick={() => setActiveTab('request')}
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'request'
-                ? 'border-blue-500 text-blue-600 bg-white'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-primary-500 text-primary-600 bg-bg-paper'
+                : 'border-transparent text-text-tertiary hover:text-text-secondary'
             }`}
           >
             <div className="flex items-center space-x-2">
@@ -285,8 +285,8 @@ const APITestModal: React.FC<APITestModalProps> = ({
             onClick={() => setActiveTab('response')}
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'response'
-                ? 'border-blue-500 text-blue-600 bg-white'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-primary-500 text-primary-600 bg-bg-paper'
+                : 'border-transparent text-text-tertiary hover:text-text-secondary'
             }`}
           >
             <div className="flex items-center space-x-2">
@@ -298,8 +298,8 @@ const APITestModal: React.FC<APITestModalProps> = ({
             onClick={() => setActiveTab('history')}
             className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'history'
-                ? 'border-blue-500 text-blue-600 bg-white'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-primary-500 text-primary-600 bg-bg-paper'
+                : 'border-transparent text-text-tertiary hover:text-text-secondary'
             }`}
           >
             <div className="flex items-center space-x-2">
@@ -316,7 +316,7 @@ const APITestModal: React.FC<APITestModalProps> = ({
               {/* Headers */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-gray-700 flex items-center space-x-2">
+                  <h3 className="text-sm font-medium text-text-secondary flex items-center space-x-2">
                     <span>请求头</span>
                   </h3>
                   <button
@@ -330,9 +330,9 @@ const APITestModal: React.FC<APITestModalProps> = ({
                 
                 {showHeaders && (
                   <div className="space-y-2">
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded">
-                      <div className="text-xs font-medium text-gray-600">Content-Type: application/json</div>
-                      <div className="text-xs font-medium text-gray-600">Accept: application/json</div>
+                    <div className="grid grid-cols-2 gap-3 p-3 bg-bg-tertiary rounded">
+                      <div className="text-xs font-medium text-text-secondary">Content-Type: application/json</div>
+                      <div className="text-xs font-medium text-text-secondary">Accept: application/json</div>
                     </div>
                     
                     {customHeaders.map((header, index) => (
@@ -342,14 +342,14 @@ const APITestModal: React.FC<APITestModalProps> = ({
                           placeholder="Header名称"
                           value={header.key}
                           onChange={(e) => updateCustomHeader(index, 'key', e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
+                          className="flex-1 px-3 py-2 border border-border-primary rounded text-sm"
                         />
                         <input
                           type="text"
                           placeholder="Header值"
                           value={header.value}
                           onChange={(e) => updateCustomHeader(index, 'value', e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
+                          className="flex-1 px-3 py-2 border border-border-primary rounded text-sm"
                         />
                         <button
                           onClick={() => removeCustomHeader(index)}
@@ -374,7 +374,7 @@ const APITestModal: React.FC<APITestModalProps> = ({
               {/* Query Parameters */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-gray-700">查询参数</h3>
+                  <h3 className="text-sm font-medium text-text-secondary">查询参数</h3>
                   <button
                     onClick={() => setShowParams(!showParams)}
                     className="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1"
@@ -393,14 +393,14 @@ const APITestModal: React.FC<APITestModalProps> = ({
                           placeholder="参数名"
                           value={param.key}
                           onChange={(e) => updateCustomParam(index, 'key', e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
+                          className="flex-1 px-3 py-2 border border-border-primary rounded text-sm"
                         />
                         <input
                           type="text"
                           placeholder="参数值"
                           value={param.value}
                           onChange={(e) => updateCustomParam(index, 'value', e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
+                          className="flex-1 px-3 py-2 border border-border-primary rounded text-sm"
                         />
                         <button
                           onClick={() => removeCustomParam(index)}
@@ -425,12 +425,12 @@ const APITestModal: React.FC<APITestModalProps> = ({
               {/* Request Body */}
               {['POST', 'PUT', 'PATCH'].includes(api.method) && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">请求体 (JSON)</h3>
+                  <h3 className="text-sm font-medium text-text-secondary mb-3">请求体 (JSON)</h3>
                   <textarea
                     value={requestBody}
                     onChange={(e) => setRequestBody(e.target.value)}
                     placeholder='{\n  "key": "value"\n}'
-                    className="w-full h-40 px-3 py-2 border border-gray-300 rounded font-mono text-sm resize-vertical"
+                    className="w-full h-40 px-3 py-2 border border-border-primary rounded font-mono text-sm resize-vertical"
                   />
                 </div>
               )}
@@ -465,7 +465,7 @@ const APITestModal: React.FC<APITestModalProps> = ({
 
                   {/* Response Data */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">响应数据</h4>
+                    <h4 className="text-sm font-medium text-text-secondary mb-2">响应数据</h4>
                     <CodeHighlight
                       code={formatJSON(testResponse.data)}
                       language="json"
@@ -488,7 +488,7 @@ const APITestModal: React.FC<APITestModalProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-text-tertiary">
                   <Code className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                   <p>点击"发送请求"按钮执行API测试</p>
                 </div>
@@ -497,7 +497,7 @@ const APITestModal: React.FC<APITestModalProps> = ({
           )}
 
           {activeTab === 'history' && (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-text-tertiary">
               <Clock className="w-12 h-12 mx-auto mb-4 text-gray-300" />
               <p>测试历史功能将在未来版本中实现</p>
             </div>
@@ -505,9 +505,9 @@ const APITestModal: React.FC<APITestModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between p-6 border-t border-border-primary bg-bg-tertiary">
           <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-text-secondary">
               {api.description && (
                 <span>描述: {api.description}</span>
               )}
@@ -516,7 +516,7 @@ const APITestModal: React.FC<APITestModalProps> = ({
           <div className="flex items-center space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-sm font-medium text-text-secondary bg-bg-paper border border-border-primary rounded-lg hover:bg-bg-tertiary"
             >
               关闭
             </button>

@@ -126,7 +126,7 @@ const DebugPanel: React.FC = () => {
         </div>
 
         {/* 标签页导航 */}
-        <div className="bg-white border-b border-gray-200">
+        <div className="bg-bg-paper border-b border-gray-200">
           <div className="flex">
             {tabs.map((tab) => (
               <button

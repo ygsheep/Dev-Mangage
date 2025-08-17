@@ -187,16 +187,16 @@ const ImportDocumentModal: React.FC<ImportDocumentModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-theme-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary">
           <div className="flex items-center space-x-3">
-            <Upload className="w-6 h-6 text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-900">导入数据库设计文档</h2>
+            <Upload className="w-6 h-6 text-primary-600" />
+            <h2 className="text-xl font-semibold text-text-primary">导入数据库设计文档</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -208,14 +208,14 @@ const ImportDocumentModal: React.FC<ImportDocumentModalProps> = ({
             <>
               {/* File Upload */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   选择Markdown文档
                 </label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-border-primary border-dashed rounded-md hover:border-border-secondary transition-colors">
                   <div className="space-y-1 text-center">
-                    <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
-                      <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                    <FileText className="mx-auto h-12 w-12 text-text-tertiary" />
+                    <div className="flex text-sm text-text-secondary">
+                      <label className="relative cursor-pointer bg-bg-paper rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none">
                         <span>选择文件</span>
                         <input
                           type="file"
@@ -226,18 +226,18 @@ const ImportDocumentModal: React.FC<ImportDocumentModalProps> = ({
                       </label>
                       <p className="pl-1">或拖拽到此处</p>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-text-tertiary">
                       支持 .md 格式，最大 10MB
                     </p>
                   </div>
                 </div>
                 
                 {selectedFile && (
-                  <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="mt-4 p-4 bg-primary-50 rounded-lg">
                     <div className="flex items-center space-x-2">
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-900">{selectedFile.name}</span>
-                      <span className="text-sm text-blue-600">
+                      <FileText className="w-5 h-5 text-primary-600" />
+                      <span className="text-sm font-medium text-primary-900">{selectedFile.name}</span>
+                      <span className="text-sm text-primary-600">
                         ({(selectedFile.size / 1024).toFixed(1)} KB)
                       </span>
                     </div>
@@ -249,12 +249,12 @@ const ImportDocumentModal: React.FC<ImportDocumentModalProps> = ({
               {isUploading && (
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">解析进度</span>
-                    <span className="text-sm text-gray-500">{uploadProgress}%</span>
+                    <span className="text-sm font-medium text-text-secondary">解析进度</span>
+                    <span className="text-sm text-text-tertiary">{uploadProgress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-bg-tertiary rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
@@ -262,9 +262,9 @@ const ImportDocumentModal: React.FC<ImportDocumentModalProps> = ({
               )}
 
               {/* Instructions */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-2">支持的文档格式</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
+              <div className="bg-bg-tertiary rounded-lg p-4">
+                <h4 className="text-sm font-medium text-text-primary mb-2">支持的文档格式</h4>
+                <ul className="text-sm text-text-secondary space-y-1">
                   <li>• 包含 CREATE TABLE 语句的SQL代码块</li>
                   <li>• 标准的MySQL/PostgreSQL建表语句</li>
                   <li>• 支持字段注释和表注释解析</li>
@@ -275,47 +275,47 @@ const ImportDocumentModal: React.FC<ImportDocumentModalProps> = ({
           ) : (
             /* Parse Results */
             <div className="space-y-6">
-              <div className="flex items-center space-x-2 text-green-600">
+              <div className="flex items-center space-x-2 text-success-600">
                 <CheckCircle className="w-5 h-5" />
                 <span className="font-medium">文档解析完成</span>
               </div>
 
               {/* Summary */}
-              <div className="bg-green-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3">解析结果</h4>
+              <div className="bg-success-50 rounded-lg p-4">
+                <h4 className="font-medium text-text-primary mb-3">解析结果</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">文档名称:</span>
+                    <span className="text-text-secondary">文档名称:</span>
                     <div className="font-medium">{parseResult.fileName}</div>
                   </div>
                   <div>
-                    <span className="text-gray-600">文件大小:</span>
+                    <span className="text-text-secondary">文件大小:</span>
                     <div className="font-medium">{(parseResult.fileSize / 1024).toFixed(1)} KB</div>
                   </div>
                   <div>
-                    <span className="text-gray-600">数据表数量:</span>
-                    <div className="font-medium text-green-600">{parseResult.tableCount} 个</div>
+                    <span className="text-text-secondary">数据表数量:</span>
+                    <div className="font-medium text-success-600">{parseResult.tableCount} 个</div>
                   </div>
                   <div>
-                    <span className="text-gray-600">解析状态:</span>
-                    <div className="font-medium text-green-600">成功</div>
+                    <span className="text-text-secondary">解析状态:</span>
+                    <div className="font-medium text-success-600">成功</div>
                   </div>
                 </div>
               </div>
 
               {/* Tables Preview */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-3">数据表预览</h4>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
+                <h4 className="font-medium text-text-primary mb-3">数据表预览</h4>
+                <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin">
                   {parseResult.tables.map((table: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-bg-paper border border-border-primary rounded-lg">
                       <div>
-                        <div className="font-medium text-gray-900">{table.displayName || table.name}</div>
-                        <div className="text-sm text-gray-500">
+                        <div className="font-medium text-text-primary">{table.displayName || table.name}</div>
+                        <div className="text-sm text-text-tertiary">
                           {table.name} • {table.fieldCount} 字段 • {table.category}
                         </div>
                       </div>
-                      <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                      <span className="px-2 py-1 bg-warning-100 text-warning-800 text-xs rounded-full">
                         草稿
                       </span>
                     </div>
@@ -327,15 +327,15 @@ const ImportDocumentModal: React.FC<ImportDocumentModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-sm text-gray-500">
+        <div className="flex items-center justify-between p-6 border-t border-border-primary bg-bg-tertiary">
+          <div className="text-sm text-text-tertiary">
             {selectedFile && !parseResult && `已选择: ${selectedFile.name}`}
             {parseResult && `将创建 ${parseResult.tableCount} 个数据表`}
           </div>
           <div className="flex space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-text-secondary bg-bg-paper border border-border-primary rounded-lg hover:bg-bg-tertiary transition-colors"
             >
               取消
             </button>
@@ -343,14 +343,14 @@ const ImportDocumentModal: React.FC<ImportDocumentModalProps> = ({
               <button
                 onClick={handleUpload}
                 disabled={!selectedFile || isUploading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isUploading ? '解析中...' : '开始解析'}
               </button>
             ) : (
               <button
                 onClick={handleConfirm}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-success-600 text-white rounded-lg hover:bg-success-700 transition-colors"
               >
                 确认导入
               </button>

@@ -12,32 +12,35 @@
   
   /* React Flow 控制面板样式 */
   .react-flow__controls {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #e5e7eb;
+    background: var(--color-bg-paper);
+    border: 1px solid var(--color-border-primary);
     border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--card-shadow);
   }
   
   .react-flow__controls button {
     background: transparent;
     border: none;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--color-border-primary);
     padding: 8px;
+    color: var(--color-text-secondary);
     
     &:last-child {
       border-bottom: none;
     }
     
     &:hover {
-      background: #f3f4f6;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
     }
   }
   
   /* React Flow 小地图样式 */
   .react-flow__minimap {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-border-primary);
     border-radius: 8px;
     overflow: hidden;
+    background: var(--color-bg-paper);
   }
   
   /* React Flow 节点样式 */
@@ -52,26 +55,28 @@
   
   /* React Flow 选择框样式 */
   .react-flow__selection {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px dashed #3b82f6;
+    background: rgba(255, 107, 53, 0.1); /* 使用Claude橙色 */
+    border: 1px dashed var(--color-primary-500);
   }
   
   /* React Flow 背景样式 */
   .react-flow__background {
-    background-color: #f9fafb;
+    background-color: var(--color-bg-secondary);
   }
   
   /* 工具栏样式 */
   .mindmap-toolbar {
     z-index: 10;
     backdrop-filter: blur(8px);
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-bg-paper);
+    border: 1px solid var(--color-border-primary);
   }
   
   /* 侧边栏样式 */
   .mindmap-sidebar {
     z-index: 5;
-    background: #ffffff;
+    background: var(--color-bg-paper);
+    border-right: 1px solid var(--color-border-primary);
     
     /* 滚动条样式 */
     &::-webkit-scrollbar {
@@ -79,16 +84,16 @@
     }
     
     &::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: var(--color-bg-tertiary);
     }
     
     &::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
+      background: var(--color-text-tertiary);
       border-radius: 3px;
     }
     
     &::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
+      background: var(--color-text-secondary);
     }
   }
 }
@@ -120,7 +125,7 @@
       width: 100%;
       max-height: 200px;
       border-right: none;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--color-border-primary);
     }
   }
 }
@@ -159,45 +164,50 @@
 
 /* 自定义节点样式基础类 */
 .mindmap-node {
-  background: white;
-  border: 2px solid #e5e7eb;
+  background: var(--color-bg-paper);
+  border: 2px solid var(--color-border-primary);
   border-radius: 8px;
   padding: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
   min-width: 150px;
   font-size: 14px;
   line-height: 1.4;
+  color: var(--color-text-primary);
   
   &.selected {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
   }
   
   &.project {
     border-color: #3b82f6;
     background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
   }
   
   &.category {
     border-color: #f59e0b;
     background: linear-gradient(135deg, #fef3c7, #fed7aa);
+    color: #92400e;
   }
   
   &.table {
     border-color: #10b981;
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    background: var(--color-bg-paper);
+    color: var(--color-text-primary);
   }
   
   &.field-group {
     border-color: #8b5cf6;
     background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    color: #6b21a8;
   }
 }
 
 /* 自定义边样式基础类 */
 .mindmap-edge {
   &.hierarchy {
-    stroke: #6b7280;
+    stroke: var(--color-text-secondary);
     stroke-dasharray: none;
   }
   
@@ -219,11 +229,12 @@
 
 /* 提示面板样式 */
 .mindmap-panel {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-bg-paper);
   backdrop-filter: blur(8px);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border-primary);
   border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
+  color: var(--color-text-primary);
   
   &.center {
     position: absolute;

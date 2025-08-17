@@ -134,12 +134,12 @@ router.post(
     }
 
     // 保存或更新布局
-    const layoutData = {
+    const layoutData = JSON.stringify({
       nodes,
       edges,
       config,
       updatedAt: new Date()
-    }
+    })
 
     const savedLayout = await prisma.mindmapLayout.upsert({
       where: { projectId },

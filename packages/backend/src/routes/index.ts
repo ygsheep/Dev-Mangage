@@ -17,6 +17,8 @@ import aiRouter from './ai'
 import collaborationRouter from './collaboration'
 import permissionsRouter from './permissions'
 import { featuresRouter } from './features'
+import apiManagementRouter from './apiManagement'
+import dashboardRouter from './dashboard'
 
 export const setupRoutes = (app: Express): void => {
   const apiPrefix = config.apiPrefix
@@ -57,6 +59,12 @@ export const setupRoutes = (app: Express): void => {
   // 功能模块管理API
   app.use(`${apiPrefix}/features`, featuresRouter)
   
+  // API接口管理相关API
+  app.use(`${apiPrefix}/api-management`, apiManagementRouter)
+  
+  // 仪表板统计API
+  app.use(`${apiPrefix}/dashboard`, dashboardRouter)
+  
   // 集成HTTP MCP服务路由
   setupIntegratedMCPRoutes(app)
   
@@ -95,6 +103,8 @@ export const setupRoutes = (app: Express): void => {
         collaboration: `${apiPrefix}/collaboration`,
         permissions: `${apiPrefix}/permissions`,
         features: `${apiPrefix}/features`,
+        apiManagement: `${apiPrefix}/api-management`,
+        dashboard: `${apiPrefix}/dashboard`,
       },
       documentation: 'https://github.com/devapi-team/devapi-manager',
     })

@@ -329,7 +329,7 @@ const ComponentsTab: React.FC = () => {
 
                 <div>
                   <label className="text-gray-500 font-medium">状态:</label>
-                  <pre className="mt-1 bg-white p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-40">
+                  <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-40">
                     {JSON.stringify(selectedComponent.state, null, 2)}
                   </pre>
                 </div>
@@ -337,7 +337,7 @@ const ComponentsTab: React.FC = () => {
                 {selectedComponent.props && (
                   <div>
                     <label className="text-gray-500 font-medium">属性:</label>
-                    <pre className="mt-1 bg-white p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-40">
+                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-40">
                       {JSON.stringify(selectedComponent.props, null, 2)}
                     </pre>
                   </div>
@@ -351,7 +351,7 @@ const ComponentsTab: React.FC = () => {
                       {componentsByName[selectedComponent.name].slice(0, 10).map((state) => (
                         <div 
                           key={state.timestamp} 
-                          className={`flex justify-between text-xs font-mono-nerd bg-white p-1 rounded cursor-pointer hover:bg-blue-50 ${
+                          className={`flex justify-between text-xs font-mono-nerd bg-bg-paper p-1 rounded cursor-pointer hover:bg-blue-50 ${
                             state.timestamp === selectedComponent.timestamp ? 'bg-blue-100' : ''
                           }`}
                           onClick={() => setSelectedComponent(state)}

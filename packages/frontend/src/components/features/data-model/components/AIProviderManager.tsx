@@ -254,14 +254,14 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-hidden">
         {/* 头部 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-header">
           <div className="flex items-center space-x-3">
             <Brain className="w-8 h-8 text-purple-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">AI提供商管理</h2>
-              <p className="text-gray-600">配置和管理AI服务提供商</p>
+              <h2 className="text-xl font-semibold text-text-primary">AI提供商管理</h2>
+              <p className="text-text-secondary">配置和管理AI服务提供商</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -296,17 +296,17 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <RefreshCw className="w-8 h-8 animate-spin text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-600">加载中...</p>
+                  <p className="text-text-secondary">加载中...</p>
                 </div>
               </div>
             ) : providers.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-text-primary mb-2">
                     暂无AI提供商
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-text-secondary mb-4">
                     点击右上角按钮添加第一个AI提供商
                   </p>
                   <button
@@ -335,7 +335,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                         <div className="flex items-center space-x-3">
                           <div className="text-2xl">{typeInfo.icon}</div>
                           <div>
-                            <h3 className="font-medium text-gray-900 flex items-center space-x-2">
+                            <h3 className="font-medium text-text-primary flex items-center space-x-2">
                               <span>{provider.displayName}</span>
                               {provider.isDefault && (
                                 <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
@@ -343,7 +343,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                                 </span>
                               )}
                             </h3>
-                            <p className="text-sm text-gray-600">{typeInfo.label}</p>
+                            <p className="text-sm text-text-secondary">{typeInfo.label}</p>
                             {provider.model && (
                               <p className="text-xs text-gray-500">{provider.model}</p>
                             )}
@@ -372,7 +372,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
             {showForm ? (
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium text-text-primary">
                     {editingProvider ? '编辑' : '添加'}AI提供商
                   </h3>
                   <button
@@ -563,7 +563,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                   <div className="flex items-center space-x-3">
                     <div className="text-3xl">{getProviderTypeInfo(selectedProvider.type).icon}</div>
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 flex items-center space-x-2">
+                      <h3 className="text-lg font-medium text-text-primary flex items-center space-x-2">
                         <span>{selectedProvider.displayName}</span>
                         {selectedProvider.isDefault && (
                           <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
@@ -574,7 +574,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                           selectedProvider.isEnabled ? 'bg-green-400' : 'bg-gray-300'
                         }`} />
                       </h3>
-                      <p className="text-gray-600">{getProviderTypeInfo(selectedProvider.type).label}</p>
+                      <p className="text-text-secondary">{getProviderTypeInfo(selectedProvider.type).label}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -610,44 +610,44 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                 <div className="space-y-6">
                   {/* 基础信息 */}
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                    <h4 className="font-medium text-text-primary mb-3 flex items-center">
                       <Settings className="w-5 h-5 mr-2" />
                       基础配置
                     </h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-600">名称：</span>
+                        <span className="text-text-secondary">名称：</span>
                         <span className="font-medium">{selectedProvider.name}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">类型：</span>
+                        <span className="text-text-secondary">类型：</span>
                         <span className="font-medium">{getProviderTypeInfo(selectedProvider.type).label}</span>
                       </div>
                       {selectedProvider.endpoint && (
                         <div>
-                          <span className="text-gray-600">端点：</span>
+                          <span className="text-text-secondary">端点：</span>
                           <span className="font-medium">{selectedProvider.endpoint}</span>
                         </div>
                       )}
                       {selectedProvider.model && (
                         <div>
-                          <span className="text-gray-600">模型：</span>
+                          <span className="text-text-secondary">模型：</span>
                           <span className="font-medium">{selectedProvider.model}</span>
                         </div>
                       )}
                       <div>
-                        <span className="text-gray-600">最大Token：</span>
+                        <span className="text-text-secondary">最大Token：</span>
                         <span className="font-medium">{selectedProvider.maxTokens || 'N/A'}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Temperature：</span>
+                        <span className="text-text-secondary">Temperature：</span>
                         <span className="font-medium">{selectedProvider.temperature || 'N/A'}</span>
                       </div>
                     </div>
 
                     {selectedProvider.apiKey && (
                       <div className="mt-4">
-                        <span className="text-gray-600">API密钥：</span>
+                        <span className="text-text-secondary">API密钥：</span>
                         <div className="flex items-center space-x-2 mt-1">
                           <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
                             {showApiKeys[selectedProvider.id] 
@@ -672,9 +672,9 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
 
                   {/* 使用统计 */}
                   {selectedProvider.stats && (
-                    <div className="bg-white rounded-lg border border-gray-200">
+                    <div className="bg-bg-paper rounded-lg border border-gray-200">
                       <div className="px-4 py-3 border-b border-gray-200">
-                        <h4 className="font-medium text-gray-900 flex items-center">
+                        <h4 className="font-medium text-text-primary flex items-center">
                           <BarChart3 className="w-5 h-5 mr-2" />
                           使用统计
                         </h4>
@@ -685,19 +685,19 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                             <div className="text-2xl font-bold text-blue-600">
                               {selectedProvider.stats.totalRequests}
                             </div>
-                            <div className="text-sm text-gray-600">总请求数</div>
+                            <div className="text-sm text-text-secondary">总请求数</div>
                           </div>
                           <div className="text-center">
                             <div className="text-2xl font-bold text-green-600">
                               {Math.round((selectedProvider.stats.successfulRequests / selectedProvider.stats.totalRequests) * 100)}%
                             </div>
-                            <div className="text-sm text-gray-600">成功率</div>
+                            <div className="text-sm text-text-secondary">成功率</div>
                           </div>
                           <div className="text-center">
                             <div className="text-2xl font-bold text-purple-600">
                               {formatResponseTime(selectedProvider.stats.averageResponseTime)}
                             </div>
-                            <div className="text-sm text-gray-600">平均响应时间</div>
+                            <div className="text-sm text-text-secondary">平均响应时间</div>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4 mt-4">
@@ -705,13 +705,13 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                             <div className="text-lg font-semibold text-orange-600">
                               {selectedProvider.stats.totalTokensUsed.toLocaleString()}
                             </div>
-                            <div className="text-sm text-gray-600">总Token消耗</div>
+                            <div className="text-sm text-text-secondary">总Token消耗</div>
                           </div>
                           <div className="text-center">
                             <div className="text-lg font-semibold text-red-600">
                               {formatCost(selectedProvider.stats.costEstimate)}
                             </div>
-                            <div className="text-sm text-gray-600">预估成本</div>
+                            <div className="text-sm text-text-secondary">预估成本</div>
                           </div>
                         </div>
                       </div>
@@ -720,7 +720,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
 
                   {/* 最后使用时间 */}
                   {selectedProvider.lastUsed && (
-                    <div className="text-sm text-gray-600 flex items-center">
+                    <div className="text-sm text-text-secondary flex items-center">
                       <Clock className="w-4 h-4 mr-2" />
                       最后使用：{new Date(selectedProvider.lastUsed).toLocaleString()}
                     </div>
@@ -731,10 +731,10 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-text-primary mb-2">
                     选择AI提供商
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-text-secondary">
                     从左侧列表中选择一个AI提供商查看详情
                   </p>
                 </div>

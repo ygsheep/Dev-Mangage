@@ -221,7 +221,7 @@ const NetworkTab: React.FC = () => {
               <div className="space-y-3 text-xs">
                 <div>
                   <label className="text-gray-500 font-medium">URL:</label>
-                  <div className="mt-1 font-mono-nerd break-all bg-white p-2 rounded border">
+                  <div className="mt-1 font-mono-nerd break-all bg-bg-paper p-2 rounded border">
                     {selectedRequest.url}
                   </div>
                 </div>
@@ -257,7 +257,7 @@ const NetworkTab: React.FC = () => {
                 {selectedRequest.requestData && (
                   <div>
                     <label className="text-gray-500 font-medium">请求数据 ({formatSize(selectedRequest.requestData)}):</label>
-                    <pre className="mt-1 bg-white p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-32">
+                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-32">
                       {JSON.stringify(selectedRequest.requestData, null, 2)}
                     </pre>
                   </div>
@@ -266,7 +266,7 @@ const NetworkTab: React.FC = () => {
                 {selectedRequest.responseData && (
                   <div>
                     <label className="text-gray-500 font-medium">响应数据 ({formatSize(selectedRequest.responseData)}):</label>
-                    <pre className="mt-1 bg-white p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-32">
+                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-32">
                       {typeof selectedRequest.responseData === 'string' 
                         ? selectedRequest.responseData 
                         : JSON.stringify(selectedRequest.responseData, null, 2)}

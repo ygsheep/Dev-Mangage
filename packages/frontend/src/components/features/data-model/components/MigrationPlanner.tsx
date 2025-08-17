@@ -375,7 +375,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
       case 'LOW': return 'text-green-600'
       case 'MEDIUM': return 'text-yellow-600'
       case 'HIGH': return 'text-red-600'
-      default: return 'text-gray-600'
+      default: return 'text-text-secondary'
     }
   }
 
@@ -387,8 +387,8 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           <div className="flex items-center space-x-3">
             <GitBranch className="w-8 h-8 text-blue-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">数据库迁移规划器</h2>
-              <p className="text-gray-600">可视化设计和执行数据库迁移计划</p>
+              <h2 className="text-xl font-semibold text-text-primary">数据库迁移规划器</h2>
+              <p className="text-text-secondary">可视化设计和执行数据库迁移计划</p>
             </div>
           </div>
           
@@ -397,7 +397,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <button
                 onClick={() => setView('list')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  view === 'list' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'
+                  view === 'list' ? 'bg-white text-text-primary shadow' : 'text-text-secondary'
                 }`}
               >
                 计划列表
@@ -405,7 +405,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <button
                 onClick={() => setView('designer')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  view === 'designer' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'
+                  view === 'designer' ? 'bg-white text-text-primary shadow' : 'text-text-secondary'
                 }`}
               >
                 可视化设计
@@ -413,7 +413,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <button
                 onClick={() => setView('execution')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  view === 'execution' ? 'bg-white text-gray-900 shadow' : 'text-gray-600'
+                  view === 'execution' ? 'bg-white text-text-primary shadow' : 'text-text-secondary'
                 }`}
                 disabled={!execution}
               >
@@ -436,7 +436,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
       {view === 'list' && (
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-text-primary">
               迁移计划 ({plans.length})
             </h3>
           </div>
@@ -475,7 +475,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                       <div className="flex items-center">
                         <GitBranch className="w-4 h-4 text-gray-400 mr-2" />
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-text-primary">
                             {plan.name}
                           </div>
                           <div className="text-sm text-gray-500">
@@ -485,16 +485,16 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                       </div>
                     </td>
                     
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
                       {plan.version}
                     </td>
                     
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
                       {plan.steps.length}
                     </td>
                     
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
+                      <div className="flex items-center text-sm text-text-primary">
                         <Clock className="w-4 h-4 mr-1" />
                         {Math.round(plan.totalEstimatedTime / 60)}分钟
                       </div>
@@ -519,7 +519,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => setSelectedPlan(plan.id)}
-                          className="text-gray-600 hover:text-gray-900"
+                          className="text-text-secondary hover:text-text-primary"
                           title="查看详情"
                         >
                           <Eye className="w-4 h-4" />
@@ -552,10 +552,10 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           {plans.length === 0 && (
             <div className="text-center py-12">
               <GitBranch className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-text-primary mb-2">
                 暂无迁移计划
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-text-secondary mb-6">
                 创建第一个迁移计划来开始数据库版本管理
               </p>
               <button
@@ -576,17 +576,17 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-text-primary">
                   迁移执行监控
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-text-secondary">
                   计划: {plans.find(p => p.id === execution.planId)?.name}
                 </p>
               </div>
               
               <div className="flex items-center space-x-4">
                 <div className="text-right">
-                  <div className="text-sm text-gray-600">进度</div>
+                  <div className="text-sm text-text-secondary">进度</div>
                   <div className="text-lg font-medium">
                     {execution.currentStep} / {execution.totalSteps}
                   </div>
@@ -619,7 +619,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                 <div className="flex items-center">
                   <Calendar className="w-5 h-5 text-gray-400 mr-2" />
                   <div>
-                    <div className="text-sm text-gray-600">开始时间</div>
+                    <div className="text-sm text-text-secondary">开始时间</div>
                     <div className="font-medium">
                       {execution.startTime?.toLocaleString() || '-'}
                     </div>
@@ -631,7 +631,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                 <div className="flex items-center">
                   <Clock className="w-5 h-5 text-gray-400 mr-2" />
                   <div>
-                    <div className="text-sm text-gray-600">已用时间</div>
+                    <div className="text-sm text-text-secondary">已用时间</div>
                     <div className="font-medium">
                       {execution.startTime ? 
                         Math.round((Date.now() - execution.startTime.getTime()) / 1000) + 's' : 
@@ -646,7 +646,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                 <div className="flex items-center">
                   <Target className="w-5 h-5 text-gray-400 mr-2" />
                   <div>
-                    <div className="text-sm text-gray-600">完成时间</div>
+                    <div className="text-sm text-text-secondary">完成时间</div>
                     <div className="font-medium">
                       {execution.endTime?.toLocaleString() || '执行中...'}
                     </div>
@@ -659,7 +659,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           {/* 执行日志 */}
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-text-primary">
                 执行日志
               </h3>
               <button className="btn-outline flex items-center space-x-2">
@@ -680,11 +680,11 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                     </span>
                     <span className={`flex-shrink-0 font-medium ${
                       log.level === 'ERROR' ? 'text-red-600' :
-                      log.level === 'WARN' ? 'text-yellow-600' : 'text-gray-600'
+                      log.level === 'WARN' ? 'text-yellow-600' : 'text-text-secondary'
                     }`}>
                       [{log.level}]
                     </span>
-                    <span className="text-gray-900">{log.message}</span>
+                    <span className="text-text-primary">{log.message}</span>
                   </div>
                 ))}
               </div>
@@ -761,7 +761,7 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">创建迁移计划</h2>
+          <h2 className="text-xl font-semibold text-text-primary">创建迁移计划</h2>
           <button onClick={onClose} className="btn-ghost">
             <X className="w-5 h-5" />
           </button>

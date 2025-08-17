@@ -109,14 +109,14 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
   ]
 
   return (
-    <div className={`mindmap-toolbar bg-white border-b border-gray-200 ${className}`}>
+    <div className={`mindmap-toolbar bg-bg-paper border-b border-border-primary ${className}`}>
       <div className="flex items-center justify-between px-4 py-2">
         {/* 左侧工具组 */}
         <div className="flex items-center space-x-2">
           {/* 布局选择 */}
           <div className="relative" ref={layoutMenuRef}>
             <button
-              className="flex items-center space-x-2 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 text-sm border border-border-primary rounded-md hover:bg-bg-tertiary transition-colors text-text-primary"
               onClick={() => setShowLayoutMenu(!showLayoutMenu)}
             >
               <Layout className="w-4 h-4" />
@@ -124,22 +124,22 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
             </button>
 
             {showLayoutMenu && (
-              <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+              <div className="absolute top-full left-0 mt-1 w-48 bg-bg-paper border border-border-primary rounded-md shadow-theme-lg z-50">
                 {layoutOptions.map((option) => (
                   <button
                     key={option.key}
-                    className="flex items-center space-x-3 w-full px-3 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="flex items-center space-x-3 w-full px-3 py-2 text-left hover:bg-bg-tertiary transition-colors"
                     onClick={() => {
                       onLayoutChange(option.key)
                       setShowLayoutMenu(false)
                     }}
                   >
-                    <option.icon className="w-4 h-4 text-gray-400" />
+                    <option.icon className="w-4 h-4 text-text-tertiary" />
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-text-primary">
                         {option.label}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-text-secondary">
                         {option.description}
                       </div>
                     </div>
@@ -150,32 +150,32 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
           </div>
 
           {/* 视图控制 */}
-          <div className="flex items-center space-x-1 border border-gray-300 rounded-md">
+          <div className="flex items-center space-x-1 border border-border-primary rounded-md">
             <button
-              className="p-2 hover:bg-gray-50 transition-colors"
+              className="p-2 hover:bg-bg-tertiary transition-colors text-text-secondary"
               onClick={onFitView}
               title="适应视图"
             >
               <Maximize2 className="w-4 h-4" />
             </button>
-            <div className="w-px h-6 bg-gray-300" />
+            <div className="w-px h-6 bg-border-primary" />
             <button
-              className="p-2 hover:bg-gray-50 transition-colors"
+              className="p-2 hover:bg-bg-tertiary transition-colors text-text-secondary"
               onClick={onZoomIn}
               title="放大"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
             <button
-              className="p-2 hover:bg-gray-50 transition-colors"
+              className="p-2 hover:bg-bg-tertiary transition-colors text-text-secondary"
               onClick={onZoomOut}
               title="缩小"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
-            <div className="w-px h-6 bg-gray-300" />
+            <div className="w-px h-6 bg-border-primary" />
             <button
-              className="p-2 hover:bg-gray-50 transition-colors"
+              className="p-2 hover:bg-bg-tertiary transition-colors text-text-secondary"
               onClick={onResetView}
               title="重置视图"
             >
@@ -185,7 +185,7 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
 
           {/* 刷新按钮 */}
           <button
-            className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="p-2 border border-border-primary rounded-md hover:bg-bg-tertiary transition-colors text-text-secondary"
             onClick={onRefresh}
             title="刷新数据"
           >
@@ -196,8 +196,8 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
           <button
             className={`flex items-center space-x-2 px-3 py-2 text-sm border rounded-md transition-colors ${
               showFilterPanel 
-                ? 'border-blue-300 bg-blue-50 text-blue-700' 
-                : 'border-gray-300 hover:bg-gray-50'
+                ? 'border-primary-300 bg-primary-50 text-primary-700' 
+                : 'border-border-primary hover:bg-bg-tertiary text-text-primary'
             }`}
             onClick={() => setShowFilterPanel(!showFilterPanel)}
           >
@@ -213,8 +213,8 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
             <button
               className={`p-2 rounded-md transition-colors ${
                 config.display.showLabels
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'hover:bg-gray-50'
+                  ? 'bg-primary-100 text-primary-600'
+                  : 'hover:bg-bg-tertiary text-text-secondary'
               }`}
               onClick={() => onConfigChange({
                 display: {
@@ -234,8 +234,8 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
             <button
               className={`p-2 rounded-md transition-colors ${
                 config.display.compactMode
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'hover:bg-gray-50'
+                  ? 'bg-primary-100 text-primary-600'
+                  : 'hover:bg-bg-tertiary text-text-secondary'
               }`}
               onClick={() => onConfigChange({
                 display: {
@@ -251,7 +251,7 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
 
           {/* 全屏按钮 */}
           <button
-            className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="p-2 border border-border-primary rounded-md hover:bg-bg-tertiary transition-colors text-text-secondary"
             onClick={onFullscreen}
             title="全屏显示"
           >
@@ -261,7 +261,7 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
           {/* 导出 */}
           <div className="relative" ref={exportMenuRef}>
             <button
-              className="flex items-center space-x-2 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 text-sm border border-border-primary rounded-md hover:bg-bg-tertiary transition-colors text-text-primary"
               onClick={() => setShowExportMenu(!showExportMenu)}
             >
               <Download className="w-4 h-4" />
@@ -269,11 +269,11 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
             </button>
 
             {showExportMenu && (
-              <div className="absolute top-full right-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+              <div className="absolute top-full right-0 mt-1 w-48 bg-bg-paper border border-border-primary rounded-md shadow-theme-lg z-50">
                 {exportOptions.map((option) => (
                   <button
                     key={option.key}
-                    className="flex items-center justify-between w-full px-3 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between w-full px-3 py-2 text-left hover:bg-bg-tertiary transition-colors"
                     onClick={() => {
                       console.log('🖱️ 点击导出选项:', option.key)
                       onExport(option.key)
@@ -281,10 +281,10 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
                     }}
                   >
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-text-primary">
                         {option.label}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-text-secondary">
                         {option.description}
                       </div>
                     </div>
@@ -296,7 +296,7 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
 
           {/* 设置 */}
           <button
-            className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="p-2 border border-border-primary rounded-md hover:bg-bg-tertiary transition-colors text-text-secondary"
             onClick={() => console.log('Open settings')}
             title="设置"
           >
@@ -307,11 +307,11 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
 
       {/* 筛选面板 */}
       {showFilterPanel && (
-        <div className="border-t border-gray-200 bg-gray-50 p-4">
+        <div className="border-t border-border-primary bg-bg-secondary p-4">
           <div className="grid grid-cols-3 gap-4">
             {/* 节点类型筛选 */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-xs font-medium text-text-primary mb-2">
                 节点类型
               </label>
               <div className="space-y-2">
@@ -328,9 +328,9 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
                           filters: { ...config.filters, nodeTypes }
                         })
                       }}
-                      className="mr-2 h-3 w-3 text-blue-600 border-gray-300 rounded"
+                      className="mr-2 h-3 w-3 text-primary-600 border-border-primary rounded"
                     />
-                    <span className="text-xs text-gray-600 capitalize">
+                    <span className="text-xs text-text-secondary capitalize">
                       {type === 'project' ? '项目' : 
                        type === 'category' ? '分类' : 
                        type === 'table' ? '数据表' : '字段组'}
@@ -342,7 +342,7 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
 
             {/* 边类型筛选 */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-xs font-medium text-text-primary mb-2">
                 关系类型
               </label>
               <div className="space-y-2">
@@ -359,9 +359,9 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
                           filters: { ...config.filters, edgeTypes }
                         })
                       }}
-                      className="mr-2 h-3 w-3 text-blue-600 border-gray-300 rounded"
+                      className="mr-2 h-3 w-3 text-primary-600 border-border-primary rounded"
                     />
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs text-text-secondary">
                       {type === 'hierarchy' ? '层次' : 
                        type === 'foreignKey' ? '外键' : 
                        type === 'reference' ? '引用' : '依赖'}
@@ -373,7 +373,7 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
 
             {/* 状态筛选 */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-xs font-medium text-text-primary mb-2">
                 表状态
               </label>
               <div className="space-y-2">
@@ -390,9 +390,9 @@ const MindmapToolbar: React.FC<MindmapToolbarProps> = ({
                           filters: { ...config.filters, statuses }
                         })
                       }}
-                      className="mr-2 h-3 w-3 text-blue-600 border-gray-300 rounded"
+                      className="mr-2 h-3 w-3 text-primary-600 border-border-primary rounded"
                     />
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs text-text-secondary">
                       {status === 'DRAFT' ? '草稿' : 
                        status === 'ACTIVE' ? '已创建' : '已废弃'}
                     </span>

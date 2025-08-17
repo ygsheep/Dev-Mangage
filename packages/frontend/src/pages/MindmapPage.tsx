@@ -20,10 +20,10 @@ const MindmapPage: React.FC = () => {
   if (!projectId) {
     return (
       <div className="card text-center py-12">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-text-primary mb-2">
           项目ID缺失
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-text-secondary mb-6">
           请通过有效的项目链接访问
         </p>
         <Link to="/projects" className="btn-primary">
@@ -37,10 +37,10 @@ const MindmapPage: React.FC = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-4">
-          <div className="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>
-          <div className="w-48 h-8 bg-gray-200 rounded animate-pulse"></div>
+          <div className="w-8 h-8 bg-bg-tertiary rounded animate-pulse"></div>
+          <div className="w-48 h-8 bg-bg-tertiary rounded animate-pulse"></div>
         </div>
-        <div className="w-full h-screen bg-gray-200 rounded animate-pulse"></div>
+        <div className="w-full h-screen bg-bg-tertiary rounded animate-pulse"></div>
       </div>
     )
   }
@@ -48,10 +48,10 @@ const MindmapPage: React.FC = () => {
   if (!project) {
     return (
       <div className="card text-center py-12">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-text-primary mb-2">
           项目不存在
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-text-secondary mb-6">
           请检查项目ID是否正确
         </p>
         <Link to="/projects" className="btn-primary">
@@ -64,21 +64,21 @@ const MindmapPage: React.FC = () => {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-bg-paper border-b border-border-primary px-6 py-4">
         <div className="flex items-center space-x-4">
           <Link
             to={`/projects/${projectId}`}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-text-secondary" />
           </Link>
           <div className="flex items-center space-x-3">
-            <GitBranch className="w-6 h-6 text-blue-600" />
+            <GitBranch className="w-6 h-6 text-primary-600" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">
+              <h1 className="text-xl font-bold text-text-primary">
                 {project.name} - 关系图谱
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-secondary">
                 数据表关系可视化展示
               </p>
             </div>

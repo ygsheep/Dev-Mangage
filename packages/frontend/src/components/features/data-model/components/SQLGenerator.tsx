@@ -621,7 +621,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
     <div className="space-y-6">
       {/* 配置面板 */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+        <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center">
           <Settings className="w-5 h-5 mr-2" />
           SQL生成配置
         </h3>
@@ -890,7 +890,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
       {/* 表选择器 */}
       {tables.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center">
             <Layers className="w-5 h-5 mr-2" />
             选择表 ({selectedTables.size} / {tables.length})
           </h3>
@@ -914,7 +914,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2">
                     <Database className="w-4 h-4 text-gray-500" />
-                    <span className="font-medium text-gray-900 text-sm truncate">
+                    <span className="font-medium text-text-primary text-sm truncate">
                       {table.displayName || table.name}
                     </span>
                   </div>
@@ -932,7 +932,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
       {showPreview && (
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 flex items-center">
+            <h3 className="text-lg font-medium text-text-primary flex items-center">
               <Code className="w-5 h-5 mr-2" />
               SQL预览 - {dialectConfigs[selectedDialect].name}
             </h3>
@@ -1024,10 +1024,10 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
             ) : (
               <div className="text-center py-12">
                 <Code className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <h3 className="text-lg font-medium text-text-primary mb-2">
                   SQL代码预览
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-text-secondary mb-6">
                   配置生成选项后点击"生成"按钮查看SQL代码
                 </p>
                 <button

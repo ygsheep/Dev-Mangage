@@ -395,7 +395,7 @@ const MindmapViewerInner: React.FC<MindmapViewerProps> = ({
   return (
     <div className={`mindmap-viewer flex flex-col ${className}`} style={{ height }}>
       {/* 工具栏 */}
-      <div className="flex-shrink-0 border-b border-gray-200 bg-white relative z-40">
+      <div className="flex-shrink-0 border-b border-border-primary bg-bg-paper relative z-40">
         <MindmapToolbar
           config={config}
           onLayoutChange={handleLayoutChange}
@@ -413,7 +413,7 @@ const MindmapViewerInner: React.FC<MindmapViewerProps> = ({
       {/* 主视图区域 */}
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* 侧边栏 */}
-        <div className="flex-shrink-0 w-80 border-r border-gray-200 bg-white overflow-y-auto">
+        <div className="flex-shrink-0 w-80 border-r border-border-primary bg-bg-paper overflow-y-auto">
           <MindmapSidebar
             selectedNodeIds={selectedNodeIds}
             selectedEdgeIds={selectedEdgeIds}
@@ -450,7 +450,7 @@ const MindmapViewerInner: React.FC<MindmapViewerProps> = ({
             edgeTypes={edgeTypes}
             fitView
             attributionPosition="bottom-left"
-            className="bg-gray-50 w-full h-full"
+            className="bg-bg-secondary w-full h-full"
             style={{ width: '100%', height: '100%' }}
           >
             {/* 控制面板 */}
@@ -472,7 +472,7 @@ const MindmapViewerInner: React.FC<MindmapViewerProps> = ({
                   default: return '#6B7280'
                 }
               }}
-              className="bg-white border border-gray-200 rounded-lg shadow-sm"
+              className="bg-bg-paper border border-border-primary rounded-lg shadow-theme-sm"
               style={{ width: 200, height: 150 }}
             />
             
@@ -481,16 +481,16 @@ const MindmapViewerInner: React.FC<MindmapViewerProps> = ({
               variant="dots" 
               gap={20} 
               size={1}
-              color="#E5E7EB"
+              color="var(--color-border-secondary)"
             />
 
             {/* 加载状态 */}
             {isLoading && (
               <Panel position="center">
-                <div className="bg-white p-6 rounded-lg shadow-lg">
+                <div className="bg-bg-paper p-6 rounded-lg shadow-theme-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm text-gray-600">正在加载关系图谱...</span>
+                    <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-sm text-text-secondary">正在加载关系图谱...</span>
                   </div>
                 </div>
               </Panel>
@@ -499,19 +499,19 @@ const MindmapViewerInner: React.FC<MindmapViewerProps> = ({
             {/* 空数据状态 */}
             {!isLoading && nodes_state.length === 0 && (
               <Panel position="center">
-                <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md">
-                  <div className="text-gray-400 mb-4">
+                <div className="bg-bg-paper p-8 rounded-lg shadow-theme-lg text-center max-w-md">
+                  <div className="text-text-tertiary mb-4">
                     <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-text-primary mb-2">
                     暂无数据表关系
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-text-secondary mb-4">
                     请先在"数据模型"标签页中导入数据库设计文档，或手动创建数据表
                   </p>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-text-tertiary">
                     支持的操作：
                     <br />• 导入 Markdown 格式的数据库文档
                     <br />• 手动创建数据表和字段

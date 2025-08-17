@@ -220,4 +220,50 @@ router.get(
   })
 )
 
+// Get project database tables
+router.get(
+  '/:id/database-tables',
+  validateParams(projectParamsSchema),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params
+
+    const project = await prisma.project.findUnique({
+      where: { id },
+      select: { id: true }
+    })
+
+    if (!project) {
+      throw new AppError('Project not found', 404)
+    }
+
+    const tables = await prisma.databaseTable.findMany({
+      where: { projectId: id },
+      include: {
+        fields: {
+          orderBy: { sortOrder: 'asc' },
+          include: {
+            referencedTable: { select: { id: true, name: true } },
+            referencedField: { select: { id: true, name: true } },
+          },
+        },
+        indexes: true,
+        _count: {
+          select: { 
+            fields: true, 
+            indexes: true,
+            fromRelations: true,
+            toRelations: true,
+          },
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+    })
+
+    res.json({
+      success: true,
+      data: { tables },
+    })
+  })
+)
+
 export { router as projectsRouter }

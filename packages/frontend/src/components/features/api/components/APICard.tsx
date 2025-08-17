@@ -55,26 +55,26 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6 hover:shadow-theme-md transition-shadow">
       {/* Header with Stats */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-4">
           <div className="text-center">
-            <div className="text-xs text-gray-500">调用次数</div>
-            <div className="text-lg font-semibold text-blue-600">{Math.floor(Math.random() * 1000)}</div>
+            <div className="text-xs text-text-tertiary">调用次数</div>
+            <div className="text-lg font-semibold text-primary-600">{Math.floor(Math.random() * 1000)}</div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-500">响应时间</div>
-            <div className="text-lg font-semibold text-green-600">{Math.floor(Math.random() * 200)}ms</div>
+            <div className="text-xs text-text-tertiary">响应时间</div>
+            <div className="text-lg font-semibold text-status-success">{Math.floor(Math.random() * 200)}ms</div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-500">成功率</div>
-            <div className="text-lg font-semibold text-purple-600">{(95 + Math.random() * 5).toFixed(1)}%</div>
+            <div className="text-xs text-text-tertiary">成功率</div>
+            <div className="text-lg font-semibold text-status-info">{(95 + Math.random() * 5).toFixed(1)}%</div>
           </div>
         </div>
         <button
           onClick={() => onViewDetails?.(api)}
-          className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-sm hover:bg-blue-100 transition-colors"
+          className="px-3 py-1 bg-primary-50 text-primary-600 rounded-lg text-sm hover:bg-primary-100 transition-colors"
         >
           查看详情
         </button>
@@ -87,10 +87,10 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
             <span className={`px-2 py-1 rounded text-xs font-medium ${HTTP_METHOD_COLORS[api.method as HTTPMethod]}`}>
               {api.method}
             </span>
-            <h3 className="font-semibold text-gray-900 truncate">{api.name}</h3>
+            <h3 className="font-semibold text-text-primary truncate">{api.name}</h3>
           </div>
           
-          <code className="text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded font-mono">
+          <code className="text-sm text-text-secondary bg-bg-tertiary px-2 py-1 rounded font-mono">
             {api.path}
           </code>
         </div>
@@ -98,7 +98,7 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
         <div className="flex items-center gap-2 ml-4">
           <button
             onClick={() => setShowDescription(!showDescription)}
-            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-1 text-text-tertiary hover:text-text-secondary transition-colors"
             title={showDescription ? '隐藏描述' : '显示描述'}
           >
             {showDescription ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -107,7 +107,7 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
           {!api.frontendCode && !api.backendCode && (
             <button
               onClick={() => handleGenerateCode('both')}
-              className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+              className="p-1 text-text-tertiary hover:text-status-success transition-colors"
               title="生成代码"
               disabled={generateCodeMutation.isPending}
             >
@@ -116,7 +116,7 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
           )}
           
           <button
-            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+            className="p-1 text-text-tertiary hover:text-primary-600 transition-colors"
             title="更多操作"
           >
             <MoreVertical className="h-4 w-4" />
@@ -126,18 +126,18 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
 
       {/* 描述信息 */}
       {showDescription && api.description && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-700">{api.description}</p>
+        <div className="mb-4 p-3 bg-bg-tertiary rounded-lg">
+          <p className="text-sm text-text-secondary">{api.description}</p>
         </div>
       )}
 
       {/* 状态选择器 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">状态</label>
+        <label className="block text-sm font-medium text-text-secondary mb-2">状态</label>
         <select
           value={api.status}
           onChange={(e) => handleStatusChange(e.target.value as APIStatus)}
-          className={`w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${API_STATUS_COLORS[api.status]}`}
+          className={`input w-full text-sm ${API_STATUS_COLORS[api.status]}`}
         >
           {Object.entries(API_STATUS_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
@@ -157,8 +157,8 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
                 onClick={() => setActiveCodeTab('frontend')}
                 className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   activeCodeTab === 'frontend'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-bg-paper text-blue-600 shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
                 <Code2 className="h-4 w-4 inline mr-1" />
@@ -170,8 +170,8 @@ const APICard: React.FC<APICardProps> = ({ api, onUpdate, onViewDetails }) => {
                 onClick={() => setActiveCodeTab('backend')}
                 className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   activeCodeTab === 'backend'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-bg-paper text-blue-600 shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
                 <Code2 className="h-4 w-4 inline mr-1" />

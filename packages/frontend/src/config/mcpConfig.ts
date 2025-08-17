@@ -8,7 +8,7 @@ const getEnvConfig = () => {
   return {
     // 从环境变量获取配置，提供默认值
     BACKEND_HOST: import.meta.env.VITE_BACKEND_HOST || 'localhost',
-    BACKEND_PORT: import.meta.env.VITE_BACKEND_PORT || '3001',
+    BACKEND_PORT: import.meta.env.VITE_BACKEND_PORT || '3002',
     MCP_HTTP_HOST: import.meta.env.VITE_MCP_HTTP_HOST || 'localhost',
     MCP_HTTP_PORT: import.meta.env.VITE_MCP_HTTP_PORT || '3001',
     MCP_WS_HOST: import.meta.env.VITE_MCP_WS_HOST || 'localhost',

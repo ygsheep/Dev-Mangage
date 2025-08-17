@@ -14,6 +14,7 @@
     "@devapi/shared": "file:../shared",
     "@hookform/resolvers": "^3.3.1",
     "@tanstack/react-query": "^4.35.3",
+    "@types/recharts": "^1.8.29",
     "axios": "^1.5.0",
     "clsx": "^2.0.0",
     "html2canvas": "^1.4.1",
@@ -26,6 +27,7 @@
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.16.0",
     "reactflow": "^11.11.4",
+    "recharts": "^3.1.2",
     "tailwind-merge": "^1.14.0",
     "zod": "^3.22.4",
     "zustand": "^4.4.1"

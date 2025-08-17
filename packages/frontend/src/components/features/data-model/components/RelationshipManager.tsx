@@ -260,13 +260,13 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
   const getRelationshipColor = (type: string) => {
     switch (type) {
       case 'ONE_TO_ONE':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-primary-100 text-primary-800'
       case 'ONE_TO_MANY':
-        return 'bg-green-100 text-green-800'
+        return 'bg-success-100 text-success-800'
       case 'MANY_TO_MANY':
-        return 'bg-amber-100 text-amber-800'
+        return 'bg-warning-100 text-warning-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-bg-tertiary text-text-secondary'
     }
   }
 
@@ -325,79 +325,79 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
     <div className="space-y-6">
       {/* 统计卡片 */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">总关系数</p>
-              <p className="text-2xl font-bold text-gray-900">{relationshipStats.total}</p>
+              <p className="text-sm font-medium text-text-secondary">总关系数</p>
+              <p className="text-2xl font-bold text-text-primary">{relationshipStats.total}</p>
             </div>
-            <Link className="w-8 h-8 text-gray-400" />
+            <Link className="w-8 h-8 text-text-tertiary" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">一对一</p>
-              <p className="text-2xl font-bold text-blue-600">{relationshipStats.oneToOne}</p>
+              <p className="text-sm font-medium text-text-secondary">一对一</p>
+              <p className="text-2xl font-bold text-primary-600">{relationshipStats.oneToOne}</p>
             </div>
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <span className="text-xs font-bold text-blue-600">1:1</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">一对多</p>
-              <p className="text-2xl font-bold text-green-600">{relationshipStats.oneToMany}</p>
-            </div>
-            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-              <span className="text-xs font-bold text-green-600">1:N</span>
+            <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+              <span className="text-xs font-bold text-primary-600">1:1</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">多对多</p>
-              <p className="text-2xl font-bold text-amber-600">{relationshipStats.manyToMany}</p>
+              <p className="text-sm font-medium text-text-secondary">一对多</p>
+              <p className="text-2xl font-bold text-success-600">{relationshipStats.oneToMany}</p>
             </div>
-            <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-              <span className="text-xs font-bold text-amber-600">N:M</span>
+            <div className="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center">
+              <span className="text-xs font-bold text-success-600">1:N</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">循环依赖</p>
-              <p className="text-2xl font-bold text-orange-600">{relationshipStats.circularDependencies}</p>
+              <p className="text-sm font-medium text-text-secondary">多对多</p>
+              <p className="text-2xl font-bold text-warning-600">{relationshipStats.manyToMany}</p>
             </div>
-            <GitBranch className="w-8 h-8 text-orange-400" />
+            <div className="w-8 h-8 bg-warning-100 rounded-lg flex items-center justify-center">
+              <span className="text-xs font-bold text-warning-600">N:M</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">需要修复</p>
-              <p className="text-2xl font-bold text-red-600">{relationshipStats.issues + relationshipStats.orphanedRelationships}</p>
+              <p className="text-sm font-medium text-text-secondary">循环依赖</p>
+              <p className="text-2xl font-bold text-warning-600">{relationshipStats.circularDependencies}</p>
             </div>
-            <AlertTriangle className="w-8 h-8 text-red-400" />
+            <GitBranch className="w-8 h-8 text-warning-500" />
+          </div>
+        </div>
+
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-text-secondary">需要修复</p>
+              <p className="text-2xl font-bold text-danger-600">{relationshipStats.issues + relationshipStats.orphanedRelationships}</p>
+            </div>
+            <AlertTriangle className="w-8 h-8 text-danger-500" />
           </div>
         </div>
       </div>
 
       {/* 工具栏 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary w-4 h-4" />
               <input
                 type="text"
                 placeholder="搜索关系..."
@@ -449,8 +449,8 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
 
       {/* 表筛选器 */}
       {tables.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
+          <h3 className="font-medium text-text-primary mb-3 flex items-center">
             <Filter className="w-4 h-4 mr-2" />
             按表筛选 {selectedTables.size > 0 && `(${selectedTables.size} 个已选择)`}
           </h3>
@@ -461,15 +461,15 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                 key={table.id}
                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                   selectedTables.has(table.id)
-                    ? 'bg-blue-50 border-blue-500 text-blue-700'
-                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                    ? 'bg-primary-50 border-primary-500 text-primary-700'
+                    : 'bg-bg-secondary border-border-primary text-text-primary hover:bg-bg-tertiary'
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={selectedTables.has(table.id)}
                   onChange={() => handleTableToggle(table.id)}
-                  className="rounded border-gray-300"
+                  className="rounded border-border-primary"
                 />
                 <span className="text-sm">
                   {table.displayName || table.name}
@@ -481,57 +481,57 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
       )}
 
       {/* 关系列表 */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+      <div className="bg-bg-paper rounded-lg border border-border-primary">
+        <div className="px-6 py-4 border-b border-border-primary">
+          <h3 className="text-lg font-medium text-text-primary">
             关系列表 ({filteredRelationships.length})
           </h3>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-border-primary">
+            <thead className="bg-bg-secondary">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   关系名称
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   类型
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   从表
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   到表
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   约束行为
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                   状态
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">
                   操作
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-bg-paper divide-y divide-border-primary">
               {filteredRelationships.map((relationship) => {
                 const fromTable = tables.find(t => t.id === relationship.fromTableId)
                 const toTable = tables.find(t => t.id === relationship.toTableId)
                 const hasProblems = hasIssues(relationship)
 
                 return (
-                  <tr key={relationship.id} className="hover:bg-gray-50">
+                  <tr key={relationship.id} className="hover:bg-bg-tertiary">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <Link className="w-4 h-4 text-gray-400 mr-2" />
+                        <Link className="w-4 h-4 text-text-tertiary mr-2" />
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-text-primary">
                             {relationship.name || `${fromTable?.name}_${toTable?.name}`}
                           </div>
                           {relationship.comment && (
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-text-secondary">
                               {relationship.comment}
                             </div>
                           )}
@@ -547,11 +547,11 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                     
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-text-primary">
                           {fromTable?.displayName || fromTable?.name || '未知表'}
                         </div>
                         {relationship.fromFieldId && (
-                          <div className="ml-2 flex items-center text-xs text-gray-500">
+                          <div className="ml-2 flex items-center text-xs text-text-secondary">
                             <Key className="w-3 h-3 mr-1" />
                             <span>字段ID</span>
                           </div>
@@ -561,12 +561,12 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                     
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <ArrowRight className="w-4 h-4 text-gray-400 mr-2" />
-                        <div className="text-sm text-gray-900">
+                        <ArrowRight className="w-4 h-4 text-text-tertiary mr-2" />
+                        <div className="text-sm text-text-primary">
                           {toTable?.displayName || toTable?.name || '未知表'}
                         </div>
                         {relationship.toFieldId && (
-                          <div className="ml-2 flex items-center text-xs text-gray-500">
+                          <div className="ml-2 flex items-center text-xs text-text-secondary">
                             <Key className="w-3 h-3 mr-1" />
                             <span>字段ID</span>
                           </div>
@@ -574,7 +574,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                       </div>
                     </td>
                     
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
                       <div className="space-y-1">
                         <div>更新: {relationship.onUpdate}</div>
                         <div>删除: {relationship.onDelete}</div>
@@ -583,12 +583,12 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                     
                     <td className="px-6 py-4 whitespace-nowrap">
                       {hasProblems ? (
-                        <div className="flex items-center text-red-600">
+                        <div className="flex items-center text-danger-600">
                           <AlertTriangle className="w-4 h-4 mr-1" />
                           <span className="text-sm">需要修复</span>
                         </div>
                       ) : (
-                        <div className="flex items-center text-green-600">
+                        <div className="flex items-center text-success-600">
                           <CheckCircle className="w-4 h-4 mr-1" />
                           <span className="text-sm">正常</span>
                         </div>
@@ -599,7 +599,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => handleEditRelationship(relationship)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-primary-600 hover:text-primary-700"
                           title="编辑关系"
                         >
                           <Edit3 className="w-4 h-4" />
@@ -607,7 +607,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                         
                         <button
                           onClick={() => handleViewRelationshipDetails(relationship.id)}
-                          className="text-gray-600 hover:text-gray-900"
+                          className="text-text-secondary hover:text-text-primary"
                           title="查看详情"
                         >
                           <Eye className="w-4 h-4" />
@@ -615,7 +615,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                         
                         <button
                           onClick={() => handleCopyRelationship(relationship)}
-                          className="text-gray-600 hover:text-gray-900"
+                          className="text-text-secondary hover:text-text-primary"
                           title="复制关系"
                         >
                           <Copy className="w-4 h-4" />
@@ -623,7 +623,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
                         
                         <button
                           onClick={() => onRelationshipDelete(relationship.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-danger-600 hover:text-danger-700"
                           title="删除关系"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -639,14 +639,14 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
 
         {filteredRelationships.length === 0 && (
           <div className="text-center py-12">
-            <Link className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <Link className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-text-primary mb-2">
               {searchQuery || selectedType !== 'ALL' || selectedTables.size > 0
                 ? '没有找到匹配的关系'
                 : '暂无关系'
               }
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-text-secondary mb-6">
               {searchQuery || selectedType !== 'ALL' || selectedTables.size > 0
                 ? '请尝试调整搜索条件'
                 : '创建表之间的关系来建立数据连接'
@@ -741,9 +741,9 @@ const ConstraintValidationModal: React.FC<ConstraintValidationModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary">
+          <h2 className="text-xl font-semibold text-text-primary">
             约束验证报告
           </h2>
           <button onClick={onClose} className="btn-ghost">
@@ -751,7 +751,7 @@ const ConstraintValidationModal: React.FC<ConstraintValidationModalProps> = ({
           </button>
         </div>
         <div className="p-6">
-          <p className="text-gray-600">约束验证功能正在开发中...</p>
+          <p className="text-text-secondary">约束验证功能正在开发中...</p>
         </div>
       </div>
     </div>
@@ -783,9 +783,9 @@ const RelationshipDetailsModal: React.FC<RelationshipDetailsModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-2xl">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary">
+          <h2 className="text-xl font-semibold text-text-primary">
             关系详情
           </h2>
           <button onClick={onClose} className="btn-ghost">
@@ -795,16 +795,16 @@ const RelationshipDetailsModal: React.FC<RelationshipDetailsModalProps> = ({
         <div className="p-6">
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">关系名称</label>
-              <p className="text-gray-900">{relationship.name}</p>
+              <label className="text-sm font-medium text-text-primary">关系名称</label>
+              <p className="text-text-primary">{relationship.name}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">类型</label>
-              <p className="text-gray-900">{relationship.relationshipType}</p>
+              <label className="text-sm font-medium text-text-primary">类型</label>
+              <p className="text-text-primary">{relationship.relationshipType}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">约束行为</label>
-              <p className="text-gray-900">
+              <label className="text-sm font-medium text-text-primary">约束行为</label>
+              <p className="text-text-primary">
                 更新: {relationship.onUpdate}, 删除: {relationship.onDelete}
               </p>
             </div>

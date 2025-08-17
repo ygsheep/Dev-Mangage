@@ -21,7 +21,7 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({ data, selected }) => {
       {/* 节点主体 */}
       <div
         className={`
-          bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl shadow-lg border-3 transition-all duration-200
+          bg-gradient-card rounded-xl shadow-lg border-3 transition-all duration-200
           ${selected ? 'border-blue-500 shadow-xl scale-105' : 'border-blue-200 hover:border-blue-300'}
         `}
         style={{ 
@@ -44,12 +44,12 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({ data, selected }) => {
             </div>
           </div>
           
-          <h2 className="text-lg font-bold text-gray-900 mb-1">
+          <h2 className="text-lg font-bold text-text-primary mb-1">
             {data.label}
           </h2>
           
           {data.description && (
-            <p className="text-sm text-gray-600 line-clamp-2">
+            <p className="text-sm text-text-secondary line-clamp-2">
               {data.description}
             </p>
           )}
@@ -62,30 +62,30 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({ data, selected }) => {
               <div className="flex justify-center mb-1">
                 <Database className="w-5 h-5 text-green-500" />
               </div>
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-lg font-semibold text-text-primary">
                 {data.metadata?.tableCount || 0}
               </div>
-              <div className="text-xs text-gray-500">数据表</div>
+              <div className="text-xs text-text-tertiary">数据表</div>
             </div>
             
             <div className="text-center">
               <div className="flex justify-center mb-1">
                 <Tag className="w-5 h-5 text-orange-500" />
               </div>
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-lg font-semibold text-text-primary">
                 {data.metadata?.tagCount || 0}
               </div>
-              <div className="text-xs text-gray-500">标签</div>
+              <div className="text-xs text-text-tertiary">标签</div>
             </div>
             
             <div className="text-center">
               <div className="flex justify-center mb-1">
                 <Activity className="w-5 h-5 text-purple-500" />
               </div>
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-lg font-semibold text-text-primary">
                 {data.metadata?.relationCount || 0}
               </div>
-              <div className="text-xs text-gray-500">关系</div>
+              <div className="text-xs text-text-tertiary">关系</div>
             </div>
           </div>
         </div>

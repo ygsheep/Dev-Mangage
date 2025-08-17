@@ -86,8 +86,7 @@ export class SQLParser {
         comment: comment || this.extractTableComment(definition),
         fields,
         indexes: indexes || [],
-        category: this.inferTableCategory(tableName, comment),
-        schema: schema
+        category: this.inferTableCategory(tableName, comment)
       }
     } catch (error) {
       logger.warn('解析表定义失败', { tableName, error: error.message })

@@ -346,19 +346,19 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* 头部 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary bg-gradient-header">
           <div className="flex items-center space-x-3">
-            <Brain className="w-8 h-8 text-blue-500" />
+            <Brain className="w-8 h-8 text-primary-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">AI文档解析</h2>
-              <p className="text-gray-600">智能解析数据库设计文档，自动生成表结构</p>
+              <h2 className="text-xl font-semibold text-text-primary">AI文档解析</h2>
+              <p className="text-text-secondary">智能解析数据库设计文档，自动生成表结构</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -367,22 +367,22 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
         <div className="p-6 max-h-[calc(90vh-80px)] overflow-y-auto">
           {/* 第一步：文件上传 */}
           <div className="space-y-6">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+            <div className="bg-bg-secondary rounded-lg p-4">
+              <h3 className="font-medium text-text-primary mb-3 flex items-center">
                 <Upload className="w-5 h-5 mr-2" />
                 第一步：选择文档文件
               </h3>
               
               {!file ? (
                 <div
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                  className="border-2 border-dashed border-border-primary rounded-lg p-8 text-center hover:border-border-secondary transition-colors cursor-pointer"
                   onDrop={handleFileDrop}
                   onDragOver={(e) => e.preventDefault()}
                   onClick={() => document.getElementById('file-input')?.click()}
                 >
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">点击选择文件或拖拽文件到此处</p>
-                  <p className="text-sm text-gray-500">
+                  <Upload className="w-12 h-12 text-text-tertiary mx-auto mb-4" />
+                  <p className="text-text-secondary mb-2">点击选择文件或拖拽文件到此处</p>
+                  <p className="text-sm text-text-tertiary">
                     支持格式: MD, SQL, Excel, Word, PDF, JSON
                   </p>
                   
@@ -398,19 +398,19 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                   />
                 </div>
               ) : (
-                <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center space-x-3 p-3 bg-bg-paper rounded-lg border border-border-primary">
                   <span className="text-2xl">{getFileIcon(file.name)}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{file.name}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-medium text-text-primary truncate">{file.name}</p>
+                    <p className="text-sm text-text-secondary">
                       {(file.size / 1024).toFixed(1)} KB
                     </p>
                   </div>
                   <button
                     onClick={() => setFile(null)}
-                    className="p-1 hover:bg-gray-100 rounded"
+                    className="p-1 hover:bg-bg-tertiary rounded"
                   >
-                    <X className="w-4 h-4 text-gray-500" />
+                    <X className="w-4 h-4 text-text-tertiary" />
                   </button>
                 </div>
               )}
@@ -418,21 +418,21 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
 
             {/* 第二步：AI配置 */}
             {file && (
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+              <div className="bg-bg-secondary rounded-lg p-4">
+                <h3 className="font-medium text-text-primary mb-3 flex items-center">
                   <Settings className="w-5 h-5 mr-2" />
                   第二步：AI解析配置
                 </h3>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-primary mb-2">
                       AI服务提供商
                       {serviceHealth && (
                         <span className={`ml-2 text-xs px-2 py-1 rounded-full ${
-                          serviceHealth.overall === 'healthy' ? 'bg-green-100 text-green-800' :
-                          serviceHealth.overall === 'degraded' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
+                          serviceHealth.overall === 'healthy' ? 'bg-success-100 text-success-800' :
+                          serviceHealth.overall === 'degraded' ? 'bg-warning-100 text-warning-800' :
+                          'bg-danger-100 text-danger-800'
                         }`}>
                           {serviceHealth.overall === 'healthy' ? '服务正常' :
                            serviceHealth.overall === 'degraded' ? '部分可用' : '服务异常'}
@@ -447,8 +447,8 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                             key={provider.id || provider.name || index}
                             className={`flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer transition-colors ${
                               selectedProvider === provider.name
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-primary-500 bg-primary-50'
+                                : 'border-border-primary hover:border-border-secondary'
                             } ${provider.status !== 'healthy' ? 'opacity-50' : ''}`}
                           >
                             <div className="flex items-center space-x-3">
@@ -459,7 +459,7 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                                 checked={selectedProvider === provider.name}
                                 onChange={(e) => handleProviderChange(e.target.value)}
                                 disabled={provider.status !== 'healthy'}
-                                className="rounded border-gray-300"
+                                className="rounded border-border-primary"
                               />
                               {provider.icon && (
                                 <img 
@@ -473,20 +473,20 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                               )}
                               <div>
                                 <span className="font-medium text-sm">{provider.displayName}</span>
-                                <p className="text-xs text-gray-500 mt-1">{provider.description}</p>
-                                <p className="text-xs text-gray-400">模型: {provider.model}</p>
+                                <p className="text-xs text-text-secondary mt-1">{provider.description}</p>
+                                <p className="text-xs text-text-tertiary">模型: {provider.model}</p>
                               </div>
                             </div>
                             <div className={`w-2 h-2 rounded-full ${
-                              provider.status === 'healthy' ? 'bg-green-500' : 
-                              provider.status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
+                              provider.status === 'healthy' ? 'bg-success-500' : 
+                              provider.status === 'degraded' ? 'bg-warning-500' : 'bg-danger-500'
                             }`} />
                           </label>
                         ))}
                       </div>
                     ) : (
-                      <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                        <p className="text-sm text-gray-500">正在加载AI服务提供商...</p>
+                      <div className="p-3 border border-border-primary rounded-lg bg-bg-secondary">
+                        <p className="text-sm text-text-secondary">正在加载AI服务提供商...</p>
                       </div>
                     )}
                   </div>
@@ -494,13 +494,13 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                   {/* 模型选择 */}
                   {selectedProvider && availableModels.length > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         模型选择
                       </label>
                       <select
                         value={selectedModel}
                         onChange={(e) => setSelectedModel(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         <option value="">请选择模型</option>
                         {availableModels.map((model, index) => (
@@ -540,12 +540,12 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
 
             {/* 第三步：解析结果 */}
             {parseResult && (
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+              <div className="bg-bg-secondary rounded-lg p-4">
+                <h3 className="font-medium text-text-primary mb-3 flex items-center">
                   {parseResult.success ? (
-                    <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
+                    <CheckCircle className="w-5 h-5 mr-2 text-success-500" />
                   ) : (
-                    <AlertCircle className="w-5 h-5 mr-2 text-red-500" />
+                    <AlertCircle className="w-5 h-5 mr-2 text-danger-500" />
                   )}
                   第三步：解析结果确认
                 </h3>
@@ -553,21 +553,21 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                 {parseResult.success ? (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-text-secondary">
                         成功解析 {parseResult.tables.length} 张表，
                         选中 {selectedTables.size} 张表进行导入
                       </div>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => setShowPreview(!showPreview)}
-                          className="text-sm text-blue-600 hover:text-blue-700 flex items-center space-x-1"
+                          className="text-sm text-primary-600 hover:text-primary-700 flex items-center space-x-1"
                         >
                           <Eye className="w-4 h-4" />
                           <span>{showPreview ? '隐藏' : '预览'}SQL</span>
                         </button>
                         <button
                           onClick={handleAIParse}
-                          className="text-sm text-gray-600 hover:text-gray-700 flex items-center space-x-1"
+                          className="text-sm text-text-secondary hover:text-text-primary flex items-center space-x-1"
                         >
                           <RefreshCw className="w-4 h-4" />
                           <span>重新解析</span>
@@ -577,32 +577,32 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                     
                     <div className="space-y-3 max-h-64 overflow-y-auto">
                       {parseResult.tables.map((table) => (
-                        <div key={table.name} className="bg-white rounded-lg border border-gray-200 p-3">
+                        <div key={table.name} className="bg-bg-paper rounded-lg border border-border-primary p-3">
                           <label className="flex items-start space-x-3 cursor-pointer">
                             <input
                               type="checkbox"
                               checked={selectedTables.has(table.name)}
                               onChange={() => handleTableToggle(table.name)}
-                              className="mt-1 rounded border-gray-300"
+                              className="mt-1 rounded border-border-primary"
                             />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center space-x-2">
-                                <Database className="w-4 h-4 text-gray-500" />
-                                <span className="font-medium text-gray-900">
+                                <Database className="w-4 h-4 text-text-secondary" />
+                                <span className="font-medium text-text-primary">
                                   {table.displayName || table.name}
                                 </span>
-                                <span className="text-sm text-gray-500">
+                                <span className="text-sm text-text-secondary">
                                   ({table.name})
                                 </span>
                               </div>
                               
                               {table.comment && (
-                                <p className="text-sm text-gray-600 mt-1">
+                                <p className="text-sm text-text-secondary mt-1">
                                   {table.comment}
                                 </p>
                               )}
                               
-                              <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                              <div className="flex items-center space-x-4 mt-2 text-xs text-text-secondary">
                                 <span>{table.fields.length} 字段</span>
                                 <span>{table.indexes?.length || 0} 索引</span>
                                 <span>
@@ -668,10 +668,10 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                 ) : (
                   <div className="space-y-3">
                     {parseResult.errors?.map((error, index) => (
-                      <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-3">
+                      <div key={index} className="bg-danger-50 border border-danger-200 rounded-lg p-3">
                         <div className="flex items-center space-x-2">
-                          <AlertCircle className="w-5 h-5 text-red-500" />
-                          <span className="text-red-700">{error}</span>
+                          <AlertCircle className="w-5 h-5 text-danger-500" />
+                          <span className="text-danger-700">{error}</span>
                         </div>
                       </div>
                     ))}

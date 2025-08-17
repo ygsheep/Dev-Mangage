@@ -2,10 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 全局文本选中样式 */
+::selection {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-800);
+}
+
+::-moz-selection {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-800);
+}
+
 /* 自定义字体定义 */
 @font-face {
   font-family: 'OPPO Sans';
-  src: url('/static/fonts/OPPO Sans 4.0.ttf') format('truetype');
+  src: url('/fonts/OPPO-Sans-4.0.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -13,7 +24,7 @@
 
 @font-face {
   font-family: 'JetBrains Mono Nerd Font';
-  src: url('/static/fonts/JetBrainsMonoNerdFont-Medium.ttf') format('truetype');
+  src: url('/fonts/JetBrainsMonoNerdFont-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -25,8 +36,10 @@
   }
   
   body {
-    @apply bg-gray-50 text-gray-900;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
     font-family: 'OPPO Sans', 'Inter', system-ui, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
@@ -50,27 +63,49 @@
   }
 
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-primary-600 hover:bg-primary-700 font-medium py-2 px-4 rounded-theme-lg transition-colors duration-200;
+    color: var(--color-text-inverse);
   }
   
   .btn-secondary {
-    @apply bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    @apply hover:opacity-80 font-medium py-2 px-4 rounded-theme-lg transition-all duration-200;
   }
   
   .btn-outline {
-    @apply border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    border: 1px solid var(--color-border-primary);
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    @apply hover:bg-bg-tertiary font-medium py-2 px-4 rounded-theme-lg transition-all duration-200;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    background-color: var(--color-bg-paper);
+    border: 1px solid var(--color-border-primary);
+    box-shadow: var(--card-shadow);
+    @apply rounded-theme-lg p-6 transition-all duration-200;
   }
   
   .input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500;
+    background-color: var(--color-bg-paper);
+    border: 1px solid var(--color-border-primary);
+    color: var(--color-text-primary);
+    @apply block w-full px-3 py-2 rounded-theme-md shadow-theme-sm focus:outline-none transition-all duration-200;
+  }
+  
+  .input:focus {
+    border-color: var(--color-focus);
+    box-shadow: var(--focus-ring);
+  }
+  
+  .input::placeholder {
+    color: var(--color-text-tertiary);
   }
   
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-2;
+    color: var(--color-text-secondary);
+    @apply block text-sm font-medium mb-2;
   }
   
   .badge {
@@ -89,7 +124,7 @@
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: rgb(156 163 175) transparent;
+    scrollbar-color: var(--color-border-secondary) transparent;
   }
   
   .scrollbar-thin::-webkit-scrollbar {
@@ -101,18 +136,140 @@
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: rgb(156 163 175);
+    background-color: var(--color-border-secondary);
     border-radius: 3px;
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(107 114 128);
+    background-color: var(--color-border-primary);
   }
   
   /* Override space-y-6 margins */
   .space-y-6 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-y-reverse: 0;
   }
+}
+
+/* 自定义标题栏样式 */
+.title-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2d2d2d;
+  z-index: 1000;
+  -webkit-app-region: no-drag;
+}
+
+.title-bar-draggable {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  -webkit-app-region: drag;
+}
+
+.title-bar-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.title-bar-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #e5e5e5;
+  font-family: 'OPPO Sans', 'Inter', system-ui, sans-serif;
+  line-height: 1;
+  user-select: none;
+}
+
+.title-bar-separator {
+  color: #666;
+  margin: 0 2px;
+}
+
+.title-bar-subtitle {
+  color: #999;
+  font-weight: 400;
+}
+
+.title-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  -webkit-app-region: no-drag;
+}
+
+.title-bar-button {
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  color: #a3a3a3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+
+.title-bar-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e5e5;
+}
+
+.title-bar-button.close:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.title-bar-button:active {
+  transform: scale(0.95);
+}
+
+/* Windows特定样式 */
+@media (max-width: 1024px) {
+  .title-bar-title {
+    font-size: 13px;
+  }
+  
+  .title-bar-button {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* 确保内容不被标题栏遮挡 */
+.app-with-titlebar {
+  padding-top: 48px;
+}
+
+/* 暗色主题优化 */
+.dark .title-bar {
+  background: #1a1a1a;
+  border-bottom-color: #2d2d2d;
+}
+
+.dark .title-bar-title {
+  color: #e5e5e5;
+}
+
+.dark .title-bar-subtitle {
+  color: #999;
+}
+
+.dark .title-bar-button {
+  color: #a3a3a3;
+}
+
+.dark .title-bar-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e5e5;
 }
 
 /* Custom animations */

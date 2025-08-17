@@ -3,7 +3,16 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { spawn, ChildProcess } from 'child_process';
 
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development' || process.env.ELECTRON_IS_DEV === '1';
+
+// 添加详细的日志记录
+console.log('=== DevAPI Manager Electron Startup ===');
+console.log('isDev:', isDev);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('ELECTRON_IS_DEV:', process.env.ELECTRON_IS_DEV);
+console.log('app.isPackaged:', app.isPackaged);
+console.log('process.resourcesPath:', process.resourcesPath);
+console.log('__dirname:', __dirname);
 
 let mainWindow: BrowserWindow;
 
@@ -19,27 +28,116 @@ function createWindow(): void {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
     },
-    titleBarStyle: 'default',
+    frame: false, // 无边框窗口
+    titleBarStyle: 'hidden', // 隐藏标题栏
+    titleBarOverlay: false, // 禁用标题栏覆盖
     show: false,
+    backgroundColor: '#1a1a1a', // 设置背景色为暗色
+    vibrancy: 'under-window', // macOS毛玻璃效果
+    visualEffectState: 'active', // macOS视觉效果状态
   });
 
   // 加载应用
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
+    console.log('开发模式：尝试连接到 http://localhost:5174');
+    mainWindow.loadURL('http://localhost:5174').catch(err => {
+      console.error('开发模式连接失败，尝试备用端口:', err);
+      // 尝试5173端口
+      mainWindow.loadURL('http://localhost:5173').catch(err2 => {
+        console.error('备用端口也连接失败:', err2);
+        // 最后尝试加载本地文件
+        const localPath = path.join(__dirname, '../../frontend/dist/index.html');
+        console.log('尝试加载本地文件:', localPath);
+        mainWindow.loadFile(localPath);
+      });
+    });
     mainWindow.webContents.openDevTools();
   } else {
     // 生产环境加载打包后的前端资源
     const frontendPath = path.join(process.resourcesPath, 'frontend', 'index.html');
-    if (require('fs').existsSync(frontendPath)) {
-      mainWindow.loadFile(frontendPath);
-    } else {
-      // 开发模式下的备用路径
-      mainWindow.loadFile(path.join(__dirname, '../../frontend/dist/index.html'));
+    const fallbackPath = path.join(__dirname, '../../frontend/dist/index.html');
+    
+    console.log('生产模式尝试加载路径:');
+    console.log('1. 主路径:', frontendPath);
+    console.log('2. 备用路径:', fallbackPath);
+    console.log('process.resourcesPath:', process.resourcesPath);
+    console.log('__dirname:', __dirname);
+    
+    // 列出resources目录内容
+    if (fs.existsSync(process.resourcesPath)) {
+      console.log('Resources目录内容:', fs.readdirSync(process.resourcesPath));
+      const frontendDir = path.join(process.resourcesPath, 'frontend');
+      if (fs.existsSync(frontendDir)) {
+        console.log('Frontend目录内容:', fs.readdirSync(frontendDir));
+      }
     }
+    
+    console.log('1. 主路径存在:', fs.existsSync(frontendPath));
+    console.log('2. 备用路径存在:', fs.existsSync(fallbackPath));
+    
+    if (fs.existsSync(frontendPath)) {
+      console.log('使用主路径加载前端');
+      mainWindow.loadFile(frontendPath);
+    } else if (fs.existsSync(fallbackPath)) {
+      console.log('使用备用路径加载前端');
+      mainWindow.loadFile(fallbackPath);
+    } else {
+      console.error('所有前端路径都不存在！');
+      // 创建一个错误页面
+      mainWindow.loadURL(`data:text/html;charset=utf-8,
+        <html>
+          <head><title>DevAPI Manager - Error</title></head>
+          <body style="font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5;">
+            <h1 style="color: #e74c3c;">DevAPI Manager 启动错误</h1>
+            <p>前端资源文件未找到，请检查以下路径：</p>
+            <ul>
+              <li><code>${frontendPath}</code></li>
+              <li><code>${fallbackPath}</code></li>
+            </ul>
+            <p><strong>Resources目录：</strong> <code>${process.resourcesPath}</code></p>
+            <p><strong>解决方案：</strong></p>
+            <ol>
+              <li>确保前端已正确构建：<code>npm run build</code></li>
+              <li>重新构建桌面应用：<code>npm run build:win</code></li>
+              <li>检查 electron-builder 配置</li>
+            </ol>
+          </body>
+        </html>
+      `);
+    }
+    
+    // 生产模式也开启开发者工具用于调试
+    mainWindow.webContents.openDevTools();
   }
+
+  // 添加页面加载事件监听
+  mainWindow.webContents.on('did-start-loading', () => {
+    console.log('页面开始加载...');
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('页面加载完成！');
+  });
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error('页面加载失败:', {
+      errorCode,
+      errorDescription,
+      validatedURL
+    });
+  });
+
+  mainWindow.webContents.on('dom-ready', () => {
+    console.log('DOM 准备就绪');
+  });
+
+  mainWindow.webContents.on('crashed', (event, killed) => {
+    console.error('渲染进程崩溃:', { killed });
+  });
 
   // 窗口准备显示时显示
   mainWindow.once('ready-to-show', () => {
+    console.log('窗口准备显示');
     mainWindow.show();
   });
 

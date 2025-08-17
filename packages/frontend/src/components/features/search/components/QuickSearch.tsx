@@ -209,7 +209,7 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
       PATCH: 'text-purple-600 bg-purple-50',
       DELETE: 'text-red-600 bg-red-50'
     }
-    return colors[method as keyof typeof colors] || 'text-gray-600 bg-gray-50'
+    return colors[method as keyof typeof colors] || 'text-text-secondary bg-gray-50'
   }
 
   if (!isOpen) return null
@@ -219,7 +219,7 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center pt-20">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-96 overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-96 overflow-hidden">
         {/* 搜索头部 */}
         <div className="flex items-center px-4 py-3 border-b border-gray-200">
           <Search className="h-5 w-5 text-gray-400 mr-3" />
@@ -255,7 +255,7 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
 
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-1 text-gray-400 hover:text-text-secondary transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -266,7 +266,7 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
           {isLoading && (
             <div className="flex items-center justify-center py-8">
               <Loader className="h-6 w-6 animate-spin text-blue-600" />
-              <span className="ml-2 text-gray-600">搜索中...</span>
+              <span className="ml-2 text-text-secondary">搜索中...</span>
             </div>
           )}
 
@@ -308,7 +308,7 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center">
-                  <h3 className="font-medium text-gray-900 truncate">
+                  <h3 className="font-medium text-text-primary truncate">
                     {result.title}
                   </h3>
                   {result.type === 'api' && result.metadata?.method && (
@@ -319,7 +319,7 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
                 </div>
                 
                 {result.subtitle && (
-                  <p className="text-sm text-gray-600 truncate">
+                  <p className="text-sm text-text-secondary truncate">
                     {result.subtitle}
                   </p>
                 )}
@@ -345,15 +345,15 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
           <div className="flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center space-x-4">
               <span className="flex items-center">
-                <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">↑↓</kbd>
+                <kbd className="px-2 py-1 bg-bg-paper border border-gray-300 rounded text-xs">↑↓</kbd>
                 <span className="ml-1">导航</span>
               </span>
               <span className="flex items-center">
-                <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Enter</kbd>
+                <kbd className="px-2 py-1 bg-bg-paper border border-gray-300 rounded text-xs">Enter</kbd>
                 <span className="ml-1">选择</span>
               </span>
               <span className="flex items-center">
-                <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Esc</kbd>
+                <kbd className="px-2 py-1 bg-bg-paper border border-gray-300 rounded text-xs">Esc</kbd>
                 <span className="ml-1">关闭</span>
               </span>
             </div>

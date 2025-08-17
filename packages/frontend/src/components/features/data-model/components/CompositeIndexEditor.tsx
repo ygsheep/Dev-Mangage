@@ -287,7 +287,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[90vh] flex flex-col">
         {/* 头部 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-header">
           <div className="flex items-center space-x-3">
             <Database className="w-8 h-8 text-blue-500" />
             <div>

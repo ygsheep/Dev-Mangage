@@ -106,7 +106,7 @@ export class MigrationScriptGenerator {
       operations.push({
         type: 'ADD_CONSTRAINT',
         table: stmt.table,
-        description: stmt.description
+        description: `Add foreign key constraint to ${stmt.table}`
       })
       
       upQueries.push(stmt.sql)
@@ -118,7 +118,7 @@ export class MigrationScriptGenerator {
       operations.push({
         type: 'ADD_INDEX',
         table: stmt.table,
-        description: stmt.description
+        description: `Add index to ${stmt.table}`
       })
       
       upQueries.push(stmt.sql)

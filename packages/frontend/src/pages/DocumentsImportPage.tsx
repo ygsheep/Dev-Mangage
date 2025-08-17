@@ -149,7 +149,7 @@ const DocumentsImportPage: React.FC = () => {
         {/* Right Panel - Import Types */}
         <div className="lg:col-span-2 space-y-6">
           {/* Tab Navigation */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-bg-paper rounded-lg shadow-sm border border-gray-200">
             <div className="border-b border-gray-200 bg-gray-50 rounded-t-lg">
               <div className="flex">
                 {tabs.map((tab) => (
@@ -158,7 +158,7 @@ const DocumentsImportPage: React.FC = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex-1 px-6 py-4 text-sm font-medium border-b-2 transition-all ${
                       activeTab === tab.id
-                        ? 'border-blue-500 text-blue-600 bg-white'
+                        ? 'border-blue-500 text-blue-600 bg-bg-paper'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                     }`}
                   >

@@ -28,6 +28,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    // 为Electron设置相对路径
+    base: './',
   },
   publicDir: 'static',
 })

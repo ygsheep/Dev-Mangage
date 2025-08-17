@@ -280,16 +280,16 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary">
           <div className="flex items-center space-x-3">
             <FileText className="w-6 h-6 text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-900">导入API接口文档</h2>
+            <h2 className="text-xl font-semibold text-text-primary">导入API接口文档</h2>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -299,14 +299,14 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
           {!file ? (
             <div className="space-y-6">
               {/* 文件上传区域 */}
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
+              <div className="border-2 border-dashed border-border-primary rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
                 <div className="flex flex-col items-center space-y-4">
-                  <Upload className="w-12 h-12 text-gray-400" />
+                  <Upload className="w-12 h-12 text-text-tertiary" />
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-lg font-medium text-text-primary mb-2">
                       选择API接口设计文档
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-text-secondary mb-4">
                       支持Markdown格式的API文档，自动解析接口信息
                     </p>
                     <label className="btn-primary cursor-pointer">
@@ -354,13 +354,13 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
           ) : (
             <div className="space-y-6">
               {/* 文件信息 */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-bg-tertiary rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <FileText className="w-5 h-5 text-blue-600" />
                     <div>
-                      <div className="font-medium text-gray-900">{file.name}</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="font-medium text-text-primary">{file.name}</div>
+                      <div className="text-sm text-text-secondary">
                         {(file.size / 1024).toFixed(1)} KB
                       </div>
                     </div>
@@ -390,7 +390,7 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
                         id="use-ai"
                         checked={useAI}
                         onChange={(e) => setUseAI(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-blue-600 bg-bg-tertiary border-border-primary rounded focus:ring-blue-500"
                       />
                       <label htmlFor="use-ai" className="text-sm font-medium text-blue-800">
                         使用AI智能解析
@@ -428,8 +428,8 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
               {/* 文件内容预览 */}
               {previewContent && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">文档预览:</h4>
-                  <pre className="bg-gray-50 rounded-lg p-4 text-xs text-gray-700 overflow-x-auto max-h-40">
+                  <h4 className="text-sm font-medium text-text-secondary mb-2">文档预览:</h4>
+                  <pre className="bg-bg-tertiary rounded-lg p-4 text-xs text-text-secondary overflow-x-auto max-h-40">
                     {previewContent}
                   </pre>
                 </div>
@@ -480,25 +480,25 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
                   
                   <div className="space-y-3 max-h-60 overflow-y-auto">
                     {parsedAPIs.map((api, index) => (
-                      <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div key={index} className="bg-bg-paper border border-border-primary rounded-lg p-4">
                         <div className="flex items-center space-x-3 mb-2">
                           <span className={`px-2 py-1 rounded text-xs font-mono font-medium ${
                             api.method === 'GET' ? 'bg-blue-100 text-blue-800' :
                             api.method === 'POST' ? 'bg-green-100 text-green-800' :
                             api.method === 'PUT' ? 'bg-orange-100 text-orange-800' :
                             api.method === 'DELETE' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
+                            'bg-bg-tertiary text-text-primary'
                           }`}>
                             {api.method}
                           </span>
-                          <span className="font-medium text-gray-900">{api.name}</span>
+                          <span className="font-medium text-text-primary">{api.name}</span>
                         </div>
-                        <div className="text-sm text-gray-600 mb-2">{api.path}</div>
+                        <div className="text-sm text-text-secondary mb-2">{api.path}</div>
                         {api.description && (
-                          <div className="text-sm text-gray-500">{api.description}</div>
+                          <div className="text-sm text-text-tertiary">{api.description}</div>
                         )}
                         {api.parameters && api.parameters.length > 0 && (
-                          <div className="text-xs text-gray-400 mt-2">
+                          <div className="text-xs text-text-tertiary mt-2">
                             参数: {api.parameters.length} 个
                           </div>
                         )}
@@ -512,14 +512,14 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between p-6 border-t border-border-primary bg-bg-tertiary">
+          <div className="text-sm text-text-secondary">
             {file && `已选择文件: ${file.name}`}
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-sm font-medium text-text-secondary bg-bg-paper border border-border-primary rounded-lg hover:bg-bg-tertiary"
             >
               取消
             </button>

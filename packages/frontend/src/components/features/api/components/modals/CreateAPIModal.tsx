@@ -54,24 +54,24 @@ const CreateAPIModal: React.FC<CreateAPIModalProps> = ({ projectId, onClose, onS
       [HTTPMethod.PUT]: 'text-orange-600',
       [HTTPMethod.PATCH]: 'text-purple-600',
       [HTTPMethod.DELETE]: 'text-red-600',
-      [HTTPMethod.HEAD]: 'text-gray-600',
-      [HTTPMethod.OPTIONS]: 'text-gray-600',
+      [HTTPMethod.HEAD]: 'text-text-secondary',
+      [HTTPMethod.OPTIONS]: 'text-text-secondary',
     }
-    return colors[method] || 'text-gray-600'
+    return colors[method] || 'text-text-secondary'
   }
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose} />
+        <div className="fixed inset-0 bg-bg-tertiary0 bg-opacity-75 transition-opacity" onClick={onClose} />
         
-        <div className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+        <div className="relative transform overflow-hidden rounded-lg bg-bg-paper px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">添加新API</h3>
+            <h3 className="text-lg font-semibold text-text-primary">添加新API</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-text-tertiary hover:text-text-secondary transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -108,7 +108,7 @@ const CreateAPIModal: React.FC<CreateAPIModalProps> = ({ projectId, onClose, onS
               <div className="sm:col-span-2">
                 <label className="label">路径 *</label>
                 <div className="flex">
-                  <span className={`inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-sm font-medium ${getMethodColor(method)}`}>
+                  <span className={`inline-flex items-center px-3 rounded-l-md border border-r-0 border-border-primary bg-bg-tertiary text-sm font-medium ${getMethodColor(method)}`}>
                     {method}
                   </span>
                   <input

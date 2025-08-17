@@ -209,7 +209,7 @@ export const reloadAIConfiguration = async () => {
 }
 
 export const testAIProvider = async (providerId: string) => {
-  return apiClient.post(`/api/v1/ai/providers/${providerId}/test`)
+  return apiClient.post(`/ai/providers/${providerId}/test`)
 }
 
 // AI提供商管理API
@@ -229,15 +229,15 @@ export const createAIProvider = async (data: {
 }
 
 export const updateAIProvider = async (providerId: string, data: any) => {
-  return apiClient.put(`/api/v1/ai/providers/${providerId}`, data)
+  return apiClient.put(`/ai/providers/${providerId}`, data)
 }
 
 export const deleteAIProvider = async (providerId: string) => {
-  return apiClient.delete(`/api/v1/ai/providers/${providerId}`)
+  return apiClient.delete(`/ai/providers/${providerId}`)
 }
 
 export const getAIProviderStats = async (providerId: string) => {
-  return apiClient.get(`/api/v1/ai/providers/${providerId}/stats`)
+  return apiClient.get(`/ai/providers/${providerId}/stats`)
 }
 
 // AI文档解析相关API
@@ -266,7 +266,7 @@ export const batchParseDocuments = async (data: {
 }
 
 export const getParseHistory = async (projectId: string, limit?: number) => {
-  return apiClient.get(`/api/v1/ai/history/${projectId}`, { 
+  return apiClient.get(`/ai/history/${projectId}`, { 
     params: { limit } 
   })
 }
@@ -285,7 +285,7 @@ export const createBatchImportJob = async (data: {
 }
 
 export const getBatchImportJobStatus = async (jobId: string) => {
-  return apiClient.get(`/api/v1/ai/batch/status/${jobId}`)
+  return apiClient.get(`/ai/batch/status/${jobId}`)
 }
 
 export const getBatchImportJobs = async () => {
@@ -293,11 +293,11 @@ export const getBatchImportJobs = async () => {
 }
 
 export const cancelBatchImportJob = async (jobId: string) => {
-  return apiClient.post(`/api/v1/ai/batch/cancel/${jobId}`)
+  return apiClient.post(`/ai/batch/cancel/${jobId}`)
 }
 
 export const getBatchImportJobReport = async (jobId: string) => {
-  return apiClient.get(`/api/v1/ai/batch/report/${jobId}`)
+  return apiClient.get(`/ai/batch/report/${jobId}`)
 }
 
 // SQL代码生成API
@@ -327,19 +327,19 @@ export const generateRollbackScript = async (migrationId: string, data: {
   migration: any
   targetVersion?: string
 }) => {
-  return apiClient.post(`/api/v1/ai/generate/rollback/${migrationId}`, data)
+  return apiClient.post(`/ai/generate/rollback/${migrationId}`, data)
 }
 
 // 数据库优化API
 export const optimizeProjectSchema = async (projectId: string, options?: any) => {
-  return apiClient.post(`/api/v1/ai/optimize/schema/${projectId}`, options || {})
+  return apiClient.post(`/ai/optimize/schema/${projectId}`, options || {})
 }
 
 export const suggestTableIndexes = async (tableId: string, data?: {
   queryPatterns?: string[]
   provider?: string
 }) => {
-  return apiClient.post(`/api/v1/ai/suggest/indexes/${tableId}`, data || {})
+  return apiClient.post(`/ai/suggest/indexes/${tableId}`, data || {})
 }
 
 // 模型验证和修正API
@@ -496,11 +496,11 @@ export const getCodeTemplates = async (filters?: {
 }
 
 export const getCodeTemplate = async (templateId: string) => {
-  return apiClient.get(`/api/v1/ai/templates/${templateId}`)
+  return apiClient.get(`/ai/templates/${templateId}`)
 }
 
 export const renderCodeTemplate = async (templateId: string, variables: Record<string, any>) => {
-  return apiClient.post(`/api/v1/ai/templates/${templateId}/render`, { variables })
+  return apiClient.post(`/ai/templates/${templateId}/render`, { variables })
 }
 
 export const previewCodeTemplate = async (templateId: string, context: {
@@ -508,7 +508,7 @@ export const previewCodeTemplate = async (templateId: string, context: {
   dialect: string
   [key: string]: any
 }) => {
-  return apiClient.post(`/api/v1/ai/templates/${templateId}/preview`, { context })
+  return apiClient.post(`/ai/templates/${templateId}/preview`, { context })
 }
 
 export const createCodeTemplate = async (template: {
@@ -525,11 +525,11 @@ export const createCodeTemplate = async (template: {
 }
 
 export const updateCodeTemplate = async (templateId: string, updates: any) => {
-  return apiClient.put(`/api/v1/ai/templates/${templateId}`, updates)
+  return apiClient.put(`/ai/templates/${templateId}`, updates)
 }
 
 export const deleteCodeTemplate = async (templateId: string) => {
-  return apiClient.delete(`/api/v1/ai/templates/${templateId}`)
+  return apiClient.delete(`/ai/templates/${templateId}`)
 }
 
 export const exportTemplateCollection = async (templateIds: string[]) => {
@@ -553,6 +553,9 @@ export const importCodeTemplates = async (file: File) => {
     }
   })
 }
+
+// 导出API客户端实例（用于直接HTTP调用）
+export const api = apiClient
 
 // 导出API对象
 export const apiMethods = {

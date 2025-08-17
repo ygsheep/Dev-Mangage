@@ -60,7 +60,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
     frontend: { color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
     backend: { color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
     both: { color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' }
-  }[type || 'frontend'] || { color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' })
+  }[type || 'frontend'] || { color: 'text-text-secondary', bg: 'bg-gray-50', border: 'border-gray-200' })
 
   const getStatusColor = (status: string) => ({
     DRAFT: 'text-yellow-600 bg-yellow-50',
@@ -68,7 +68,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
     TESTING: 'text-cyan-600 bg-cyan-50',
     PRODUCTION: 'text-green-600 bg-green-50',
     DEPRECATED: 'text-red-600 bg-red-50'
-  }[status] || 'text-gray-600 bg-gray-50')
+  }[status] || 'text-text-secondary bg-gray-50')
 
   const getPriorityIcon = (priority?: string) => {
     switch(priority) {
@@ -127,7 +127,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
     // Compact list view
     return (
       <div
-        className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 cursor-pointer flex items-center"
+        className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-4 hover:shadow-theme-md transition-all duration-200 cursor-pointer flex items-center"
         style={style}
         onClick={handleCardClick}
       >
@@ -139,12 +139,12 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2 mb-1">
-              <h3 className="font-medium text-gray-900 text-sm truncate">{api.name}</h3>
+              <h3 className="font-medium text-text-primary text-sm truncate">{api.name}</h3>
               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(api.status)} flex-shrink-0`}>
                 {api.status}
               </span>
             </div>
-            <code className="text-xs text-gray-600 bg-gray-50 px-2 py-0.5 rounded font-mono truncate block">
+            <code className="text-xs text-text-secondary bg-bg-tertiary px-2 py-0.5 rounded font-mono truncate block">
               {api.path}
             </code>
           </div>
@@ -153,7 +153,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
         {/* Right section: Metrics and Actions */}
         <div className="flex items-center space-x-4 flex-shrink-0">
           {showMetrics && (
-            <div className="flex items-center space-x-3 text-xs text-gray-500">
+            <div className="flex items-center space-x-3 text-xs text-text-tertiary">
               <span className="flex items-center space-x-1">
                 <TrendingUp className="w-3 h-3" />
                 <span>{mockMetrics.usage}</span>
@@ -193,7 +193,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
               </button>
               
               {showDropdown && (
-                <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                <div className="absolute right-0 top-8 w-48 bg-bg-paper rounded-lg shadow-lg border border-border-primary z-10">
                   <div className="py-1">
                     {menuItems.map(item => (
                       <button
@@ -222,33 +222,33 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
   // Card view (original layout)
   return (
     <div
-      className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300 cursor-pointer"
+      className="bg-bg-paper rounded-xl shadow-theme-sm border border-border-primary p-6 hover:shadow-theme-md transition-all duration-300 cursor-pointer"
       style={style}
       onClick={handleCardClick}
     >
       {/* Header with enhanced stats */}
       {showMetrics && !compact && (
-        <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between mb-4 p-3 bg-bg-tertiary rounded-lg">
           <div className="flex items-center space-x-6">
             <div className="text-center">
-              <div className="text-xs text-gray-500 mb-1">调用次数</div>
+              <div className="text-xs text-text-tertiary mb-1">调用次数</div>
               <div className="flex items-center space-x-1">
-                <TrendingUp className="w-4 h-4 text-blue-500" />
-                <span className="text-lg font-semibold text-blue-600">{mockMetrics.usage}</span>
+                <TrendingUp className="w-4 h-4 text-primary-500" />
+                <span className="text-lg font-semibold text-primary-600">{mockMetrics.usage}</span>
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500 mb-1">响应时间</div>
+              <div className="text-xs text-text-tertiary mb-1">响应时间</div>
               <div className="flex items-center space-x-1">
-                <Clock className="w-4 h-4 text-green-500" />
-                <span className="text-lg font-semibold text-green-600">{mockMetrics.responseTime}ms</span>
+                <Clock className="w-4 h-4 text-status-success" />
+                <span className="text-lg font-semibold text-status-success">{mockMetrics.responseTime}ms</span>
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-gray-500 mb-1">成功率</div>
+              <div className="text-xs text-text-tertiary mb-1">成功率</div>
               <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-purple-500" />
-                <span className="text-lg font-semibold text-purple-600">{mockMetrics.successRate}%</span>
+                <CheckCircle className="w-4 h-4 text-status-info" />
+                <span className="text-lg font-semibold text-status-info">{mockMetrics.successRate}%</span>
               </div>
             </div>
           </div>
@@ -257,7 +257,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
               e.stopPropagation()
               onViewDetails?.(api)
             }}
-            className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center space-x-1"
+            className="btn-primary flex items-center space-x-1"
           >
             <Eye className="w-4 h-4" />
             <span>查看详情</span>
@@ -288,7 +288,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
           
           {/* Second row: API Name */}
           <div className="mb-2">
-            <h3 className="font-semibold text-gray-900 text-base truncate">{api.name}</h3>
+            <h3 className="font-semibold text-text-primary text-base truncate">{api.name}</h3>
           </div>
           
           {/* Third row: Method and Path */}
@@ -296,7 +296,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
             <span className={`px-2 py-1 rounded text-xs font-mono font-medium ${HTTP_METHOD_COLORS[api.method as HTTPMethod]} flex-shrink-0`}>
               {api.method}
             </span>
-            <code className="text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded font-mono truncate min-w-0">
+            <code className="text-sm text-text-secondary bg-gray-50 px-2 py-1 rounded font-mono truncate min-w-0">
               {api.path}
             </code>
           </div>
@@ -337,7 +337,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
             </button>
             
             {showDropdown && (
-              <div className="absolute right-0 top-10 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+              <div className="absolute right-0 top-10 w-48 bg-bg-paper rounded-lg shadow-lg border border-border-primary z-10">
                 <div className="py-1">
                   {menuItems.map(item => (
                     <button
@@ -387,7 +387,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
               )
             ))}
             {api.apiTags.length > 5 && (
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+              <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-text-secondary">
                 +{api.apiTags.length - 5}
               </span>
             )}

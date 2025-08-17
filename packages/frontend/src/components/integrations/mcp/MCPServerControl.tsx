@@ -204,7 +204,7 @@ const MCPServerControl: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+    <div className="bg-bg-paper rounded-lg shadow-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           {getStatusIcon()}

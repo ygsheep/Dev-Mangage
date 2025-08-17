@@ -75,7 +75,7 @@ const DebugController: React.FC = () => {
 
         {/* 扩展面板 */}
         {isExpanded && (
-          <div className="absolute bottom-14 right-0 bg-white rounded-lg shadow-xl border border-gray-200 p-3 min-w-64">
+          <div className="absolute bottom-14 right-0 bg-bg-paper rounded-lg shadow-xl border border-gray-200 p-3 min-w-64">
             <div className="text-sm font-medium text-gray-800 mb-3 flex items-center">
               🐛 调试控制台
               <span className="ml-auto text-xs text-gray-500">

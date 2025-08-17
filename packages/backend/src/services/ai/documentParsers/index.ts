@@ -64,8 +64,7 @@ export class DocumentParserService {
           warnings: validation.warnings,
           metadata: {
             provider: 'DocumentParser',
-            timestamp: new Date(),
-            documentType: type
+            timestamp: new Date()
           }
         }
       }
@@ -84,7 +83,6 @@ export class DocumentParserService {
         metadata: {
           provider: 'DocumentParser',
           timestamp: new Date(),
-          documentType: type,
           processingTime: Date.now()
         }
       }
@@ -101,8 +99,7 @@ export class DocumentParserService {
         error: `文档解析失败: ${error.message}`,
         metadata: {
           provider: 'DocumentParser',
-          timestamp: new Date(),
-          documentType: type
+          timestamp: new Date()
         }
       }
     }

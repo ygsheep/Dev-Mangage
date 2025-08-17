@@ -293,10 +293,10 @@ const ProjectDetailPage: React.FC = () => {
   if (!project) {
     return (
       <div className="card text-center py-12">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-text-primary mb-2">
           项目不存在
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-text-secondary mb-6">
           请检查项目ID是否正确
         </p>
         <Link to="/projects" className="btn-primary">
@@ -318,9 +318,9 @@ const ProjectDetailPage: React.FC = () => {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
+            <h1 className="text-2xl font-bold text-text-primary">{project.name}</h1>
             {project.description && (
-              <p className="text-gray-600">{project.description}</p>
+              <p className="text-text-secondary">{project.description}</p>
             )}
           </div>
         </div>
@@ -365,8 +365,8 @@ const ProjectDetailPage: React.FC = () => {
               onClick={() => setViewMode('card')}
               className={`px-3 py-1.5 flex items-center space-x-2 rounded-md text-sm font-medium transition-all ${
                 viewMode === 'card' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-bg-paper text-text-primary shadow-sm' 
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -376,8 +376,8 @@ const ProjectDetailPage: React.FC = () => {
               onClick={() => setViewMode('list')}
               className={`px-3 py-1.5 flex items-center space-x-2 rounded-md text-sm font-medium transition-all ${
                 viewMode === 'list' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-bg-paper text-text-primary shadow-sm' 
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               <List className="w-4 h-4" />
@@ -404,14 +404,14 @@ const ProjectDetailPage: React.FC = () => {
       {showStats && <ProjectStats projectId={id!} />}
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="flex border-b border-gray-200">
+      <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary">
+        <div className="flex border-b border-border-primary">
           <button
             onClick={() => setActiveTab('apis')}
             className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'apis'
-                ? 'border-blue-500 text-blue-600 bg-blue-50'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600 bg-primary-50'
+                : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border-secondary'
             }`}
           >
             <Code2 className="w-4 h-4 mr-2" />
@@ -421,8 +421,8 @@ const ProjectDetailPage: React.FC = () => {
             onClick={() => setActiveTab('features')}
             className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'features'
-                ? 'border-blue-500 text-blue-600 bg-blue-50'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600 bg-primary-50'
+                : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border-secondary'
             }`}
           >
             <Users className="w-4 h-4 mr-2" />
@@ -432,8 +432,8 @@ const ProjectDetailPage: React.FC = () => {
             onClick={() => setActiveTab('models')}
             className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'models'
-                ? 'border-blue-500 text-blue-600 bg-blue-50'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600 bg-primary-50'
+                : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border-secondary'
             }`}
           >
             <Grid3X3 className="w-4 h-4 mr-2" />
@@ -443,8 +443,8 @@ const ProjectDetailPage: React.FC = () => {
             onClick={() => setActiveTab('mindmap')}
             className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'mindmap'
-                ? 'border-blue-500 text-blue-600 bg-blue-50'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600 bg-primary-50'
+                : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border-secondary'
             }`}
           >
             <GitBranch className="w-4 h-4 mr-2" />
@@ -515,7 +515,7 @@ const ProjectDetailPage: React.FC = () => {
         {/* View mode indicator */}
         {apis.length > 0 && (
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-2 text-sm text-text-secondary">
               <span>共 {apis.length} 个接口</span>
               <span>•</span>
               <span className="flex items-center space-x-1">
@@ -531,10 +531,10 @@ const ProjectDetailPage: React.FC = () => {
             <div className="text-gray-400 mb-4">
               <Plus className="w-12 h-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-text-primary mb-2">
               还没有API
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-text-secondary mb-6">
               添加API或导入文档开始管理
             </p>
             <div className="flex justify-center space-x-3">
@@ -582,8 +582,8 @@ const ProjectDetailPage: React.FC = () => {
         <div className="card">
           <div className="text-center py-12">
             <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">功能模块</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-lg font-medium text-text-primary mb-2">功能模块</h3>
+            <p className="text-text-secondary mb-6">
               在这里管理项目的功能模块，如用户登录、权限管理等业务功能
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -591,11 +591,11 @@ const ProjectDetailPage: React.FC = () => {
               {featureModules.map((module) => (
                 <div 
                   key={module.id}
-                  className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
+                  className="bg-bg-paper border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
                   onClick={() => setSelectedFeatureModule(module)}
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-semibold text-gray-900">{module.name}</h4>
+                    <h4 className="font-semibold text-text-primary">{module.name}</h4>
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       module.status === 'completed' ? 'bg-green-100 text-green-800' :
                       module.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
@@ -605,7 +605,7 @@ const ProjectDetailPage: React.FC = () => {
                        module.status === 'in-progress' ? '开发中' : '规划中'}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-sm text-text-secondary mb-4">
                     {module.description}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-3">
@@ -630,8 +630,8 @@ const ProjectDetailPage: React.FC = () => {
         <div className="card">
           <div className="text-center py-12">
             <Grid3X3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">数据模型管理</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-lg font-medium text-text-primary mb-2">数据模型管理</h3>
+            <p className="text-text-secondary mb-6">
               设计和管理数据库表结构，支持ER图设计、AI文档解析、SQL生成等完整功能
             </p>
             <div className="space-y-4">
@@ -650,7 +650,7 @@ const ProjectDetailPage: React.FC = () => {
               {/* Quick action when data exists */}
               {allDataTables.length > 0 && (
                 <div className="flex items-center justify-between mb-6">
-                  <h4 className="text-lg font-semibold text-gray-900">数据模型 ({allDataTables.length})</h4>
+                  <h4 className="text-lg font-semibold text-text-primary">数据模型 ({allDataTables.length})</h4>
                   <div className="flex items-center space-x-2">
                     <button className="btn-outline flex items-center space-x-2 text-sm">
                       <Plus className="w-4 h-4" />
@@ -665,11 +665,11 @@ const ProjectDetailPage: React.FC = () => {
                 {allDataTables.map((table: DatabaseTable) => (
                   <div 
                     key={table.id}
-                    className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
+                    className="bg-bg-paper border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all cursor-pointer transform hover:scale-105"
                     onClick={() => handleTableClick(table)}
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-semibold text-gray-900">
+                      <h4 className="font-semibold text-text-primary">
                         {table.displayName || table.name} ({table.name})
                       </h4>
                       <span className={`px-2 py-1 text-xs rounded-full ${DATA_MODEL_STATUS_COLORS[table.status]}`}>
@@ -677,7 +677,7 @@ const ProjectDetailPage: React.FC = () => {
                          table.status === DataModelStatus.ACTIVE ? '已创建' : '已废弃'}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm text-text-secondary mb-4">
                       {table.comment || '暂无描述'}
                     </p>
                     <div className="text-xs text-gray-500 space-y-1 mb-3">
@@ -713,7 +713,7 @@ const ProjectDetailPage: React.FC = () => {
         </div>
       ) : activeTab === 'mindmap' ? (
         /* Mindmap Tab Content */
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 240px)' }}>
+        <div className="bg-bg-paper rounded-lg shadow-sm border border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 240px)' }}>
           <MindmapViewer
             projectId={id!}
             height="100%"

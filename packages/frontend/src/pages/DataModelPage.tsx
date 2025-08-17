@@ -346,7 +346,7 @@ const DataModelPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
       </div>
     )
   }
@@ -364,27 +364,45 @@ const DataModelPage: React.FC = () => {
   ] as const
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-bg-secondary">
       {/* 页面头部 */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-bg-paper border-b border-border-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => navigate(`/projects/${projectId}`)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors mr-2"
+                className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors mr-2"
                 title="返回项目详情"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <ArrowLeft className="w-5 h-5 text-text-secondary" />
               </button>
-              <Database className="w-8 h-8 text-blue-500" />
+              <Database className="w-8 h-8 text-primary-500" />
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">数据模型管理</h1>
-                <p className="text-sm text-gray-500">设计和管理数据库结构</p>
+                <h1 className="text-xl font-semibold text-text-primary">数据模型管理</h1>
+                <p className="text-sm text-text-secondary">设计和管理数据库结构</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-3">
+              <button
+                onClick={() => navigate(`/projects/${projectId}/erd`)}
+                className="btn-outline flex items-center space-x-2"
+                title="查看实体关系图"
+              >
+                <Layers className="w-4 h-4" />
+                <span>ERD视图</span>
+              </button>
+              
+              <button
+                onClick={() => navigate(`/projects/${projectId}/data-mindmap`)}
+                className="btn-outline flex items-center space-x-2"
+                title="查看数据模型思维导图"
+              >
+                <GitBranch className="w-4 h-4" />
+                <span>思维导图</span>
+              </button>
+              
               <button
                 onClick={() => setShowAIParser(true)}
                 className="btn-outline flex items-center space-x-2"
@@ -403,7 +421,7 @@ const DataModelPage: React.FC = () => {
       </div>
 
       {/* 标签导航 */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-bg-paper border-b border-border-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* 移动端导航 */}
           <div className="sm:hidden">
@@ -430,8 +448,8 @@ const DataModelPage: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 py-4 px-1 border-b-2 text-sm font-medium transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? 'border-primary-500 text-primary-600'
+                      : 'border-transparent text-text-secondary hover:text-text-primary'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -439,8 +457,8 @@ const DataModelPage: React.FC = () => {
                   {tab.count !== undefined && (
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       activeTab === tab.id
-                        ? 'bg-blue-100 text-blue-600'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'bg-primary-100 text-primary-600'
+                        : 'bg-bg-tertiary text-text-secondary'
                     }`}>
                       {tab.count}
                     </span>
@@ -458,61 +476,61 @@ const DataModelPage: React.FC = () => {
           <div className="space-y-6">
             {/* 统计卡片 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-              <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+              <div className="bg-bg-paper rounded-lg border border-border-primary p-4 lg:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <Database className="w-6 h-6 lg:w-8 lg:h-8 text-blue-500" />
+                    <Database className="w-6 h-6 lg:w-8 lg:h-8 text-primary-500" />
                   </div>
                   <div className="ml-3 lg:ml-4">
-                    <h3 className="text-lg lg:text-xl font-semibold text-gray-900">{tables.length}</h3>
-                    <p className="text-xs lg:text-sm text-gray-500">数据表</p>
+                    <h3 className="text-lg lg:text-xl font-semibold text-text-primary">{tables.length}</h3>
+                    <p className="text-xs lg:text-sm text-text-secondary">数据表</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+              <div className="bg-bg-paper rounded-lg border border-border-primary p-4 lg:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <Layers className="w-6 h-6 lg:w-8 lg:h-8 text-green-500" />
+                    <Layers className="w-6 h-6 lg:w-8 lg:h-8 text-success-500" />
                   </div>
                   <div className="ml-3 lg:ml-4">
-                    <h3 className="text-lg lg:text-xl font-semibold text-gray-900">
+                    <h3 className="text-lg lg:text-xl font-semibold text-text-primary">
                       {tables.reduce((sum, table) => sum + (table.fields?.length || 0), 0)}
                     </h3>
-                    <p className="text-xs lg:text-sm text-gray-500">字段总数</p>
+                    <p className="text-xs lg:text-sm text-text-secondary">字段总数</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+              <div className="bg-bg-paper rounded-lg border border-border-primary p-4 lg:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <Database className="w-6 h-6 lg:w-8 lg:h-8 text-purple-500" />
+                    <Database className="w-6 h-6 lg:w-8 lg:h-8 text-secondary-500" />
                   </div>
                   <div className="ml-3 lg:ml-4">
-                    <h3 className="text-lg lg:text-xl font-semibold text-gray-900">{relationships.length}</h3>
-                    <p className="text-xs lg:text-sm text-gray-500">关联关系</p>
+                    <h3 className="text-lg lg:text-xl font-semibold text-text-primary">{relationships.length}</h3>
+                    <p className="text-xs lg:text-sm text-text-secondary">关联关系</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+              <div className="bg-bg-paper rounded-lg border border-border-primary p-4 lg:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <GitBranch className="w-6 h-6 lg:w-8 lg:h-8 text-orange-500" />
+                    <GitBranch className="w-6 h-6 lg:w-8 lg:h-8 text-warning-500" />
                   </div>
                   <div className="ml-3 lg:ml-4">
-                    <h3 className="text-lg lg:text-xl font-semibold text-gray-900">1</h3>
-                    <p className="text-xs lg:text-sm text-gray-500">版本数</p>
+                    <h3 className="text-lg lg:text-xl font-semibold text-text-primary">1</h3>
+                    <p className="text-xs lg:text-sm text-text-secondary">版本数</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* 表列表 */}
-            <div className="bg-white rounded-lg border border-gray-200">
-              <div className="px-4 lg:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-                <h3 className="text-lg font-medium text-gray-900">数据表列表</h3>
+            <div className="bg-bg-paper rounded-lg border border-border-primary">
+              <div className="px-4 lg:px-6 py-4 border-b border-border-primary flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                <h3 className="text-lg font-medium text-text-primary">数据表列表</h3>
                 <button
                   onClick={() => setShowCreateTable(true)}
                   className="btn-primary flex items-center justify-center space-x-2 w-full sm:w-auto"
@@ -526,27 +544,27 @@ const DataModelPage: React.FC = () => {
                 {tables.map(table => (
                   <div
                     key={table.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 cursor-pointer transition-colors"
+                    className="border border-border-primary rounded-lg p-4 hover:border-border-secondary cursor-pointer transition-colors"
                     onClick={() => setShowTableDetail(table)}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-medium text-gray-900 truncate">
+                      <h4 className="font-medium text-text-primary truncate">
                         {table.displayName || table.name}
                       </h4>
                       <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ml-2 ${
                         table.status === 'ACTIVE' 
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-success-100 text-success-800'
+                          : 'bg-bg-tertiary text-text-secondary'
                       }`}>
                         {table.status}
                       </span>
                     </div>
                     
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    <p className="text-sm text-text-secondary mb-3 line-clamp-2">
                       {table.comment || '暂无描述'}
                     </p>
                     
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center justify-between text-xs text-text-tertiary">
                       <span>{table.fields?.length || 0} 字段</span>
                       <span>{table.indexes?.length || 0} 索引</span>
                       <span className="hidden sm:inline">{table.engine}</span>
@@ -693,12 +711,12 @@ const DataModelPage: React.FC = () => {
       {/* AI文档解析模态框 */}
       {showAIParser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">AI文档解析</h2>
+          <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-border-primary">
+              <h2 className="text-xl font-semibold text-text-primary">AI文档解析</h2>
               <button
                 onClick={() => setShowAIParser(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>

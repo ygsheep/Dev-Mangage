@@ -713,27 +713,27 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">导入文档</h2>
+        <div className="flex items-center justify-between p-6 border-b border-border-primary">
+          <h2 className="text-xl font-semibold text-text-primary">导入文档</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-text-tertiary hover:text-text-secondary transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
         
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200">
+        <div className="border-b border-border-primary">
           <nav className="flex space-x-8 px-6">
             <button
               onClick={() => setActiveTab('api-doc')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === 'api-doc'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-text-tertiary hover:text-text-secondary hover:border-border-primary'
               }`}
             >
               <div className="flex items-center space-x-2">
@@ -745,8 +745,8 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
               onClick={() => setActiveTab('database')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === 'database'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-text-tertiary hover:text-text-secondary hover:border-border-primary'
               }`}
             >
               <div className="flex items-center space-x-2">
@@ -764,22 +764,22 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
             <div className="p-6">
               {/* API文档类型选择 */}
               <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">选择API文档格式</h3>
+                <h3 className="text-lg font-medium text-text-primary mb-4">选择API文档格式</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {/* Markdown 选项 */}
                   <button
                     onClick={() => setApiDocType('markdown')}
                     className={`p-4 border-2 rounded-lg text-left transition-all ${
                       apiDocType === 'markdown'
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-gray-200 hover:border-purple-300'
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-border-primary hover:border-primary-300'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
-                      <Brain className="w-6 h-6 text-purple-600" />
+                      <Brain className="w-6 h-6 text-primary-600" />
                       <div>
-                        <h4 className="font-medium text-gray-900">Markdown 文档</h4>
-                        <p className="text-sm text-gray-600">AI智能解析，支持自然语言描述</p>
+                        <h4 className="font-medium text-text-primary">Markdown 文档</h4>
+                        <p className="text-sm text-text-secondary">AI智能解析，支持自然语言描述</p>
                       </div>
                     </div>
                   </button>
@@ -789,15 +789,15 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                     onClick={() => setApiDocType('json')}
                     className={`p-4 border-2 rounded-lg text-left transition-all ${
                       apiDocType === 'json'
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300'
+                        ? 'border-info-500 bg-info-50'
+                        : 'border-border-primary hover:border-info-300'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
-                      <Code className="w-6 h-6 text-blue-600" />
+                      <Code className="w-6 h-6 text-info-600" />
                       <div>
-                        <h4 className="font-medium text-gray-900">JSON 规范</h4>
-                        <p className="text-sm text-gray-600">标准OpenAPI/Swagger格式</p>
+                        <h4 className="font-medium text-text-primary">JSON 规范</h4>
+                        <p className="text-sm text-text-secondary">标准OpenAPI/Swagger格式</p>
                       </div>
                     </div>
                   </button>
@@ -808,12 +808,12 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
               {apiDocType === 'markdown' ? (
                 <div className="space-y-6">
                   {/* Markdown 文档导入 */}
-                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg">
                     <div className="flex items-start space-x-3">
-                      <Brain className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                      <Brain className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h4 className="text-sm font-medium text-purple-800 mb-1">AI智能解析</h4>
-                        <p className="text-sm text-purple-700">
+                        <h4 className="text-sm font-medium text-primary-800 mb-1">AI智能解析</h4>
+                        <p className="text-sm text-primary-700">
                           使用AI技术自动识别和解析各种格式的API文档，支持自然语言描述
                         </p>
                       </div>
@@ -823,12 +823,12 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                   {!apiFile ? (
                     <div className="space-y-6">
                       {/* 文件上传区域 */}
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
+                      <div className="border-2 border-dashed border-border-primary rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
                         <div className="flex flex-col items-center space-y-4">
-                          <Upload className="w-12 h-12 text-gray-400" />
+                          <Upload className="w-12 h-12 text-text-tertiary" />
                           <div>
-                            <p className="text-lg font-medium text-gray-900 mb-2">上传API文档</p>
-                            <p className="text-sm text-gray-600 mb-4">
+                            <p className="text-lg font-medium text-text-primary mb-2">上传API文档</p>
+                            <p className="text-sm text-text-secondary mb-4">
                               支持 Markdown、Word、PDF、TXT 等格式的API文档
                             </p>
                             <input
@@ -840,7 +840,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                             />
                             <label
                               htmlFor="api-file-upload"
-                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 cursor-pointer"
                             >
                               选择文件
                             </label>
@@ -849,15 +849,15 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       </div>
                       
                       {/* 支持格式说明 */}
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">支持的文档格式</h4>
-                        <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                      <div className="bg-bg-tertiary rounded-lg p-4">
+                        <h4 className="text-sm font-medium text-text-primary mb-2">支持的文档格式</h4>
+                        <div className="grid grid-cols-2 gap-2 text-sm text-text-secondary">
                           <div>• Markdown (.md)</div>
                           <div>• 纯文本 (.txt)</div>
                           <div>• Word文档 (.doc, .docx)</div>
                           <div>• PDF文档 (.pdf)</div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">
+                        <p className="text-xs text-text-tertiary mt-2">
                           AI将自动识别文档中的API接口信息，包括接口名称、HTTP方法、路径、参数等
                         </p>
                       </div>
@@ -865,16 +865,16 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                   ) : (
                     <div className="space-y-6">
                       {/* 文件信息 */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="bg-bg-paper border border-border-primary rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <FileText className="w-8 h-8 text-purple-600" />
+                            <FileText className="w-8 h-8 text-primary-600" />
                             <div>
-                              <h4 className="font-medium text-gray-900">{apiFile.name}</h4>
-                              <p className="text-sm text-gray-500">
+                              <h4 className="font-medium text-text-primary">{apiFile.name}</h4>
+                              <p className="text-sm text-text-tertiary">
                                 {(apiFile.size / 1024).toFixed(1)} KB • {apiFile.type || '未知类型'}
                               </p>
-                              <p className="text-xs text-green-600 mt-1">
+                              <p className="text-xs text-success-600 mt-1">
                                 ✅ 文件已上传，请向下滚动点击"开始解析"按钮
                               </p>
                             </div>
@@ -886,7 +886,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                               setParsedAPIs([])
                               setApiParseError(null)
                             }}
-                            className="text-gray-400 hover:text-gray-600"
+                            className="text-text-tertiary hover:text-text-secondary"
                           >
                             <X className="w-5 h-5" />
                           </button>
@@ -895,32 +895,32 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       
                       {/* 文档统计信息 */}
                       {documentStats && useAI && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <h4 className="text-sm font-medium text-blue-800 mb-3 flex items-center">
+                        <div className="bg-info-50 border border-info-200 rounded-lg p-4">
+                          <h4 className="text-sm font-medium text-info-800 mb-3 flex items-center">
                             <Zap className="w-4 h-4 mr-2" />
                             文档分析结果
                           </h4>
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div className="space-y-2">
                               <div className="flex justify-between">
-                                <span className="text-blue-700">文件大小:</span>
-                                <span className="font-medium text-blue-900">{(documentStats.size / 1024).toFixed(1)} KB</span>
+                                <span className="text-info-700">文件大小:</span>
+                                <span className="font-medium text-info-900">{(documentStats.size / 1024).toFixed(1)} KB</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-blue-700">估算Token:</span>
-                                <span className="font-medium text-blue-900">{documentStats.estimatedTokens.toLocaleString()}</span>
+                                <span className="text-info-700">估算Token:</span>
+                                <span className="font-medium text-info-900">{documentStats.estimatedTokens.toLocaleString()}</span>
                               </div>
                             </div>
                             <div className="space-y-2">
                               <div className="flex justify-between">
-                                <span className="text-blue-700">处理方式:</span>
-                                <span className={`font-medium ${documentStats.willNeedChunking ? 'text-orange-700' : 'text-green-700'}`}>
+                                <span className="text-info-700">处理方式:</span>
+                                <span className={`font-medium ${documentStats.willNeedChunking ? 'text-warning-700' : 'text-success-700'}`}>
                                   {documentStats.willNeedChunking ? `分${documentStats.chunks}块` : '单块处理'}
                                 </span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-blue-700">预计时间:</span>
-                                <span className="font-medium text-blue-900 flex items-center">
+                                <span className="text-info-700">预计时间:</span>
+                                <span className="font-medium text-info-900 flex items-center">
                                   <Clock className="w-3 h-3 mr-1" />
                                   {documentStats.processingTime}
                                 </span>
@@ -928,7 +928,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                             </div>
                           </div>
                           {documentStats.willNeedChunking && (
-                            <div className="mt-3 p-2 bg-orange-100 rounded text-xs text-orange-800">
+                            <div className="mt-3 p-2 bg-warning-100 rounded text-xs text-warning-800">
                               <strong>注意:</strong> 文档较大，将分块处理以避免Token限制。每个分块会单独解析后合并结果。
                             </div>
                           )}
@@ -937,22 +937,22 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       
                       {/* 解析进度 */}
                       {parseProgress && (
-                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
                           <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-medium text-purple-800 flex items-center">
+                            <h4 className="text-sm font-medium text-primary-800 flex items-center">
                               <Brain className="w-4 h-4 mr-2" />
                               AI解析进度
                             </h4>
-                            <span className="text-sm text-purple-700">
+                            <span className="text-sm text-primary-700">
                               {parseProgress.current}/{parseProgress.total}
                             </span>
                           </div>
                           
                           {/* 进度条 */}
                           <div className="mb-3">
-                            <div className="bg-purple-200 rounded-full h-2 overflow-hidden">
+                            <div className="bg-primary-200 rounded-full h-2 overflow-hidden">
                               <div 
-                                className="bg-purple-600 h-2 rounded-full transition-all duration-300 ease-out"
+                                className="bg-primary-600 h-2 rounded-full transition-all duration-300 ease-out"
                                 style={{ width: `${(parseProgress.current / parseProgress.total) * 100}%` }}
                               />
                             </div>
@@ -982,9 +982,9 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                               type="checkbox"
                               checked={useAI}
                               onChange={(e) => setUseAI(e.target.checked)}
-                              className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                              className="rounded border-border-primary text-primary-600 focus:ring-primary-500 bg-bg-paper"
                             />
-                            <span className="text-sm font-medium text-gray-900">AI智能解析</span>
+                            <span className="text-sm font-medium text-text-primary">AI智能解析</span>
                           </label>
                           
                           {useAI && (
@@ -999,13 +999,13 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                         </div>
                         
                         {useAI && (
-                          <div className="text-xs text-blue-700">
+                          <div className="text-xs text-info-700">
                             <div>当前使用: {aiConfig.provider === 'ollama' ? 'Ollama本地' : aiConfig.provider === 'deepseek' ? 'DeepSeek在线' : aiConfig.provider === 'openai' ? 'OpenAI在线' : '模拟模式'}</div>
                             <div>模型: {aiConfig.model}</div>
                           </div>
                         )}
                         
-                        <div className="text-xs text-blue-600">
+                        <div className="text-xs text-info-600">
                           {useAI 
                             ? '✨ AI模式可以更准确地识别复杂格式的API文档，支持自然语言描述，解析完成后将显示提交按钮'
                             : '📝 标准模式使用规则匹配，适合格式规范的文档，解析完成后将显示提交按钮'
@@ -1016,21 +1016,21 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       {/* 文件内容预览 */}
                       {apiPreviewContent && (
                         <div className="space-y-2">
-                          <h4 className="text-sm font-medium text-gray-900">文档预览</h4>
-                          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 max-h-32 overflow-y-auto">
-                            <pre className="text-xs text-gray-700 whitespace-pre-wrap">{apiPreviewContent}</pre>
+                          <h4 className="text-sm font-medium text-text-primary">文档预览</h4>
+                          <div className="bg-bg-tertiary border border-border-primary rounded-lg p-3 max-h-32 overflow-y-auto">
+                            <pre className="text-xs text-text-secondary whitespace-pre-wrap">{apiPreviewContent}</pre>
                           </div>
                         </div>
                       )}
                       
                       {/* 解析错误 */}
                       {apiParseError && (
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div className="bg-danger-50 border border-danger-200 rounded-lg p-4">
                           <div className="flex items-start space-x-3">
-                            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                            <AlertCircle className="w-5 h-5 text-danger-600 mt-0.5 flex-shrink-0" />
                             <div>
-                              <h4 className="text-sm font-medium text-red-800">解析失败</h4>
-                              <p className="text-sm text-red-700 mt-1">{apiParseError}</p>
+                              <h4 className="text-sm font-medium text-danger-800">解析失败</h4>
+                              <p className="text-sm text-danger-700 mt-1">{apiParseError}</p>
                             </div>
                           </div>
                         </div>
@@ -1040,37 +1040,37 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       {parsedAPIs.length > 0 && (
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-medium text-gray-900">
+                            <h4 className="text-sm font-medium text-text-primary">
                               解析结果 ({parsedAPIs.length} 个API)
                             </h4>
-                            <div className="flex items-center space-x-2 text-xs text-green-600">
+                            <div className="flex items-center space-x-2 text-xs text-success-600">
                               <CheckCircle className="w-4 h-4" />
                               <span>解析成功</span>
                             </div>
                           </div>
                           
-                          <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-200 max-h-64 overflow-y-auto">
+                          <div className="bg-bg-paper border border-border-primary rounded-lg divide-y divide-border-primary max-h-64 overflow-y-auto">
                             {parsedAPIs.map((api, index) => (
                               <div key={index} className="p-3">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center space-x-3">
                                     <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                                      api.method === 'GET' ? 'bg-green-100 text-green-800' :
-                                      api.method === 'POST' ? 'bg-blue-100 text-blue-800' :
-                                      api.method === 'PUT' ? 'bg-yellow-100 text-yellow-800' :
-                                      api.method === 'DELETE' ? 'bg-red-100 text-red-800' :
-                                      'bg-gray-100 text-gray-800'
+                                      api.method === 'GET' ? 'bg-success-100 text-success-800' :
+                                      api.method === 'POST' ? 'bg-info-100 text-info-800' :
+                                      api.method === 'PUT' ? 'bg-warning-100 text-warning-800' :
+                                      api.method === 'DELETE' ? 'bg-danger-100 text-danger-800' :
+                                      'bg-bg-tertiary text-text-primary'
                                     }`}>
                                       {api.method}
                                     </span>
                                     <div>
-                                      <div className="font-medium text-gray-900">{api.name}</div>
-                                      <div className="text-sm text-gray-500">{api.path}</div>
+                                      <div className="font-medium text-text-primary">{api.name}</div>
+                                      <div className="text-sm text-text-tertiary">{api.path}</div>
                                     </div>
                                   </div>
                                 </div>
                                 {api.description && (
-                                  <p className="text-sm text-gray-600 mt-2">{api.description}</p>
+                                  <p className="text-sm text-text-secondary mt-2">{api.description}</p>
                                 )}
                               </div>
                             ))}
@@ -1105,7 +1105,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                                 setParsedAPIs([])
                                 setApiParseError(null)
                               }}
-                              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                              className="px-4 py-2 text-sm font-medium text-text-secondary bg-bg-paper border border-border-primary rounded-lg hover:bg-bg-tertiary"
                             >
                               重新解析
                             </button>
@@ -1139,7 +1139,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                   
                   {/* Swagger导入方式选择 */}
                   <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-900">导入方式</h4>
+                    <h4 className="text-sm font-medium text-text-primary">导入方式</h4>
                     <div className="space-y-3">
                       <label className="flex items-center space-x-3">
                         <input
@@ -1148,9 +1148,9 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                           value="url"
                           checked={swaggerImportMethod === 'url'}
                           onChange={(e) => setSwaggerImportMethod(e.target.value as 'url' | 'content')}
-                          className="text-blue-600"
+                          className="text-info-600 focus:ring-info-500 bg-bg-paper border-border-primary"
                         />
-                        <span className="text-sm text-gray-700">从URL导入</span>
+                        <span className="text-sm text-text-secondary">从URL导入</span>
                       </label>
                       <label className="flex items-center space-x-3">
                         <input
@@ -1159,9 +1159,9 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                           value="content"
                           checked={swaggerImportMethod === 'content'}
                           onChange={(e) => setSwaggerImportMethod(e.target.value as 'url' | 'content')}
-                          className="text-blue-600"
+                          className="text-info-600 focus:ring-info-500 bg-bg-paper border-border-primary"
                         />
-                        <span className="text-sm text-gray-700">粘贴内容</span>
+                        <span className="text-sm text-text-secondary">粘贴内容</span>
                       </label>
                     </div>
                   </div>
@@ -1169,7 +1169,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                   {/* URL导入 */}
                   {swaggerImportMethod === 'url' && (
                     <div className="space-y-3">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-text-secondary">
                         Swagger文档URL
                       </label>
                       <input
@@ -1177,7 +1177,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                         value={swaggerUrl}
                         onChange={(e) => setSwaggerUrl(e.target.value)}
                         placeholder="https://api.example.com/swagger.json"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-info-500 bg-bg-paper text-text-primary"
                       />
                     </div>
                   )}
@@ -1185,7 +1185,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                   {/* 内容导入 */}
                   {swaggerImportMethod === 'content' && (
                     <div className="space-y-3">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-text-secondary">
                         Swagger文档内容
                       </label>
                       <textarea
@@ -1193,7 +1193,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                         onChange={(e) => setSwaggerContent(e.target.value)}
                         placeholder="粘贴您的OpenAPI/Swagger JSON或YAML内容..."
                         rows={10}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-info-500 bg-bg-paper text-text-primary"
                       />
                     </div>
                   )}
@@ -1232,13 +1232,13 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
               {currentStep === 'import' && (
                 <div className="space-y-6">
                   {/* 文件上传区域 */}
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                  <div className="border-2 border-dashed border-border-primary rounded-lg p-6">
                     <div className="text-center">
-                      <Database className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      <Database className="w-12 h-12 text-text-tertiary mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-text-primary mb-2">
                         上传数据库设计文档
                       </h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-text-secondary mb-4">
                         支持 .md、.sql、.txt 格式的数据库设计文档
                       </p>
                       
@@ -1258,7 +1258,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       </label>
                       
                       {selectedFile && (
-                        <p className="text-sm text-gray-600 mt-2">
+                        <p className="text-sm text-text-secondary mt-2">
                           已选择: {selectedFile.name}
                         </p>
                       )}
@@ -1268,15 +1268,15 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                   {/* 或者直接粘贴内容 */}
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300" />
+                      <div className="w-full border-t border-border-primary" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">或者</span>
+                      <span className="px-2 bg-bg-paper text-text-tertiary">或者</span>
                     </div>
                   </div>
                   
                   <div className="space-y-3">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-text-secondary">
                       直接粘贴数据库文档内容
                     </label>
                     <textarea
@@ -1284,7 +1284,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       onChange={(e) => setDatabasePreviewContent(e.target.value)}
                       placeholder="粘贴您的数据库设计文档、CREATE TABLE语句或Markdown格式的表结构..."
                       rows={12}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                      className="w-full px-3 py-2 border border-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-info-500 bg-bg-paper text-text-primary font-mono text-sm"
                     />
                   </div>
 
@@ -1298,7 +1298,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                           使用AI模型自动识别表结构、字段类型、索引和关系
                         </p>
                         <div className="mt-2 flex items-center justify-between">
-                          <div className="text-xs text-blue-600">
+                          <div className="text-xs text-info-600">
                             当前使用: {aiConfig.provider === 'ollama' ? 'Ollama本地' : aiConfig.provider === 'deepseek' ? 'DeepSeek在线' : aiConfig.provider === 'openai' ? 'OpenAI在线' : '模拟模式'}
                           </div>
                           <button
@@ -1315,23 +1315,23 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
 
                   {/* 文档统计信息 */}
                   {documentStats && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">文档分析</h4>
+                    <div className="bg-bg-tertiary border border-border-primary rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-text-primary mb-2">文档分析</h4>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600">文档大小:</span>
+                          <span className="text-text-secondary">文档大小:</span>
                           <span className="ml-2 font-medium">{(documentStats.size / 1024).toFixed(1)} KB</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">预估Token:</span>
+                          <span className="text-text-secondary">预估Token:</span>
                           <span className="ml-2 font-medium">{documentStats.estimatedTokens}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">处理分块:</span>
+                          <span className="text-text-secondary">处理分块:</span>
                           <span className="ml-2 font-medium">{documentStats.chunks} 个</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">预计耗时:</span>
+                          <span className="text-text-secondary">预计耗时:</span>
                           <span className="ml-2 font-medium">{documentStats.processingTime}</span>
                         </div>
                       </div>
@@ -1340,12 +1340,12 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
 
                   {/* 解析错误显示 */}
                   {databaseParseError && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="bg-danger-50 border border-danger-200 rounded-lg p-4">
                       <div className="flex">
-                        <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                        <AlertCircle className="w-5 h-5 text-danger-600 mt-0.5" />
                         <div className="ml-3">
-                          <h4 className="text-sm font-medium text-red-800">解析失败</h4>
-                          <p className="text-sm text-red-700 mt-1">{databaseParseError}</p>
+                          <h4 className="text-sm font-medium text-danger-800">解析失败</h4>
+                          <p className="text-sm text-danger-700 mt-1">{databaseParseError}</p>
                         </div>
                       </div>
                     </div>
@@ -1356,7 +1356,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                     <button
                       onClick={handleDatabaseParseSubmit}
                       disabled={isParsingAPI || (!selectedFile && !databasePreviewContent.trim())}
-                      className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                      className="px-6 py-2 text-sm font-medium text-white bg-info-600 rounded-lg hover:bg-info-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                     >
                       {isParsingAPI ? (
                         <>
@@ -1378,21 +1378,21 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
               {currentStep === 'parsing' && parsingProgress && (
                 <div className="space-y-6">
                   <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">AI正在解析数据库文档</h3>
-                    <p className="text-gray-600">
+                    <div className="w-16 h-16 border-4 border-info-200 border-t-info-600 rounded-full animate-spin mx-auto mb-4"></div>
+                    <h3 className="text-lg font-medium text-text-primary mb-2">AI正在解析数据库文档</h3>
+                    <p className="text-text-secondary">
                       正在处理第 {parsingProgress.current} / {parsingProgress.total} 个分块
                     </p>
                     {parsingProgress.chunk && (
-                      <p className="text-sm text-gray-500 mt-2">
+                      <p className="text-sm text-text-tertiary mt-2">
                         当前: {parsingProgress.chunk.title || '处理中...'}
                       </p>
                     )}
                   </div>
 
-                  <div className="bg-gray-200 rounded-full h-2">
+                  <div className="bg-bg-tertiary rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-info-600 h-2 rounded-full transition-all duration-300"
                       style={{ 
                         width: `${Math.round((parsingProgress.current / parsingProgress.total) * 100)}%` 
                       }}
@@ -1406,8 +1406,8 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900">解析结果预览</h3>
-                      <p className="text-gray-600">共解析出 {parsedTables.length} 个数据表</p>
+                      <h3 className="text-lg font-medium text-text-primary">解析结果预览</h3>
+                      <p className="text-text-secondary">共解析出 {parsedTables.length} 个数据表</p>
                     </div>
                     <button
                       onClick={() => setCurrentStep('import')}
@@ -1419,40 +1419,40 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
 
                   <div className="space-y-4 max-h-96 overflow-y-auto">
                     {parsedTables.map((table, index) => (
-                      <div key={table.id || index} className="border border-gray-200 rounded-lg p-4">
+                      <div key={table.id || index} className="border border-border-primary rounded-lg p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h4 className="font-medium text-gray-900">
+                            <h4 className="font-medium text-text-primary">
                               {table.displayName} ({table.name})
                             </h4>
                             {table.comment && (
-                              <p className="text-sm text-gray-600 mt-1">{table.comment}</p>
+                              <p className="text-sm text-text-secondary mt-1">{table.comment}</p>
                             )}
                           </div>
-                          <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                          <span className="text-xs bg-bg-tertiary text-text-secondary px-2 py-1 rounded">
                             {table.fields.length} 个字段
                           </span>
                         </div>
 
                         <div className="space-y-2">
-                          <h5 className="text-sm font-medium text-gray-700">字段列表:</h5>
+                          <h5 className="text-sm font-medium text-text-secondary">字段列表:</h5>
                           <div className="grid gap-2">
                             {table.fields.slice(0, 5).map((field: any, fieldIndex: number) => (
-                              <div key={fieldIndex} className="flex items-center justify-between text-sm bg-gray-50 px-3 py-2 rounded">
+                              <div key={fieldIndex} className="flex items-center justify-between text-sm bg-bg-tertiary px-3 py-2 rounded">
                                 <div className="flex items-center space-x-3">
                                   <span className="font-medium">{field.name}</span>
-                                  <span className="text-gray-600">{field.type}</span>
+                                  <span className="text-text-secondary">{field.type}</span>
                                   {field.primaryKey && (
-                                    <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">PK</span>
+                                    <span className="text-xs bg-warning-100 text-warning-700 px-2 py-0.5 rounded">PK</span>
                                   )}
                                 </div>
-                                <span className="text-gray-500 text-xs">
+                                <span className="text-text-tertiary text-xs">
                                   {field.nullable ? '可空' : '非空'}
                                 </span>
                               </div>
                             ))}
                             {table.fields.length > 5 && (
-                              <div className="text-sm text-gray-500 text-center py-1">
+                              <div className="text-sm text-text-tertiary text-center py-1">
                                 还有 {table.fields.length - 5} 个字段...
                               </div>
                             )}
@@ -1468,7 +1468,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                         setParsedTables([])
                         setCurrentStep('import')
                       }}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                      className="px-4 py-2 text-sm font-medium text-text-secondary bg-bg-paper border border-border-primary rounded-md hover:bg-bg-tertiary"
                     >
                       重新解析
                     </button>
@@ -1487,13 +1487,13 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
         </div>
         
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-sm text-gray-500">
+        <div className="flex items-center justify-between p-6 border-t border-border-primary bg-bg-tertiary">
+          <div className="text-sm text-text-tertiary">
             支持多种格式的API和数据库文档导入
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            className="px-4 py-2 text-sm font-medium text-text-secondary bg-bg-paper border border-border-primary rounded-md hover:bg-bg-tertiary"
           >
             关闭
           </button>

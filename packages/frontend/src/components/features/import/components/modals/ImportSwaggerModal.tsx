@@ -58,12 +58,12 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+      <div className="bg-bg-paper rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">导入Swagger文档</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-text-tertiary hover:text-text-secondary"
           >
             <X className="h-5 w-5" />
           </button>
@@ -78,7 +78,7 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
               className={`flex-1 p-3 rounded-lg border-2 transition-colors ${
                 importType === 'url'
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-border-primary hover:border-border-primary'
               }`}
             >
               <LinkIcon className="h-5 w-5 mx-auto mb-1" />
@@ -90,7 +90,7 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
               className={`flex-1 p-3 rounded-lg border-2 transition-colors ${
                 importType === 'content'
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-border-primary hover:border-border-primary'
               }`}
             >
               <Upload className="h-5 w-5 mx-auto mb-1" />
@@ -101,7 +101,7 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
           {/* 输入区域 */}
           {importType === 'url' ? (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Swagger文档URL
               </label>
               <input
@@ -109,13 +109,13 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
                 value={swaggerUrl}
                 onChange={(e) => setSwaggerUrl(e.target.value)}
                 placeholder="https://api.example.com/swagger.json"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
           ) : (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-secondary mb-2">
                 Swagger文档内容
               </label>
               <textarea
@@ -123,7 +123,7 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
                 onChange={(e) => setSwaggerContent(e.target.value)}
                 placeholder="粘贴Swagger JSON或YAML内容..."
                 rows={8}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
@@ -134,7 +134,7 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              className="px-4 py-2 text-text-secondary hover:text-text-primary"
             >
               取消
             </button>

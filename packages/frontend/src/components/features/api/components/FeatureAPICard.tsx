@@ -47,7 +47,7 @@ const FeatureAPICard: React.FC<FeatureAPICardProps> = ({
 
   return (
     <div 
-      className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer group"
+      className="bg-bg-paper border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer group"
       onClick={handleCardClick}
     >
       {/* API 标识和状态 */}

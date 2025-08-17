@@ -43,15 +43,15 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onSucc
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose} />
+        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
         
-        <div className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+        <div className="relative transform overflow-hidden rounded-lg bg-bg-paper px-4 pb-4 pt-5 text-left shadow-theme-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">创建新项目</h3>
+            <h3 className="text-lg font-semibold text-text-primary">创建新项目</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-text-tertiary hover:text-text-secondary transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -69,7 +69,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onSucc
                 placeholder="输入项目名称"
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                <p className="mt-1 text-sm text-error-600">{errors.name.message}</p>
               )}
             </div>
 

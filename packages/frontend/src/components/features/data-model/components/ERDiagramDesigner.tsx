@@ -260,18 +260,18 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
   // 空状态检查
   if (!tables || tables.length === 0) {
     return (
-      <div className="h-full bg-gray-50 flex items-center justify-center">
+      <div className="h-full bg-bg-secondary flex items-center justify-center">
         <div className="text-center">
-          <Database className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <Database className="w-16 h-16 text-text-tertiary mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-text-primary mb-2">
             暂无数据表
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-text-secondary mb-6">
             开始创建数据表来设计您的数据库结构
           </p>
           <button
             onClick={handleAddTable}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            className="inline-flex items-center space-x-2 px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>创建第一个数据表</span>
@@ -282,24 +282,24 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
   }
 
   return (
-    <div className="h-full bg-white relative" style={{ width: '100%', height: '100%' }}>
+    <div className="h-full bg-bg-primary relative" style={{ width: '100%', height: '100%' }}>
       {/* 工具栏 */}
-      <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg border border-gray-200">
+      <div className="absolute top-4 left-4 z-10 bg-bg-paper rounded-lg shadow-lg border border-border-primary">
         <div className="flex items-center space-x-2 p-3">
           <button
             onClick={handleAddTable}
-            className="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            className="flex items-center space-x-2 px-3 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors"
             title="添加数据表"
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm">添加表</span>
           </button>
           
-          <div className="w-px h-6 bg-gray-300" />
+          <div className="w-px h-6 bg-border-secondary" />
           
           <button
             onClick={handleAutoLayout}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary rounded-md transition-colors"
             title="自动布局"
           >
             <RefreshCw className="w-4 h-4" />
@@ -309,19 +309,19 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
             onClick={() => setIsDesignMode(!isDesignMode)}
             className={`p-2 rounded-md transition-colors ${
               isDesignMode 
-                ? 'bg-blue-100 text-blue-600' 
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                ? 'bg-primary-100 text-primary-600' 
+                : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary'
             }`}
             title="设计模式"
           >
             <Settings className="w-4 h-4" />
           </button>
           
-          <div className="w-px h-6 bg-gray-300" />
+          <div className="w-px h-6 bg-border-secondary" />
           
           <button
             onClick={handleExportLayout}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary rounded-md transition-colors"
             title="导出布局"
           >
             <Download className="w-4 h-4" />
@@ -329,17 +329,17 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
           
           <button
             onClick={handleImportLayout}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary rounded-md transition-colors"
             title="导入布局"
           >
             <Upload className="w-4 h-4" />
           </button>
           
-          <div className="w-px h-6 bg-gray-300" />
+          <div className="w-px h-6 bg-border-secondary" />
           
           <button
             onClick={onSave}
-            className="flex items-center space-x-2 px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+            className="flex items-center space-x-2 px-3 py-2 bg-success-500 text-white rounded-md hover:bg-success-600 transition-colors"
             title="保存"
           >
             <Save className="w-4 h-4" />
@@ -349,14 +349,14 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
       </div>
 
       {/* 视图选项 */}
-      <div className="absolute top-4 right-4 z-10 bg-white rounded-lg shadow-lg border border-gray-200">
+      <div className="absolute top-4 right-4 z-10 bg-bg-paper rounded-lg shadow-lg border border-border-primary">
         <div className="flex items-center space-x-2 p-3">
           <label className="flex items-center space-x-2 text-sm">
             <input
               type="checkbox"
               checked={showMiniMap}
               onChange={(e) => setShowMiniMap(e.target.checked)}
-              className="rounded border-gray-300"
+              className="rounded border-border-primary"
             />
             <span>小地图</span>
           </label>
@@ -366,7 +366,7 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
               type="checkbox"
               checked={showBackground}
               onChange={(e) => setShowBackground(e.target.checked)}
-              className="rounded border-gray-300"
+              className="rounded border-border-primary"
             />
             <span>网格</span>
           </label>
@@ -388,7 +388,7 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
         fitView
         attributionPosition="bottom-left"
         proOptions={proOptions}
-        className="bg-gray-50"
+        className="bg-bg-secondary"
         style={{ width: '100%', height: '100%' }}
       >
         {showBackground && (
@@ -412,7 +412,7 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
             position="bottom-left"
             zoomable
             pannable
-            className="bg-white border border-gray-200 rounded-lg"
+            className="bg-bg-paper border border-border-primary rounded-lg"
             style={{ background: '#f9fafb' }}
           />
         )}
@@ -420,13 +420,13 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
 
       {/* 表详情面板 */}
       {selectedTable && (
-        <div className="absolute right-4 top-20 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-          <div className="p-4 border-b border-gray-200">
+        <div className="absolute right-4 top-20 w-80 bg-bg-paper rounded-lg shadow-lg border border-border-primary z-10">
+          <div className="p-4 border-b border-border-primary">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">表详情</h3>
+              <h3 className="text-lg font-medium text-text-primary">表详情</h3>
               <button
                 onClick={() => setSelectedTable(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-text-tertiary hover:text-text-secondary"
               >
                 ×
               </button>
@@ -441,43 +441,43 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
               return (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       表名
                     </label>
-                    <div className="text-sm text-gray-900">{table.name}</div>
+                    <div className="text-sm text-text-primary">{table.name}</div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       显示名
                     </label>
-                    <div className="text-sm text-gray-900">{table.displayName}</div>
+                    <div className="text-sm text-text-primary">{table.displayName}</div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       字段数量
                     </label>
-                    <div className="text-sm text-gray-900">{table.fields?.length || 0}</div>
+                    <div className="text-sm text-text-primary">{table.fields?.length || 0}</div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       状态
                     </label>
-                    <div className="text-sm text-gray-900">{table.status}</div>
+                    <div className="text-sm text-text-primary">{table.status}</div>
                   </div>
                   
                   {table.comment && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-text-primary mb-1">
                         说明
                       </label>
-                      <div className="text-sm text-gray-600">{table.comment}</div>
+                      <div className="text-sm text-text-secondary">{table.comment}</div>
                     </div>
                   )}
                   
-                  <div className="pt-2 border-t border-gray-200">
+                  <div className="pt-2 border-t border-border-primary">
                     <button
                       onClick={() => onTableUpdate?.(table.id, {})}
                       className="w-full btn-primary text-sm"
@@ -493,8 +493,8 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
       )}
 
       {/* 状态栏 */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-2">
-        <div className="flex items-center space-x-4 text-sm text-gray-600">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-bg-paper rounded-lg shadow-lg border border-border-primary px-4 py-2">
+        <div className="flex items-center space-x-4 text-sm text-text-secondary">
           <div className="flex items-center space-x-2">
             <Database className="w-4 h-4" />
             <span>{tables.length} 张表</span>
@@ -504,7 +504,7 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
             <span>{relationships.length} 个关系</span>
           </div>
           {selectedTable && (
-            <div className="flex items-center space-x-2 text-blue-600">
+            <div className="flex items-center space-x-2 text-primary-600">
               <span>已选择: {tables.find(t => t.id === selectedTable)?.displayName}</span>
             </div>
           )}

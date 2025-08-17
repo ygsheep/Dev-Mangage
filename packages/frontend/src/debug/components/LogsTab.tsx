@@ -246,7 +246,7 @@ const LogsTab: React.FC = () => {
                 {selectedLog.data && (
                   <div>
                     <label className="text-gray-500 font-medium">数据:</label>
-                    <pre className="mt-1 bg-white p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-32">
+                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-32">
                       {JSON.stringify(selectedLog.data, null, 2)}
                     </pre>
                   </div>
@@ -255,7 +255,7 @@ const LogsTab: React.FC = () => {
                 {selectedLog.stack && (
                   <div>
                     <label className="text-gray-500 font-medium">调用栈:</label>
-                    <pre className="mt-1 bg-white p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-40 whitespace-pre-wrap">
+                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-40 whitespace-pre-wrap">
                       {selectedLog.stack}
                     </pre>
                   </div>

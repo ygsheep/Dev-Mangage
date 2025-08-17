@@ -101,8 +101,8 @@ const SwaggerImportPage: React.FC = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">导入Swagger文档</h1>
-            <p className="text-gray-600">从Swagger/OpenAPI文档导入API定义</p>
+            <h1 className="text-2xl font-bold text-text-primary">导入Swagger文档</h1>
+            <p className="text-text-secondary">从Swagger/OpenAPI文档导入API定义</p>
           </div>
         </div>
       </div>
@@ -112,14 +112,14 @@ const SwaggerImportPage: React.FC = () => {
         <div className="space-y-6">
           {/* Import Type Selection */}
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">导入方式</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-4">导入方式</h3>
             <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
               <button
                 onClick={() => setImportType('url')}
                 className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   importType === 'url'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-bg-paper text-primary-600 shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
                 <LinkIcon className="w-4 h-4" />
@@ -129,8 +129,8 @@ const SwaggerImportPage: React.FC = () => {
                 onClick={() => setImportType('content')}
                 className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   importType === 'content'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-bg-paper text-primary-600 shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
                 <FileText className="w-4 h-4" />
@@ -141,7 +141,7 @@ const SwaggerImportPage: React.FC = () => {
 
           {/* Input Area */}
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold text-text-primary mb-4">
               {importType === 'url' ? 'Swagger URL' : 'Swagger JSON内容'}
             </h3>
             
@@ -186,7 +186,7 @@ const SwaggerImportPage: React.FC = () => {
 
           {/* Project Selection */}
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">目标项目</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-4">目标项目</h3>
             <select
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
@@ -203,7 +203,7 @@ const SwaggerImportPage: React.FC = () => {
 
           {/* Import Options */}
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">导入选项</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-4">导入选项</h3>
             <div className="space-y-3">
               <label className="flex items-center">
                 <input
@@ -272,7 +272,7 @@ const SwaggerImportPage: React.FC = () => {
                 ) : (
                   <AlertCircle className="w-5 h-5 text-red-500" />
                 )}
-                <h3 className="text-lg font-semibold text-gray-900">验证结果</h3>
+                <h3 className="text-lg font-semibold text-text-primary">验证结果</h3>
               </div>
 
               {validationResult.valid ? (
@@ -297,14 +297,14 @@ const SwaggerImportPage: React.FC = () => {
 
                   {validationResult.info?.description && (
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">描述</h4>
-                      <p className="text-sm text-gray-600">{validationResult.info.description}</p>
+                      <h4 className="font-medium text-text-primary mb-2">描述</h4>
+                      <p className="text-sm text-text-secondary">{validationResult.info.description}</p>
                     </div>
                   )}
 
                   {validationResult.info?.methods && (
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">HTTP方法</h4>
+                      <h4 className="font-medium text-text-primary mb-2">HTTP方法</h4>
                       <div className="flex flex-wrap gap-1">
                         {validationResult.info.methods.map((method: string) => (
                           <span
@@ -328,8 +328,8 @@ const SwaggerImportPage: React.FC = () => {
 
           {/* Instructions */}
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">使用说明</h3>
-            <div className="space-y-3 text-sm text-gray-600">
+            <h3 className="text-lg font-semibold text-text-primary mb-4">使用说明</h3>
+            <div className="space-y-3 text-sm text-text-secondary">
               <div className="flex items-start space-x-2">
                 <span className="flex-shrink-0 w-5 h-5 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-medium">1</span>
                 <p>选择导入方式：URL链接或直接粘贴JSON内容</p>

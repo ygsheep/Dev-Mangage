@@ -289,8 +289,7 @@ export class SQLDialectManager {
         generatedAt: new Date(),
         totalStatements: statements.length,
         estimatedSize: this.estimateSize(statements),
-        warnings: this.generateWarnings(model, dialect, features),
-        deploymentOrder: statements.map(s => s.table).filter((v, i, a) => a.indexOf(v) === i)
+        warnings: this.generateWarnings(model, dialect, features)
       }
     }
 

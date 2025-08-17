@@ -13,6 +13,7 @@ import {
   Download
 } from 'lucide-react'
 import MCPServerControl from '../components/integrations/mcp/MCPServerControl'
+import ThemeSettings from '../components/features/settings/ThemeSettings'
 import { debug, useDebugComponent } from '../debug'
 import { useMCPConfig } from '../hooks/useMCPConfig'
 
@@ -251,8 +252,8 @@ const SettingsPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">MCP 服务器管理</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-2xl font-bold text-text-primary mb-2">MCP 服务器管理</h2>
+              <p className="text-text-secondary mb-6">
                 管理和监控 Model Context Protocol (MCP) 服务器，包括向量搜索、数据库连接和API接口服务。
               </p>
             </div>
@@ -260,22 +261,22 @@ const SettingsPage: React.FC = () => {
             <MCPServerControl />
             
             {/* 服务器地址配置 */}
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+            <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">服务器地址配置</h3>
+                <h3 className="text-lg font-semibold text-text-primary">服务器地址配置</h3>
                 {!isValid && (
-                  <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                  <span className="px-2 py-1 bg-error-100 text-error-800 text-xs rounded-full">
                     配置错误
                   </span>
                 )}
               </div>
-              <p className="text-gray-600 mb-4">
+              <p className="text-text-secondary mb-4">
                 配置 MCP 服务器的网络地址，用于生成 URL 形式的客户端配置。
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-text-primary mb-2">
                     服务器主机
                   </label>
                   <input
@@ -287,14 +288,14 @@ const SettingsPage: React.FC = () => {
                     }}
                     className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                       validation.errors.some(err => err.includes('后端主机名'))
-                        ? 'border-red-300 focus:ring-red-500'
-                        : 'border-gray-300 focus:ring-blue-500'
-                    }`}
+                        ? 'border-error-300 focus:ring-error-500'
+                        : 'border-border-primary focus:ring-primary-500'
+                    } bg-bg-paper text-text-primary`}
                     placeholder="localhost 或 IP 地址"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-text-primary mb-2">
                     服务器端口
                   </label>
                   <input
@@ -306,9 +307,9 @@ const SettingsPage: React.FC = () => {
                     }}
                     className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                       validation.errors.some(err => err.includes('后端端口号'))
-                        ? 'border-red-300 focus:ring-red-500'
-                        : 'border-gray-300 focus:ring-blue-500'
-                    }`}
+                        ? 'border-error-300 focus:ring-error-500'
+                        : 'border-border-primary focus:ring-primary-500'
+                    } bg-bg-paper text-text-primary`}
                     placeholder="3001"
                   />
                 </div>
@@ -316,10 +317,10 @@ const SettingsPage: React.FC = () => {
               
               {/* 配置验证错误显示 */}
               {validation.errors.length > 0 && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="mt-4 p-3 bg-error-50 border border-error-200 rounded-lg">
                   <div className="flex items-start space-x-2">
-                    <Info className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                    <div className="text-sm text-red-800">
+                    <Info className="w-4 h-4 text-error-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-error-800">
                       <p className="font-medium mb-1">配置错误：</p>
                       <ul className="space-y-1 text-xs">
                         {validation.errors.map((error, index) => (
@@ -332,10 +333,10 @@ const SettingsPage: React.FC = () => {
               )}
               
               {/* 当前生成的 URLs 预览 */}
-              <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="mt-4 p-3 bg-bg-secondary border border-border-secondary rounded-lg">
                 <div className="flex items-start space-x-2">
-                  <Info className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-gray-800">
+                  <Info className="w-4 h-4 text-text-secondary mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-text-primary">
                     <p className="font-medium mb-1">当前配置预览：</p>
                     <ul className="space-y-1 text-xs font-mono">
                       <li>• <strong>后端 API</strong>: {urls.backend}</li>
@@ -346,10 +347,10 @@ const SettingsPage: React.FC = () => {
                 </div>
               </div>
               
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="mt-4 p-3 bg-primary-50 border border-primary-200 rounded-lg">
                 <div className="flex items-start space-x-2">
-                  <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-blue-800">
+                  <Info className="w-4 h-4 text-primary-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-primary-800">
                     <p className="font-medium mb-1">地址说明：</p>
                     <ul className="space-y-1 text-xs">
                       <li>• <strong>localhost</strong>：本地开发环境</li>
@@ -363,14 +364,14 @@ const SettingsPage: React.FC = () => {
             </div>
             
             {/* MCP 服务器配置 JSON */}
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+            <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">客户端配置</h3>
+                <h3 className="text-lg font-semibold text-text-primary">客户端配置</h3>
               </div>
               
               {/* 客户端类型选择器 */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-text-primary mb-3">
                   选择客户端类型
                 </label>
                 <div className="flex space-x-4">
@@ -378,8 +379,8 @@ const SettingsPage: React.FC = () => {
                     onClick={() => setClientType('claude')}
                     className={`px-4 py-2 rounded-lg border transition-colors ${
                       clientType === 'claude'
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'bg-bg-paper text-text-primary border-border-primary hover:bg-bg-tertiary'
                     }`}
                   >
                     Claude Desktop
@@ -388,8 +389,8 @@ const SettingsPage: React.FC = () => {
                     onClick={() => setClientType('trae')}
                     className={`px-4 py-2 rounded-lg border transition-colors ${
                       clientType === 'trae'
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'bg-bg-paper text-text-primary border-border-primary hover:bg-bg-tertiary'
                     }`}
                   >
                     Trae AI
@@ -397,28 +398,28 @@ const SettingsPage: React.FC = () => {
                 </div>
               </div>
               
-              <p className="text-gray-600 mb-6">
+              <p className="text-text-secondary mb-6">
                 将以下配置添加到您的 {clientType === 'claude' ? 'Claude Desktop' : 'Trae AI'} 配置文件中。选择适合您环境的配置：
               </p>
               
               {/* 开发环境配置 */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-md font-medium text-gray-900 flex items-center space-x-2">
-                    <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+                  <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                    <span className="w-3 h-3 bg-primary-500 rounded-full"></span>
                     <span>开发环境配置</span>
                   </h4>
                   <div className="flex space-x-2">
                     <button
                       onClick={() => copyConfig('development')}
-                      className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
                     >
                       <Copy className="w-3 h-3" />
                       <span>{copiedConfig === 'development' ? '已复制' : '复制'}</span>
                     </button>
                     <button
                       onClick={() => downloadConfig('development')}
-                      className="flex items-center space-x-2 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                      className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
                     >
                       <Download className="w-3 h-3" />
                       <span>下载</span>
@@ -426,12 +427,12 @@ const SettingsPage: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="bg-gray-50 rounded-lg p-4 border">
+                <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">开发环境 MCP 配置</span>
-                    <Code className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm font-medium text-text-primary">开发环境 MCP 配置</span>
+                    <Code className="w-4 h-4 text-text-tertiary" />
                   </div>
-                  <pre className="text-sm text-gray-800 overflow-x-auto">
+                  <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
 {JSON.stringify(generateMCPConfig(), null, 2)}
                   </pre>
                 </div>
@@ -440,21 +441,21 @@ const SettingsPage: React.FC = () => {
               {/* 生产环境配置 */}
                <div className="mb-6">
                  <div className="flex items-center justify-between mb-3">
-                   <h4 className="text-md font-medium text-gray-900 flex items-center space-x-2">
-                     <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                   <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                     <span className="w-3 h-3 bg-success-500 rounded-full"></span>
                      <span>生产环境配置</span>
                    </h4>
                    <div className="flex space-x-2">
                      <button
                        onClick={() => copyConfig('production')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                       className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
                      >
                        <Copy className="w-3 h-3" />
                        <span>{copiedConfig === 'production' ? '已复制' : '复制'}</span>
                      </button>
                      <button
                        onClick={() => downloadConfig('production')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                       className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
                      >
                        <Download className="w-3 h-3" />
                        <span>下载</span>
@@ -462,12 +463,12 @@ const SettingsPage: React.FC = () => {
                    </div>
                  </div>
                  
-                 <div className="bg-gray-50 rounded-lg p-4 border">
+                 <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
                    <div className="flex items-center justify-between mb-2">
-                     <span className="text-sm font-medium text-gray-700">生产环境 MCP 配置</span>
-                     <Code className="w-4 h-4 text-gray-500" />
+                     <span className="text-sm font-medium text-text-primary">生产环境 MCP 配置</span>
+                     <Code className="w-4 h-4 text-text-tertiary" />
                    </div>
-                   <pre className="text-sm text-gray-800 overflow-x-auto">
+                   <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
 {JSON.stringify(generateProductionConfig(), null, 2)}
                    </pre>
                  </div>
@@ -476,21 +477,21 @@ const SettingsPage: React.FC = () => {
                {/* HTTP URL 配置 */}
                <div className="mb-6">
                  <div className="flex items-center justify-between mb-3">
-                   <h4 className="text-md font-medium text-gray-900 flex items-center space-x-2">
-                     <span className="w-3 h-3 bg-purple-500 rounded-full"></span>
+                   <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                     <span className="w-3 h-3 bg-secondary-500 rounded-full"></span>
                      <span>HTTP URL 配置</span>
                    </h4>
                    <div className="flex space-x-2">
                      <button
                        onClick={() => copyConfig('http')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                       className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
                      >
                        <Copy className="w-3 h-3" />
                        <span>{copiedConfig === 'http' ? '已复制' : '复制'}</span>
                      </button>
                      <button
                        onClick={() => downloadConfig('http')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                       className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
                      >
                        <Download className="w-3 h-3" />
                        <span>下载</span>
@@ -498,12 +499,12 @@ const SettingsPage: React.FC = () => {
                    </div>
                  </div>
                  
-                 <div className="bg-gray-50 rounded-lg p-4 border">
+                 <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
                    <div className="flex items-center justify-between mb-2">
-                     <span className="text-sm font-medium text-gray-700">HTTP 传输 MCP 配置</span>
-                     <Code className="w-4 h-4 text-gray-500" />
+                     <span className="text-sm font-medium text-text-primary">HTTP 传输 MCP 配置</span>
+                     <Code className="w-4 h-4 text-text-tertiary" />
                    </div>
-                   <pre className="text-sm text-gray-800 overflow-x-auto">
+                   <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
 {JSON.stringify(generateURLConfig(), null, 2)}
                    </pre>
                  </div>
@@ -512,21 +513,21 @@ const SettingsPage: React.FC = () => {
                {/* WebSocket 配置 */}
                <div className="mb-6">
                  <div className="flex items-center justify-between mb-3">
-                   <h4 className="text-md font-medium text-gray-900 flex items-center space-x-2">
-                     <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
+                   <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                     <span className="w-3 h-3 bg-warning-500 rounded-full"></span>
                      <span>WebSocket 配置</span>
                    </h4>
                    <div className="flex space-x-2">
                      <button
                        onClick={() => copyConfig('websocket')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                       className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
                      >
                        <Copy className="w-3 h-3" />
                        <span>{copiedConfig === 'websocket' ? '已复制' : '复制'}</span>
                      </button>
                      <button
                        onClick={() => downloadConfig('websocket')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                       className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
                      >
                        <Download className="w-3 h-3" />
                        <span>下载</span>
@@ -534,12 +535,12 @@ const SettingsPage: React.FC = () => {
                    </div>
                  </div>
                  
-                 <div className="bg-gray-50 rounded-lg p-4 border">
+                 <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
                    <div className="flex items-center justify-between mb-2">
-                     <span className="text-sm font-medium text-gray-700">WebSocket 传输 MCP 配置</span>
-                     <Code className="w-4 h-4 text-gray-500" />
+                     <span className="text-sm font-medium text-text-primary">WebSocket 传输 MCP 配置</span>
+                     <Code className="w-4 h-4 text-text-tertiary" />
                    </div>
-                   <pre className="text-sm text-gray-800 overflow-x-auto">
+                   <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
 {JSON.stringify(generateWebSocketConfig(), null, 2)}
                    </pre>
                  </div>
@@ -549,21 +550,21 @@ const SettingsPage: React.FC = () => {
                {clientType === 'trae' && (
                  <div className="mb-6">
                    <div className="flex items-center justify-between mb-3">
-                     <h4 className="text-md font-medium text-gray-900 flex items-center space-x-2">
-                       <span className="w-3 h-3 bg-indigo-500 rounded-full"></span>
+                     <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                       <span className="w-3 h-3 bg-accent-500 rounded-full"></span>
                        <span>Trae AI HTTP 配置</span>
                      </h4>
                      <div className="flex space-x-2">
                        <button
                          onClick={() => copyConfig('trae-http')}
-                         className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                         className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
                        >
                          <Copy className="w-3 h-3" />
                          <span>{copiedConfig === 'trae-http' ? '已复制' : '复制'}</span>
                        </button>
                        <button
                          onClick={() => downloadConfig('trae-http')}
-                         className="flex items-center space-x-2 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                         className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
                        >
                          <Download className="w-3 h-3" />
                          <span>下载</span>
@@ -571,12 +572,12 @@ const SettingsPage: React.FC = () => {
                      </div>
                    </div>
                    
-                   <div className="bg-gray-50 rounded-lg p-4 border">
+                   <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
                      <div className="flex items-center justify-between mb-2">
-                       <span className="text-sm font-medium text-gray-700">Trae AI HTTP MCP 配置</span>
-                       <Code className="w-4 h-4 text-gray-500" />
+                       <span className="text-sm font-medium text-text-primary">Trae AI HTTP MCP 配置</span>
+                       <Code className="w-4 h-4 text-text-tertiary" />
                      </div>
-                     <pre className="text-sm text-gray-800 overflow-x-auto">
+                     <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
 {JSON.stringify(generateTraeHTTPConfig(), null, 2)}
                      </pre>
                    </div>
@@ -585,10 +586,10 @@ const SettingsPage: React.FC = () => {
               
               {/* 配置说明 */}
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                 <div className="p-3 bg-primary-50 border border-primary-200 rounded-lg">
                    <div className="flex items-start space-x-2">
-                     <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                     <div className="text-sm text-blue-800">
+                     <Info className="w-4 h-4 text-primary-600 mt-0.5 flex-shrink-0" />
+                     <div className="text-sm text-primary-800">
                        <p className="font-medium mb-1">开发环境：</p>
                        <ul className="space-y-1 text-xs">
                          <li>• 本地源码路径</li>
@@ -599,10 +600,10 @@ const SettingsPage: React.FC = () => {
                    </div>
                  </div>
                  
-                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                 <div className="p-3 bg-success-50 border border-success-200 rounded-lg">
                    <div className="flex items-start space-x-2">
-                     <Info className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                     <div className="text-sm text-green-800">
+                     <Info className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                     <div className="text-sm text-success-800">
                        <p className="font-medium mb-1">生产环境：</p>
                        <ul className="space-y-1 text-xs">
                          <li>• 构建后代码</li>
@@ -613,10 +614,10 @@ const SettingsPage: React.FC = () => {
                    </div>
                  </div>
                  
-                 <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                 <div className="p-3 bg-secondary-50 border border-secondary-200 rounded-lg">
                    <div className="flex items-start space-x-2">
-                     <Info className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                     <div className="text-sm text-purple-800">
+                     <Info className="w-4 h-4 text-secondary-600 mt-0.5 flex-shrink-0" />
+                     <div className="text-sm text-secondary-800">
                        <p className="font-medium mb-1">HTTP 传输：</p>
                        <ul className="space-y-1 text-xs">
                          <li>• RESTful API</li>
@@ -628,10 +629,10 @@ const SettingsPage: React.FC = () => {
                  </div>
                  
                  {clientType === 'claude' ? (
-                   <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                   <div className="p-3 bg-warning-50 border border-warning-200 rounded-lg">
                      <div className="flex items-start space-x-2">
-                       <Info className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                       <div className="text-sm text-orange-800">
+                       <Info className="w-4 h-4 text-warning-600 mt-0.5 flex-shrink-0" />
+                       <div className="text-sm text-warning-800">
                          <p className="font-medium mb-1">WebSocket：</p>
                          <ul className="space-y-1 text-xs">
                            <li>• 实时双向通信</li>
@@ -642,10 +643,10 @@ const SettingsPage: React.FC = () => {
                      </div>
                    </div>
                  ) : (
-                   <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+                   <div className="p-3 bg-accent-50 border border-accent-200 rounded-lg">
                      <div className="flex items-start space-x-2">
-                       <Info className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                       <div className="text-sm text-indigo-800">
+                       <Info className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                       <div className="text-sm text-accent-800">
                          <p className="font-medium mb-1">Trae AI HTTP：</p>
                          <ul className="space-y-1 text-xs">
                            <li>• 专为 Trae AI 优化</li>
@@ -658,10 +659,10 @@ const SettingsPage: React.FC = () => {
                  )}
                </div>
               
-              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="mt-4 p-3 bg-warning-50 border border-warning-200 rounded-lg">
                 <div className="flex items-start space-x-2">
-                  <Info className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-yellow-800">
+                  <Info className="w-4 h-4 text-warning-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-warning-800">
                     <p className="font-medium mb-1">使用步骤：</p>
                     <ol className="space-y-1 text-xs list-decimal list-inside">
                       <li>确保已运行 <code className="bg-yellow-100 px-1 rounded">npm run build</code> 构建 MCP 服务器</li>
@@ -677,15 +678,15 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+                <Info className="h-5 w-5 text-primary-600 mt-0.5" />
                 <div>
-                  <h3 className="font-medium text-blue-900 mb-1">关于 MCP 服务器</h3>
-                  <p className="text-sm text-blue-700 mb-2">
+                  <h3 className="font-medium text-primary-900 mb-1">关于 MCP 服务器</h3>
+                  <p className="text-sm text-primary-700 mb-2">
                     MCP 服务器提供强大的API搜索和发现功能，支持以下特性：
                   </p>
-                  <ul className="text-sm text-blue-700 space-y-1">
+                  <ul className="text-sm text-primary-700 space-y-1">
                     <li>• <strong>向量语义搜索</strong> - 使用 all-MiniLM-L6-v2 模型进行深度语义理解</li>
                     <li>• <strong>智能回退机制</strong> - 网络问题时自动使用 TF-IDF 算法</li>
                     <li>• <strong>混合搜索</strong> - 结合关键词匹配和语义相似度</li>
@@ -702,30 +703,30 @@ const SettingsPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">数据库设置</h2>
-              <p className="text-gray-600 mb-6">配置数据存储和备份选项。</p>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">数据库设置</h2>
+              <p className="text-text-secondary mb-6">配置数据存储和备份选项。</p>
             </div>
             
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Prisma 数据库配置</h3>
+            <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">Prisma 数据库配置</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-text-primary mb-2">
                     数据库类型
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-bg-paper text-text-primary">
                     <option>SQLite (本地)</option>
                     <option>PostgreSQL</option>
                     <option>MySQL</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-text-primary mb-2">
                     连接字符串
                   </label>
                   <input 
                     type="text" 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-bg-paper text-text-primary placeholder-text-tertiary"
                     placeholder="file:./dev.db"
                     disabled
                   />
@@ -739,15 +740,15 @@ const SettingsPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">搜索引擎设置</h2>
-              <p className="text-gray-600 mb-6">配置向量搜索和关键词搜索参数。</p>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">搜索引擎设置</h2>
+              <p className="text-text-secondary mb-6">配置向量搜索和关键词搜索参数。</p>
             </div>
             
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">向量搜索配置</h3>
+            <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">向量搜索配置</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-text-primary mb-2">
                     相似度阈值 (0.0 - 1.0)
                   </label>
                   <input 
@@ -758,13 +759,13 @@ const SettingsPage: React.FC = () => {
                     defaultValue="0.3"
                     className="w-full"
                   />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <div className="flex justify-between text-xs text-text-tertiary mt-1">
                     <span>0.0 (宽松)</span>
                     <span>1.0 (严格)</span>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-text-primary mb-2">
                     最大结果数量
                   </label>
                   <input 
@@ -772,7 +773,7 @@ const SettingsPage: React.FC = () => {
                     min="1" 
                     max="50" 
                     defaultValue="10"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-bg-paper text-text-primary"
                   />
                 </div>
               </div>
@@ -781,69 +782,32 @@ const SettingsPage: React.FC = () => {
         )
 
       case 'appearance':
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">外观设置</h2>
-              <p className="text-gray-600 mb-6">自定义界面主题和字体。</p>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">主题配置</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">主题模式</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>浅色模式</option>
-                    <option>深色模式</option>
-                    <option>跟随系统</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">UI字体</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>OPPO Sans (推荐)</option>
-                    <option>系统默认</option>
-                    <option>Arial</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">代码字体</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>JetBrains Mono Nerd Font (推荐)</option>
-                    <option>Fira Code</option>
-                    <option>Monaco</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
+        return <ThemeSettings />
 
       case 'notifications':
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">通知设置</h2>
-              <p className="text-gray-600 mb-6">管理应用通知和提醒。</p>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">通知设置</h2>
+              <p className="text-text-secondary mb-6">管理应用通知和提醒。</p>
             </div>
             
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">通知偏好</h3>
+            <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">通知偏好</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900">MCP服务器状态通知</h4>
-                    <p className="text-sm text-gray-500">服务器启动、停止或出错时通知</p>
+                    <h4 className="text-sm font-medium text-text-primary">MCP服务器状态通知</h4>
+                    <p className="text-sm text-text-tertiary">服务器启动、停止或出错时通知</p>
                   </div>
-                  <input type="checkbox" className="rounded" defaultChecked />
+                  <input type="checkbox" className="rounded border-border-primary text-primary-600 focus:ring-primary-500" defaultChecked />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900">搜索性能警告</h4>
-                    <p className="text-sm text-gray-500">搜索响应时间过长时提醒</p>
+                    <h4 className="text-sm font-medium text-text-primary">搜索性能警告</h4>
+                    <p className="text-sm text-text-tertiary">搜索响应时间过长时提醒</p>
                   </div>
-                  <input type="checkbox" className="rounded" />
+                  <input type="checkbox" className="rounded border-border-primary text-primary-600 focus:ring-primary-500" />
                 </div>
               </div>
             </div>
@@ -854,26 +818,26 @@ const SettingsPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">安全设置</h2>
-              <p className="text-gray-600 mb-6">配置权限和安全选项。</p>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">安全设置</h2>
+              <p className="text-text-secondary mb-6">配置权限和安全选项。</p>
             </div>
             
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">访问控制</h3>
+            <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">访问控制</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900">MCP服务器认证</h4>
-                    <p className="text-sm text-gray-500">要求API密钥访问MCP服务</p>
+                    <h4 className="text-sm font-medium text-text-primary">MCP服务器认证</h4>
+                    <p className="text-sm text-text-tertiary">要求API密钥访问MCP服务</p>
                   </div>
-                  <input type="checkbox" className="rounded" />
+                  <input type="checkbox" className="rounded border-border-primary text-primary-600 focus:ring-primary-500" />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900">本地网络访问</h4>
-                    <p className="text-sm text-gray-500">允许局域网内其他设备访问</p>
+                    <h4 className="text-sm font-medium text-text-primary">本地网络访问</h4>
+                    <p className="text-sm text-text-tertiary">允许局域网内其他设备访问</p>
                   </div>
-                  <input type="checkbox" className="rounded" defaultChecked />
+                  <input type="checkbox" className="rounded border-border-primary text-primary-600 focus:ring-primary-500" defaultChecked />
                 </div>
               </div>
             </div>
@@ -888,11 +852,11 @@ const SettingsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-3">
-          <Settings className="h-8 w-8 text-blue-600" />
+        <h1 className="text-3xl font-bold text-text-primary flex items-center space-x-3">
+          <Settings className="h-8 w-8 text-primary-600" />
           <span>系统设置</span>
         </h1>
-        <p className="text-gray-600 mt-2">管理应用配置和服务设置</p>
+        <p className="text-text-secondary mt-2">管理应用配置和服务设置</p>
       </div>
 
       <div className="flex space-x-8">
@@ -905,16 +869,16 @@ const SettingsPage: React.FC = () => {
                 onClick={() => handleTabChange(tab.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-primary-50 text-primary-700 border border-primary-200'
+                    : 'text-text-secondary hover:bg-bg-tertiary'
                 }`}
               >
                 <tab.icon className={`h-5 w-5 ${
-                  activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'
+                  activeTab === tab.id ? 'text-primary-600' : 'text-text-tertiary'
                 }`} />
                 <div>
                   <div className="font-medium">{tab.name}</div>
-                  <div className="text-xs text-gray-500">{tab.description}</div>
+                  <div className="text-xs text-text-tertiary">{tab.description}</div>
                 </div>
               </button>
             ))}

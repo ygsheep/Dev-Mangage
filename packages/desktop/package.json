@@ -42,7 +42,6 @@
     },
     "files": [
       "dist/**/*",
-      "../frontend/dist/**/*",
       "!node_modules/**/*"
     ],
     "extraResources": [

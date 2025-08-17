@@ -92,7 +92,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
       case 'DELETE':
         return <Minus className="w-4 h-4 text-red-600" />
       default:
-        return <FileText className="w-4 h-4 text-gray-600" />
+        return <FileText className="w-4 h-4 text-text-secondary" />
     }
   }
 
@@ -166,10 +166,10 @@ const VersionControl: React.FC<VersionControlProps> = ({
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-3">
-            <GitBranch className="w-6 h-6 text-gray-600" />
+            <GitBranch className="w-6 h-6 text-text-secondary" />
             <div>
-              <h2 className="text-lg font-medium text-gray-900">版本控制</h2>
-              <p className="text-sm text-gray-600">
+              <h2 className="text-lg font-medium text-text-primary">版本控制</h2>
+              <p className="text-sm text-text-secondary">
                 管理数据模型的版本历史和变更记录
               </p>
             </div>
@@ -212,7 +212,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
       {/* 版本时间线 */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+          <h3 className="text-lg font-medium text-text-primary">
             版本历史 ({versions.length})
           </h3>
         </div>
@@ -231,7 +231,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                   <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
                     version.id === currentVersion
                       ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-600'
+                      : 'bg-gray-100 text-text-secondary'
                   }`}>
                     {version.id === currentVersion ? (
                       <GitCommit className="w-6 h-6" />
@@ -253,7 +253,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                               disabled={selectedVersions.length >= 2 && !selectedVersions.includes(version.id)}
                               className="rounded border-gray-300"
                             />
-                            <h4 className="font-medium text-gray-900">
+                            <h4 className="font-medium text-text-primary">
                               {version.name}
                             </h4>
                           </label>
@@ -306,7 +306,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                         </div>
                       </div>
                       
-                      <p className="text-gray-600 text-sm mb-3">
+                      <p className="text-text-secondary text-sm mb-3">
                         {version.description}
                       </p>
                       
@@ -329,7 +329,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                       {version.changes.length > 0 && (
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <h5 className="font-medium text-gray-900 text-sm">
+                            <h5 className="font-medium text-text-primary text-sm">
                               变更详情
                             </h5>
                             <div className="flex items-center space-x-3 text-xs">
@@ -360,7 +360,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                                     <span className="font-medium text-sm">
                                       {change.type} {change.entity}
                                     </span>
-                                    <span className="text-sm text-gray-600">
+                                    <span className="text-sm text-text-secondary">
                                       {change.entityName}
                                     </span>
                                   </div>
@@ -429,10 +429,10 @@ const VersionControl: React.FC<VersionControlProps> = ({
           {versions.length === 0 && (
             <div className="text-center py-12">
               <GitBranch className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-text-primary mb-2">
                 暂无版本历史
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-text-secondary mb-6">
                 创建第一个版本来开始跟踪数据模型的变更
               </p>
               <button
@@ -491,7 +491,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({ onClose, onSave
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">创建新版本</h2>
+          <h2 className="text-xl font-semibold text-text-primary">创建新版本</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -575,7 +575,7 @@ const TagVersionModal: React.FC<TagVersionModalProps> = ({ versionId, onClose, o
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-sm">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">添加标签</h2>
+          <h2 className="text-xl font-semibold text-text-primary">添加标签</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
