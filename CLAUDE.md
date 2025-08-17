@@ -15,6 +15,29 @@ DevAPI Manager is a modern API management platform built as a monorepo with Type
 
 ## Essential Commands
 
+### NixOS 开发环境规则
+
+本项目在 NixOS 环境下开发，需要遵循以下规则：
+
+**命令执行规范：**
+- 所有项目相关的 npm 脚本和工具命令都应使用 `npx` 前缀执行
+- 这确保了使用项目本地安装的依赖版本，避免全局依赖冲突
+- 特别重要的是 Prisma 相关命令，必须使用 `npx prisma` 而不是 `prisma`
+
+**示例：**
+```bash
+# 正确的 NixOS 执行方式
+npx prisma generate          # 而不是 prisma generate
+npx prisma db push          # 而不是 prisma db push
+npx tsx src/index.ts        # 而不是 tsx src/index.ts
+npx vite build              # 而不是 vite build
+```
+
+**环境要求：**
+- Node.js 18+ (通过 NixOS 配置管理)
+- 项目依赖通过 npm install 安装在本地 node_modules
+- 使用 npx 确保工具版本一致性和环境隔离
+
 ### Development Environment
 ```bash
 # Start full development environment (recommended)
@@ -31,11 +54,11 @@ npm run dev:mcp              # MCP server only (port 3004)
 ```bash
 # Backend database commands
 cd packages/backend
-npm run db:generate          # Generate Prisma client
-npm run db:push             # Push schema to database
-npm run db:migrate          # Create and run migrations
-npm run db:seed             # Seed database with sample data
-npm run db:studio           # Open Prisma Studio
+npx prisma generate          # Generate Prisma client
+npx prisma db push          # Push schema to database
+npx prisma migrate dev      # Create and run migrations
+npx prisma db seed          # Seed database with sample data
+npx prisma studio           # Open Prisma Studio
 ```
 
 ### Building & Testing
@@ -59,6 +82,10 @@ cd packages/mcp-server
 npm run dev                # STDIO MCP server
 npm run dev:http           # HTTP MCP server
 HTTP_MCP_PORT=3004 npm run start:http  # Custom port
+
+# NixOS 环境下使用 npx 执行工具
+npx tsx src/index.ts       # 运行 TypeScript 文件
+npx vite build             # 构建前端项目
 ```
 
 ## Architecture Overview
@@ -258,10 +285,10 @@ The platform now includes comprehensive AI-driven capabilities:
   ```
 - **Database Connection Issues**:
   ```bash
-  # Reset database
-  npm run db:push --force-reset
-  # Regenerate Prisma client
-  npm run db:generate
+  # Reset database (NixOS 环境)
+  npx prisma db push --force-reset
+  # Regenerate Prisma client (NixOS 环境)
+  npx prisma generate
   ```
 - **MCP Service Unresponsive**:
   ```bash
@@ -410,7 +437,7 @@ Cursor IDE configuration in `.cursor/mcp.json`:
 
 ### Common Issues Resolution
 - **Toast errors**: Use `toast.error()` not `toast.warning()` (react-hot-toast limitation)
-- **Database sync**: Run `npm run db:push` after schema changes
+- **Database sync**: Run `npx prisma db push` after schema changes (NixOS 环境)
 - **MCP connection**: Check SSE headers and CORS settings for client compatibility
 - **Build failures**: Ensure shared package is built first with `npm run build`
 

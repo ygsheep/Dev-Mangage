@@ -58,6 +58,19 @@ const Layout: React.FC = () => {
     }, 'Layout')
   }
 
+  // 点击非功能按钮时展开侧边栏
+  const handleSidebarInteraction = (e: React.MouseEvent, href?: string) => {
+    if (isSidebarCollapsed && href && !href.startsWith('#')) {
+      // 如果是收起状态且点击的是有效链接，先展开侧边栏
+      setIsSidebarCollapsed(false)
+      localStorage.setItem('devapi-sidebar-collapsed', 'false')
+      debug.log('点击链接展开侧边栏', { 
+        href,
+        currentPath: location.pathname 
+      }, 'Layout')
+    }
+  }
+
   // 点击外部关闭用户菜单
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -189,6 +202,7 @@ const Layout: React.FC = () => {
                 <Link
                   key={item.name}
                   to={item.href}
+                  onClick={(e) => handleSidebarInteraction(e, item.href)}
                   className={`claude-nav-item group flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 ${
                     item.isAction
                       ? 'bg-[#d97757] text-white hover:bg-[#e08663]'
@@ -218,6 +232,7 @@ const Layout: React.FC = () => {
                   <Link
                     key={index}
                     to={`/recent/${index}`}
+                    onClick={(e) => handleSidebarInteraction(e, `/recent/${index}`)}
                     className="block px-3 py-1.5 text-sm rounded hover:bg-[#404040] hover:text-white transition-colors duration-200 truncate"
                   >
                     {item}
@@ -317,6 +332,7 @@ const Layout: React.FC = () => {
                   <Link
                     key={item.name}
                     to={item.href}
+                    onClick={(e) => handleSidebarInteraction(e, item.href)}
                     className={`flex items-center px-3 py-2 text-sm rounded hover:bg-[#404040] transition-colors duration-200 ${
                       active ? 'bg-[#404040] text-white' : 'text-[#b8b8b8]'
                     }`}

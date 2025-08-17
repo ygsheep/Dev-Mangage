@@ -13,7 +13,18 @@
       "Bash(npx prisma db seed:*)",
       "WebFetch(domain:steveshao.com)",
       "Bash(npm run start:http:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(npm run:*)",
+      "Bash(PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npm run db:generate)",
+      "Bash(PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma generate)",
+      "Bash(PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 PRISMA_QUERY_ENGINE_BINARY=linux-musl PRISMA_MIGRATION_ENGINE_BINARY=linux-musl npx prisma generate)",
+      "Bash(PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 PRISMA_CLI_BINARY_TARGETS=linux-musl npx prisma generate --generator)",
+      "Bash(PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 PRISMA_CLI_BINARY_TARGETS=linux-musl npx prisma generate)",
+      "Bash(PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x npx prisma generate)",
+      "Bash(node:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" npx prisma db push --skip-generate)"
     ],
     "deny": []
   }
