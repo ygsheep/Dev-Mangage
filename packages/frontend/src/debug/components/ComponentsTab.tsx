@@ -78,7 +78,7 @@ const ComponentsTab: React.FC = () => {
       case 'simple': return 'text-green-600 bg-green-50'
       case 'medium': return 'text-yellow-600 bg-yellow-50'
       case 'complex': return 'text-red-600 bg-red-50'
-      default: return 'text-gray-600 bg-gray-50'
+      default: return 'text-gray-600 bg-bg-secondary'
     }
   }
 
@@ -155,7 +155,7 @@ const ComponentsTab: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       {/* 控制面板 */}
-      <div className="p-3 bg-gray-50 border-b border-gray-200">
+      <div className="p-3 bg-bg-secondary border-b border-gray-200">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <input
@@ -208,7 +208,7 @@ const ComponentsTab: React.FC = () => {
             {Object.entries(componentsByName).map(([name, states]) => (
               <div key={name} className="p-2">
                 <div className="flex items-center justify-between mb-2">
-                  <h5 className="text-sm font-medium text-gray-700 flex items-center">
+                  <h5 className="text-sm font-medium text-text-primary flex items-center">
                     <span className="text-blue-600 mr-2">📦</span>
                     {name}
                     <span className="ml-2 text-xs text-gray-400">({states.length} 个状态)</span>
@@ -226,7 +226,7 @@ const ComponentsTab: React.FC = () => {
                 </div>
 
                 {/* 最新状态预览 */}
-                <div className="mb-2 p-2 bg-gray-50 rounded text-xs">
+                <div className="mb-2 p-2 bg-bg-secondary rounded text-xs">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-gray-500">最新状态:</span>
                     <span className="text-gray-400">{formatTime(states[0].timestamp)}</span>
@@ -241,9 +241,9 @@ const ComponentsTab: React.FC = () => {
                   {states.slice(0, 5).map((state) => (
                     <div
                       key={state.timestamp}
-                      className={`p-2 hover:bg-gray-50 cursor-pointer text-xs rounded border ${
+                      className={`p-2 hover:bg-bg-secondary cursor-pointer text-xs rounded border ${
                         selectedComponent?.timestamp === state.timestamp && selectedComponent?.name === state.name 
-                          ? 'bg-blue-50 border-blue-200' : 'border-gray-200'
+                          ? 'bg-primary-50 dark:bg-primary-900/20 border-blue-200' : 'border-gray-200'
                       }`}
                       onClick={() => setSelectedComponent(
                         selectedComponent?.timestamp === state.timestamp && selectedComponent?.name === state.name 
@@ -287,7 +287,7 @@ const ComponentsTab: React.FC = () => {
 
         {/* 详情面板 */}
         {selectedComponent && (
-          <div className="w-96 border-l border-gray-200 bg-gray-50 overflow-auto">
+          <div className="w-96 border-l border-gray-200 bg-bg-secondary overflow-auto">
             <div className="p-3">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium text-gray-800">组件详情</h4>
@@ -351,7 +351,7 @@ const ComponentsTab: React.FC = () => {
                       {componentsByName[selectedComponent.name].slice(0, 10).map((state) => (
                         <div 
                           key={state.timestamp} 
-                          className={`flex justify-between text-xs font-mono-nerd bg-bg-paper p-1 rounded cursor-pointer hover:bg-blue-50 ${
+                          className={`flex justify-between text-xs font-mono-nerd bg-bg-paper p-1 rounded cursor-pointer hover:bg-primary-50 dark:bg-primary-900/20 ${
                             state.timestamp === selectedComponent.timestamp ? 'bg-blue-100' : ''
                           }`}
                           onClick={() => setSelectedComponent(state)}

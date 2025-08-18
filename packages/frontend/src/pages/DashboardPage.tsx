@@ -347,7 +347,7 @@ export const DashboardPage: React.FC = () => {
             <div className="space-y-3">
               {stats.tagStats.slice(0, 5).map((tag, index) => (
                 <div key={tag.name} className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">#{tag.name}</span>
+                  <span className="text-sm font-medium text-text-primary">#{tag.name}</span>
                   <span className="text-sm text-gray-500">{tag.value}次使用</span>
                 </div>
               ))}
@@ -367,7 +367,7 @@ export const DashboardPage: React.FC = () => {
                       <span className={`px-2 py-1 text-xs font-medium rounded ${getMethodColor(api.method)}`}>
                         {api.method}
                       </span>
-                      <span className="text-sm font-medium text-gray-700">{api.name}</span>
+                      <span className="text-sm font-medium text-text-primary">{api.name}</span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">{api.path}</p>
                   </div>

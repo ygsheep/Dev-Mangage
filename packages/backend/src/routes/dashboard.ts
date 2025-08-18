@@ -20,7 +20,7 @@ router.get('/stats', async (req, res, next) => {
         include: {
           apis: {
             include: {
-              tags: {
+              apiTags: {
                 include: {
                   tag: true
                 }
@@ -55,7 +55,7 @@ router.get('/stats', async (req, res, next) => {
 
       // 标签使用统计
       const tagStats = project.apis.flatMap(api => 
-        api.tags.map(at => at.tag.name)
+        api.apiTags.map(at => at.tag.name)
       ).reduce((acc: any, tagName) => {
         acc[tagName] = (acc[tagName] || 0) + 1;
         return acc;
@@ -293,7 +293,7 @@ async function getPopularApis(projectId?: string) {
           name: true
         }
       },
-      tags: {
+      apiTags: {
         include: {
           tag: true
         }
@@ -311,7 +311,7 @@ async function getPopularApis(projectId?: string) {
     method: api.method,
     path: api.path,
     project: api.project.name,
-    tags: api.tags.map(at => at.tag.name),
+    tags: api.apiTags.map(at => at.tag.name),
     // 模拟使用次数
     usageCount: Math.floor(Math.random() * 1000) + 100
   }));

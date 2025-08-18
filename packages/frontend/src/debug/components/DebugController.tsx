@@ -45,7 +45,7 @@ const DebugController: React.FC = () => {
           className={`w-12 h-12 rounded-full shadow-lg border-2 transition-all duration-200 flex items-center justify-center text-lg ${
             isEnabled 
               ? 'bg-blue-500 border-blue-600 text-white hover:bg-blue-600' 
-              : 'bg-gray-500 border-gray-600 text-white hover:bg-gray-600'
+              : 'bg-gray-600 border-gray-600 text-white hover:bg-gray-700'
           }`}
           title="调试控制台"
         >
@@ -111,25 +111,25 @@ const DebugController: React.FC = () => {
             {/* 统计信息 */}
             {isEnabled && (
               <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
-                <div className="bg-gray-50 p-2 rounded">
+                <div className="bg-bg-secondary p-2 rounded">
                   <div className="text-gray-500">日志</div>
                   <div className="font-semibold">
                     {logs.length}
                     {errorCount > 0 && <span className="text-red-500 ml-1">({errorCount} 个错误)</span>}
                   </div>
                 </div>
-                <div className="bg-gray-50 p-2 rounded">
+                <div className="bg-bg-secondary p-2 rounded">
                   <div className="text-gray-500">网络</div>
                   <div className="font-semibold">
                     {networkRequests.length}
                     {failedRequests > 0 && <span className="text-red-500 ml-1">({failedRequests} 个失败)</span>}
                   </div>
                 </div>
-                <div className="bg-gray-50 p-2 rounded">
+                <div className="bg-bg-secondary p-2 rounded">
                   <div className="text-gray-500">性能</div>
                   <div className="font-semibold">{performanceMetrics.length}</div>
                 </div>
-                <div className="bg-gray-50 p-2 rounded">
+                <div className="bg-bg-secondary p-2 rounded">
                   <div className="text-gray-500">组件</div>
                   <div className="font-semibold">{componentStates.length}</div>
                 </div>

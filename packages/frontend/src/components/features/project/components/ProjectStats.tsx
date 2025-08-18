@@ -72,7 +72,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({ projectId }) => {
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 rounded-lg p-4">
+        <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-blue-600">总API数</p>
@@ -119,7 +119,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({ projectId }) => {
                 <div key={status} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     {getStatusIcon(status)}
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-text-primary">
                       {API_STATUS_LABELS[status as keyof typeof API_STATUS_LABELS] || status}
                     </span>
                   </div>

@@ -229,7 +229,7 @@ const MCPServerControl: React.FC = () => {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowLogs(!showLogs)}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-500 hover:text-text-primary hover:bg-gray-100 rounded-lg transition-colors"
             title="查看日志"
           >
             <Terminal className="h-4 w-4" />
@@ -238,7 +238,7 @@ const MCPServerControl: React.FC = () => {
           <button
             onClick={restartServer}
             disabled={isStarting || isStopping}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+            className="p-2 text-gray-500 hover:text-text-primary hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
             title="重启服务器"
           >
             <RefreshCw className={`h-4 w-4 ${(isStarting || isStopping) ? 'animate-spin' : ''}`} />
@@ -279,14 +279,14 @@ const MCPServerControl: React.FC = () => {
 
       {/* 连接和配置状态 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-bg-secondary p-3 rounded-lg">
           <div className="flex items-center space-x-2 mb-1">
             {isConnected ? (
               <Wifi className="h-4 w-4 text-green-500" />
             ) : (
               <WifiOff className="h-4 w-4 text-red-500" />
             )}
-            <span className="text-sm font-medium text-gray-700">连接状态</span>
+            <span className="text-sm font-medium text-text-primary">连接状态</span>
           </div>
           <div className="flex items-center space-x-1">
             <span className={`text-sm font-medium ${
@@ -297,22 +297,22 @@ const MCPServerControl: React.FC = () => {
           </div>
         </div>
         
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-bg-secondary p-3 rounded-lg">
           <div className="flex items-center space-x-2 mb-1">
             <Server className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">服务地址</span>
+            <span className="text-sm font-medium text-text-primary">服务地址</span>
           </div>
           <p className="text-xs font-mono text-gray-900">{urls.backend}</p>
         </div>
         
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-bg-secondary p-3 rounded-lg">
           <div className="flex items-center space-x-2 mb-1">
             {isValid ? (
               <CheckCircle className="h-4 w-4 text-green-500" />
             ) : (
               <AlertCircle className="h-4 w-4 text-red-500" />
             )}
-            <span className="text-sm font-medium text-gray-700">配置状态</span>
+            <span className="text-sm font-medium text-text-primary">配置状态</span>
           </div>
           <span className={`text-sm font-medium ${
             isValid ? 'text-green-600' : 'text-red-600'
@@ -325,26 +325,26 @@ const MCPServerControl: React.FC = () => {
       {/* 服务状态 */}
       {serverStatus.isRunning && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="bg-bg-secondary p-3 rounded-lg">
             <div className="flex items-center space-x-2 mb-1">
               <Clock className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">运行时间</span>
+              <span className="text-sm font-medium text-text-primary">运行时间</span>
             </div>
             <p className="text-lg font-semibold text-gray-900">{formatUptime(serverStatus.uptime)}</p>
           </div>
           
-          <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="bg-bg-secondary p-3 rounded-lg">
             <div className="flex items-center space-x-2 mb-1">
               <Zap className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">请求数</span>
+              <span className="text-sm font-medium text-text-primary">请求数</span>
             </div>
             <p className="text-lg font-semibold text-gray-900">{serverStatus.requestCount.toLocaleString()}</p>
           </div>
           
-          <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="bg-bg-secondary p-3 rounded-lg">
             <div className="flex items-center space-x-2 mb-1">
               <Database className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">数据库</span>
+              <span className="text-sm font-medium text-text-primary">数据库</span>
             </div>
             <div className="flex items-center space-x-1">
               {serverStatus.databaseStatus === 'connected' ? (
@@ -358,10 +358,10 @@ const MCPServerControl: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="bg-bg-secondary p-3 rounded-lg">
             <div className="flex items-center space-x-2 mb-1">
               <Search className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">向量搜索</span>
+              <span className="text-sm font-medium text-text-primary">向量搜索</span>
             </div>
             <div className="flex items-center space-x-1">
               {serverStatus.vectorSearchStatus === 'ready' ? (
@@ -382,7 +382,7 @@ const MCPServerControl: React.FC = () => {
 
       {/* 模型信息 */}
       {serverStatus.modelInfo && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg p-4 mb-6">
           <div className="flex items-center space-x-3">
             <div className={`p-2 rounded-lg ${
               serverStatus.modelInfo.type === 'vector' ? 'bg-blue-100' : 'bg-yellow-100'

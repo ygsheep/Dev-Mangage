@@ -243,7 +243,7 @@ const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
       </div>
 
       {/* 新评论输入 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-bg-paper rounded-lg border border-gray-200 p-4">
         <div className="flex items-start space-x-3">
           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
             {currentUserName.charAt(0)}
@@ -293,12 +293,12 @@ const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
       {/* 评论列表 */}
       <div className="space-y-4">
         {isLoading ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <div className="text-center py-12 bg-bg-secondary rounded-lg">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4" />
             <p className="text-text-secondary">加载评论中...</p>
           </div>
         ) : filteredComments.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <div className="text-center py-12 bg-bg-secondary rounded-lg">
             <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h4 className="text-lg font-medium text-text-primary mb-2">
               {searchQuery || filter !== 'all' ? '没有找到相关评论' : '暂无评论'}
@@ -368,7 +368,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const isEditing = editingComment === comment.id
 
   return (
-    <div className={`bg-white rounded-lg border p-4 ${comment.isResolved ? 'opacity-75' : ''}`}>
+    <div className={`bg-bg-paper rounded-lg border p-4 ${comment.isResolved ? 'opacity-75' : ''}`}>
       {/* 评论头部 */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-3">
@@ -406,13 +406,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
           </button>
 
           {showActions && (
-            <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 w-32">
+            <div className="absolute right-0 top-8 bg-bg-paper border border-gray-200 rounded-lg shadow-lg py-1 z-10 w-32">
               <button
                 onClick={() => {
                   setReplyingTo(comment.id)
                   setShowActions(false)
                 }}
-                className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full"
+                className="flex items-center space-x-2 px-3 py-2 text-sm text-text-primary hover:bg-gray-100 w-full"
               >
                 <Reply className="w-4 h-4" />
                 <span>回复</span>
@@ -425,7 +425,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                       setEditingComment(comment.id)
                       setShowActions(false)
                     }}
-                    className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full"
+                    className="flex items-center space-x-2 px-3 py-2 text-sm text-text-primary hover:bg-gray-100 w-full"
                   >
                     <Edit3 className="w-4 h-4" />
                     <span>编辑</span>
@@ -449,7 +449,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   onToggleResolution(comment.id)
                   setShowActions(false)
                 }}
-                className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full"
+                className="flex items-center space-x-2 px-3 py-2 text-sm text-text-primary hover:bg-gray-100 w-full"
               >
                 {comment.isResolved ? (
                   <>
@@ -507,7 +507,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
       {/* 回复输入 */}
       {replyingTo === comment.id && (
-        <div className="mt-4 ml-8 bg-gray-50 rounded-lg p-3">
+        <div className="mt-4 ml-8 bg-bg-secondary rounded-lg p-3">
           <textarea
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
@@ -544,7 +544,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-4 ml-8 space-y-3">
           {comment.replies.map((reply) => (
-            <div key={reply.id} className="bg-gray-50 rounded-lg p-3">
+            <div key={reply.id} className="bg-bg-secondary rounded-lg p-3">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center space-x-2">
                   <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-medium">

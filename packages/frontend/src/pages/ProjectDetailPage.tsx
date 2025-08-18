@@ -16,7 +16,8 @@ import {
   List,
   Sparkles,
   FileText,
-  GitBranch
+  GitBranch,
+  RefreshCw
 } from 'lucide-react'
 import { API, APIStatus, HTTPMethod } from '@shared/types'
 import { apiMethods } from '../utils/api'
@@ -313,7 +314,7 @@ const ProjectDetailPage: React.FC = () => {
         <div className="flex items-center space-x-4 mb-4">
           <Link
             to="/projects"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -353,20 +354,20 @@ const ProjectDetailPage: React.FC = () => {
 
           <button
             onClick={() => setUseEnhancedComponents(!useEnhancedComponents)}
-            className={`btn-outline flex items-center space-x-2 ${useEnhancedComponents ? 'bg-blue-50 text-blue-600 border-blue-300' : ''}`}
+            className={`btn-outline flex items-center space-x-2 ${useEnhancedComponents ? 'bg-primary-50 dark:bg-primary-900/20 text-blue-600 border-blue-300' : ''}`}
           >
             <Sparkles className="w-4 h-4" />
             <span>{useEnhancedComponents ? '增强模式' : '标准模式'}</span>
           </button>
 
 
-          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center bg-bg-tertiary rounded-lg p-1">
             <button
               onClick={() => setViewMode('card')}
               className={`px-3 py-1.5 flex items-center space-x-2 rounded-md text-sm font-medium transition-all ${
                 viewMode === 'card' 
-                  ? 'bg-bg-paper text-text-primary shadow-sm' 
-                  : 'text-text-secondary hover:text-text-primary'
+                  ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300 shadow-sm' 
+                  : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
               }`}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -376,8 +377,8 @@ const ProjectDetailPage: React.FC = () => {
               onClick={() => setViewMode('list')}
               className={`px-3 py-1.5 flex items-center space-x-2 rounded-md text-sm font-medium transition-all ${
                 viewMode === 'list' 
-                  ? 'bg-bg-paper text-text-primary shadow-sm' 
-                  : 'text-text-secondary hover:text-text-primary'
+                  ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300 shadow-sm' 
+                  : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
               }`}
             >
               <List className="w-4 h-4" />
@@ -389,6 +390,14 @@ const ProjectDetailPage: React.FC = () => {
             <Download className="w-4 h-4" />
             <span>导出</span>
           </button>
+
+          <Link
+            to={`/api-management?project=${id}`}
+            className="btn-outline flex items-center space-x-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>API管理</span>
+          </Link>
 
           <button 
             onClick={() => setShowProjectSettings(true)}
@@ -456,6 +465,34 @@ const ProjectDetailPage: React.FC = () => {
       {/* Tab Content */}
       {activeTab === 'apis' ? (
         <>
+          {/* 同步管理快捷入口 */}
+          <div className="bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <RefreshCw className="w-5 h-5 text-blue-600" />
+                <div>
+                  <h3 className="text-sm font-medium text-blue-800">API同步管理</h3>
+                  <p className="text-xs text-blue-600">
+                    自动保持数据模型与API接口的一致性，支持双向同步和冲突检测
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Link
+                  to={`/api-management?project=${id}`}
+                  className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  <Settings className="w-4 h-4 mr-1" />
+                  管理同步
+                </Link>
+                <button className="inline-flex items-center px-3 py-1.5 text-sm border border-blue-300 text-blue-700 bg-bg-paper rounded-md hover:bg-primary-50 dark:bg-primary-900/20">
+                  <RefreshCw className="w-4 h-4 mr-1" />
+                  快速同步
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* 标准API展示模式 */}
           <>
             {/* Filters */}
@@ -599,7 +636,7 @@ const ProjectDetailPage: React.FC = () => {
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       module.status === 'completed' ? 'bg-green-100 text-green-800' :
                       module.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
+                      'bg-bg-tertiary text-text-secondary'
                     }`}>
                       {module.status === 'completed' ? '已完成' :
                        module.status === 'in-progress' ? '开发中' : '规划中'}

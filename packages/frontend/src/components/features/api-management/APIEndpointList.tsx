@@ -140,7 +140,7 @@ export const APIEndpointList: React.FC<APIEndpointListProps> = ({
       <div className="bg-bg-paper rounded-lg border border-border-primary overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-bg-secondary">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   接口信息
@@ -164,7 +164,7 @@ export const APIEndpointList: React.FC<APIEndpointListProps> = ({
             </thead>
             <tbody className="bg-bg-paper divide-y divide-border-primary">
               {endpoints.map((endpoint) => (
-                <tr key={endpoint.id} className="hover:bg-gray-50">
+                <tr key={endpoint.id} className="hover:bg-bg-secondary">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-text-primary">

@@ -204,7 +204,7 @@ export const CreateAPIEndpointModal: React.FC<CreateAPIEndpointModalProps> = ({
   const getMethodColor = (method: string) => {
     const colors = {
       GET: 'bg-green-500',
-      POST: 'bg-blue-500',
+      POST: 'bg-primary-50 dark:bg-primary-900/20',
       PUT: 'bg-orange-500',
       PATCH: 'bg-yellow-500',
       DELETE: 'bg-red-500',
@@ -248,7 +248,7 @@ export const CreateAPIEndpointModal: React.FC<CreateAPIEndpointModalProps> = ({
                     onClick={() => setActiveTab(index)}
                     className={`px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors ${
                       activeTab === index
-                        ? 'text-blue-600 border-blue-600 bg-blue-50'
+                        ? 'text-blue-600 border-blue-600 bg-primary-50 dark:bg-primary-900/20'
                         : 'text-text-tertiary border-transparent hover:text-text-secondary hover:border-border-primary'
                     }`}
                   >

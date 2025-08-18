@@ -138,13 +138,13 @@ const DraggableWindow: React.FC<DraggableWindowProps> = ({
         
         <div className="flex items-center space-x-2">
           <button
-            className="text-gray-500 hover:text-gray-700 text-xs"
+            className="text-gray-500 hover:text-text-primary text-xs"
             onClick={() => setIsMinimized(!isMinimized)}
           >
             {isMinimized ? '▲' : '▼'}
           </button>
           <button
-            className="text-gray-500 hover:text-gray-700 text-xs"
+            className="text-gray-500 hover:text-text-primary text-xs"
             onClick={onClose}
           >
             ✕

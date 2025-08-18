@@ -23,14 +23,14 @@ const FieldGroupNode: React.FC<FieldGroupNodeProps> = ({ data, selected }) => {
       <Handle
         type="target"
         position={Position.Top}
-        className="w-2 h-2 !bg-purple-400 !border-2 !border-white"
+        className="w-2 h-2 !bg-purple-400 !border-2 !border-bg-paper"
         isConnectable={true}
       />
 
       {/* 节点主体 */}
       <div
         className={`
-          bg-white rounded-md shadow-sm border-2 transition-all duration-200
+          bg-bg-paper rounded-md shadow-sm border-2 transition-all duration-200
           ${selected ? 'border-purple-500 shadow-md' : 'border-purple-200 hover:border-purple-300'}
         `}
         style={{ 
@@ -54,7 +54,7 @@ const FieldGroupNode: React.FC<FieldGroupNodeProps> = ({ data, selected }) => {
           
           {/* 折叠/展开按钮 */}
           <button
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-bg-tertiary rounded transition-colors"
             onClick={(e) => {
               e.stopPropagation()
               console.log('Toggle collapse for field group:', data.id)
@@ -90,7 +90,7 @@ const FieldGroupNode: React.FC<FieldGroupNodeProps> = ({ data, selected }) => {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-2 h-2 !bg-purple-400 !border-2 !border-white"
+        className="w-2 h-2 !bg-purple-400 !border-2 !border-bg-paper"
         isConnectable={true}
       />
     </>

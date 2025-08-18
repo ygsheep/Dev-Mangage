@@ -95,19 +95,19 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({ data, selected }) => {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-4 h-4 !bg-blue-500 !border-2 !border-white"
+        className="w-4 h-4 !bg-primary-50 dark:bg-primary-900/20 !border-2 !border-white"
         isConnectable={true}
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="w-4 h-4 !bg-blue-500 !border-2 !border-white"
+        className="w-4 h-4 !bg-primary-50 dark:bg-primary-900/20 !border-2 !border-white"
         isConnectable={true}
       />
       <Handle
         type="source"
         position={Position.Left}
-        className="w-4 h-4 !bg-blue-500 !border-2 !border-white"
+        className="w-4 h-4 !bg-primary-50 dark:bg-primary-900/20 !border-2 !border-white"
         isConnectable={true}
       />
     </>

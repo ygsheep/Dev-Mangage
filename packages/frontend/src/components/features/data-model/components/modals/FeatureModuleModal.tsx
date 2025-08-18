@@ -251,7 +251,7 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
         <div className="p-6 max-h-[50vh] overflow-y-auto">
           {/* 使用提示 */}
           {filteredAPIs.length > 0 && (
-            <div className="mb-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+            <div className="mb-4 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg border-l-4 border-blue-400">
               <div className="flex items-center space-x-2 text-sm text-blue-800">
                 <Copy className="w-4 h-4" />
                 <span>点击路径框可复制单个API，点击右上角"复制全部"可复制所有API接口</span>

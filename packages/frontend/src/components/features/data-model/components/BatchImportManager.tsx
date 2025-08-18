@@ -340,7 +340,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
           <div className="w-1/2 border-r border-gray-200 p-6 overflow-y-auto">
             <div className="space-y-6">
               {/* 文档上传区域 */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-bg-secondary rounded-lg p-4">
                 <h3 className="font-medium text-text-primary mb-3 flex items-center">
                   <Upload className="w-5 h-5 mr-2" />
                   添加文档文件
@@ -389,7 +389,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
               </div>
 
               {/* 处理配置 */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-bg-secondary rounded-lg p-4">
                 <h3 className="font-medium text-text-primary mb-3 flex items-center">
                   <Settings className="w-5 h-5 mr-2" />
                   处理配置
@@ -398,7 +398,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                 <div className="space-y-4">
                   {/* AI服务提供商 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-primary mb-2">
                       AI服务提供商
                     </label>
                     <select
@@ -417,7 +417,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
 
                   {/* 处理模式 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-primary mb-2">
                       处理模式
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -543,7 +543,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
             {currentJob ? (
               <div className="space-y-6">
                 {/* 任务状态 */}
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
+                <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-blue-200 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-blue-900 flex items-center">
                       {getStatusIcon(currentJob.status)}
@@ -587,7 +587,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                        className="bg-primary-50 dark:bg-primary-900/20 h-2 rounded-full transition-all duration-500"
                         style={{ width: `${calculateProgress()}%` }}
                       />
                     </div>
@@ -628,7 +628,7 @@ const BatchImportManager: React.FC<BatchImportManagerProps> = ({
                       {/* 文档结果列表 */}
                       <div className="space-y-2 max-h-40 overflow-y-auto">
                         {currentJob.results.documents.map((doc, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                          <div key={index} className="flex items-center justify-between p-2 bg-bg-secondary rounded">
                             <div className="flex items-center space-x-2">
                               {doc.status === 'success' ? (
                                 <FileCheck className="w-4 h-4 text-green-500" />

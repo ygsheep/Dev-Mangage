@@ -12,6 +12,8 @@ export const APITestRunner: React.FC<APITestRunnerProps> = ({
   endpoints, 
   groups 
 }) => {
+  // 使用参数避免TypeScript警告
+  console.debug('APITestRunner for project:', projectId, 'endpoints:', endpoints?.length, 'groups:', groups?.length);
   return (
     <div className="bg-bg-paper rounded-lg border border-gray-200 shadow-sm">
       <div className="px-6 py-4 border-b border-gray-200">

@@ -63,7 +63,7 @@ export const APIManagementPage: React.FC = () => {
   // 如果没有选择项目，显示项目选择器
   if (!currentProject) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-bg-secondary flex items-center justify-center">
         <div className="text-center space-y-6">
           <div className="text-xl text-text-secondary">
             请选择一个项目来管理API接口
@@ -124,7 +124,7 @@ export const APIManagementPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-bg-secondary">
       {/* 页面头部 */}
       <div className="bg-bg-paper border-b border-border-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -286,7 +286,7 @@ export const APIManagementPage: React.FC = () => {
                   className={`flex items-center space-x-2 py-4 px-1 border-b-2 text-sm font-medium transition-colors whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                      : 'border-transparent text-gray-500 hover:text-text-primary'
                   }`}
                 >
                   <Icon className="w-4 h-4" />

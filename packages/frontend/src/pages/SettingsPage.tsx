@@ -10,10 +10,12 @@ import {
   Info,
   Copy,
   Code,
-  Download
+  Download,
+  Type
 } from 'lucide-react'
 import MCPServerControl from '../components/integrations/mcp/MCPServerControl'
 import ThemeSettings from '../components/features/settings/ThemeSettings'
+import FontTest from '../components/debug/FontTest'
 import { debug, useDebugComponent } from '../debug'
 import { useMCPConfig } from '../hooks/useMCPConfig'
 
@@ -235,6 +237,12 @@ const SettingsPage: React.FC = () => {
       name: '安全',
       icon: Shield,
       description: '权限和安全设置'
+    },
+    {
+      id: 'fonts',
+      name: '字体测试',
+      icon: Type,
+      description: '字体加载和渲染测试'
     }
   ]
 
@@ -843,6 +851,9 @@ const SettingsPage: React.FC = () => {
             </div>
           </div>
         )
+
+      case 'fonts':
+        return <FontTest />
 
       default:
         return <div>选择一个设置选项</div>

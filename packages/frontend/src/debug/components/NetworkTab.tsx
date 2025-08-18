@@ -37,12 +37,12 @@ const NetworkTab: React.FC = () => {
 
   const getMethodColor = (method: string) => {
     switch (method.toUpperCase()) {
-      case 'GET': return 'text-blue-600 bg-blue-50'
+      case 'GET': return 'text-blue-600 bg-primary-50 dark:bg-primary-900/20'
       case 'POST': return 'text-green-600 bg-green-50'
       case 'PUT': return 'text-yellow-600 bg-yellow-50'
       case 'DELETE': return 'text-red-600 bg-red-50'
       case 'PATCH': return 'text-purple-600 bg-purple-50'
-      default: return 'text-text-secondary bg-gray-50'
+      default: return 'text-text-secondary bg-bg-secondary'
     }
   }
 
@@ -108,7 +108,7 @@ const NetworkTab: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       {/* 控制面板 */}
-      <div className="p-3 bg-gray-50 border-b border-gray-200">
+      <div className="p-3 bg-bg-secondary border-b border-gray-200">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <input
@@ -165,8 +165,8 @@ const NetworkTab: React.FC = () => {
             {filteredRequests.map((request) => (
               <div
                 key={request.id}
-                className={`p-2 hover:bg-gray-50 cursor-pointer text-xs ${
-                  selectedRequest?.id === request.id ? 'bg-blue-50 border-l-2 border-blue-500' : ''
+                className={`p-2 hover:bg-bg-secondary cursor-pointer text-xs ${
+                  selectedRequest?.id === request.id ? 'bg-primary-50 dark:bg-primary-900/20 border-l-2 border-blue-500' : ''
                 }`}
                 onClick={() => setSelectedRequest(selectedRequest?.id === request.id ? null : request)}
               >
@@ -206,7 +206,7 @@ const NetworkTab: React.FC = () => {
 
         {/* 详情面板 */}
         {selectedRequest && (
-          <div className="w-96 border-l border-gray-200 bg-gray-50 overflow-auto">
+          <div className="w-96 border-l border-gray-200 bg-bg-secondary overflow-auto">
             <div className="p-3">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium text-gray-800">请求详情</h4>

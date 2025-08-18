@@ -72,7 +72,7 @@ const DocumentsImportPage: React.FC = () => {
         <div className="flex items-center space-x-4 mb-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -150,7 +150,7 @@ const DocumentsImportPage: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Tab Navigation */}
           <div className="bg-bg-paper rounded-lg shadow-sm border border-gray-200">
-            <div className="border-b border-gray-200 bg-gray-50 rounded-t-lg">
+            <div className="border-b border-gray-200 bg-bg-secondary rounded-t-lg">
               <div className="flex">
                 {tabs.map((tab) => (
                   <button
@@ -159,7 +159,7 @@ const DocumentsImportPage: React.FC = () => {
                     className={`flex-1 px-6 py-4 text-sm font-medium border-b-2 transition-all ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600 bg-bg-paper'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                        : 'border-transparent text-text-tertiary hover:text-text-secondary hover:bg-bg-tertiary'
                     }`}
                   >
                     <div className="flex flex-col items-center space-y-2">
@@ -186,7 +186,7 @@ const DocumentsImportPage: React.FC = () => {
                     {/* Tab Header */}
                     <div className={`p-4 rounded-lg border ${
                       activeTab === 'api-doc' ? 'bg-purple-50 border-purple-200' :
-                      activeTab === 'swagger' ? 'bg-blue-50 border-blue-200' :
+                      activeTab === 'swagger' ? 'bg-primary-50 dark:bg-primary-900/20 border-blue-200' :
                       'bg-green-50 border-green-200'
                     }`}>
                       <div className="flex items-start space-x-3">
@@ -224,7 +224,7 @@ const DocumentsImportPage: React.FC = () => {
                           <div key={index} className="flex items-center space-x-2 text-sm text-gray-600">
                             <div className={`w-2 h-2 rounded-full ${
                               activeTab === 'api-doc' ? 'bg-purple-500' :
-                              activeTab === 'swagger' ? 'bg-blue-500' :
+                              activeTab === 'swagger' ? 'bg-primary-50 dark:bg-primary-900/20' :
                               'bg-green-500'
                             }`}></div>
                             <span>{feature}</span>
@@ -292,7 +292,7 @@ const DocumentsImportPage: React.FC = () => {
                         <div className="flex items-start space-x-2">
                           <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium text-white ${
                             activeTab === 'api-doc' ? 'bg-purple-500' :
-                            activeTab === 'swagger' ? 'bg-blue-500' :
+                            activeTab === 'swagger' ? 'bg-primary-50 dark:bg-primary-900/20' :
                             'bg-green-500'
                           }`}>1</span>
                           <p>选择目标项目</p>
@@ -300,7 +300,7 @@ const DocumentsImportPage: React.FC = () => {
                         <div className="flex items-start space-x-2">
                           <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium text-white ${
                             activeTab === 'api-doc' ? 'bg-purple-500' :
-                            activeTab === 'swagger' ? 'bg-blue-500' :
+                            activeTab === 'swagger' ? 'bg-primary-50 dark:bg-primary-900/20' :
                             'bg-green-500'
                           }`}>2</span>
                           <p>点击"开始导入"打开导入向导</p>
@@ -308,7 +308,7 @@ const DocumentsImportPage: React.FC = () => {
                         <div className="flex items-start space-x-2">
                           <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium text-white ${
                             activeTab === 'api-doc' ? 'bg-purple-500' :
-                            activeTab === 'swagger' ? 'bg-blue-500' :
+                            activeTab === 'swagger' ? 'bg-primary-50 dark:bg-primary-900/20' :
                             'bg-green-500'
                           }`}>3</span>
                           <p>
@@ -320,7 +320,7 @@ const DocumentsImportPage: React.FC = () => {
                         <div className="flex items-start space-x-2">
                           <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium text-white ${
                             activeTab === 'api-doc' ? 'bg-purple-500' :
-                            activeTab === 'swagger' ? 'bg-blue-500' :
+                            activeTab === 'swagger' ? 'bg-primary-50 dark:bg-primary-900/20' :
                             'bg-green-500'
                           }`}>4</span>
                           <p>确认解析结果并完成导入</p>

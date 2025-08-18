@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
       title: '新建项目',
       description: '创建一个新的API项目',
       icon: Plus,
-      color: 'bg-blue-500',
+      color: 'bg-primary-50 dark:bg-primary-900/20',
       action: () => navigate('/projects?action=new'),
     },
     {
@@ -51,7 +51,7 @@ const HomePage: React.FC = () => {
       title: '设置',
       description: '应用程序设置',
       icon: Settings,
-      color: 'bg-gray-500',
+      color: 'bg-bg-secondary0',
       action: () => navigate('/settings'),
     },
   ]

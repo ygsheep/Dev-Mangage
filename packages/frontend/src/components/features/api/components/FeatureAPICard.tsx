@@ -17,7 +17,7 @@ const FeatureAPICard: React.FC<FeatureAPICardProps> = ({
   const [copied, setCopied] = useState(false)
 
   const getMethodColor = (method: HTTPMethod) => {
-    return HTTP_METHOD_COLORS[method] || 'bg-gray-100 text-gray-800'
+    return HTTP_METHOD_COLORS[method] || 'bg-bg-tertiary text-text-secondary'
   }
 
   const getFullEndpoint = () => {
@@ -90,7 +90,7 @@ const FeatureAPICard: React.FC<FeatureAPICardProps> = ({
       {/* API 路径 - 可复制的完整格式 */}
       <div className="mb-3">
         <div 
-          className="relative bg-gray-50 rounded-lg p-3 font-mono text-sm cursor-pointer hover:bg-gray-100 transition-colors group/endpoint"
+          className="relative bg-bg-secondary rounded-lg p-3 font-mono text-sm cursor-pointer hover:bg-bg-tertiary transition-colors group/endpoint"
           onClick={handleCopy}
           title="点击复制完整API"
         >
@@ -131,7 +131,7 @@ const FeatureAPICard: React.FC<FeatureAPICardProps> = ({
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           api.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
           api.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
-          api.status === 'NOT_STARTED' ? 'bg-gray-100 text-gray-800' :
+          api.status === 'NOT_STARTED' ? 'bg-bg-tertiary text-text-secondary' :
           api.status === 'TESTED' ? 'bg-emerald-100 text-emerald-800' :
           'bg-yellow-100 text-yellow-800'
         }`}>

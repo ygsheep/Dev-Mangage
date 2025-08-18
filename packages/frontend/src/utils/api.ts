@@ -1,22 +1,32 @@
+/**
+ * API请求工具模块
+ * 提供统一的HTTP请求封装和业务API方法
+ * 包含项目管理、API管理、标签管理、数据模型等所有前端需要的接口调用
+ */
+
 import axios from 'axios'
 import { getBackendBaseUrl } from '../config/env'
 
-// 获取 API 基础 URL，使用统一的环境配置管理
+// 获取API基础URL，使用统一的环境配置管理
 const API_BASE_URL = getBackendBaseUrl()
 
 /**
- * 创建 axios 实例
- * 统一管理 API 请求配置
+ * Axios HTTP客户端实例
+ * 统一管理所有API请求的配置、拦截器和错误处理
+ * 配置了较长的超时时间以支持AI文档解析等耗时操作
  */
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000, // 增加到60秒，给AI解析更多时间
+  timeout: 60000, // 60秒超时，为AI解析和复杂查询预留充裕时间
 })
 
-// 请求拦截器
+/**
+ * 请求拦截器
+ * 在发送请求前自动添加认证信息、公共头部等
+ */
 apiClient.interceptors.request.use(
   (config) => {
-    // 可以在这里添加认证token等
+    // TODO: 在这里添加认证token、请求ID等公共头部
     return config
   },
   (error) => {
@@ -24,78 +34,169 @@ apiClient.interceptors.request.use(
   }
 )
 
-// 响应拦截器
+/**
+ * 响应拦截器
+ * 统一处理响应数据和错误，简化上层调用
+ */
 apiClient.interceptors.response.use(
-  (response) => response.data,
+  (response) => response.data, // 直接返回数据部分，简化调用
   (error) => {
     console.error('API Error:', error)
-    throw error
+    throw error // 抛出错误供上层处理
   }
 )
 
-// 项目相关API
+// ========== 项目管理API ==========
+
+/**
+ * 获取项目列表
+ * @param params - 查询参数（分页、搜索、筛选等）
+ * @returns 项目列表数据
+ */
 export const getProjects = async (params?: any) => {
   return apiClient.get('/projects', { params })
 }
 
+/**
+ * 获取单个项目详情
+ * @param id - 项目 ID
+ * @returns 项目详细信息
+ */
 export const getProject = async (id: string) => {
   return apiClient.get(`/projects/${id}`)
 }
 
+/**
+ * 创建新项目
+ * @param data - 项目创建数据
+ * @returns 创建的项目信息
+ */
 export const createProject = async (data: any) => {
   return apiClient.post('/projects', data)
 }
 
+/**
+ * 更新项目信息
+ * @param id - 项目 ID
+ * @param data - 更新数据
+ * @returns 更新后的项目信息
+ */
 export const updateProject = async (id: string, data: any) => {
   return apiClient.put(`/projects/${id}`, data)
 }
 
+/**
+ * 删除项目
+ * @param id - 项目 ID
+ * @returns 删除结果
+ */
 export const deleteProject = async (id: string) => {
   return apiClient.delete(`/projects/${id}`)
 }
 
+/**
+ * 获取项目统计信息
+ * @param id - 项目 ID
+ * @returns 项目统计数据（API数量、模型数量等）
+ */
 export const getProjectStats = async (id: string) => {
   return apiClient.get(`/projects/${id}/stats`)
 }
 
-// API相关API
+// ========== API接口管理API ==========
+
+/**
+ * 获取API接口列表
+ * @param params - 查询参数（项目 ID、状态筛选、分页等）
+ * @returns API接口列表
+ */
 export const getAPIs = async (params?: any) => {
   return apiClient.get('/apis', { params })
 }
 
+/**
+ * 创建单个API接口
+ * @param data - API接口创建数据
+ * @returns 创建的API接口信息
+ */
 export const createAPI = async (data: any) => {
   return apiClient.post('/apis', data)
 }
 
+/**
+ * 批量创建API接口
+ * @param apis - API接口数据数组
+ * @returns 批量创建结果
+ */
 export const createBatchAPIs = async (apis: any[]) => {
   return apiClient.post('/apis/batch', { apis })
 }
 
+/**
+ * 更新API接口信息
+ * @param id - API接口 ID
+ * @param data - 更新数据
+ * @returns 更新后的API接口信息
+ */
 export const updateAPI = async (id: string, data: any) => {
   return apiClient.put(`/apis/${id}`, data)
 }
 
+/**
+ * 删除API接口
+ * @param id - API接口 ID
+ * @returns 删除结果
+ */
 export const deleteAPI = async (id: string) => {
   return apiClient.delete(`/apis/${id}`)
 }
 
+/**
+ * 更新API接口状态
+ * @param id - API接口 ID
+ * @param status - 新状态值
+ * @returns 更新结果
+ */
 export const updateAPIStatus = async (id: string, status: string) => {
   return apiClient.patch(`/apis/${id}/status`, { status })
 }
 
+/**
+ * 生成API接口代码
+ * @param id - API接口 ID
+ * @param options - 代码生成选项（语言、框架等）
+ * @returns 生成的代码内容
+ */
 export const generateAPICode = async (id: string, options: any) => {
   return apiClient.post(`/apis/${id}/generate-code`, options)
 }
 
-// 标签相关API
+// ========== 标签管理API ==========
+
+/**
+ * 获取项目标签列表
+ * @param projectId - 项目 ID
+ * @returns 标签列表
+ */
 export const getTags = async (projectId: string) => {
   return apiClient.get(`/tags?projectId=${projectId}`)
 }
 
+/**
+ * 创建新标签
+ * @param data - 标签创建数据（名称、颜色、描述等）
+ * @returns 创建的标签信息
+ */
 export const createTag = async (data: any) => {
   return apiClient.post('/tags', data)
 }
 
+/**
+ * 更新标签信息
+ * @param id - 标签 ID
+ * @param data - 更新数据
+ * @returns 更新后的标签信息
+ */
 export const updateTag = async (id: string, data: any) => {
   return apiClient.put(`/tags/${id}`, data)
 }
@@ -554,6 +655,301 @@ export const importCodeTemplates = async (file: File) => {
   })
 }
 
+// ========== GitHub Issues 管理API ==========
+
+/**
+ * 获取项目的 Issues 列表
+ * @param projectId - 项目 ID
+ * @param filters - 筛选条件
+ * @returns Issues 列表数据
+ */
+export const getIssues = async (projectId: string, filters?: {
+  status?: string
+  priority?: string
+  issueType?: string
+  assignee?: string
+  search?: string
+  page?: number
+  limit?: number
+}) => {
+  return apiClient.get(`/${projectId}/issues`, { params: filters })
+}
+
+/**
+ * 获取单个 Issue 详情
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @returns Issue 详细信息
+ */
+export const getIssue = async (projectId: string, issueId: string) => {
+  return apiClient.get(`/${projectId}/issues/${issueId}`)
+}
+
+/**
+ * 创建新 Issue
+ * @param projectId - 项目 ID
+ * @param data - Issue 创建数据
+ * @returns 创建的 Issue 信息
+ */
+export const createIssue = async (projectId: string, data: any) => {
+  return apiClient.post(`/${projectId}/issues`, data)
+}
+
+/**
+ * 更新 Issue
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param data - 更新数据
+ * @returns 更新后的 Issue 信息
+ */
+export const updateIssue = async (projectId: string, issueId: string, data: any) => {
+  return apiClient.put(`/${projectId}/issues/${issueId}`, data)
+}
+
+/**
+ * 删除 Issue
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @returns 删除结果
+ */
+export const deleteIssue = async (projectId: string, issueId: string) => {
+  return apiClient.delete(`/${projectId}/issues/${issueId}`)
+}
+
+/**
+ * 获取 Issue 统计信息
+ * @param projectId - 项目 ID
+ * @returns Issue 统计数据
+ */
+export const getIssueStats = async (projectId: string) => {
+  return apiClient.get(`/${projectId}/issues/stats`)
+}
+
+// ========== Issue 关联管理API ==========
+
+/**
+ * 获取 Issue 的所有关联关系
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @returns 关联关系数据
+ */
+export const getIssueRelations = async (projectId: string, issueId: string) => {
+  return apiClient.get(`/${projectId}/issues/${issueId}/relations`)
+}
+
+/**
+ * 添加 Issue 与 API 的关联
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param data - 关联数据
+ * @returns 创建的关联关系
+ */
+export const createIssueAPIRelation = async (projectId: string, issueId: string, data: {
+  apiId?: string
+  endpointId?: string
+  relationType: string
+  description?: string
+}) => {
+  return apiClient.post(`/${projectId}/issues/${issueId}/relations/apis`, data)
+}
+
+/**
+ * 添加 Issue 与数据表的关联
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param data - 关联数据
+ * @returns 创建的关联关系
+ */
+export const createIssueTableRelation = async (projectId: string, issueId: string, data: {
+  tableId: string
+  relationType: string
+  description?: string
+}) => {
+  return apiClient.post(`/${projectId}/issues/${issueId}/relations/tables`, data)
+}
+
+/**
+ * 添加 Issue 与功能模块的关联
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param data - 关联数据
+ * @returns 创建的关联关系
+ */
+export const createIssueFeatureRelation = async (projectId: string, issueId: string, data: {
+  featureName: string
+  component?: string
+  relationType: string
+  description?: string
+}) => {
+  return apiClient.post(`/${projectId}/issues/${issueId}/relations/features`, data)
+}
+
+/**
+ * 删除 Issue 与 API 的关联
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param relationId - 关联 ID
+ * @returns 删除结果
+ */
+export const deleteIssueAPIRelation = async (projectId: string, issueId: string, relationId: string) => {
+  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/apis/${relationId}`)
+}
+
+/**
+ * 删除 Issue 与数据表的关联
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param relationId - 关联 ID
+ * @returns 删除结果
+ */
+export const deleteIssueTableRelation = async (projectId: string, issueId: string, relationId: string) => {
+  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/tables/${relationId}`)
+}
+
+/**
+ * 删除 Issue 与功能模块的关联
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param relationId - 关联 ID
+ * @returns 删除结果
+ */
+export const deleteIssueFeatureRelation = async (projectId: string, issueId: string, relationId: string) => {
+  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/features/${relationId}`)
+}
+
+/**
+ * 批量创建关联
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param data - 批量关联数据
+ * @returns 批量创建结果
+ */
+export const createBatchIssueRelations = async (projectId: string, issueId: string, data: {
+  relations: Array<{
+    type: 'api' | 'table' | 'feature'
+    relationType: string
+    [key: string]: any
+  }>
+}) => {
+  return apiClient.post(`/${projectId}/issues/${issueId}/relations/batch`, data)
+}
+
+/**
+ * 获取可关联的资源列表
+ * @param projectId - 项目 ID
+ * @param issueId - Issue ID
+ * @param type - 资源类型
+ * @returns 可关联的资源
+ */
+export const getAvailableIssueRelations = async (projectId: string, issueId: string, type?: 'api' | 'table' | 'feature') => {
+  return apiClient.get(`/${projectId}/issues/${issueId}/relations/available`, {
+    params: { type }
+  })
+}
+
+// ========== GitHub 集成管理API ==========
+
+/**
+ * 获取项目的 GitHub 仓库配置
+ * @param projectId - 项目 ID
+ * @returns GitHub 仓库配置
+ */
+export const getGitHubRepository = async (projectId: string) => {
+  return apiClient.get(`/${projectId}/github/repository`)
+}
+
+/**
+ * 配置 GitHub 仓库
+ * @param projectId - 项目 ID
+ * @param data - 仓库配置数据
+ * @returns 配置结果
+ */
+export const configureGitHubRepository = async (projectId: string, data: {
+  owner: string
+  name: string
+  accessToken: string
+  autoSync?: boolean
+  syncInterval?: number
+}) => {
+  return apiClient.post(`/${projectId}/github/repository`, data)
+}
+
+/**
+ * 验证 GitHub 仓库访问权限
+ * @param projectId - 项目 ID
+ * @param data - 验证数据
+ * @returns 验证结果
+ */
+export const validateGitHubRepository = async (projectId: string, data: {
+  owner: string
+  name: string
+  accessToken: string
+}) => {
+  return apiClient.post(`/${projectId}/github/repository/validate`, data)
+}
+
+/**
+ * 从 GitHub 同步 Issues
+ * @param projectId - 项目 ID
+ * @param options - 同步选项
+ * @returns 同步结果
+ */
+export const syncIssuesFromGitHub = async (projectId: string, options?: {
+  syncLabels?: boolean
+  syncComments?: boolean
+  syncMilestones?: boolean
+  dryRun?: boolean
+}) => {
+  return apiClient.post(`/${projectId}/github/sync/from-github`, options || {})
+}
+
+/**
+ * 同步 Issues 到 GitHub
+ * @param projectId - 项目 ID
+ * @param options - 同步选项
+ * @returns 同步结果
+ */
+export const syncIssuesToGitHub = async (projectId: string, options?: {
+  syncLabels?: boolean
+  syncComments?: boolean
+  dryRun?: boolean
+}) => {
+  return apiClient.post(`/${projectId}/github/sync/to-github`, options || {})
+}
+
+/**
+ * 双向同步 Issues
+ * @param projectId - 项目 ID
+ * @param options - 同步选项
+ * @returns 同步结果
+ */
+export const syncIssuesBidirectional = async (projectId: string, options?: {
+  syncLabels?: boolean
+  syncComments?: boolean
+  syncMilestones?: boolean
+  dryRun?: boolean
+}) => {
+  return apiClient.post(`/${projectId}/github/sync/bidirectional`, options || {})
+}
+
+/**
+ * 获取同步状态
+ * @param projectId - 项目 ID
+ * @returns 同步状态信息
+ */
+export const getGitHubSyncStatus = async (projectId: string) => {
+  return apiClient.get(`/${projectId}/github/sync/status`)
+}
+
+/**
+ * 删除 GitHub 仓库配置
+ * @param projectId - 项目 ID
+ * @returns 删除结果
+ */
+export const deleteGitHubRepository = async (projectId: string) => {
+  return apiClient.delete(`/${projectId}/github/repository`)
+}
+
 // 导出API客户端实例（用于直接HTTP调用）
 export const api = apiClient
 
@@ -649,6 +1045,32 @@ export const apiMethods = {
   importTemplateCollection,
   exportCodeTemplates,
   importCodeTemplates,
+  // GitHub Issues 管理
+  getIssues,
+  getIssue,
+  createIssue,
+  updateIssue,
+  deleteIssue,
+  getIssueStats,
+  // Issue 关联管理
+  getIssueRelations,
+  createIssueAPIRelation,
+  createIssueTableRelation,
+  createIssueFeatureRelation,
+  deleteIssueAPIRelation,
+  deleteIssueTableRelation,
+  deleteIssueFeatureRelation,
+  createBatchIssueRelations,
+  getAvailableIssueRelations,
+  // GitHub 集成管理
+  getGitHubRepository,
+  configureGitHubRepository,
+  validateGitHubRepository,
+  syncIssuesFromGitHub,
+  syncIssuesToGitHub,
+  syncIssuesBidirectional,
+  getGitHubSyncStatus,
+  deleteGitHubRepository,
 }
 
 export default apiMethods

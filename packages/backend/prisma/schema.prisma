@@ -33,6 +33,10 @@ model Project {
   apiEnvironments   APIEnvironment[]
   apiTestSuites     APITestSuite[]
   syncConfigurations SyncConfiguration[]
+  
+  // GitHub Integration Relations
+  issues            Issue[]
+  githubRepository  GitHubRepository?
 
   @@map("projects")
 }
@@ -55,6 +59,7 @@ model API {
   // Relations
   project Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   apiTags APITag[]
+  relatedIssues IssueAPIRelation[]
 
   @@index([projectId])
   @@index([status])
@@ -130,6 +135,7 @@ model DatabaseTable {
   statistics      TableStatistics[]
   apiMappings     APITableMapping[]
   relatedEndpoints APIEndpoint[]
+  relatedIssues   IssueTableRelation[]
 
   @@index([projectId])
   @@index([status])
@@ -475,6 +481,7 @@ model APIEndpoint {
   documentation    APIDocumentation[]
   history          APIHistory[]
   tableMappings    APITableMapping[]
+  relatedIssues    IssueAPIRelation[]
 
   @@index([projectId])
   @@index([groupId])
@@ -896,3 +903,324 @@ model APITableMapping {
 // MappingType: "CRUD" | "READ_ONLY" | "WRITE_ONLY" | "CUSTOM"
 // ChangeType: "CREATE" | "UPDATE" | "DELETE" | "IMPORT" | "SYNC"
 // ChangeSource: "MANUAL" | "IMPORT" | "SYNC" | "AI"
+
+// ==================================================
+// GitHub Issues Integration Models
+// ==================================================
+
+// GitHub Issue model - Core issue tracking
+model Issue {
+  id             String   @id @default(uuid())
+  projectId      String
+  githubId       Int?     // GitHub issue number
+  githubNodeId   String?  // GitHub GraphQL node ID
+  title          String
+  description    String?
+  status         String   @default("OPEN") // OPEN, CLOSED
+  state          String   @default("open") // open, closed (GitHub API format)
+  priority       String   @default("MEDIUM") // HIGH, MEDIUM, LOW, CRITICAL
+  severity       String   @default("NORMAL") // BLOCKER, CRITICAL, MAJOR, MINOR, TRIVIAL, NORMAL
+  issueType      String   @default("BUG") // BUG, FEATURE, ENHANCEMENT, TASK, DOCUMENTATION
+  
+  // GitHub Integration
+  githubUrl      String?
+  githubNumber   Int?
+  githubHtmlUrl  String?
+  githubApiUrl   String?
+  repositoryName String?
+  repositoryOwner String?
+  
+  // Assignment and tracking
+  assigneeId     String?
+  assigneeName   String?
+  assigneeAvatar String?
+  reporterId     String?
+  reporterName   String?
+  reporterAvatar String?
+  
+  // Lifecycle tracking
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  closedAt       DateTime?
+  dueDate        DateTime?
+  
+  // Sync tracking
+  lastSyncAt     DateTime?
+  syncStatus     String   @default("LOCAL") // LOCAL, SYNCED, SYNC_PENDING, SYNC_FAILED
+  syncError      String?
+  
+  // Metadata
+  estimatedHours Float?
+  actualHours    Float?
+  storyPoints    Int?
+  
+  // Relations
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  labels         IssueLabel[]
+  comments       IssueComment[]
+  attachments    IssueAttachment[]
+  relatedAPIs    IssueAPIRelation[]
+  relatedTables  IssueTableRelation[]
+  relatedFeatures IssueFeatureRelation[]
+  milestones     IssueMilestone[]
+  timeEntries    IssueTimeEntry[]
+  
+  @@index([projectId])
+  @@index([status])
+  @@index([priority])
+  @@index([issueType])
+  @@index([githubId])
+  @@index([githubNumber])
+  @@index([assigneeId])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([dueDate])
+  @@unique([projectId, githubNumber])
+  @@map("issues")
+}
+
+// Issue Label model - Categorization and tagging
+model IssueLabel {
+  id          String   @id @default(uuid())
+  issueId     String
+  name        String
+  color       String   @default("#3B82F6")
+  description String?
+  
+  // GitHub Integration
+  githubId    String?  // GitHub label ID
+  githubNodeId String? // GitHub GraphQL node ID
+  
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  issue       Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@index([name])
+  @@unique([issueId, name])
+  @@map("issue_labels")
+}
+
+// Issue Comment model - Discussion and updates
+model IssueComment {
+  id           String   @id @default(uuid())
+  issueId      String
+  content      String
+  authorId     String?
+  authorName   String?
+  authorAvatar String?
+  
+  // GitHub Integration
+  githubId     String?  // GitHub comment ID
+  githubNodeId String?  // GitHub GraphQL node ID
+  githubUrl    String?
+  
+  // Comment metadata
+  isInternal   Boolean  @default(false) // Internal comments not synced to GitHub
+  replyToId    String?  // For threaded comments
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  issue        Issue         @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  replyTo      IssueComment? @relation("CommentReplies", fields: [replyToId], references: [id])
+  replies      IssueComment[] @relation("CommentReplies")
+  
+  @@index([issueId])
+  @@index([createdAt])
+  @@index([replyToId])
+  @@map("issue_comments")
+}
+
+// Issue Attachment model - File attachments
+model IssueAttachment {
+  id          String   @id @default(uuid())
+  issueId     String
+  fileName    String
+  filePath    String
+  fileSize    Int
+  mimeType    String
+  description String?
+  uploadedBy  String?
+  
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  issue       Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@map("issue_attachments")
+}
+
+// Issue API Relation model - Link issues to API endpoints
+model IssueAPIRelation {
+  id         String   @id @default(uuid())
+  issueId    String
+  apiId      String?  // Legacy API model
+  endpointId String?  // New APIEndpoint model
+  relationType String @default("RELATES_TO") // RELATES_TO, BLOCKS, BLOCKED_BY, IMPLEMENTS, FIXES
+  description String?
+  
+  createdAt  DateTime @default(now())
+  
+  // Relations
+  issue      Issue        @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  api        API?         @relation(fields: [apiId], references: [id])
+  endpoint   APIEndpoint? @relation(fields: [endpointId], references: [id])
+  
+  @@index([issueId])
+  @@index([apiId])
+  @@index([endpointId])
+  @@index([relationType])
+  @@map("issue_api_relations")
+}
+
+// Issue Table Relation model - Link issues to database tables
+model IssueTableRelation {
+  id           String   @id @default(uuid())
+  issueId      String
+  tableId      String
+  relationType String   @default("RELATES_TO") // RELATES_TO, AFFECTS, MODIFIES, CREATES, DROPS
+  description  String?
+  
+  createdAt    DateTime @default(now())
+  
+  // Relations
+  issue        Issue         @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  table        DatabaseTable @relation(fields: [tableId], references: [id])
+  
+  @@index([issueId])
+  @@index([tableId])
+  @@index([relationType])
+  @@map("issue_table_relations")
+}
+
+// Issue Feature Relation model - Link issues to feature modules
+model IssueFeatureRelation {
+  id           String   @id @default(uuid())
+  issueId      String
+  featureName  String   // Name of the feature/module
+  component    String?  // Specific component within the feature
+  relationType String   @default("RELATES_TO") // RELATES_TO, IMPLEMENTS, ENHANCES, REFACTORS
+  description  String?
+  
+  createdAt    DateTime @default(now())
+  
+  // Relations
+  issue        Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@index([featureName])
+  @@index([relationType])
+  @@map("issue_feature_relations")
+}
+
+// Issue Milestone model - Project milestones and releases
+model IssueMilestone {
+  id          String    @id @default(uuid())
+  issueId     String
+  title       String
+  description String?
+  dueDate     DateTime?
+  progress    Float     @default(0) // Progress percentage 0-100
+  status      String    @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+  
+  // GitHub Integration
+  githubId    Int?      // GitHub milestone number
+  githubNodeId String?  // GitHub GraphQL node ID
+  githubUrl   String?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  issue       Issue     @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("issue_milestones")
+}
+
+// Issue Time Entry model - Time tracking
+model IssueTimeEntry {
+  id          String   @id @default(uuid())
+  issueId     String
+  userId      String?
+  userName    String?
+  description String?
+  hours       Float
+  date        DateTime @default(now())
+  billable    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  issue       Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@index([userId])
+  @@index([date])
+  @@map("issue_time_entries")
+}
+
+// GitHub Repository Configuration model - Repository sync settings
+model GitHubRepository {
+  id          String   @id @default(uuid())
+  projectId   String   @unique
+  owner       String
+  name        String
+  fullName    String   // owner/name format
+  
+  // Authentication
+  accessToken String?  // GitHub access token (encrypted)
+  
+  // Sync Configuration
+  autoSync    Boolean  @default(true)
+  syncInterval Int     @default(300) // seconds
+  lastSyncAt  DateTime?
+  
+  // Webhook Configuration
+  webhookId   String?
+  webhookSecret String?
+  webhookUrl  String?
+  
+  // Repository metadata
+  githubId    Int?
+  nodeId      String?
+  htmlUrl     String?
+  apiUrl      String?
+  description String?
+  language    String?
+  defaultBranch String @default("main")
+  
+  isPrivate   Boolean  @default(true)
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@index([projectId])
+  @@index([owner, name])
+  @@unique([owner, name])
+  @@map("github_repositories")
+}
+
+// Add GitHub repository relation to Project model
+// (This would be added to the existing Project model)
+// githubRepository GitHubRepository?
+
+// GitHub Issue Enums:
+// IssueStatus: "OPEN" | "CLOSED"
+// IssueState: "open" | "closed" 
+// IssuePriority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW"
+// IssueSeverity: "BLOCKER" | "CRITICAL" | "MAJOR" | "MINOR" | "TRIVIAL" | "NORMAL"
+// IssueType: "BUG" | "FEATURE" | "ENHANCEMENT" | "TASK" | "DOCUMENTATION" | "QUESTION"
+// SyncStatus: "LOCAL" | "SYNCED" | "SYNC_PENDING" | "SYNC_FAILED"
+// RelationType: "RELATES_TO" | "BLOCKS" | "BLOCKED_BY" | "IMPLEMENTS" | "FIXES" | "AFFECTS" | "MODIFIES" | "CREATES" | "DROPS" | "ENHANCES" | "REFACTORS"
+// MilestoneStatus: "ACTIVE" | "COMPLETED" | "CANCELLED"

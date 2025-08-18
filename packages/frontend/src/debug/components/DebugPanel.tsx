@@ -92,7 +92,7 @@ const DebugPanel: React.FC = () => {
     >
       <div className="flex flex-col h-full">
         {/* 工具栏 */}
-        <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+        <div className="bg-bg-secondary border-b border-gray-200 px-4 py-2 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="text-xs text-gray-500">
               🐛 Debug Console
@@ -135,7 +135,7 @@ const DebugPanel: React.FC = () => {
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors relative ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-500 hover:text-text-primary hover:border-gray-300'
                 }`}
               >
                 <span>{tab.label}</span>
@@ -161,7 +161,7 @@ const DebugPanel: React.FC = () => {
         </div>
 
         {/* 状态栏 */}
-        <div className="bg-gray-50 border-t border-gray-200 px-4 py-1 text-xs text-gray-500 flex items-center justify-between">
+        <div className="bg-bg-secondary border-t border-gray-200 px-4 py-1 text-xs text-gray-500 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <span>日志: {stats.totalLogs}</span>
             <span>网络: {stats.totalRequests}</span>

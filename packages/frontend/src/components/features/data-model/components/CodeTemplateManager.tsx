@@ -373,7 +373,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
           {/* 左侧：筛选和模板列表 */}
           <div className="w-1/3 border-r border-gray-200 overflow-y-auto">
             {/* 搜索和筛选 */}
-            <div className="p-4 border-b border-gray-200 bg-gray-50">
+            <div className="p-4 border-b border-gray-200 bg-bg-secondary">
               <div className="space-y-3">
                 {/* 搜索框 */}
                 <div className="relative">
@@ -459,8 +459,8 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                         key={template.id}
                         className={`p-3 rounded-lg border cursor-pointer transition-all ${
                           selectedTemplate?.id === template.id
-                            ? 'border-blue-300 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            ? 'border-blue-300 bg-primary-50 dark:bg-primary-900/20'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-bg-secondary'
                         }`}
                         onClick={() => setSelectedTemplate(template)}
                       >
@@ -521,7 +521,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                   {/* 基础信息 */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         模板名称 *
                       </label>
                       <input
@@ -533,7 +533,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         分类 *
                       </label>
                       <select
@@ -552,7 +552,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         编程语言 *
                       </label>
                       <select
@@ -568,7 +568,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         标签
                       </label>
                       <input
@@ -585,7 +585,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-primary mb-2">
                       描述
                     </label>
                     <textarea
@@ -598,7 +598,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
 
                   {/* 模板内容 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-primary mb-2">
                       模板内容 *
                     </label>
                     <textarea
@@ -615,7 +615,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                   {/* 变量定义 */}
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium text-text-primary">
                         模板变量
                       </label>
                       <button
@@ -630,7 +630,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                     {formData.variables.length > 0 && (
                       <div className="space-y-3 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
                         {formData.variables.map((variable, index) => (
-                          <div key={index} className="flex items-center space-x-3 bg-gray-50 p-3 rounded">
+                          <div key={index} className="flex items-center space-x-3 bg-bg-secondary p-3 rounded">
                             <div className="grid grid-cols-5 gap-2 flex-1">
                               <input
                                 type="text"
@@ -696,7 +696,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                         onChange={(e) => setFormData(prev => ({ ...prev, isPublic: e.target.checked }))}
                         className="rounded border-gray-300"
                       />
-                      <span className="text-sm text-gray-700">公开模板</span>
+                      <span className="text-sm text-text-primary">公开模板</span>
                     </label>
                   </div>
 
@@ -785,7 +785,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
 
                 <div className="space-y-6">
                   {/* 模板信息 */}
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-bg-secondary rounded-lg p-4">
                     <h4 className="font-medium text-text-primary mb-3">模板信息</h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
@@ -834,7 +834,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       </div>
                       <div className="p-4 space-y-3">
                         {selectedTemplate.variables.map((variable, index) => (
-                          <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded">
+                          <div key={index} className="flex items-center space-x-4 p-3 bg-bg-secondary rounded">
                             <div className="flex-1 grid grid-cols-4 gap-3 text-sm">
                               <div>
                                 <span className="font-medium">{variable.name}</span>

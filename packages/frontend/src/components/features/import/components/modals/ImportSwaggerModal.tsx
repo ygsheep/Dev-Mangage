@@ -77,7 +77,7 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
               onClick={() => setImportType('url')}
               className={`flex-1 p-3 rounded-lg border-2 transition-colors ${
                 importType === 'url'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  ? 'border-blue-500 bg-primary-50 dark:bg-primary-900/20 text-blue-700'
                   : 'border-border-primary hover:border-border-primary'
               }`}
             >
@@ -89,7 +89,7 @@ const ImportSwaggerModal: React.FC<ImportSwaggerModalProps> = ({
               onClick={() => setImportType('content')}
               className={`flex-1 p-3 rounded-lg border-2 transition-colors ${
                 importType === 'content'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  ? 'border-blue-500 bg-primary-50 dark:bg-primary-900/20 text-blue-700'
                   : 'border-border-primary hover:border-border-primary'
               }`}
             >

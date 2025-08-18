@@ -19,7 +19,7 @@ const FieldGroupNode: React.FC<NodeProps<FieldGroupData>> = ({ data }) => {
   const { name, fields, isExpanded, color, onToggle } = data
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border-2 border-gray-200 min-w-[200px] max-w-[280px]">
+    <div className="bg-bg-paper rounded-lg shadow-lg border-2 border-gray-200 min-w-[200px] max-w-[280px]">
       {/* 分组头部 */}
       <div 
         className="px-3 py-2 rounded-t-lg cursor-pointer"
@@ -47,7 +47,7 @@ const FieldGroupNode: React.FC<NodeProps<FieldGroupData>> = ({ data }) => {
               ) : (
                 <div className="w-3 h-3 rounded-full bg-gray-300" />
               )}
-              <span className="text-sm text-gray-700 flex-1 truncate">
+              <span className="text-sm text-text-primary flex-1 truncate">
                 {field.name}
               </span>
               <span className="text-xs text-gray-500">

@@ -101,11 +101,11 @@ const VersionControl: React.FC<VersionControlProps> = ({
       case 'CREATE':
         return 'bg-green-50 border-green-200'
       case 'UPDATE':
-        return 'bg-blue-50 border-blue-200'
+        return 'bg-primary-50 dark:bg-primary-900/20 border-blue-200'
       case 'DELETE':
         return 'bg-red-50 border-red-200'
       default:
-        return 'bg-gray-50 border-gray-200'
+        return 'bg-bg-secondary border-gray-200'
     }
   }
 
@@ -163,7 +163,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
   return (
     <div className="space-y-6">
       {/* 工具栏 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-bg-paper rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-3">
             <GitBranch className="w-6 h-6 text-text-secondary" />
@@ -210,7 +210,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
       </div>
 
       {/* 版本时间线 */}
-      <div className="bg-white rounded-lg border border-gray-200">
+      <div className="bg-bg-paper rounded-lg border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <h3 className="text-lg font-medium text-text-primary">
             版本历史 ({versions.length})
@@ -242,7 +242,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                   
                   {/* 版本信息 */}
                   <div className="flex-1 min-w-0">
-                    <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                    <div className="bg-bg-secondary rounded-lg border border-gray-200 p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-3">
                           <label className="flex items-center space-x-2">
@@ -258,7 +258,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                             </h4>
                           </label>
                           
-                          <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded">
+                          <span className="px-2 py-1 bg-gray-200 text-text-primary text-xs rounded">
                             v{version.version}
                           </span>
                           
@@ -367,7 +367,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                                   
                                   <button
                                     onClick={() => toggleChangeExpansion(change.id)}
-                                    className="p-1 hover:bg-white/50 rounded"
+                                    className="p-1 hover:bg-bg-paper/50 rounded"
                                   >
                                     {expandedChanges.has(change.id) ? (
                                       <ChevronDown className="w-4 h-4" />
@@ -382,7 +382,7 @@ const VersionControl: React.FC<VersionControlProps> = ({
                                     <div className="space-y-2">
                                       {change.changes.map((fieldChange, idx) => (
                                         <div key={idx} className="flex items-center space-x-2 text-xs">
-                                          <span className="font-medium text-gray-700">
+                                          <span className="font-medium text-text-primary">
                                             {fieldChange.field}:
                                           </span>
                                           
@@ -489,7 +489,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({ onClose, onSave
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-text-primary">创建新版本</h2>
           <button
@@ -502,7 +502,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({ onClose, onSave
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-primary mb-1">
               版本名称
             </label>
             <input
@@ -516,7 +516,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({ onClose, onSave
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-primary mb-1">
               版本描述
             </label>
             <textarea
@@ -573,7 +573,7 @@ const TagVersionModal: React.FC<TagVersionModalProps> = ({ versionId, onClose, o
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-sm">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-text-primary">添加标签</h2>
           <button
@@ -586,7 +586,7 @@ const TagVersionModal: React.FC<TagVersionModalProps> = ({ versionId, onClose, o
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-primary mb-1">
               标签名称
             </label>
             <input
@@ -600,7 +600,7 @@ const TagVersionModal: React.FC<TagVersionModalProps> = ({ versionId, onClose, o
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               常用标签
             </label>
             <div className="flex flex-wrap gap-2">
@@ -609,7 +609,7 @@ const TagVersionModal: React.FC<TagVersionModalProps> = ({ versionId, onClose, o
                   key={predefinedTag}
                   type="button"
                   onClick={() => setTag(predefinedTag)}
-                  className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition-colors"
+                  className="px-2 py-1 bg-gray-100 text-text-primary text-xs rounded hover:bg-gray-200 transition-colors"
                 >
                   {predefinedTag}
                 </button>

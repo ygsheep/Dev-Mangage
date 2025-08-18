@@ -323,7 +323,7 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
               </div>
 
               {/* 支持格式说明 */}
-              <div className="bg-blue-50 rounded-lg p-4">
+              <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-blue-800 mb-2">支持的文档格式示例:</h4>
                 <pre className="text-xs text-blue-700 bg-blue-100 p-3 rounded overflow-x-auto">
 {`## 用户登录 - POST /api/v1/auth/login
@@ -375,7 +375,7 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
               </div>
 
               {/* 解析配置选项 */}
-              <div className="bg-blue-50 rounded-lg p-4">
+              <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-blue-800 mb-3 flex items-center space-x-2">
                   <Brain className="w-4 h-4" />
                   <span>解析设置</span>

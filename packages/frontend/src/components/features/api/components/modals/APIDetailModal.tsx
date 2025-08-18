@@ -201,7 +201,7 @@ app.${api.method.toLowerCase()}('${api.path}', async (req, res) => {
                   text={frontendCode}
                   onCopy={() => handleCopy(frontendCode, '前端代码')}
                 >
-                  <button className="px-3 py-1 bg-blue-50 text-blue-600 rounded text-sm hover:bg-blue-100 transition-colors">
+                  <button className="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-blue-600 rounded text-sm hover:bg-blue-100 transition-colors">
                     复制代码
                   </button>
                 </CopyToClipboard>
@@ -224,7 +224,7 @@ app.${api.method.toLowerCase()}('${api.path}', async (req, res) => {
                   text={backendCode}
                   onCopy={() => handleCopy(backendCode, '后端代码')}
                 >
-                  <button className="px-3 py-1 bg-blue-50 text-blue-600 rounded text-sm hover:bg-blue-100 transition-colors">
+                  <button className="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-blue-600 rounded text-sm hover:bg-blue-100 transition-colors">
                     复制代码
                   </button>
                 </CopyToClipboard>

@@ -458,7 +458,7 @@ export const DataModelMindmap: React.FC<DataModelMindmapProps> = ({
   return (
     <div className={`data-model-mindmap relative ${className}`} style={{ height }}>
       {/* 工具栏 */}
-      <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex items-center gap-2">
+      <div className="absolute top-4 left-4 z-10 bg-bg-paper rounded-lg shadow-lg border border-border-primary p-2 flex items-center gap-2">
         {/* 布局选择 */}
         <select
           value={selectedLayout}
@@ -473,7 +473,7 @@ export const DataModelMindmap: React.FC<DataModelMindmapProps> = ({
         {/* 应用布局按钮 */}
         <button
           onClick={() => applyLayout(selectedLayout)}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded transition-colors"
           title="应用布局"
         >
           <Settings className="w-4 h-4" />
@@ -513,7 +513,7 @@ export const DataModelMindmap: React.FC<DataModelMindmapProps> = ({
         {/* 控制面板 */}
         <Controls
           showInteractive={false}
-          className="bg-white border border-gray-200 rounded-lg shadow-lg"
+          className="bg-bg-paper border border-border-primary rounded-lg shadow-lg"
         />
 
         {/* 背景 */}
@@ -540,7 +540,7 @@ export const DataModelMindmap: React.FC<DataModelMindmapProps> = ({
                 default: return '#6b7280';
               }
             }}
-            className="bg-white border border-gray-200 rounded-lg"
+            className="bg-bg-paper border border-border-primary rounded-lg"
           />
         )}
       </ReactFlow>

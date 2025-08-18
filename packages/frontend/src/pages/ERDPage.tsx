@@ -67,7 +67,7 @@ export const ERDPage: React.FC = () => {
             {!isFullscreen && (
               <Link
                 to={`/projects/${projectId}/data-model`}
-                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
                 title="返回数据模型"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -131,7 +131,7 @@ export const ERDPage: React.FC = () => {
             {/* 全屏按钮 */}
             <button
               onClick={toggleFullscreen}
-              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
               title={isFullscreen ? '退出全屏' : '进入全屏'}
             >
               <Maximize2 className="w-5 h-5" />
@@ -143,7 +143,7 @@ export const ERDPage: React.FC = () => {
                 // 这里可以显示帮助对话框
                 alert('ERD 帮助:\n\n• 拖拽表格来重新排列\n• 使用鼠标滚轮缩放\n• 点击表格标题可以折叠/展开字段\n• 蓝色线条表示外键关系\n• 黄色图标表示主键\n• 蓝色图标表示外键');
               }}
-              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
               title="查看帮助"
             >
               <HelpCircle className="w-5 h-5" />
@@ -166,7 +166,7 @@ export const ERDPage: React.FC = () => {
 
       {/* 使用说明 */}
       {!isFullscreen && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg p-4">
           <div className="flex items-start gap-3">
             <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>

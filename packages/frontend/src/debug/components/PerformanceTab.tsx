@@ -55,8 +55,8 @@ const PerformanceTab: React.FC = () => {
     switch (type) {
       case 'memory': return 'text-purple-600 bg-purple-50'
       case 'timing': return 'text-green-600 bg-green-50'
-      case 'counter': return 'text-blue-600 bg-blue-50'
-      default: return 'text-text-secondary bg-gray-50'
+      case 'counter': return 'text-blue-600 bg-primary-50 dark:bg-primary-900/20'
+      default: return 'text-text-secondary bg-bg-secondary'
     }
   }
 
@@ -122,7 +122,7 @@ const PerformanceTab: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       {/* 控制面板 */}
-      <div className="p-3 bg-gray-50 border-b border-gray-200">
+      <div className="p-3 bg-bg-secondary border-b border-gray-200">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <select
@@ -177,11 +177,11 @@ const PerformanceTab: React.FC = () => {
             <div className="text-green-600">平均耗时</div>
             <div className="text-lg font-semibold text-green-800">{stats.avgTiming.toFixed(1)}ms</div>
           </div>
-          <div className="bg-blue-50 p-2 rounded border">
+          <div className="bg-primary-50 dark:bg-primary-900/20 p-2 rounded border">
             <div className="text-blue-600">计数器</div>
             <div className="text-lg font-semibold text-blue-800">{stats.counter}</div>
           </div>
-          <div className="bg-gray-50 p-2 rounded border">
+          <div className="bg-bg-secondary p-2 rounded border">
             <div className="text-text-secondary">唯一</div>
             <div className="text-lg font-semibold text-gray-800">{Object.keys(metricsByName).length}</div>
           </div>
@@ -195,7 +195,7 @@ const PerformanceTab: React.FC = () => {
           <div className="divide-y divide-gray-100">
             {Object.entries(metricsByName).map(([name, metrics]) => (
               <div key={name} className="p-2">
-                <h5 className="text-xs font-medium text-gray-700 mb-2 flex items-center">
+                <h5 className="text-xs font-medium text-text-primary mb-2 flex items-center">
                   <span className={`px-1 py-0.5 rounded text-xs mr-2 ${getTypeColor(metrics[0].type)}`}>
                     {metrics[0].type.toUpperCase()}
                   </span>
@@ -238,8 +238,8 @@ const PerformanceTab: React.FC = () => {
                   {metrics.slice(-3).map((metric) => (
                     <div
                       key={metric.id}
-                      className={`p-1 hover:bg-gray-50 cursor-pointer text-xs rounded ${
-                        selectedMetric?.id === metric.id ? 'bg-blue-50 border border-blue-200' : ''
+                      className={`p-1 hover:bg-bg-secondary cursor-pointer text-xs rounded ${
+                        selectedMetric?.id === metric.id ? 'bg-primary-50 dark:bg-primary-900/20 border border-blue-200' : ''
                       }`}
                       onClick={() => setSelectedMetric(selectedMetric?.id === metric.id ? null : metric)}
                     >
@@ -263,7 +263,7 @@ const PerformanceTab: React.FC = () => {
 
         {/* 详情面板 */}
         {selectedMetric && (
-          <div className="w-80 border-l border-gray-200 bg-gray-50 overflow-auto">
+          <div className="w-80 border-l border-gray-200 bg-bg-secondary overflow-auto">
             <div className="p-3">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium text-gray-800">指标详情</h4>

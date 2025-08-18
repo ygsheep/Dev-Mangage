@@ -382,7 +382,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
   return (
     <div className="space-y-6">
       {/* 头部工具栏 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-bg-paper rounded-lg border border-gray-200 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <GitBranch className="w-8 h-8 text-blue-500" />
@@ -397,7 +397,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <button
                 onClick={() => setView('list')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  view === 'list' ? 'bg-white text-text-primary shadow' : 'text-text-secondary'
+                  view === 'list' ? 'bg-bg-paper text-text-primary shadow' : 'text-text-secondary'
                 }`}
               >
                 计划列表
@@ -405,7 +405,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <button
                 onClick={() => setView('designer')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  view === 'designer' ? 'bg-white text-text-primary shadow' : 'text-text-secondary'
+                  view === 'designer' ? 'bg-bg-paper text-text-primary shadow' : 'text-text-secondary'
                 }`}
               >
                 可视化设计
@@ -413,7 +413,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <button
                 onClick={() => setView('execution')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  view === 'execution' ? 'bg-white text-text-primary shadow' : 'text-text-secondary'
+                  view === 'execution' ? 'bg-bg-paper text-text-primary shadow' : 'text-text-secondary'
                 }`}
                 disabled={!execution}
               >
@@ -434,7 +434,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
 
       {/* 计划列表视图 */}
       {view === 'list' && (
-        <div className="bg-white rounded-lg border border-gray-200">
+        <div className="bg-bg-paper rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-medium text-text-primary">
               迁移计划 ({plans.length})
@@ -443,7 +443,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-bg-secondary">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     计划名称
@@ -468,9 +468,9 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-bg-paper divide-y divide-gray-200">
                 {plans.map((plan) => (
-                  <tr key={plan.id} className="hover:bg-gray-50">
+                  <tr key={plan.id} className="hover:bg-bg-secondary">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <GitBranch className="w-4 h-4 text-gray-400 mr-2" />
@@ -573,7 +573,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
       {view === 'execution' && execution && (
         <div className="space-y-6">
           {/* 执行状态概览 */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="bg-bg-paper rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-medium text-text-primary">
@@ -596,7 +596,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                   <div
                     className={`h-2 rounded-full transition-all duration-300 ${
                       execution.status === 'COMPLETED' ? 'bg-green-500' :
-                      execution.status === 'FAILED' ? 'bg-red-500' : 'bg-blue-500'
+                      execution.status === 'FAILED' ? 'bg-red-500' : 'bg-primary-50 dark:bg-primary-900/20'
                     }`}
                     style={{ 
                       width: `${(execution.currentStep / execution.totalSteps) * 100}%` 
@@ -615,7 +615,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
 
             {/* 执行时间信息 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-bg-secondary rounded-lg p-4">
                 <div className="flex items-center">
                   <Calendar className="w-5 h-5 text-gray-400 mr-2" />
                   <div>
@@ -627,7 +627,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                 </div>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-bg-secondary rounded-lg p-4">
                 <div className="flex items-center">
                   <Clock className="w-5 h-5 text-gray-400 mr-2" />
                   <div>
@@ -642,7 +642,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                 </div>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-bg-secondary rounded-lg p-4">
                 <div className="flex items-center">
                   <Target className="w-5 h-5 text-gray-400 mr-2" />
                   <div>
@@ -657,7 +657,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           </div>
 
           {/* 执行日志 */}
-          <div className="bg-white rounded-lg border border-gray-200">
+          <div className="bg-bg-paper rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-lg font-medium text-text-primary">
                 执行日志
@@ -759,7 +759,7 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-text-primary">创建迁移计划</h2>
           <button onClick={onClose} className="btn-ghost">
@@ -769,7 +769,7 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-primary mb-1">
               计划名称 *
             </label>
             <input
@@ -783,7 +783,7 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-primary mb-1">
               计划描述
             </label>
             <textarea
@@ -796,7 +796,7 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-primary mb-1">
               目标数据库
             </label>
             <select
@@ -819,7 +819,7 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
                 onChange={(e) => setFormData(prev => ({ ...prev, includeRollback: e.target.checked }))}
                 className="rounded border-gray-300"
               />
-              <span className="text-sm text-gray-700">生成回滚脚本</span>
+              <span className="text-sm text-text-primary">生成回滚脚本</span>
             </label>
           </div>
 

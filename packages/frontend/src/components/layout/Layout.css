@@ -4,8 +4,10 @@
 .claude-sidebar {
   background: #2f2f2f;
   border-right: 1px solid #404040;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 200ms ease;
 }
+
+/* 侧边栏收起状态悬停效果已移除 */
 
 /* 内容区域动画 */
 .content-transition {
@@ -115,9 +117,21 @@
 
 /* 过渡动画优化 */
 .claude-sidebar * {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, width, margin;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
+  transition-duration: 300ms;
+}
+
+/* 文本容器动画优化 */
+.claude-sidebar .overflow-hidden {
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
+              margin 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 防止文本在动画期间换行 */
+.claude-sidebar .whitespace-nowrap {
+  white-space: nowrap;
 }
 
 /* 滚动条样式 */
@@ -215,10 +229,7 @@
   border-radius: 0 2px 2px 0;
 }
 
-/* 键盘导航支持 */
-.claude-sidebar:focus-within {
-  box-shadow: inset 0 0 0 2px #d97757;
-}
+/* 键盘导航支持 - focus-within 样式已移除 */
 
 /* 打印样式 */
 @media print {

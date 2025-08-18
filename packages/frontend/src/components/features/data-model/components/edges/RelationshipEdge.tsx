@@ -97,7 +97,7 @@ const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
         >
           {/* 关系标签 */}
           <div 
-            className={`bg-white border-2 rounded-lg px-2 py-1 shadow-sm transition-all duration-200 ${
+            className={`bg-bg-paper border-2 rounded-lg px-2 py-1 shadow-sm transition-all duration-200 ${
               selected ? 'border-blue-500 shadow-lg' : 'border-gray-300'
             }`}
             style={{ borderColor: color }}
@@ -119,13 +119,13 @@ const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
 
           {/* 操作按钮 */}
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="bg-white rounded-lg shadow-lg border border-gray-200 flex items-center">
+            <div className="bg-bg-paper rounded-lg shadow-lg border border-gray-200 flex items-center">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   // TODO: 查看关系详情
                 }}
-                className="p-2 hover:bg-gray-50 rounded-l-lg transition-colors"
+                className="p-2 hover:bg-bg-secondary rounded-l-lg transition-colors"
                 title="查看详情"
               >
                 <Eye className="w-3 h-3 text-gray-600" />
@@ -136,7 +136,7 @@ const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
                   e.stopPropagation()
                   onEdit()
                 }}
-                className="p-2 hover:bg-gray-50 transition-colors border-x border-gray-200"
+                className="p-2 hover:bg-bg-secondary transition-colors border-x border-gray-200"
                 title="编辑关系"
               >
                 <Edit3 className="w-3 h-3 text-gray-600" />

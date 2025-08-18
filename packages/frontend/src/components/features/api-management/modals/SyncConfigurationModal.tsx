@@ -23,33 +23,21 @@ interface SyncConfigurationModalProps {
   onSuccess?: () => void;
 }
 
-interface SyncMapping {
-  apiEndpointId: string;
-  databaseTableId: string;
-  syncDirection: 'api_to_db' | 'db_to_api' | 'bidirectional';
-  conflictResolution: 'api_wins' | 'db_wins' | 'manual';
-  fieldMappings: Array<{
-    apiField: string;
-    dbField: string;
-    transformation?: string;
-  }>;
-}
-
 interface FormData {
   name: string;
-  description: string;
-  isEnabled: boolean;
-  syncFrequency: 'manual' | 'realtime' | 'scheduled';
-  scheduleExpression?: string;
-  retryAttempts: number;
-  retryDelay: number;
-  timeoutSeconds: number;
-  enableConflictDetection: boolean;
-  defaultConflictResolution: 'api_wins' | 'db_wins' | 'manual';
-  syncMappings: SyncMapping[];
-  webhookUrl?: string;
-  enableNotifications: boolean;
-  notificationEvents: string[];
+  description?: string;
+  isActive: boolean;
+  autoSync: boolean;
+  syncDirection: 'MODEL_TO_API' | 'API_TO_MODEL' | 'BIDIRECTIONAL';
+  conflictResolution: 'MANUAL' | 'MODEL_WINS' | 'API_WINS' | 'MERGE';
+  namingConvention: 'CAMEL_CASE' | 'SNAKE_CASE' | 'KEBAB_CASE';
+  includeTables: string[];
+  excludeTables: string[];
+  includeFields: string[];
+  excludeFields: string[];
+  syncInterval?: number;
+  tableToEndpointMapping?: Record<string, any>;
+  fieldToParameterMapping?: Record<string, any>;
 }
 
 export const SyncConfigurationModal: React.FC<SyncConfigurationModalProps> = ({
@@ -72,64 +60,63 @@ export const SyncConfigurationModal: React.FC<SyncConfigurationModalProps> = ({
     defaultValues: {
       name: '',
       description: '',
-      isEnabled: true,
-      syncFrequency: 'manual',
-      scheduleExpression: '0 0 * * *',
-      retryAttempts: 3,
-      retryDelay: 1000,
-      timeoutSeconds: 30,
-      enableConflictDetection: true,
-      defaultConflictResolution: 'manual',
-      syncMappings: [],
-      webhookUrl: '',
-      enableNotifications: true,
-      notificationEvents: ['sync_success', 'sync_failure', 'conflict_detected']
+      isActive: true,
+      autoSync: false,
+      syncDirection: 'MODEL_TO_API',
+      conflictResolution: 'MANUAL',
+      namingConvention: 'CAMEL_CASE',
+      includeTables: [],
+      excludeTables: [],
+      includeFields: [],
+      excludeFields: [],
+      syncInterval: undefined,
+      tableToEndpointMapping: {},
+      fieldToParameterMapping: {}
     }
   });
 
-  const { fields: mappingFields, append: addMapping, remove: removeMapping } = useFieldArray({
-    control,
-    name: 'syncMappings'
-  });
-
-  const watchedFrequency = watch('syncFrequency');
-  const watchedNotifications = watch('enableNotifications');
+  const watchedAutoSync = watch('autoSync');
+  const watchedDirection = watch('syncDirection');
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      // 这里应该调用API保存同步配置
-      console.log('保存同步配置:', data);
+      const response = await fetch('/api/v1/api-management/sync-configurations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...data,
+          projectId
+        })
+      });
+
+      const result = await response.json();
       
-      toast.success('同步配置保存成功');
-      reset();
-      onClose();
-      onSuccess?.();
-    } catch (error) {
+      if (result.success) {
+        toast.success('同步配置创建成功');
+        reset();
+        onClose();
+        onSuccess?.();
+      } else {
+        throw new Error(result.message || '创建同步配置失败');
+      }
+    } catch (error: any) {
       console.error('保存同步配置失败:', error);
-      toast.error('保存同步配置失败');
+      toast.error(error.message || '保存同步配置失败');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleAddMapping = () => {
-    addMapping({
-      apiEndpointId: '',
-      databaseTableId: '',
-      syncDirection: 'api_to_db',
-      conflictResolution: 'manual',
-      fieldMappings: []
-    });
   };
 
   if (!isOpen) return null;
 
   const tabs = [
     { id: 0, label: '基本设置', icon: Settings },
-    { id: 1, label: '同步映射', icon: Database },
-    { id: 2, label: '调度配置', icon: Clock },
-    { id: 3, label: '通知设置', icon: AlertCircle }
+    { id: 1, label: '表过滤', icon: Database },
+    { id: 2, label: '字段过滤', icon: Clock },
+    { id: 3, label: '映射配置', icon: AlertCircle }
   ];
 
   return (
@@ -210,7 +197,7 @@ export const SyncConfigurationModal: React.FC<SyncConfigurationModalProps> = ({
                   <div>
                     <label className="flex items-center space-x-3">
                       <Controller
-                        name="isEnabled"
+                        name="isActive"
                         control={control}
                         render={({ field }) => (
                           <input
@@ -221,9 +208,9 @@ export const SyncConfigurationModal: React.FC<SyncConfigurationModalProps> = ({
                           />
                         )}
                       />
-                      <span className="text-sm font-medium text-text-secondary">启用同步</span>
+                      <span className="text-sm font-medium text-text-secondary">启用同步配置</span>
                     </label>
-                    <p className="mt-1 text-xs text-text-tertiary ml-7">关闭后将停止所有同步操作</p>
+                    <p className="mt-1 text-xs text-text-tertiary ml-7">关闭后将停止此配置的所有同步操作</p>
                   </div>
                 </div>
 
@@ -246,109 +233,37 @@ export const SyncConfigurationModal: React.FC<SyncConfigurationModalProps> = ({
                   />
                 </div>
 
-                {/* 同步频率 */}
+                {/* 同步方向 */}
                 <div>
                   <label className="block text-sm font-medium text-text-secondary mb-1">
-                    同步频率
+                    同步方向
                   </label>
                   <Controller
-                    name="syncFrequency"
+                    name="syncDirection"
                     control={control}
                     render={({ field }) => (
                       <select
                         {...field}
                         className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        <option value="manual">手动触发</option>
-                        <option value="realtime">实时同步</option>
-                        <option value="scheduled">定时同步</option>
+                        <option value="MODEL_TO_API">数据模型 → API</option>
+                        <option value="API_TO_MODEL">API → 数据模型</option>
+                        <option value="BIDIRECTIONAL">双向同步</option>
                       </select>
                     )}
                   />
+                  <p className="mt-1 text-xs text-text-tertiary">
+                    选择同步的方向：从数据模型生成API，从API生成数据模型，或双向同步
+                  </p>
                 </div>
 
-                {/* 性能配置 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-1">
-                      重试次数
-                    </label>
-                    <Controller
-                      name="retryAttempts"
-                      control={control}
-                      rules={{ 
-                        min: { value: 0, message: '重试次数不能小于0' },
-                        max: { value: 10, message: '重试次数不能大于10' }
-                      }}
-                      render={({ field }) => (
-                        <input
-                          {...field}
-                          type="number"
-                          min="0"
-                          max="10"
-                          className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        />
-                      )}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-1">
-                      重试间隔(ms)
-                    </label>
-                    <Controller
-                      name="retryDelay"
-                      control={control}
-                      rules={{ 
-                        min: { value: 100, message: '重试间隔不能小于100ms' },
-                        max: { value: 60000, message: '重试间隔不能大于60秒' }
-                      }}
-                      render={({ field }) => (
-                        <input
-                          {...field}
-                          type="number"
-                          min="100"
-                          max="60000"
-                          step="100"
-                          className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 1000)}
-                        />
-                      )}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-text-secondary mb-1">
-                      超时时间(秒)
-                    </label>
-                    <Controller
-                      name="timeoutSeconds"
-                      control={control}
-                      rules={{ 
-                        min: { value: 5, message: '超时时间不能小于5秒' },
-                        max: { value: 300, message: '超时时间不能大于300秒' }
-                      }}
-                      render={({ field }) => (
-                        <input
-                          {...field}
-                          type="number"
-                          min="5"
-                          max="300"
-                          className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 30)}
-                        />
-                      )}
-                    />
-                  </div>
-                </div>
-
-                {/* 冲突检测 */}
-                <div className="space-y-4">
+                {/* 基本配置 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* 自动同步 */}
                   <div>
                     <label className="flex items-center space-x-3">
                       <Controller
-                        name="enableConflictDetection"
+                        name="autoSync"
                         control={control}
                         render={({ field }) => (
                           <input
@@ -359,298 +274,297 @@ export const SyncConfigurationModal: React.FC<SyncConfigurationModalProps> = ({
                           />
                         )}
                       />
-                      <span className="text-sm font-medium text-text-secondary">启用冲突检测</span>
+                      <span className="text-sm font-medium text-text-secondary">启用自动同步</span>
                     </label>
+                    <p className="mt-1 text-xs text-text-tertiary ml-7">数据模型或API变更时自动触发同步</p>
                   </div>
 
+                  {/* 命名约定 */}
                   <div>
                     <label className="block text-sm font-medium text-text-secondary mb-1">
-                      默认冲突解决策略
+                      命名约定
                     </label>
                     <Controller
-                      name="defaultConflictResolution"
+                      name="namingConvention"
                       control={control}
                       render={({ field }) => (
                         <select
                           {...field}
                           className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                          <option value="manual">手动解决</option>
-                          <option value="api_wins">API数据优先</option>
-                          <option value="db_wins">数据库数据优先</option>
+                          <option value="CAMEL_CASE">驼峰命名 (camelCase)</option>
+                          <option value="SNAKE_CASE">下划线命名 (snake_case)</option>
+                          <option value="KEBAB_CASE">短横线命名 (kebab-case)</option>
                         </select>
                       )}
                     />
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* 同步映射 */}
-            {activeTab === 1 && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-text-primary">API与数据表映射</h3>
-                  <button
-                    type="button"
-                    onClick={handleAddMapping}
-                    className="btn-primary flex items-center space-x-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>添加映射</span>
-                  </button>
-                </div>
-
-                {mappingFields.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Database className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-text-tertiary">暂无同步映射，请点击上方按钮添加</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {mappingFields.map((field, index) => (
-                      <div key={field.id} className="border border-border-primary rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="font-medium text-text-primary">映射 #{index + 1}</h4>
-                          <button
-                            type="button"
-                            onClick={() => removeMapping(index)}
-                            className="p-1 text-red-600 hover:bg-red-50 rounded"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-text-secondary mb-1">
-                              API端点
-                            </label>
-                            <Controller
-                              name={`syncMappings.${index}.apiEndpointId`}
-                              control={control}
-                              render={({ field }) => (
-                                <select
-                                  {...field}
-                                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                >
-                                  <option value="">选择API端点</option>
-                                  {/* 这里应该从API获取端点列表 */}
-                                </select>
-                              )}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-text-secondary mb-1">
-                              数据表
-                            </label>
-                            <Controller
-                              name={`syncMappings.${index}.databaseTableId`}
-                              control={control}
-                              render={({ field }) => (
-                                <select
-                                  {...field}
-                                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                >
-                                  <option value="">选择数据表</option>
-                                  {/* 这里应该从API获取数据表列表 */}
-                                </select>
-                              )}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-text-secondary mb-1">
-                              同步方向
-                            </label>
-                            <Controller
-                              name={`syncMappings.${index}.syncDirection`}
-                              control={control}
-                              render={({ field }) => (
-                                <select
-                                  {...field}
-                                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                >
-                                  <option value="api_to_db">API → 数据库</option>
-                                  <option value="db_to_api">数据库 → API</option>
-                                  <option value="bidirectional">双向同步</option>
-                                </select>
-                              )}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-text-secondary mb-1">
-                              冲突解决
-                            </label>
-                            <Controller
-                              name={`syncMappings.${index}.conflictResolution`}
-                              control={control}
-                              render={({ field }) => (
-                                <select
-                                  {...field}
-                                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                >
-                                  <option value="manual">手动解决</option>
-                                  <option value="api_wins">API数据优先</option>
-                                  <option value="db_wins">数据库数据优先</option>
-                                </select>
-                              )}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 调度配置 */}
-            {activeTab === 2 && (
-              <div className="space-y-6">
-                {watchedFrequency === 'scheduled' && (
+                {/* 同步间隔 */}
+                {watchedAutoSync && (
                   <div>
                     <label className="block text-sm font-medium text-text-secondary mb-1">
-                      Cron表达式
+                      同步间隔（分钟）
                     </label>
                     <Controller
-                      name="scheduleExpression"
+                      name="syncInterval"
                       control={control}
-                      rules={{
-                        required: watchedFrequency === 'scheduled' ? 'Cron表达式不能为空' : false
+                      rules={{ 
+                        min: { value: 1, message: '同步间隔不能小于1分钟' },
+                        max: { value: 1440, message: '同步间隔不能大于1440分钟（1天）' }
                       }}
                       render={({ field }) => (
                         <input
                           {...field}
-                          type="text"
+                          type="number"
+                          min="1"
+                          max="1440"
                           className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="0 0 * * *"
+                          placeholder="输入同步间隔（分钟）"
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                         />
                       )}
                     />
-                    <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                      <div className="flex items-center space-x-2 text-blue-800 mb-2">
-                        <Info className="w-4 h-4" />
-                        <span className="text-sm font-medium">Cron表达式说明</span>
-                      </div>
-                      <div className="text-xs text-blue-700 space-y-1">
-                        <p>格式：分 时 日 月 周</p>
-                        <p>示例：0 0 * * * (每天凌晨执行)</p>
-                        <p>示例：0 */2 * * * (每两小时执行)</p>
-                      </div>
-                    </div>
+                    <p className="mt-1 text-xs text-text-tertiary">
+                      设置自动同步的时间间隔，留空表示仅在数据变更时同步
+                    </p>
                   </div>
                 )}
 
-                <div className="p-4 bg-bg-tertiary rounded-lg">
-                  <h4 className="font-medium text-text-primary mb-2">预设调度模板</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {[
-                      { label: '每小时', value: '0 * * * *' },
-                      { label: '每天凌晨', value: '0 0 * * *' },
-                      { label: '每周一', value: '0 0 * * 1' },
-                      { label: '每月1号', value: '0 0 1 * *' }
-                    ].map((template) => (
-                      <button
-                        key={template.value}
-                        type="button"
-                        onClick={() => setValue('scheduleExpression', template.value)}
-                        className="text-left px-3 py-2 border border-border-primary rounded-lg hover:bg-bg-paper hover:border-blue-300 transition-colors"
+                {/* 冲突解决策略 */}
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                    冲突解决策略
+                  </label>
+                  <Controller
+                    name="conflictResolution"
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        <div className="font-medium text-sm text-text-primary">{template.label}</div>
-                        <div className="text-xs text-text-tertiary">{template.value}</div>
-                      </button>
-                    ))}
+                        <option value="MANUAL">手动处理</option>
+                        <option value="MODEL_WINS">数据模型优先</option>
+                        <option value="API_WINS">API优先</option>
+                        <option value="MERGE">自动合并</option>
+                      </select>
+                    )}
+                  />
+                  <p className="mt-1 text-xs text-text-tertiary">
+                    当检测到冲突时的处理策略
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* 表过滤配置 */}
+            {activeTab === 1 && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* 包含的表 */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-3">
+                      包含的表（留空表示包含所有表）
+                    </label>
+                    <Controller
+                      name="includeTables"
+                      control={control}
+                      render={({ field }) => (
+                        <textarea
+                          {...field}
+                          value={field.value?.join('\n') || ''}
+                          onChange={(e) => field.onChange(e.target.value.split('\n').filter(Boolean))}
+                          rows={8}
+                          className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          placeholder="user\nproduct\norder\n支持通配符: user_*"
+                        />
+                      )}
+                    />
+                    <p className="mt-1 text-xs text-text-tertiary">
+                      每行一个表名或模式，支持通配符（*）
+                    </p>
+                  </div>
+
+                  {/* 排除的表 */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-3">
+                      排除的表
+                    </label>
+                    <Controller
+                      name="excludeTables"
+                      control={control}
+                      render={({ field }) => (
+                        <textarea
+                          {...field}
+                          value={field.value?.join('\n') || ''}
+                          onChange={(e) => field.onChange(e.target.value.split('\n').filter(Boolean))}
+                          rows={8}
+                          className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          placeholder="temp_*\nlog_*\ncache_*"
+                        />
+                      )}
+                    />
+                    <p className="mt-1 text-xs text-text-tertiary">
+                      每行一个表名或模式，这些表将被排除
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 text-blue-800 mb-2">
+                    <Info className="w-4 h-4" />
+                    <span className="text-sm font-medium">过滤规则说明</span>
+                  </div>
+                  <div className="text-xs text-blue-700 space-y-1">
+                    <p>• 先应用包含规则，再应用排除规则</p>
+                    <p>• 支持通配符：* 匹配任意字符，如 user_* 匹配所有以 user_ 开头的表</p>
+                    <p>• 大小写敏感，请确保表名拼写正确</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 通知设置 */}
-            {activeTab === 3 && (
+            {/* 字段过滤配置 */}
+            {activeTab === 2 && (
               <div className="space-y-6">
-                <div>
-                  <label className="flex items-center space-x-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* 包含的字段 */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-3">
+                      包含的字段（留空表示包含所有字段）
+                    </label>
                     <Controller
-                      name="enableNotifications"
+                      name="includeFields"
                       control={control}
                       render={({ field }) => (
-                        <input
-                          type="checkbox"
-                          checked={field.value}
-                          onChange={field.onChange}
-                          className="w-4 h-4 text-blue-600 border-border-primary rounded focus:ring-blue-500"
+                        <textarea
+                          {...field}
+                          value={field.value?.join('\n') || ''}
+                          onChange={(e) => field.onChange(e.target.value.split('\n').filter(Boolean))}
+                          rows={8}
+                          className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          placeholder="id\nname\nemail\ncreated_at\n支持通配符: *_id"
                         />
                       )}
                     />
-                    <span className="text-sm font-medium text-text-secondary">启用通知</span>
-                  </label>
+                    <p className="mt-1 text-xs text-text-tertiary">
+                      每行一个字段名或模式，支持通配符（*）
+                    </p>
+                  </div>
+
+                  {/* 排除的字段 */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-3">
+                      排除的字段
+                    </label>
+                    <Controller
+                      name="excludeFields"
+                      control={control}
+                      render={({ field }) => (
+                        <textarea
+                          {...field}
+                          value={field.value?.join('\n') || ''}
+                          onChange={(e) => field.onChange(e.target.value.split('\n').filter(Boolean))}
+                          rows={8}
+                          className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          placeholder="password\nsalt\ntemp_*\ninternal_*"
+                        />
+                      )}
+                    />
+                    <p className="mt-1 text-xs text-text-tertiary">
+                      每行一个字段名或模式，这些字段将被排除
+                    </p>
+                  </div>
                 </div>
 
-                {watchedNotifications && (
-                  <>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 text-orange-800 mb-2">
+                    <AlertCircle className="w-4 h-4" />
+                    <span className="text-sm font-medium">字段过滤建议</span>
+                  </div>
+                  <div className="text-xs text-orange-700 space-y-1">
+                    <p>• 建议排除敏感字段：password、secret、token 等</p>
+                    <p>• 排除系统内部字段：temp_*、internal_*、debug_* 等</p>
+                    <p>• 根据业务需要包含或排除特定字段</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 映射配置 */}
+            {activeTab === 3 && (
+              <div className="space-y-6">
+                <div className="bg-bg-secondary border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-medium text-text-primary mb-4">表到端点映射规则</h3>
+                  <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-text-secondary mb-1">
-                        Webhook URL
+                      <label className="block text-sm font-medium text-text-secondary mb-2">
+                        表到端点映射（JSON格式）
                       </label>
                       <Controller
-                        name="webhookUrl"
+                        name="tableToEndpointMapping"
                         control={control}
                         render={({ field }) => (
-                          <input
+                          <textarea
                             {...field}
-                            type="url"
-                            className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="https://example.com/webhook"
+                            value={JSON.stringify(field.value || {}, null, 2)}
+                            onChange={(e) => {
+                              try {
+                                field.onChange(JSON.parse(e.target.value));
+                              } catch {
+                                // 保持输入值，即使JSON无效
+                              }
+                            }}
+                            rows={6}
+                            className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+                            placeholder='{\n  "user": "/api/users",\n  "product": "/api/products",\n  "order": "/api/orders"\n}'
                           />
                         )}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-text-secondary mb-3">
-                        通知事件
+                      <label className="block text-sm font-medium text-text-secondary mb-2">
+                        字段到参数映射（JSON格式）
                       </label>
-                      <div className="space-y-2">
-                        {[
-                          { id: 'sync_success', label: '同步成功', icon: CheckCircle },
-                          { id: 'sync_failure', label: '同步失败', icon: AlertCircle },
-                          { id: 'conflict_detected', label: '检测到冲突', icon: AlertCircle },
-                          { id: 'schedule_triggered', label: '定时任务触发', icon: Calendar }
-                        ].map((event) => {
-                          const Icon = event.icon;
-                          return (
-                            <label key={event.id} className="flex items-center space-x-3">
-                              <Controller
-                                name="notificationEvents"
-                                control={control}
-                                render={({ field }) => (
-                                  <input
-                                    type="checkbox"
-                                    checked={field.value?.includes(event.id)}
-                                    onChange={(e) => {
-                                      const currentEvents = field.value || [];
-                                      if (e.target.checked) {
-                                        field.onChange([...currentEvents, event.id]);
-                                      } else {
-                                        field.onChange(currentEvents.filter(ev => ev !== event.id));
-                                      }
-                                    }}
-                                    className="w-4 h-4 text-blue-600 border-border-primary rounded focus:ring-blue-500"
-                                  />
-                                )}
-                              />
-                              <Icon className="w-4 h-4 text-text-tertiary" />
-                              <span className="text-sm text-text-secondary">{event.label}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
+                      <Controller
+                        name="fieldToParameterMapping"
+                        control={control}
+                        render={({ field }) => (
+                          <textarea
+                            {...field}
+                            value={JSON.stringify(field.value || {}, null, 2)}
+                            onChange={(e) => {
+                              try {
+                                field.onChange(JSON.parse(e.target.value));
+                              } catch {
+                                // 保持输入值，即使JSON无效
+                              }
+                            }}
+                            rows={6}
+                            className="w-full px-3 py-2 border border-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+                            placeholder='{\n  "user_id": "userId",\n  "created_at": "createdAt",\n  "updated_at": "updatedAt"\n}'
+                          />
+                        )}
+                      />
                     </div>
-                  </>
-                )}
+                  </div>
+                </div>
+
+                <div className="bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 text-blue-800 mb-2">
+                    <Info className="w-4 h-4" />
+                    <span className="text-sm font-medium">映射配置说明</span>
+                  </div>
+                  <div className="text-xs text-blue-700 space-y-1">
+                    <p>• 表到端点映射：定义数据表对应的API端点路径</p>
+                    <p>• 字段到参数映射：定义数据库字段名到API参数名的转换规则</p>
+                    <p>• 留空使用默认映射规则（基于命名约定）</p>
+                    <p>• 映射规则仅在自动生成API时生效</p>
+                  </div>
+                </div>
               </div>
             )}
           </div>

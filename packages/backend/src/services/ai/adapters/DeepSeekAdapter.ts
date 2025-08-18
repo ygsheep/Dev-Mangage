@@ -1,3 +1,9 @@
+/**
+ * DeepSeek AI服务适配器
+ * 集成DeepSeek AI服务，提供文档解析、SQL生成和数据库优化功能
+ * 支持多轮对话、服务健康检查和自动重试机制
+ */
+
 import axios, { AxiosInstance } from 'axios'
 import { BaseAIAdapter } from './BaseAIAdapter'
 import { 
@@ -14,52 +20,103 @@ import {
 } from '../types'
 import logger from '../../../utils/logger'
 
+/**
+ * DeepSeek消息对象接口
+ * 定义对话中的单条消息结构
+ */
 interface DeepSeekMessage {
+  /** 消息角色：系统、用户或助手 */
   role: 'system' | 'user' | 'assistant'
+  /** 消息内容 */
   content: string
 }
 
+/**
+ * DeepSeek API请求参数接口
+ * 定义调用DeepSeek对话接口的请求参数
+ */
 interface DeepSeekCompletionRequest {
+  /** 使用的模型名称 */
   model: string
+  /** 对话消息列表 */
   messages: DeepSeekMessage[]
+  /** 随机性参数，控制输出的随机性 */
   temperature?: number
+  /** 最大生成token数 */
   max_tokens?: number
+  /** 核采样参数 */
   top_p?: number
+  /** 频率惩罚参数 */
   frequency_penalty?: number
+  /** 存在惩罚参数 */
   presence_penalty?: number
+  /** 停止词列表 */
   stop?: string[]
+  /** 是否使用流式输出 */
   stream?: boolean
 }
 
+/**
+ * DeepSeek API响应接口
+ * 定义DeepSeek对话接口的响应结构
+ */
 interface DeepSeekCompletionResponse {
+  /** 请求唯一标识 */
   id: string
+  /** 对象类型 */
   object: string
+  /** 创建时间戳 */
   created: number
+  /** 使用的模型名称 */
   model: string
+  /** 生成的选择列表 */
   choices: Array<{
+    /** 选择的索引 */
     index: number
+    /** 生成的消息 */
     message: {
+      /** 消息角色 */
       role: string
+      /** 消息内容 */
       content: string
     }
+    /** 结束原因 */
     finish_reason: string
   }>
+  /** token使用情况 */
   usage: {
+    /** 提示词token数 */
     prompt_tokens: number
+    /** 生成token数 */
     completion_tokens: number
+    /** 总用token数 */
     total_tokens: number
   }
 }
 
+/**
+ * DeepSeek AI服务适配器类
+ * 继承自基础AI适配器，实现DeepSeek特定的API调用和响应处理
+ */
 export class DeepSeekAdapter extends BaseAIAdapter {
+  /** HTTP客户端实例，用于调用DeepSeek API */
   private client: AxiosInstance
+  /** 服务可用性状态缓存 */
   private isServiceAvailable: boolean = false
+  /** 上次健康检查时间戳 */
   private lastHealthCheck: number = 0
-  private healthCheckInterval: number = 300000 // 5分钟
+  /** 健康检查间隔时间（5分钟） */
+  private healthCheckInterval: number = 300000
 
+  /**
+   * 构造函数
+   * 初始化DeepSeek适配器，配置HTTP客户端和启动健康检查
+   * @param config - AI服务配置参数
+   */
   constructor(config: AIServiceConfig) {
     super(config)
     
+    // 创建HTTP客户端实例，配置基本参数和认证头
     this.client = axios.create({
       baseURL: config.apiUrl || 'https://api.deepseek.com/v1',
       timeout: config.timeout || 30000,
@@ -74,14 +131,27 @@ export class DeepSeekAdapter extends BaseAIAdapter {
     this.checkServiceAvailability()
   }
 
+  /**
+   * 获取服务提供商名称
+   * @returns 服务提供商名称
+   */
   getProviderName(): string {
     return 'DeepSeek'
   }
 
+  /**
+   * 获取当前使用的模型版本
+   * @returns 模型版本名称，默认为deepseek-coder
+   */
   getModelVersion(): string {
     return this.config.model || 'deepseek-coder'
   }
 
+  /**
+   * 检查服务是否可用
+   * 使用缓存机制避免频繁的健康检查请求
+   * @returns 服务可用性状态
+   */
   async isAvailable(): Promise<boolean> {
     if (!this.config.apiKey) {
       return false
@@ -98,9 +168,14 @@ export class DeepSeekAdapter extends BaseAIAdapter {
     return this.isServiceAvailable
   }
 
+  /**
+   * 检查服务可用性的私有方法
+   * 发送最小化的测试请求来验证API连接状态
+   * @private
+   */
   private async checkServiceAvailability(): Promise<void> {
     try {
-      // DeepSeek API测试请求
+      // 构造最小化的测试请求以验证API连通性
       const testRequest: DeepSeekCompletionRequest = {
         model: this.getModelVersion(),
         messages: [
@@ -112,6 +187,7 @@ export class DeepSeekAdapter extends BaseAIAdapter {
 
       await this.client.post('/chat/completions', testRequest)
       
+      // 更新服务状态和检查时间
       this.isServiceAvailable = true
       this.lastHealthCheck = Date.now()
       
@@ -120,6 +196,7 @@ export class DeepSeekAdapter extends BaseAIAdapter {
         available: true 
       })
     } catch (error) {
+      // 记录服务不可用状态
       this.isServiceAvailable = false
       this.lastHealthCheck = Date.now()
       
@@ -133,6 +210,11 @@ export class DeepSeekAdapter extends BaseAIAdapter {
     }
   }
 
+  /**
+   * 执行详细的健康检查
+   * 测试API响应时间和功能完整性，返回详细的健康状态信息
+   * @returns 健康检查结果，包含状态和详细信息
+   */
   async healthCheck(): Promise<{ status: 'healthy' | 'degraded' | 'unhealthy', details?: any }> {
     try {
       if (!this.config.apiKey) {
@@ -144,7 +226,7 @@ export class DeepSeekAdapter extends BaseAIAdapter {
 
       const startTime = Date.now()
       
-      // 发送测试请求
+      // 发送完整的测试请求以验证服务功能
       const testRequest: DeepSeekCompletionRequest = {
         model: this.getModelVersion(),
         messages: [
@@ -158,6 +240,7 @@ export class DeepSeekAdapter extends BaseAIAdapter {
       const response = await this.client.post<DeepSeekCompletionResponse>('/chat/completions', testRequest)
       const responseTime = Date.now() - startTime
 
+      // 根据响应时间判断服务状态
       return {
         status: responseTime < 10000 ? 'healthy' : 'degraded',
         details: {
@@ -168,6 +251,7 @@ export class DeepSeekAdapter extends BaseAIAdapter {
         }
       }
     } catch (error) {
+      // 收集错误详情用于诊断
       const errorDetails = {
         error: error.response?.data?.error?.message || error.message,
         status: error.response?.status,

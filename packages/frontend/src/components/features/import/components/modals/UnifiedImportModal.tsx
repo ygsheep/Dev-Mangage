@@ -1125,7 +1125,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
               ) : (
                 <div className="space-y-6">
                   {/* JSON/Swagger 文档导入 */}
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="p-4 bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg">
                     <div className="flex items-start space-x-3">
                       <Code className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                       <div>
@@ -1251,7 +1251,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       />
                       <label
                         htmlFor="database-upload"
-                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 cursor-pointer"
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-md hover:bg-blue-100 cursor-pointer"
                       >
                         <Upload className="w-4 h-4 mr-2" />
                         选择文件
@@ -1289,7 +1289,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                   </div>
 
                   {/* AI配置显示 */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-start space-x-3">
                       <Brain className="w-5 h-5 text-blue-600 mt-0.5" />
                       <div className="flex-1">

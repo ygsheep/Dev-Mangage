@@ -23,14 +23,14 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({ data, selected }) => {
       <Handle
         type="target"
         position={Position.Top}
-        className="w-3 h-3 !bg-amber-400 !border-2 !border-white"
+        className="w-3 h-3 !bg-amber-400 !border-2 !border-bg-paper"
         isConnectable={true}
       />
 
       {/* 节点主体 */}
       <div
         className={`
-          bg-white rounded-lg shadow-md border-2 transition-all duration-200
+          bg-bg-paper rounded-lg shadow-md border-2 transition-all duration-200
           ${selected ? 'border-amber-500 shadow-lg' : 'border-amber-200 hover:border-amber-300'}
         `}
         style={{ 
@@ -54,7 +54,7 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({ data, selected }) => {
           
           {/* 折叠/展开按钮 */}
           <button
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-bg-tertiary rounded transition-colors"
             onClick={(e) => {
               e.stopPropagation()
               // 触发折叠/展开逻辑
@@ -98,7 +98,7 @@ const CategoryNode: React.FC<CategoryNodeProps> = ({ data, selected }) => {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-3 h-3 !bg-amber-400 !border-2 !border-white"
+        className="w-3 h-3 !bg-amber-400 !border-2 !border-bg-paper"
         isConnectable={true}
       />
     </>

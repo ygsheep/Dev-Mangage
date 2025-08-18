@@ -620,7 +620,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
   return (
     <div className="space-y-6">
       {/* 配置面板 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-bg-paper rounded-lg border border-gray-200 p-6">
         <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center">
           <Settings className="w-5 h-5 mr-2" />
           SQL生成配置
@@ -629,7 +629,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           {/* 数据库方言 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               数据库类型
             </label>
             <select
@@ -647,7 +647,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           
           {/* 生成类型 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               生成类型
             </label>
             <select
@@ -664,7 +664,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
 
           {/* AI增强选项 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               生成方式
             </label>
             <div className="flex space-x-2">
@@ -694,7 +694,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           
           {/* 表选择 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               表选择 ({selectedTables.size}/{tables.length})
             </label>
             <button
@@ -707,7 +707,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           
           {/* 生成按钮 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               生成SQL
             </label>
             <button
@@ -732,7 +732,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
 
         {/* AI增强选项 */}
         {useAIGeneration && (
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="mb-6 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-blue-200">
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium text-blue-900 flex items-center">
                 <Brain className="w-4 h-4 mr-2" />
@@ -889,7 +889,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
 
       {/* 表选择器 */}
       {tables.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-bg-paper rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center">
             <Layers className="w-5 h-5 mr-2" />
             选择表 ({selectedTables.size} / {tables.length})
@@ -901,8 +901,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                 key={table.id}
                 className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                   selectedTables.has(table.id)
-                    ? 'bg-blue-50 border-blue-500'
-                    : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                    ? 'bg-primary-50 dark:bg-primary-900/20 border-blue-500'
+                    : 'bg-bg-secondary border-gray-200 hover:bg-gray-100'
                 }`}
               >
                 <input
@@ -930,7 +930,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
 
       {/* SQL预览/结果 */}
       {showPreview && (
-        <div className="bg-white rounded-lg border border-gray-200">
+        <div className="bg-bg-paper rounded-lg border border-gray-200">
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h3 className="text-lg font-medium text-text-primary flex items-center">
               <Code className="w-5 h-5 mr-2" />
@@ -973,7 +973,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
               <div className="space-y-4">
                 {/* SQL元数据显示 */}
                 {sqlMetadata && (
-                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-3 border border-blue-200">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
                         <span className="text-blue-700 font-medium">生成时间：</span>
@@ -1044,7 +1044,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
       )}
 
       {/* 特性支持信息 */}
-      <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
+      <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-blue-200 p-4">
         <h4 className="font-medium text-blue-900 mb-2 flex items-center">
           <CheckCircle className="w-4 h-4 mr-2" />
           {dialectConfigs[selectedDialect].name} 特性支持

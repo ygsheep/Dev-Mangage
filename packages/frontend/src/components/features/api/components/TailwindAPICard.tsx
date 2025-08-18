@@ -57,18 +57,18 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
   }
 
   const getTypeColor = (type?: string) => ({
-    frontend: { color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
+    frontend: { color: 'text-blue-600', bg: 'bg-primary-50 dark:bg-primary-900/20', border: 'border-blue-200' },
     backend: { color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
     both: { color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' }
-  }[type || 'frontend'] || { color: 'text-text-secondary', bg: 'bg-gray-50', border: 'border-gray-200' })
+  }[type || 'frontend'] || { color: 'text-text-secondary', bg: 'bg-bg-secondary', border: 'border-border-primary' })
 
   const getStatusColor = (status: string) => ({
     DRAFT: 'text-yellow-600 bg-yellow-50',
-    DEVELOPMENT: 'text-blue-600 bg-blue-50', 
+    DEVELOPMENT: 'text-blue-600 bg-primary-50 dark:bg-primary-900/20', 
     TESTING: 'text-cyan-600 bg-cyan-50',
     PRODUCTION: 'text-green-600 bg-green-50',
     DEPRECATED: 'text-red-600 bg-red-50'
-  }[status] || 'text-text-secondary bg-gray-50')
+  }[status] || 'text-text-secondary bg-bg-secondary')
 
   const getPriorityIcon = (priority?: string) => {
     switch(priority) {
@@ -173,7 +173,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
             <button
               title={isFavorited ? '取消收藏' : '添加收藏'}
               onClick={handleToggleFavorite}
-              className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded hover:bg-bg-tertiary transition-colors"
             >
               {isFavorited ? 
                 <Heart className="w-3.5 h-3.5 text-red-500 fill-current" /> : 
@@ -187,7 +187,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
                   e.stopPropagation()
                   setShowDropdown(!showDropdown)
                 }}
-                className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                className="p-1.5 rounded hover:bg-bg-tertiary transition-colors"
               >
                 <MoreVertical className="w-3.5 h-3.5" />
               </button>
@@ -203,7 +203,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
                           item.onClick()
                           setShowDropdown(false)
                         }}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="flex items-center w-full px-4 py-2 text-sm text-text-primary hover:bg-bg-tertiary"
                       >
                         {item.icon}
                         <span className="ml-3">{item.label}</span>
@@ -226,44 +226,6 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
       style={style}
       onClick={handleCardClick}
     >
-      {/* Header with enhanced stats */}
-      {showMetrics && !compact && (
-        <div className="flex items-center justify-between mb-4 p-3 bg-bg-tertiary rounded-lg">
-          <div className="flex items-center space-x-6">
-            <div className="text-center">
-              <div className="text-xs text-text-tertiary mb-1">调用次数</div>
-              <div className="flex items-center space-x-1">
-                <TrendingUp className="w-4 h-4 text-primary-500" />
-                <span className="text-lg font-semibold text-primary-600">{mockMetrics.usage}</span>
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-xs text-text-tertiary mb-1">响应时间</div>
-              <div className="flex items-center space-x-1">
-                <Clock className="w-4 h-4 text-status-success" />
-                <span className="text-lg font-semibold text-status-success">{mockMetrics.responseTime}ms</span>
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-xs text-text-tertiary mb-1">成功率</div>
-              <div className="flex items-center space-x-1">
-                <CheckCircle className="w-4 h-4 text-status-info" />
-                <span className="text-lg font-semibold text-status-info">{mockMetrics.successRate}%</span>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onViewDetails?.(api)
-            }}
-            className="btn-primary flex items-center space-x-1"
-          >
-            <Eye className="w-4 h-4" />
-            <span>查看详情</span>
-          </button>
-        </div>
-      )}
 
       {/* API Information */}
       <div className="flex items-start justify-between mb-4">
@@ -296,7 +258,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
             <span className={`px-2 py-1 rounded text-xs font-mono font-medium ${HTTP_METHOD_COLORS[api.method as HTTPMethod]} flex-shrink-0`}>
               {api.method}
             </span>
-            <code className="text-sm text-text-secondary bg-gray-50 px-2 py-1 rounded font-mono truncate min-w-0">
+            <code className="text-sm text-text-secondary bg-bg-secondary px-2 py-1 rounded font-mono truncate min-w-0">
               {api.path}
             </code>
           </div>
@@ -306,7 +268,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
           <button
             title={isFavorited ? '取消收藏' : '添加收藏'}
             onClick={handleToggleFavorite}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
           >
             {isFavorited ? 
               <Heart className="w-4 h-4 text-red-500 fill-current" /> : 
@@ -319,7 +281,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
               e.stopPropagation()
               setShowDescription(!showDescription)
             }}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
             title={showDescription ? '隐藏描述' : '显示描述'}
           >
             {showDescription ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -331,7 +293,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
                 e.stopPropagation()
                 setShowDropdown(!showDropdown)
               }}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
@@ -347,7 +309,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
                         item.onClick()
                         setShowDropdown(false)
                       }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm text-text-primary hover:bg-bg-tertiary"
                     >
                       {item.icon}
                       <span className="ml-3">{item.label}</span>
@@ -362,8 +324,8 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
 
       {/* Description */}
       {showDescription && api.description && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-          <p className="text-sm text-gray-700">{api.description}</p>
+        <div className="mb-4 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg border-l-4 border-blue-400">
+          <p className="text-sm text-text-primary">{api.description}</p>
         </div>
       )}
 
@@ -387,7 +349,7 @@ const TailwindAPICard: React.FC<TailwindAPICardProps> = ({
               )
             ))}
             {api.apiTags.length > 5 && (
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-text-secondary">
+              <span className="px-2 py-1 rounded-full text-xs font-medium bg-bg-tertiary text-text-secondary">
                 +{api.apiTags.length - 5}
               </span>
             )}

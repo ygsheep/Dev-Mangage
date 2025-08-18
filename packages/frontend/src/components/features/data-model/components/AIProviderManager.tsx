@@ -326,8 +326,8 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       key={provider.id}
                       className={`p-4 rounded-lg border cursor-pointer transition-all ${
                         selectedProvider?.id === provider.id
-                          ? 'border-blue-300 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          ? 'border-blue-300 bg-primary-50 dark:bg-primary-900/20'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-bg-secondary'
                       }`}
                       onClick={() => setSelectedProvider(provider)}
                     >
@@ -387,7 +387,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                   {/* 基础信息 */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         名称 *
                       </label>
                       <input
@@ -399,7 +399,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         显示名称 *
                       </label>
                       <input
@@ -414,7 +414,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
 
                   {/* 类型选择 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-primary mb-2">
                       提供商类型 *
                     </label>
                     <div className="grid grid-cols-3 gap-3">
@@ -423,7 +423,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                           key={type.value}
                           className={`p-3 border rounded-lg cursor-pointer transition-all ${
                             formData.type === type.value
-                              ? 'border-blue-300 bg-blue-50'
+                              ? 'border-blue-300 bg-primary-50 dark:bg-primary-900/20'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
@@ -449,7 +449,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                   <div className="grid grid-cols-2 gap-4">
                     {(formData.type === 'custom' || formData.type === 'ollama') && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-text-primary mb-2">
                           API端点
                         </label>
                         <input
@@ -462,7 +462,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       </div>
                     )}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         API密钥
                       </label>
                       <input
@@ -478,7 +478,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                   {/* 模型配置 */}
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         模型名称
                       </label>
                       <input
@@ -490,7 +490,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         最大Token数
                       </label>
                       <input
@@ -503,7 +503,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-text-primary mb-2">
                         Temperature
                       </label>
                       <input
@@ -527,7 +527,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                         onChange={(e) => setFormData(prev => ({ ...prev, isDefault: e.target.checked }))}
                         className="rounded border-gray-300"
                       />
-                      <span className="text-sm text-gray-700">设为默认提供商</span>
+                      <span className="text-sm text-text-primary">设为默认提供商</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input
@@ -536,7 +536,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                         onChange={(e) => setFormData(prev => ({ ...prev, isEnabled: e.target.checked }))}
                         className="rounded border-gray-300"
                       />
-                      <span className="text-sm text-gray-700">启用此提供商</span>
+                      <span className="text-sm text-text-primary">启用此提供商</span>
                     </label>
                   </div>
 
@@ -609,7 +609,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
 
                 <div className="space-y-6">
                   {/* 基础信息 */}
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-bg-secondary rounded-lg p-4">
                     <h4 className="font-medium text-text-primary mb-3 flex items-center">
                       <Settings className="w-5 h-5 mr-2" />
                       基础配置

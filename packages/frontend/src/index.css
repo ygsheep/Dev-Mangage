@@ -16,7 +16,7 @@
 /* 自定义字体定义 */
 @font-face {
   font-family: 'OPPO Sans';
-  src: url('/fonts/OPPO-Sans-4.0.ttf') format('truetype');
+  src: url('/fonts/OPPOSans.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -24,10 +24,17 @@
 
 @font-face {
   font-family: 'JetBrains Mono Nerd Font';
-  src: url('/fonts/JetBrainsMonoNerdFont-Medium.ttf') format('truetype');
+  src: url('/fonts/JetBrainsMono.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
+}
+
+/* 字体加载失败时的样式 */
+@supports not (font-display: swap) {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  }
 }
 
 @layer base {

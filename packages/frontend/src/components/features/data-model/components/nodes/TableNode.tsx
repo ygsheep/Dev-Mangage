@@ -62,7 +62,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
   return (
     <div
       onClick={onSelect}
-      className={`bg-white rounded-lg shadow-lg border-2 transition-all duration-200 cursor-pointer min-w-[280px] max-w-[320px] ${
+      className={`bg-bg-paper rounded-lg shadow-lg border-2 transition-all duration-200 cursor-pointer min-w-[280px] max-w-[320px] ${
         selected || isSelected
           ? 'border-blue-500 shadow-xl'
           : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
@@ -93,13 +93,13 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
                 <MoreVertical className="w-4 h-4 text-gray-500" />
               </button>
               
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[120px]">
+              <div className="absolute right-0 top-full mt-1 bg-bg-paper rounded-lg shadow-lg border border-gray-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[120px]">
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
                     onEdit()
                   }}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-text-primary hover:bg-bg-secondary"
                 >
                   <Edit3 className="w-4 h-4" />
                   <span>编辑</span>
@@ -109,7 +109,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
                     e.stopPropagation()
                     // TODO: 复制表结构
                   }}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-text-primary hover:bg-bg-secondary"
                 >
                   <Copy className="w-4 h-4" />
                   <span>复制</span>
@@ -119,7 +119,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
                     e.stopPropagation()
                     // TODO: 查看详情
                   }}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-text-primary hover:bg-bg-secondary"
                 >
                   <Eye className="w-4 h-4" />
                   <span>详情</span>
@@ -179,7 +179,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
                 <div className="w-2 h-2 bg-red-400 rounded-full" title="NOT NULL" />
               )}
             </div>
-            <span className="text-gray-700 text-sm flex-1 truncate">
+            <span className="text-text-primary text-sm flex-1 truncate">
               {field.name}
             </span>
             <span className={`text-xs ${getFieldTypeColor(field.type)}`}>
@@ -209,7 +209,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
 
       {/* 表说明 */}
       {table.comment && (
-        <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 rounded-b-lg">
+        <div className="px-4 py-2 border-t border-gray-100 bg-bg-secondary rounded-b-lg">
           <p className="text-xs text-gray-600 line-clamp-2">
             {table.comment}
           </p>

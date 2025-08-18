@@ -459,7 +459,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                       表统计信息
                     </label>
                     <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="bg-blue-50 p-3 rounded">
+                      <div className="bg-primary-50 dark:bg-primary-900/20 p-3 rounded">
                         <div className="text-blue-600 font-medium">字段数量</div>
                         <div className="text-lg font-bold text-blue-900">
                           {table.fields?.length || 0}

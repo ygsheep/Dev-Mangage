@@ -47,10 +47,10 @@ const LogsTab: React.FC = () => {
   const getLevelBg = (level: LogEntry['level']) => {
     switch (level) {
       case 'debug': return 'bg-gray-100'
-      case 'info': return 'bg-blue-50'
+      case 'info': return 'bg-primary-50 dark:bg-primary-900/20'
       case 'warn': return 'bg-yellow-50'
       case 'error': return 'bg-red-50'
-      default: return 'bg-gray-50'
+      default: return 'bg-bg-secondary'
     }
   }
 
@@ -97,7 +97,7 @@ const LogsTab: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       {/* 控制面板 */}
-      <div className="p-3 bg-gray-50 border-b border-gray-200">
+      <div className="p-3 bg-bg-secondary border-b border-gray-200">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <input
@@ -163,8 +163,8 @@ const LogsTab: React.FC = () => {
             {filteredLogs.map((log) => (
               <div
                 key={log.id}
-                className={`p-2 hover:bg-gray-50 cursor-pointer text-xs ${
-                  selectedLog?.id === log.id ? 'bg-blue-50 border-l-2 border-blue-500' : ''
+                className={`p-2 hover:bg-bg-secondary cursor-pointer text-xs ${
+                  selectedLog?.id === log.id ? 'bg-primary-50 dark:bg-primary-900/20 border-l-2 border-blue-500' : ''
                 }`}
                 onClick={() => setSelectedLog(selectedLog?.id === log.id ? null : log)}
               >
@@ -204,7 +204,7 @@ const LogsTab: React.FC = () => {
 
         {/* 详情面板 */}
         {selectedLog && (
-          <div className="w-80 border-l border-gray-200 bg-gray-50 overflow-auto">
+          <div className="w-80 border-l border-gray-200 bg-bg-secondary overflow-auto">
             <div className="p-3">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium text-gray-800">日志详情</h4>

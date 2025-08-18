@@ -1,3 +1,9 @@
+/**
+ * OpenAI服务适配器
+ * 集成OpenAI GPT模型，提供文档解析、SQL生成和数据库优化功能
+ * 支持GPT-3.5、GPT-4等主流模型，具备完善的错误处理和重试机制
+ */
+
 import axios, { AxiosInstance } from 'axios'
 import { BaseAIAdapter } from './BaseAIAdapter'
 import { 
@@ -14,51 +20,101 @@ import {
 } from '../types'
 import logger from '../../../utils/logger'
 
+/**
+ * OpenAI消息对象接口
+ * 定义OpenAI Chat API中的单条消息结构
+ */
 interface OpenAIMessage {
+  /** 消息角色：系统、用户或助手 */
   role: 'system' | 'user' | 'assistant'
+  /** 消息内容 */
   content: string
 }
 
+/**
+ * OpenAI Chat Completion API请求参数接口
+ * 定义调用OpenAI对话接口的请求参数
+ */
 interface OpenAICompletionRequest {
+  /** 使用的GPT模型名称 */
   model: string
+  /** 对话消息列表 */
   messages: OpenAIMessage[]
+  /** 随机性参数，控制输出的创造性 */
   temperature?: number
+  /** 最大生成token数量 */
   max_tokens?: number
+  /** 核采样参数 */
   top_p?: number
+  /** 频率惩罚系数 */
   frequency_penalty?: number
+  /** 存在惩罚系数 */
   presence_penalty?: number
+  /** 停止词列表 */
   stop?: string[]
 }
 
+/**
+ * OpenAI Chat Completion API响应接口
+ * 定义OpenAI对话接口的响应结构
+ */
 interface OpenAICompletionResponse {
+  /** 请求唯一标识符 */
   id: string
+  /** 对象类型 */
   object: string
+  /** 创建时间戳 */
   created: number
+  /** 实际使用的模型名称 */
   model: string
+  /** 生成的回复选择列表 */
   choices: Array<{
+    /** 选择的索引 */
     index: number
+    /** 生成的消息 */
     message: {
+      /** 消息角色 */
       role: string
+      /** 消息内容 */
       content: string
     }
+    /** 结束原因 */
     finish_reason: string
   }>
+  /** Token使用情况统计 */
   usage: {
+    /** 提示词token数量 */
     prompt_tokens: number
+    /** 生成token数量 */
     completion_tokens: number
+    /** 总用token数量 */
     total_tokens: number
   }
 }
 
+/**
+ * OpenAI服务适配器类
+ * 继承自基础AI适配器，实现OpenAI特定的API调用和响应处理
+ */
 export class OpenAIAdapter extends BaseAIAdapter {
+  /** HTTP客户端实例，用于调用OpenAI API */
   private client: AxiosInstance
+  /** 服务可用性状态缓存 */
   private isServiceAvailable: boolean = false
+  /** 上次健康检查的时间戳 */
   private lastHealthCheck: number = 0
-  private healthCheckInterval: number = 300000 // 5分钟
+  /** 健康检查间隔时间（5分钟） */
+  private healthCheckInterval: number = 300000
 
+  /**
+   * 构造函数
+   * 初始化OpenAI适配器，配置HTTP客户端和启动服务检查
+   * @param config - AI服务配置参数
+   */
   constructor(config: AIServiceConfig) {
     super(config)
     
+    // 创建HTTP客户端，配置基本参数和认证头
     this.client = axios.create({
       baseURL: config.apiUrl || 'https://api.openai.com/v1',
       timeout: config.timeout || 30000,
@@ -73,14 +129,27 @@ export class OpenAIAdapter extends BaseAIAdapter {
     this.checkServiceAvailability()
   }
 
+  /**
+   * 获取服务提供商名称
+   * @returns 服务提供商名称
+   */
   getProviderName(): string {
     return 'OpenAI'
   }
 
+  /**
+   * 获取当前使用的模型版本
+   * @returns 模型版本名称，默认为GPT-4
+   */
   getModelVersion(): string {
     return this.config.model || 'gpt-4'
   }
 
+  /**
+   * 检查服务是否可用
+   * 使用缓存机制避免频繁的API调用，提高响应效率
+   * @returns 服务可用性状态
+   */
   async isAvailable(): Promise<boolean> {
     if (!this.config.apiKey) {
       return false

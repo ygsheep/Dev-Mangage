@@ -196,14 +196,14 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
       case 'draft':
         return 'bg-yellow-100 text-yellow-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-bg-tertiary text-text-secondary'
     }
   }
 
   return (
     <div className="space-y-6">
       {/* 页面头部 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-bg-paper rounded-lg border border-border-primary p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <BarChart className="w-8 h-8 text-blue-600" />
@@ -248,7 +248,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
 
       {/* 关键指标卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-text-secondary">数据表总数</p>
@@ -261,7 +261,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-text-secondary">总数据量</p>
@@ -276,7 +276,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-text-secondary">总记录数</p>
@@ -291,7 +291,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-bg-paper rounded-lg border border-border-primary p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-text-secondary">健康度评分</p>
@@ -310,8 +310,8 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
       </div>
 
       {/* 标签导航 */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-bg-paper rounded-lg border border-border-primary">
+        <div className="border-b border-border-primary">
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'overview', label: '概览', icon: Eye },
@@ -325,7 +325,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                 className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    : 'border-transparent text-gray-500 hover:text-text-primary'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -342,7 +342,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
               <div>
                 <button
                   onClick={() => toggleSection('categories')}
-                  className="flex items-center space-x-2 text-lg font-medium text-text-primary hover:text-gray-700"
+                  className="flex items-center space-x-2 text-lg font-medium text-text-primary hover:text-text-primary"
                 >
                   {expandedSections.has('categories') ? (
                     <ChevronDown className="w-5 h-5" />
@@ -355,7 +355,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                 {expandedSections.has('categories') && (
                   <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                     {Object.entries(summary.categoryBreakdown).map(([category, stats]) => (
-                      <div key={category} className="bg-gray-50 rounded-lg p-4">
+                      <div key={category} className="bg-bg-secondary rounded-lg p-4">
                         <h4 className="font-medium text-text-primary mb-2">
                           {category === 'uncategorized' ? '未分类' : category}
                         </h4>
@@ -383,7 +383,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
               <div>
                 <button
                   onClick={() => toggleSection('status')}
-                  className="flex items-center space-x-2 text-lg font-medium text-text-primary hover:text-gray-700"
+                  className="flex items-center space-x-2 text-lg font-medium text-text-primary hover:text-text-primary"
                 >
                   {expandedSections.has('status') ? (
                     <ChevronDown className="w-5 h-5" />
@@ -412,7 +412,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                 <h3 className="text-lg font-medium text-text-primary mb-4">数据量排行</h3>
                 <div className="space-y-3">
                   {summary.largestTables.slice(0, 5).map((table, index) => (
-                    <div key={table.tableId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={table.tableId} className="flex items-center justify-between p-3 bg-bg-secondary rounded-lg">
                       <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
                           {index + 1}
@@ -476,7 +476,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
               {/* 表统计列表 */}
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-bg-secondary">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         表名
@@ -501,13 +501,13 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-bg-paper divide-y divide-border-secondary">
                     {sortedStatistics.map((stat) => {
                       const fragmentationRate = stat.dataSize > 0 ? (stat.fragmentSize / stat.dataSize) * 100 : 0
                       const daysSinceAnalysis = (Date.now() - new Date(stat.lastAnalyzed).getTime()) / (1000 * 60 * 60 * 24)
 
                       return (
-                        <tr key={stat.id} className="hover:bg-gray-50">
+                        <tr key={stat.id} className="hover:bg-bg-secondary">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div>
                               <div className="text-sm font-medium text-text-primary">
@@ -598,8 +598,8 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
 
       {/* 最近更新 */}
       {summary.recentlyUpdated.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="bg-bg-paper rounded-lg border border-border-primary">
+          <div className="px-6 py-4 border-b border-border-primary">
             <h3 className="text-lg font-medium text-text-primary flex items-center">
               <Clock className="w-5 h-5 mr-2" />
               最近更新
@@ -609,7 +609,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
           <div className="p-6">
             <div className="space-y-3">
               {summary.recentlyUpdated.map((table) => (
-                <div key={table.tableId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={table.tableId} className="flex items-center justify-between p-3 bg-bg-secondary rounded-lg">
                   <div className="flex items-center space-x-3">
                     <Table className="w-4 h-4 text-gray-400" />
                     <div>

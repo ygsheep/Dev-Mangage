@@ -106,7 +106,7 @@ export const ThemeSettings: React.FC = () => {
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+              className={`inline-block h-4 w-4 transform rounded-full bg-bg-paper transition-transform duration-200 ${
                 isDark ? 'translate-x-6' : 'translate-x-1'
               }`}
             />

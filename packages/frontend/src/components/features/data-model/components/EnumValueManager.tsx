@@ -221,7 +221,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
   return (
     <div className="space-y-6">
       {/* 字段信息和统计 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-bg-paper rounded-lg border border-gray-200 p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <Type className="w-6 h-6 text-text-secondary" />
@@ -264,7 +264,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       </div>
 
       {/* 工具栏 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-bg-paper rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-3">
             <div className="relative">
@@ -323,12 +323,12 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
 
       {/* 添加表单 */}
       {showAddForm && !readonly && (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-bg-paper rounded-lg border border-gray-200 p-4">
           <h3 className="text-lg font-medium text-text-primary mb-4">添加新枚举值</h3>
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-text-primary mb-1">
                 值 *
               </label>
               <input
@@ -345,7 +345,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-text-primary mb-1">
                 显示标签
               </label>
               <input
@@ -359,7 +359,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-primary mb-1">
               描述
             </label>
             <textarea
@@ -379,7 +379,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                 onChange={(e) => setNewValue({ ...newValue, isDefault: e.target.checked })}
                 className="rounded border-gray-300"
               />
-              <span className="text-sm text-gray-700">设为默认值</span>
+              <span className="text-sm text-text-primary">设为默认值</span>
             </label>
 
             <div className="flex items-center space-x-2">
@@ -402,7 +402,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       )}
 
       {/* 枚举值列表 */}
-      <div className="bg-white rounded-lg border border-gray-200">
+      <div className="bg-bg-paper rounded-lg border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-text-primary">
             枚举值列表 ({filteredAndSortedValues.length})
@@ -411,7 +411,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-bg-secondary">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   排序
@@ -435,9 +435,9 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                 )}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-bg-paper divide-y divide-gray-200">
               {filteredAndSortedValues.map((enumValue, index) => (
-                <tr key={enumValue.id} className="hover:bg-gray-50">
+                <tr key={enumValue.id} className="hover:bg-bg-secondary">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
@@ -674,7 +674,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-text-primary">批量导入枚举值</h2>
           <button
@@ -692,7 +692,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
             
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-text-primary mb-1">
                   分隔符
                 </label>
                 <select
@@ -715,7 +715,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
                     onChange={(e) => setHasLabels(e.target.checked)}
                     className="rounded border-gray-300"
                   />
-                  <span className="text-sm text-gray-700">包含显示标签</span>
+                  <span className="text-sm text-text-primary">包含显示标签</span>
                 </label>
               </div>
               
@@ -727,7 +727,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
                     onChange={(e) => setHasDescriptions(e.target.checked)}
                     className="rounded border-gray-300"
                   />
-                  <span className="text-sm text-gray-700">包含描述</span>
+                  <span className="text-sm text-text-primary">包含描述</span>
                 </label>
               </div>
             </div>
@@ -744,7 +744,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
 
           {/* 输入区域 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-primary mb-1">
               枚举值数据
             </label>
             <textarea
@@ -771,16 +771,16 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
               
               <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-bg-secondary">
                     <tr>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">值</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">标签</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">描述</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-bg-paper divide-y divide-gray-200">
                     {previewValues.map((value, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index} className="hover:bg-bg-secondary">
                         <td className="px-4 py-2 text-sm">
                           <code className="px-2 py-1 bg-gray-100 rounded">{value.value}</code>
                         </td>

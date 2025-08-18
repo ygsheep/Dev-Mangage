@@ -308,7 +308,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
       {/* 快捷键显示 */}
       {showShortcuts && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
+          <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center space-x-3">
                 <Keyboard className="w-6 h-6 text-blue-500" />
@@ -332,7 +332,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
                     <div className="space-y-3">
                       {shortcuts.map((shortcut) => (
                         <div key={shortcut.id} className="flex items-center justify-between">
-                          <span className="text-sm text-gray-700">{shortcut.description}</span>
+                          <span className="text-sm text-text-primary">{shortcut.description}</span>
                           <div className="flex items-center space-x-1">
                             {shortcut.keys.map((key, index) => (
                               <React.Fragment key={index}>
@@ -356,7 +356,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-200 bg-gray-50">
+            <div className="p-6 border-t border-gray-200 bg-bg-secondary">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600">
                   按 <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Ctrl + K</kbd> 随时打开此面板
@@ -376,7 +376,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
       {/* 使用提示 */}
       {showTips && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+          <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-md">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center space-x-3">
                 <HelpCircle className="w-6 h-6 text-blue-500" />
@@ -412,7 +412,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
                       key={index}
                       onClick={() => setCurrentTip(index)}
                       className={`w-2 h-2 rounded-full transition-colors ${
-                        index === currentTip ? 'bg-blue-500' : 'bg-gray-300'
+                        index === currentTip ? 'bg-primary-50 dark:bg-primary-900/20' : 'bg-gray-300'
                       }`}
                     />
                   ))}
@@ -420,7 +420,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-bg-secondary">
               <button
                 onClick={prevTip}
                 className="btn-outline flex items-center space-x-2"

@@ -96,7 +96,7 @@ const SwaggerImportPage: React.FC = () => {
         <div className="flex items-center space-x-4 mb-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -113,7 +113,7 @@ const SwaggerImportPage: React.FC = () => {
           {/* Import Type Selection */}
           <div className="card">
             <h3 className="text-lg font-semibold text-text-primary mb-4">导入方式</h3>
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            <div className="flex space-x-1 bg-bg-tertiary p-1 rounded-lg">
               <button
                 onClick={() => setImportType('url')}
                 className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
@@ -215,7 +215,7 @@ const SwaggerImportPage: React.FC = () => {
                   }))}
                   className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
-                <span className="ml-2 text-sm text-gray-700">覆盖已存在的API</span>
+                <span className="ml-2 text-sm text-text-primary">覆盖已存在的API</span>
               </label>
               
               <label className="flex items-center">
@@ -228,7 +228,7 @@ const SwaggerImportPage: React.FC = () => {
                   }))}
                   className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
-                <span className="ml-2 text-sm text-gray-700">自动创建标签</span>
+                <span className="ml-2 text-sm text-text-primary">自动创建标签</span>
               </label>
 
               <div>

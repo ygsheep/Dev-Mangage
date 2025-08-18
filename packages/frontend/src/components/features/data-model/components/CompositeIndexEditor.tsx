@@ -285,7 +285,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[90vh] flex flex-col">
+      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl h-[90vh] flex flex-col">
         {/* 头部 */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-header">
           <div className="flex items-center space-x-3">
@@ -329,7 +329,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       索引名称 *
                     </label>
                     <input
@@ -342,7 +342,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       索引类型
                     </label>
                     <select
@@ -364,7 +364,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
                         onChange={(e) => setIsUnique(e.target.checked)}
                         className="rounded border-gray-300"
                       />
-                      <span className="text-sm text-gray-700">唯一索引</span>
+                      <span className="text-sm text-text-primary">唯一索引</span>
                     </label>
                   </div>
                 </div>
@@ -376,7 +376,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
                   <h3 className="text-lg font-medium text-text-primary mb-4">高级选项</h3>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-text-primary mb-1">
                       索引注释
                     </label>
                     <textarea
@@ -402,8 +402,8 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
                         key={field.id}
                         className={`p-3 border rounded-lg cursor-pointer transition-colors ${
                           isAdded 
-                            ? 'border-gray-300 bg-gray-50 cursor-not-allowed' 
-                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                            ? 'border-gray-300 bg-bg-secondary cursor-not-allowed' 
+                            : 'border-gray-200 hover:border-blue-300 hover:bg-primary-50 dark:bg-primary-900/20'
                         }`}
                         onClick={() => !isAdded && addField(field.id)}
                       >
@@ -461,7 +461,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
                         onDragStart={() => handleDragStart(index)}
                         onDragOver={(e) => handleDragOver(e, index)}
                         onDragEnd={handleDragEnd}
-                        className={`p-4 border border-gray-200 rounded-lg bg-white transition-all ${
+                        className={`p-4 border border-gray-200 rounded-lg bg-bg-paper transition-all ${
                           draggedIndex === index ? 'opacity-50' : ''
                         } ${!field.visible ? 'opacity-60' : ''}`}
                       >
@@ -564,7 +564,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
                   )}
 
                   {validation.suggestions.length > 0 && (
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="p-4 bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg">
                       <div className="flex items-center space-x-2 mb-2">
                         <Info className="w-5 h-5 text-blue-600" />
                         <h4 className="font-medium text-blue-900">建议</h4>
@@ -583,7 +583,7 @@ const CompositeIndexEditor: React.FC<CompositeIndexEditorProps> = ({
         </div>
 
         {/* 底部操作栏 */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="px-6 py-4 border-t border-gray-200 bg-bg-secondary">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <button

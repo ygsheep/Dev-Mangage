@@ -20,7 +20,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 }) => {
   if (!content || content.trim() === '') {
     return (
-      <div className={`bg-gray-50 border border-gray-200 rounded-lg p-4 text-center ${className}`}>
+      <div className={`bg-bg-secondary border border-border-primary rounded-lg p-4 text-center ${className}`}>
         <p className="text-gray-500 text-sm">暂无内容</p>
       </div>
     )

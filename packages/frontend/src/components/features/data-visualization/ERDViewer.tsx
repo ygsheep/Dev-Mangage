@@ -109,7 +109,7 @@ const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
           {data.fields.map((field, index) => (
             <div
               key={field.id}
-              className={`px-4 py-2 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 ${
+              className={`px-4 py-2 flex items-center justify-between border-b border-gray-100 hover:bg-bg-secondary ${
                 index === data.fields.length - 1 ? 'border-b-0' : ''
               }`}
             >
@@ -132,7 +132,7 @@ const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
                   <div className="flex items-center gap-2">
                     <span className={`text-sm font-medium ${
                       field.isPrimaryKey ? 'text-yellow-700' : 
-                      field.isForeignKey ? 'text-blue-700' : 'text-gray-700'
+                      field.isForeignKey ? 'text-blue-700' : 'text-text-primary'
                     }`}>
                       {field.name}
                     </span>
@@ -165,7 +165,7 @@ const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
                 {/* 输出连接点（用于外键引用） */}
                 {field.isForeignKey && (
                   <div
-                    className="w-2 h-2 bg-blue-500 rounded-full"
+                    className="w-2 h-2 bg-primary-50 dark:bg-primary-900/20 rounded-full"
                     style={{
                       position: 'absolute',
                       right: '-4px',
@@ -182,7 +182,7 @@ const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
 
       {/* 索引信息 */}
       {!isCollapsed && data.indexes.length > 0 && (
-        <div className="border-t border-gray-200 bg-gray-50 px-4 py-2">
+        <div className="border-t border-gray-200 bg-bg-secondary px-4 py-2">
           <div className="text-xs text-gray-600 mb-1">索引:</div>
           {data.indexes.map((index) => (
             <div key={index.id} className="text-xs text-gray-500 flex items-center gap-1">
@@ -432,7 +432,7 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
         {/* 应用布局按钮 */}
         <button
           onClick={applyAutoLayout}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded transition-colors"
           title="应用布局"
         >
           <Settings className="w-4 h-4" />
@@ -469,7 +469,7 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
         connectionMode={ConnectionMode.Loose}
         fitView
         fitViewOptions={{ padding: 0.2 }}
-        className="bg-gray-50"
+        className="bg-bg-secondary"
       >
         {/* 控制面板 */}
         <Controls

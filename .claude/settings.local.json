@@ -24,7 +24,8 @@
       "Bash(node:*)",
       "Bash(mkdir:*)",
       "Bash(rm:*)",
-      "Bash(DATABASE_URL=\"file:./dev.db\" npx prisma db push --skip-generate)"
+      "Bash(DATABASE_URL=\"file:./dev.db\" npx prisma db push --skip-generate)",
+      "Bash(npx prisma:*)"
     ],
     "deny": []
   }

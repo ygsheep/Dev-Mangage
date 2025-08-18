@@ -205,7 +205,7 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 <button
                   onClick={testBaseUrl}
                   disabled={isSaving || !baseUrl}
-                  className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-blue-600 bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   测试连接
                 </button>
@@ -222,7 +222,7 @@ const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
             </div>
 
             {/* Base URL 使用说明 */}
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
               <h4 className="text-sm font-medium text-blue-800 mb-2">使用说明:</h4>
               <ul className="text-sm text-blue-700 space-y-1">
                 <li>• Base URL 会与API接口路径自动组合</li>

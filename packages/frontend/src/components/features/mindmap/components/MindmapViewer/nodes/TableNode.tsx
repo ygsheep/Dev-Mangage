@@ -55,21 +55,21 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
       <Handle
         type="target"
         position={Position.Top}
-        className="w-3 h-3 !bg-gray-400 !border-2 !border-white"
+        className="w-3 h-3 !bg-text-tertiary !border-2 !border-bg-paper"
         isConnectable={true}
       />
       <Handle
         type="target"
         position={Position.Left}
-        className="w-3 h-3 !bg-gray-400 !border-2 !border-white"
+        className="w-3 h-3 !bg-text-tertiary !border-2 !border-bg-paper"
         isConnectable={true}
       />
 
       {/* 节点主体 */}
       <div
         className={`
-          bg-white rounded-lg shadow-md border-2 transition-all duration-200
-          ${selected ? 'border-blue-500 shadow-lg' : 'border-gray-200 hover:border-gray-300'}
+          bg-bg-paper rounded-lg shadow-md border-2 transition-all duration-200
+          ${selected ? 'border-blue-500 shadow-lg' : 'border-border-primary hover:border-border-secondary'}
           ${data.isCollapsed ? 'opacity-75' : ''}
         `}
         style={{ 
@@ -80,7 +80,7 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
         }}
       >
         {/* 标题栏 */}
-        <div className="flex items-center justify-between p-3 border-b border-gray-100">
+        <div className="flex items-center justify-between p-3 border-b border-border-secondary">
           <div className="flex items-center space-x-2 flex-1 min-w-0">
             <Database 
               className="w-5 h-5 flex-shrink-0" 
@@ -164,7 +164,7 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
                 {Object.entries(data.metadata).slice(0, 3).map(([key, value]) => (
                   <span 
                     key={key}
-                    className="px-2 py-1 text-xs bg-gray-100 text-text-secondary rounded"
+                    className="px-2 py-1 text-xs bg-bg-tertiary text-text-secondary rounded"
                   >
                     {key}: {String(value)}
                   </span>
@@ -178,7 +178,7 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="flex items-center space-x-1">
             <button
-              className="p-1 rounded bg-white shadow-sm hover:bg-gray-50 transition-colors"
+              className="p-1 rounded bg-bg-paper shadow-sm hover:bg-bg-tertiary transition-colors"
               onClick={(e) => {
                 e.stopPropagation()
                 // 查看详情
@@ -189,7 +189,7 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
               <Eye className="w-3 h-3 text-gray-500" />
             </button>
             <button
-              className="p-1 rounded bg-white shadow-sm hover:bg-gray-50 transition-colors"
+              className="p-1 rounded bg-bg-paper shadow-sm hover:bg-bg-tertiary transition-colors"
               onClick={(e) => {
                 e.stopPropagation()
                 // 编辑设置
@@ -207,13 +207,13 @@ const TableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-3 h-3 !bg-gray-400 !border-2 !border-white"
+        className="w-3 h-3 !bg-text-tertiary !border-2 !border-bg-paper"
         isConnectable={true}
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="w-3 h-3 !bg-gray-400 !border-2 !border-white"
+        className="w-3 h-3 !bg-text-tertiary !border-2 !border-bg-paper"
         isConnectable={true}
       />
     </>
