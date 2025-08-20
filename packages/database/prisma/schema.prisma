@@ -1,0 +1,1480 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  status      String @default("ACTIVE")
+  baseUrl     String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  apis              API[]
+  tags              Tag[]
+  databaseTables    DatabaseTable[]
+  dataModelDocuments DataModelDocument[]
+  mindmapLayout     MindmapLayout?
+  modelVersions     ModelVersion[]
+  aiParseHistory    AIParseHistory[]
+  
+  // API Management Relations
+  apiEndpoints      APIEndpoint[]
+  apiGroups         APIGroup[]
+  apiEnvironments   APIEnvironment[]
+  apiTestSuites     APITestSuite[]
+  syncConfigurations SyncConfiguration[]
+  
+  // GitHub Integration Relations
+  issues            Issue[]
+  githubRepository  GitHubRepository?
+  
+  // Feature Module Relations
+  featureModules    FeatureModule[]
+
+  @@map("projects")
+}
+
+model API {
+  id           String     @id @default(uuid())
+  projectId    String
+  name         String
+  method       String
+  path         String
+  description  String?
+  parameters   String?
+  responses    String?
+  status       String @default("NOT_STARTED")
+  frontendCode String?
+  backendCode  String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  project Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  apiTags APITag[]
+  relatedIssues IssueAPIRelation[]
+
+  @@index([projectId])
+  @@index([status])
+  @@index([method])
+  @@map("apis")
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String
+  color     String   @default("#3B82F6")
+  projectId String
+  createdAt DateTime @default(now())
+
+  // Relations
+  project Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  apiTags APITag[]
+
+  @@unique([name, projectId])
+  @@index([projectId])
+  @@map("tags")
+}
+
+model APITag {
+  apiId String
+  tagId String
+
+  // Relations
+  api API @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([apiId, tagId])
+  @@map("api_tags")
+}
+
+// Enhanced DatabaseTable model based on design docs
+model DatabaseTable {
+  id            String   @id @default(uuid())
+  projectId     String
+  name          String
+  displayName   String?
+  comment       String?
+  engine        String   @default("InnoDB")
+  charset       String   @default("utf8mb4")
+  collation     String   @default("utf8mb4_unicode_ci")
+  status        String   @default("DRAFT")
+  category      String?
+  
+  // Extended attributes
+  tablespace    String?
+  autoIncrement Int?
+  rowFormat     String?
+  dataLength    Int      @default(0)
+  indexLength   Int      @default(0)
+  avgRowLength  Int      @default(0)
+  checksum      Boolean  @default(false)
+  
+  // Metadata
+  createdBy     String?
+  lastModifiedBy String?
+  version       Int      @default(1)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fields          DatabaseField[]   @relation("TableFields")
+  indexes         DatabaseIndex[]
+  fromRelations   TableRelationship[] @relation("FromTable")
+  toRelations     TableRelationship[] @relation("ToTable")
+  referencedByFields DatabaseField[] @relation("FieldReference")
+  statistics      TableStatistics[]
+  apiMappings     APITableMapping[]
+  relatedEndpoints APIEndpoint[]
+  relatedIssues   IssueTableRelation[]
+  moduleReferences ModuleTable[]
+
+  @@index([projectId])
+  @@index([status])
+  @@index([category])
+  @@index([updatedAt])
+  @@unique([name, projectId])
+  @@map("database_tables")
+}
+
+// Enhanced DatabaseField model based on design docs
+model DatabaseField {
+  id                String   @id @default(uuid())
+  tableId           String
+  name              String
+  type              String
+  length            Int?
+  precision         Int?
+  scale             Int?
+  nullable          Boolean  @default(true)
+  defaultValue      String?
+  comment           String?
+  isPrimaryKey      Boolean  @default(false)
+  isAutoIncrement   Boolean  @default(false)
+  sortOrder         Int      @default(0)
+  
+  // String field attributes
+  characterSet      String?
+  collation         String?
+  
+  // Numeric field attributes
+  isUnsigned        Boolean  @default(false)
+  zerofill          Boolean  @default(false)
+  
+  // Constraint attributes
+  isUnique          Boolean  @default(false)
+  isIndex           Boolean  @default(false)
+  checkConstraint   String?
+  
+  // Foreign key attributes
+  referencedTableId String?
+  referencedFieldId String?
+  onUpdate          String   @default("RESTRICT")
+  onDelete          String   @default("RESTRICT")
+  
+  // Business attributes
+  isBusinessKey     Boolean  @default(false)
+  isRequired        Boolean  @default(false)
+  fieldGroup        String?
+  displayOrder      Int?
+  
+  // Metadata
+  createdBy         String?
+  lastModifiedBy    String?
+  version           Int      @default(1)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  table             DatabaseTable     @relation("TableFields", fields: [tableId], references: [id], onDelete: Cascade)
+  referencedTable   DatabaseTable?    @relation("FieldReference", fields: [referencedTableId], references: [id])
+  referencedField   DatabaseField?    @relation("FieldToField", fields: [referencedFieldId], references: [id])
+  referencingFields DatabaseField[]   @relation("FieldToField")
+  enumValues        FieldEnumValue[]
+
+  @@index([tableId])
+  @@index([name])
+  @@index([type])
+  @@index([isPrimaryKey])
+  @@index([referencedTableId])
+  @@index([tableId, sortOrder])
+  @@unique([name, tableId])
+  @@map("database_fields")
+}
+
+// Field enum values model
+model FieldEnumValue {
+  id        String   @id @default(uuid())
+  fieldId   String
+  value     String
+  label     String?
+  description String?
+  sortOrder Int      @default(0)
+  isDefault Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  color     String?  // For UI display
+  createdAt DateTime @default(now())
+
+  // Relations
+  field     DatabaseField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@index([fieldId])
+  @@index([fieldId, sortOrder])
+  @@unique([fieldId, value])
+  @@map("field_enum_values")
+}
+
+// Enhanced DatabaseIndex model
+model DatabaseIndex {
+  id        String   @id @default(uuid())
+  tableId   String
+  name      String
+  type      String   @default("INDEX")
+  isUnique  Boolean  @default(false)
+  comment   String?
+  
+  // Extended attributes
+  indexMethod String @default("BTREE")
+  keyBlockSize Int?
+  parser      String?
+  visibility  String @default("VISIBLE")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  table     DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  fields    IndexField[]
+
+  @@index([tableId])
+  @@unique([name, tableId])
+  @@map("database_indexes")
+}
+
+// Index fields model
+model IndexField {
+  id         String @id @default(uuid())
+  indexId    String
+  fieldName  String
+  sortOrder  Int    @default(0)
+  order      String @default("ASC")
+  length     Int?
+  
+  // Relations
+  index      DatabaseIndex @relation(fields: [indexId], references: [id], onDelete: Cascade)
+  
+  @@index([indexId])
+  @@index([indexId, sortOrder])
+  @@unique([indexId, fieldName])
+  @@map("index_fields")
+}
+
+// Enhanced TableRelationship model
+model TableRelationship {
+  id               String   @id @default(uuid())
+  fromTableId      String
+  toTableId        String
+  fromFieldId      String
+  toFieldId        String
+  relationshipType String   @default("ONE_TO_MANY")
+  name             String?
+  description      String?
+  onUpdate         String   @default("RESTRICT")
+  onDelete         String   @default("RESTRICT")
+  isDeferrable     Boolean  @default(false)
+  isEnforced       Boolean  @default(true)
+  constraintName   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  fromTable        DatabaseTable @relation("FromTable", fields: [fromTableId], references: [id], onDelete: Cascade)
+  toTable          DatabaseTable @relation("ToTable", fields: [toTableId], references: [id], onDelete: Cascade)
+
+  @@index([fromTableId])
+  @@index([toTableId])
+  @@index([fromFieldId])
+  @@index([toFieldId])
+  @@map("table_relationships")
+}
+
+// Table statistics model
+model TableStatistics {
+  id           String    @id @default(uuid())
+  tableId      String
+  rowCount     Int       @default(0)
+  dataSize     Int       @default(0)
+  indexSize    Int       @default(0)
+  fragmentSize Int       @default(0)
+  lastAnalyzed DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  table        DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@index([tableId])
+  @@map("table_statistics")
+}
+
+// ModelVersion model for data model version control
+model ModelVersion {
+  id                 String   @id @default(uuid())
+  projectId          String
+  versionNumber      String
+  changeDescription  String?
+  changeType         String   @default("MANUAL")
+  createdBy          String?
+  createdAt          DateTime @default(now())
+  schemaSnapshot     String   // JSON string containing complete schema at this version
+  isActive           Boolean  @default(false)
+  tags               String?  // JSON array of version tags
+  parentVersionId    String?
+  branchName         String   @default("main")
+
+  // Relations
+  project            Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentVersion      ModelVersion? @relation("VersionTree", fields: [parentVersionId], references: [id])
+  childVersions      ModelVersion[] @relation("VersionTree")
+
+  @@index([projectId])
+  @@index([isActive])
+  @@index([createdAt])
+  @@unique([projectId, versionNumber])
+  @@map("model_versions")
+}
+
+// AIParseHistory model for tracking AI document parsing
+model AIParseHistory {
+  id             String   @id @default(uuid())
+  projectId      String
+  fileName       String
+  fileType       String
+  aiProvider     String
+  parseResult    String   // JSON string containing parsed data
+  status         String   @default("PENDING")
+  errorMessage   String?
+  confidence     Float?   // AI parsing confidence score
+  tokensUsed     Int?     // For tracking AI API usage
+  processingTime Int?     // Processing time in milliseconds
+  createdAt      DateTime @default(now())
+
+  // Relations
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
+  @@index([aiProvider])
+  @@index([createdAt])
+  @@map("ai_parse_history")
+}
+
+// DataModelDocument model for imported documents
+model DataModelDocument {
+  id           String   @id @default(uuid())
+  projectId    String
+  name         String
+  description  String?
+  filePath     String?
+  content      String
+  parseStatus  String   @default("PENDING")
+  parseError   String?
+  language     String   @default("markdown")
+  importedAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([parseStatus])
+  @@map("data_model_documents")
+}
+
+// MindmapLayout model for saving mindmap layouts
+model MindmapLayout {
+  id         String   @id @default(uuid())
+  projectId  String   @unique
+  layoutData String   // JSON string containing nodes, edges, and config
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("mindmap_layouts")
+}
+
+// ==================================================
+// API Interface Management Models
+// ==================================================
+
+// API Endpoint model - Enhanced API management
+model APIEndpoint {
+  id               String   @id @default(uuid())
+  projectId        String
+  groupId          String?
+  name             String
+  displayName      String?
+  method           String   // HTTP method
+  path             String
+  summary          String?
+  description      String?
+  tags             String?  // JSON array
+  deprecated       Boolean  @default(false)
+  version          String   @default("1.0.0")
+  
+  // Authentication & Security
+  authRequired     Boolean  @default(false)
+  authType         String?  // BEARER, API_KEY, BASIC, etc.
+  scopes           String?  // JSON array for OAuth scopes
+  rateLimit        Int?
+  
+  // Request/Response Configuration
+  contentType      String?  @default("application/json")
+  produces         String?  // JSON array of response content types
+  consumes         String?  // JSON array of request content types
+  
+  // Status and State
+  status           String   @default("DRAFT")
+  implementationStatus String @default("NOT_IMPLEMENTED") 
+  testStatus       String   @default("NOT_TESTED")
+  
+  // Generated Code
+  frontendCode     String?
+  backendCode      String?
+  mockData         String?  // JSON for mock responses
+  
+  // Data Model Integration
+  relatedTableId   String?  // Link to database table
+  autoGenerated    Boolean  @default(false)
+  syncedFromModel  Boolean  @default(false)
+  lastSyncAt       DateTime?
+  
+  // Metadata
+  createdBy        String?
+  lastModifiedBy   String?
+  sortOrder        Int      @default(0)
+  isPublic         Boolean  @default(false)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  project          Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  group            APIGroup?       @relation(fields: [groupId], references: [id])
+  relatedTable     DatabaseTable?  @relation(fields: [relatedTableId], references: [id])
+  parameters       APIParameter[]
+  responses        APIResponse[]
+  examples         APIExample[]
+  testCases        APITestCase[]
+  documentation    APIDocumentation[]
+  history          APIHistory[]
+  tableMappings    APITableMapping[]
+  relatedIssues    IssueAPIRelation[]
+  moduleReferences ModuleEndpoint[]
+
+  @@index([projectId])
+  @@index([groupId])
+  @@index([status])
+  @@index([method])
+  @@index([relatedTableId])
+  @@index([lastSyncAt])
+  @@unique([projectId, method, path])
+  @@map("api_endpoints")
+}
+
+// API Group model - For organizing endpoints
+model APIGroup {
+  id          String   @id @default(uuid())
+  projectId   String
+  name        String
+  displayName String?
+  description String?
+  prefix      String?  // URL prefix for all endpoints in this group
+  color       String   @default("#3B82F6")
+  icon        String?
+  sortOrder   Int      @default(0)
+  parentId    String?
+  status      String   @default("ACTIVE")
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parent      APIGroup?    @relation("GroupHierarchy", fields: [parentId], references: [id])
+  children    APIGroup[]   @relation("GroupHierarchy")
+  endpoints   APIEndpoint[]
+
+  @@index([projectId])
+  @@index([parentId])
+  @@index([sortOrder])
+  @@unique([projectId, name])
+  @@map("api_groups")
+}
+
+// API Parameter model - Request parameters
+model APIParameter {
+  id           String   @id @default(uuid())
+  endpointId   String
+  name         String
+  displayName  String?
+  type         String   // query, path, header, body, formData
+  dataType     String   // string, integer, boolean, array, object, etc.
+  format       String?  // date, email, uuid, etc.
+  required     Boolean  @default(false)
+  defaultValue String?
+  description  String?
+  example      String?
+  enum         String?  // JSON array for enum values
+  minimum      Int?
+  maximum      Int?
+  pattern      String?  // RegExp pattern
+  sortOrder    Int      @default(0)
+  
+  // Advanced validation
+  minLength    Int?
+  maxLength    Int?
+  multipleOf   Float?
+  items        String?  // JSON schema for array items
+  properties   String?  // JSON schema for object properties
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  endpoint     APIEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId])
+  @@index([type])
+  @@index([required])
+  @@index([sortOrder])
+  @@unique([endpointId, name, type])
+  @@map("api_parameters")
+}
+
+// API Response model - Response definitions
+model APIResponse {
+  id          String   @id @default(uuid())
+  endpointId  String
+  statusCode  String   // 200, 404, 500, default, etc.
+  description String?
+  contentType String   @default("application/json")
+  schema      String?  // JSON schema
+  example     String?  // JSON example
+  headers     String?  // JSON object for response headers
+  isDefault   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  endpoint    APIEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId])
+  @@index([statusCode])
+  @@unique([endpointId, statusCode])
+  @@map("api_responses")
+}
+
+// API Example model - Request/Response examples
+model APIExample {
+  id          String   @id @default(uuid())
+  endpointId  String
+  name        String
+  description String?
+  type        String   // request, response
+  statusCode  String?  // For response examples
+  contentType String   @default("application/json")
+  data        String   // JSON data
+  headers     String?  // JSON object
+  isDefault   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  endpoint    APIEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId])
+  @@index([type])
+  @@unique([endpointId, name, type])
+  @@map("api_examples")
+}
+
+// API Environment model - Different environments (dev, test, prod)
+model APIEnvironment {
+  id          String   @id @default(uuid())
+  projectId   String
+  name        String
+  displayName String?
+  description String?
+  baseUrl     String
+  variables   String?  // JSON object for environment variables
+  headers     String?  // JSON object for default headers
+  auth        String?  // JSON object for authentication config
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testRuns    APITestRun[]
+
+  @@index([projectId])
+  @@unique([projectId, name])
+  @@map("api_environments")
+}
+
+// API Test Suite model - Test collections
+model APITestSuite {
+  id          String   @id @default(uuid())
+  projectId   String
+  name        String
+  description String?
+  variables   String?  // JSON object for test variables
+  preScript   String?  // Pre-test script
+  postScript  String?  // Post-test script
+  timeout     Int      @default(30000) // milliseconds
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testCases   APITestCase[]
+  testRuns    APITestRun[]
+
+  @@index([projectId])
+  @@unique([projectId, name])
+  @@map("api_test_suites")
+}
+
+// API Test Case model - Individual test cases
+model APITestCase {
+  id          String   @id @default(uuid())
+  endpointId  String
+  suiteId     String?
+  name        String
+  description String?
+  method      String
+  path        String
+  headers     String?  // JSON object
+  parameters  String?  // JSON object
+  body        String?  // Request body
+  assertions  String?  // JSON array of assertions
+  preScript   String?  // Pre-test script
+  postScript  String?  // Post-test script
+  timeout     Int      @default(30000)
+  isActive    Boolean  @default(true)
+  priority    String   @default("MEDIUM") // HIGH, MEDIUM, LOW
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  endpoint    APIEndpoint   @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  suite       APITestSuite? @relation(fields: [suiteId], references: [id])
+  results     APITestResult[]
+
+  @@index([endpointId])
+  @@index([suiteId])
+  @@index([isActive])
+  @@map("api_test_cases")
+}
+
+// API Test Run model - Test execution sessions
+model APITestRun {
+  id            String   @id @default(uuid())
+  suiteId       String
+  environmentId String
+  name          String?
+  status        String   @default("PENDING") // PENDING, RUNNING, COMPLETED, FAILED
+  startTime     DateTime?
+  endTime       DateTime?
+  duration      Int?     // milliseconds
+  totalTests    Int      @default(0)
+  passedTests   Int      @default(0)
+  failedTests   Int      @default(0)
+  skippedTests  Int      @default(0)
+  errorMessage  String?
+  
+  createdBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  suite         APITestSuite    @relation(fields: [suiteId], references: [id], onDelete: Cascade)
+  environment   APIEnvironment  @relation(fields: [environmentId], references: [id])
+  results       APITestResult[]
+
+  @@index([suiteId])
+  @@index([environmentId])
+  @@index([status])
+  @@index([startTime])
+  @@map("api_test_runs")
+}
+
+// API Test Result model - Individual test results
+model APITestResult {
+  id          String   @id @default(uuid())
+  runId       String
+  testCaseId  String
+  status      String   // PASSED, FAILED, SKIPPED, ERROR
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int?     // milliseconds
+  request     String?  // JSON object - actual request sent
+  response    String?  // JSON object - actual response received
+  assertions  String?  // JSON array - assertion results
+  errorMessage String?
+  logs        String?  // Execution logs
+  
+  createdAt   DateTime @default(now())
+
+  // Relations
+  run         APITestRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  testCase    APITestCase @relation(fields: [testCaseId], references: [id])
+
+  @@index([runId])
+  @@index([testCaseId])
+  @@index([status])
+  @@map("api_test_results")
+}
+
+// API Documentation model - Additional documentation
+model APIDocumentation {
+  id          String   @id @default(uuid())
+  endpointId  String
+  type        String   // overview, examples, changelog, notes
+  title       String
+  content     String   // Markdown content
+  language    String   @default("markdown")
+  sortOrder   Int      @default(0)
+  isPublic    Boolean  @default(true)
+  
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  endpoint    APIEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId])
+  @@index([type])
+  @@index([sortOrder])
+  @@map("api_documentation")
+}
+
+// API History model - Change tracking
+model APIHistory {
+  id          String   @id @default(uuid())
+  endpointId  String
+  changeType  String   // CREATE, UPDATE, DELETE, IMPORT, SYNC
+  changes     String   // JSON object describing changes
+  previousData String? // JSON snapshot of previous state
+  newData     String?  // JSON snapshot of new state
+  reason      String?  // Reason for change
+  source      String   @default("MANUAL") // MANUAL, IMPORT, SYNC, AI
+  
+  createdBy   String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  endpoint    APIEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId])
+  @@index([changeType])
+  @@index([source])
+  @@index([createdAt])
+  @@map("api_history")
+}
+
+// Sync Configuration model - Data model to API sync settings
+model SyncConfiguration {
+  id                String   @id @default(uuid())
+  projectId         String
+  name              String
+  description       String?
+  isActive          Boolean  @default(true)
+  
+  // Sync Rules
+  autoSync          Boolean  @default(false)
+  syncDirection     String   @default("MODEL_TO_API") // MODEL_TO_API, API_TO_MODEL, BIDIRECTIONAL
+  conflictResolution String  @default("MANUAL") // MANUAL, MODEL_WINS, API_WINS, MERGE
+  
+  // Mapping Rules
+  tableToEndpointMapping String? // JSON object for custom mapping rules
+  fieldToParameterMapping String? // JSON object for field mappings
+  namingConvention   String   @default("CAMEL_CASE") // CAMEL_CASE, SNAKE_CASE, KEBAB_CASE
+  
+  // Filter Rules
+  includeTables     String?  // JSON array of table patterns to include
+  excludeTables     String?  // JSON array of table patterns to exclude
+  includeFields     String?  // JSON array of field patterns to include
+  excludeFields     String?  // JSON array of field patterns to exclude
+  
+  lastSyncAt        DateTime?
+  nextSyncAt        DateTime?
+  syncInterval      Int?     // minutes, for scheduled sync
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  project           Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([isActive])
+  @@index([lastSyncAt])
+  @@unique([projectId, name])
+  @@map("sync_configurations")
+}
+
+// ==================================================
+// Enhanced Existing Models for API Integration
+// ==================================================
+
+// Add API endpoint relationship to DatabaseTable
+model APITableMapping {
+  id          String   @id @default(uuid())
+  tableId     String
+  endpointId  String
+  mappingType String   // CRUD, READ_ONLY, WRITE_ONLY, CUSTOM
+  operations  String   // JSON array of supported operations [CREATE, READ, UPDATE, DELETE]
+  fieldMapping String? // JSON object for field to parameter mapping
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  table       DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  endpoint    APIEndpoint   @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([tableId])
+  @@index([endpointId])
+  @@unique([tableId, endpointId])
+  @@map("api_table_mappings")
+}
+
+// Note: SQLite doesn't support enums, so we use String with validation in application layer
+// ProjectStatus: "ACTIVE" | "ARCHIVED" | "DELETED"
+// APIStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "NOT_TESTED" | "TESTED" | "DEPRECATED"
+// HTTPMethod: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS"
+// DataModelStatus: "DRAFT" | "ACTIVE" | "DEPRECATED"
+// DatabaseFieldType: "VARCHAR" | "CHAR" | "TEXT" | "LONGTEXT" | "MEDIUMTEXT" | "TINYTEXT" |
+//                    "INT" | "TINYINT" | "SMALLINT" | "MEDIUMINT" | "BIGINT" |
+//                    "DECIMAL" | "NUMERIC" | "FLOAT" | "DOUBLE" |
+//                    "DATE" | "TIME" | "DATETIME" | "TIMESTAMP" | "YEAR" |
+//                    "BOOLEAN" | "BIT" | "JSON" | "ENUM" | "SET" |
+//                    "BINARY" | "VARBINARY" | "BLOB" | "LONGBLOB" | "MEDIUMBLOB" | "TINYBLOB"
+// DatabaseIndexType: "PRIMARY" | "UNIQUE" | "INDEX" | "FULLTEXT" | "FOREIGN"
+// ModelVersionChangeType: "MANUAL" | "AUTO_IMPORT" | "AI_GENERATED" | "MIGRATION"
+// AIParseStatus: "PENDING" | "SUCCESS" | "FAILED" | "PARTIAL"
+// RelationshipConstraint: "CASCADE" | "SET_NULL" | "SET_DEFAULT" | "RESTRICT" | "NO_ACTION"
+// RelationshipType: "ONE_TO_ONE" | "ONE_TO_MANY" | "MANY_TO_ONE" | "MANY_TO_MANY"
+// IndexMethod: "BTREE" | "HASH" | "RTREE" | "FULLTEXT"
+// RowFormat: "DYNAMIC" | "FIXED" | "COMPRESSED" | "REDUNDANT" | "COMPACT"
+
+// API Management Enums:
+// APIEndpointStatus: "DRAFT" | "DESIGN" | "DEVELOPMENT" | "TESTING" | "COMPLETED" | "DEPRECATED"
+// APIImplementationStatus: "NOT_IMPLEMENTED" | "IMPLEMENTING" | "IMPLEMENTED" | "NEEDS_UPDATE"
+// APITestStatus: "NOT_TESTED" | "TESTING" | "PASSED" | "FAILED" | "SKIPPED"
+// ParameterType: "query" | "path" | "header" | "body" | "formData"
+// ParameterDataType: "string" | "integer" | "number" | "boolean" | "array" | "object" | "file"
+// ResponseStatusCode: "200" | "201" | "204" | "400" | "401" | "403" | "404" | "422" | "500" | "default"
+// TestCasePriority: "HIGH" | "MEDIUM" | "LOW"
+// TestRunStatus: "PENDING" | "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED"
+// TestResultStatus: "PASSED" | "FAILED" | "SKIPPED" | "ERROR"
+// SyncDirection: "MODEL_TO_API" | "API_TO_MODEL" | "BIDIRECTIONAL"
+// ConflictResolution: "MANUAL" | "MODEL_WINS" | "API_WINS" | "MERGE"
+// MappingType: "CRUD" | "READ_ONLY" | "WRITE_ONLY" | "CUSTOM"
+// ChangeType: "CREATE" | "UPDATE" | "DELETE" | "IMPORT" | "SYNC"
+// ChangeSource: "MANUAL" | "IMPORT" | "SYNC" | "AI"
+
+// ==================================================
+// GitHub Issues Integration Models
+// ==================================================
+
+// GitHub Issue model - Core issue tracking
+model Issue {
+  id             String   @id @default(uuid())
+  projectId      String
+  githubId       Int?     // GitHub issue number
+  githubNodeId   String?  // GitHub GraphQL node ID
+  title          String
+  description    String?
+  status         String   @default("OPEN") // OPEN, CLOSED
+  state          String   @default("open") // open, closed (GitHub API format)
+  priority       String   @default("MEDIUM") // HIGH, MEDIUM, LOW, CRITICAL
+  severity       String   @default("NORMAL") // BLOCKER, CRITICAL, MAJOR, MINOR, TRIVIAL, NORMAL
+  issueType      String   @default("BUG") // BUG, FEATURE, ENHANCEMENT, TASK, DOCUMENTATION
+  
+  // GitHub Integration
+  githubUrl      String?
+  githubNumber   Int?
+  githubHtmlUrl  String?
+  githubApiUrl   String?
+  repositoryName String?
+  repositoryOwner String?
+  
+  // Assignment and tracking
+  assigneeId     String?
+  assigneeName   String?
+  assigneeAvatar String?
+  reporterId     String?
+  reporterName   String?
+  reporterAvatar String?
+  
+  // Lifecycle tracking
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  closedAt       DateTime?
+  dueDate        DateTime?
+  
+  // Sync tracking
+  lastSyncAt     DateTime?
+  syncStatus     String   @default("LOCAL") // LOCAL, SYNCED, SYNC_PENDING, SYNC_FAILED
+  syncError      String?
+  
+  // Metadata
+  estimatedHours Float?
+  actualHours    Float?
+  storyPoints    Int?
+  
+  // Relations
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  labels         IssueLabel[]
+  comments       IssueComment[]
+  attachments    IssueAttachment[]
+  relatedAPIs    IssueAPIRelation[]
+  relatedTables  IssueTableRelation[]
+  relatedFeatures IssueFeatureRelation[]
+  milestones     IssueMilestone[]
+  timeEntries    IssueTimeEntry[]
+  
+  @@index([projectId])
+  @@index([status])
+  @@index([priority])
+  @@index([issueType])
+  @@index([githubId])
+  @@index([githubNumber])
+  @@index([assigneeId])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([dueDate])
+  @@unique([projectId, githubNumber])
+  @@map("issues")
+}
+
+// Issue Label model - Categorization and tagging
+model IssueLabel {
+  id          String   @id @default(uuid())
+  issueId     String
+  name        String
+  color       String   @default("#3B82F6")
+  description String?
+  
+  // GitHub Integration
+  githubId    String?  // GitHub label ID
+  githubNodeId String? // GitHub GraphQL node ID
+  
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  issue       Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@index([name])
+  @@unique([issueId, name])
+  @@map("issue_labels")
+}
+
+// Issue Comment model - Discussion and updates
+model IssueComment {
+  id           String   @id @default(uuid())
+  issueId      String
+  content      String
+  authorId     String?
+  authorName   String?
+  authorAvatar String?
+  
+  // GitHub Integration
+  githubId     String?  // GitHub comment ID
+  githubNodeId String?  // GitHub GraphQL node ID
+  githubUrl    String?
+  
+  // Comment metadata
+  isInternal   Boolean  @default(false) // Internal comments not synced to GitHub
+  replyToId    String?  // For threaded comments
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  issue        Issue         @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  replyTo      IssueComment? @relation("CommentReplies", fields: [replyToId], references: [id])
+  replies      IssueComment[] @relation("CommentReplies")
+  
+  @@index([issueId])
+  @@index([createdAt])
+  @@index([replyToId])
+  @@map("issue_comments")
+}
+
+// Issue Attachment model - File attachments
+model IssueAttachment {
+  id          String   @id @default(uuid())
+  issueId     String
+  fileName    String
+  filePath    String
+  fileSize    Int
+  mimeType    String
+  description String?
+  uploadedBy  String?
+  
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  issue       Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@map("issue_attachments")
+}
+
+// Issue API Relation model - Link issues to API endpoints
+model IssueAPIRelation {
+  id         String   @id @default(uuid())
+  issueId    String
+  apiId      String?  // Legacy API model
+  endpointId String?  // New APIEndpoint model
+  relationType String @default("RELATES_TO") // RELATES_TO, BLOCKS, BLOCKED_BY, IMPLEMENTS, FIXES
+  description String?
+  
+  createdAt  DateTime @default(now())
+  
+  // Relations
+  issue      Issue        @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  api        API?         @relation(fields: [apiId], references: [id])
+  endpoint   APIEndpoint? @relation(fields: [endpointId], references: [id])
+  
+  @@index([issueId])
+  @@index([apiId])
+  @@index([endpointId])
+  @@index([relationType])
+  @@map("issue_api_relations")
+}
+
+// Issue Table Relation model - Link issues to database tables
+model IssueTableRelation {
+  id           String   @id @default(uuid())
+  issueId      String
+  tableId      String
+  relationType String   @default("RELATES_TO") // RELATES_TO, AFFECTS, MODIFIES, CREATES, DROPS
+  description  String?
+  
+  createdAt    DateTime @default(now())
+  
+  // Relations
+  issue        Issue         @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  table        DatabaseTable @relation(fields: [tableId], references: [id])
+  
+  @@index([issueId])
+  @@index([tableId])
+  @@index([relationType])
+  @@map("issue_table_relations")
+}
+
+// Issue Feature Relation model - Link issues to feature modules
+model IssueFeatureRelation {
+  id           String   @id @default(uuid())
+  issueId      String
+  featureId    String   // Reference to FeatureModule ID
+  component    String?  // Specific component within the feature
+  relationType String   @default("RELATES_TO") // RELATES_TO, IMPLEMENTS, ENHANCES, REFACTORS
+  description  String?
+  
+  createdAt    DateTime @default(now())
+  
+  // Relations
+  issue        Issue         @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  feature      FeatureModule @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@index([featureId])
+  @@index([relationType])
+  @@unique([issueId, featureId])
+  @@map("issue_feature_relations")
+}
+
+// Issue Milestone model - Project milestones and releases
+model IssueMilestone {
+  id          String    @id @default(uuid())
+  issueId     String
+  title       String
+  description String?
+  dueDate     DateTime?
+  progress    Float     @default(0) // Progress percentage 0-100
+  status      String    @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+  
+  // GitHub Integration
+  githubId    Int?      // GitHub milestone number
+  githubNodeId String?  // GitHub GraphQL node ID
+  githubUrl   String?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  issue       Issue     @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("issue_milestones")
+}
+
+// Issue Time Entry model - Time tracking
+model IssueTimeEntry {
+  id          String   @id @default(uuid())
+  issueId     String
+  userId      String?
+  userName    String?
+  description String?
+  hours       Float
+  date        DateTime @default(now())
+  billable    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  issue       Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  @@index([issueId])
+  @@index([userId])
+  @@index([date])
+  @@map("issue_time_entries")
+}
+
+// GitHub Repository Configuration model - Repository sync settings
+model GitHubRepository {
+  id          String   @id @default(uuid())
+  projectId   String   @unique
+  owner       String
+  name        String
+  fullName    String   // owner/name format
+  
+  // Authentication
+  accessToken String?  // GitHub access token (encrypted)
+  
+  // Sync Configuration
+  autoSync    Boolean  @default(true)
+  syncInterval Int     @default(300) // seconds
+  lastSyncAt  DateTime?
+  
+  // Webhook Configuration
+  webhookId   String?
+  webhookSecret String?
+  webhookUrl  String?
+  
+  // Repository metadata
+  githubId    Int?
+  nodeId      String?
+  htmlUrl     String?
+  apiUrl      String?
+  description String?
+  language    String?
+  defaultBranch String @default("main")
+  
+  isPrivate   Boolean  @default(true)
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@index([projectId])
+  @@index([owner, name])
+  @@unique([owner, name])
+  @@map("github_repositories")
+}
+
+// Add GitHub repository relation to Project model
+// (This would be added to the existing Project model)
+// githubRepository GitHubRepository?
+
+// GitHub Issue Enums:
+// IssueStatus: "OPEN" | "CLOSED"
+// IssueState: "open" | "closed" 
+// IssuePriority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW"
+// IssueSeverity: "BLOCKER" | "CRITICAL" | "MAJOR" | "MINOR" | "TRIVIAL" | "NORMAL"
+// IssueType: "BUG" | "FEATURE" | "ENHANCEMENT" | "TASK" | "DOCUMENTATION" | "QUESTION"
+// SyncStatus: "LOCAL" | "SYNCED" | "SYNC_PENDING" | "SYNC_FAILED"
+// RelationType: "RELATES_TO" | "BLOCKS" | "BLOCKED_BY" | "IMPLEMENTS" | "FIXES" | "AFFECTS" | "MODIFIES" | "CREATES" | "DROPS" | "ENHANCES" | "REFACTORS"
+// MilestoneStatus: "ACTIVE" | "COMPLETED" | "CANCELLED"
+
+// ==================================================
+// Feature Module Management Models
+// ==================================================
+
+// Feature Module model - Core feature management
+model FeatureModule {
+  id            String   @id @default(uuid())
+  projectId     String
+  name          String
+  displayName   String?
+  description   String?
+  category      String   @default("通用")
+  status        String   @default("planned") // planned, in-progress, completed, deprecated
+  priority      String   @default("MEDIUM") // HIGH, MEDIUM, LOW
+  
+  // Progress tracking
+  progress      Int      @default(0) // Progress percentage 0-100
+  estimatedHours Float?
+  actualHours   Float?
+  
+  // Dependencies and constraints
+  dependencies  String?  // JSON array of dependency module IDs or names
+  prerequisites String?  // JSON array of required conditions
+  
+  // Technical specifications
+  techStack     String?  // JSON array of technologies
+  architecture  String?  // JSON object for architectural details
+  
+  // Metadata
+  tags          String?  // JSON array of tags
+  icon          String?  // Icon identifier
+  color         String   @default("#3B82F6")
+  sortOrder     Int      @default(0)
+  
+  // Assignment and ownership
+  assigneeId    String?
+  assigneeName  String?
+  ownerId       String?
+  ownerName     String?
+  
+  // Lifecycle tracking
+  startDate     DateTime?
+  dueDate       DateTime?
+  completedAt   DateTime?
+  createdBy     String?
+  lastModifiedBy String?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  project       Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  endpoints     ModuleEndpoint[]
+  tables        ModuleTable[]
+  tasks         ModuleTask[]
+  dependencies_from ModuleDependency[] @relation("FromModule")
+  dependencies_to   ModuleDependency[] @relation("ToModule")
+  relatedIssues IssueFeatureRelation[]
+  documents     ModuleDocument[]
+  
+  @@index([projectId])
+  @@index([status])
+  @@index([category])
+  @@index([priority])
+  @@index([assigneeId])
+  @@index([dueDate])
+  @@index([sortOrder])
+  @@unique([projectId, name])
+  @@map("feature_modules")
+}
+
+// Module Endpoint model - API endpoints within a feature module
+model ModuleEndpoint {
+  id          String   @id @default(uuid())
+  moduleId    String
+  endpointId  String?  // Reference to existing APIEndpoint
+  name        String
+  method      String   // HTTP method
+  path        String
+  description String?
+  status      String   @default("planned") // planned, implementing, implemented, tested
+  priority    String   @default("MEDIUM")
+  
+  // Implementation details
+  requestSchema  String? // JSON schema for request
+  responseSchema String? // JSON schema for response
+  mockData      String? // JSON mock data
+  testCases     String? // JSON array of test cases
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  module      FeatureModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  endpoint    APIEndpoint?  @relation(fields: [endpointId], references: [id])
+  
+  @@index([moduleId])
+  @@index([endpointId])
+  @@index([status])
+  @@unique([moduleId, method, path])
+  @@map("module_endpoints")
+}
+
+// Module Table model - Database tables within a feature module
+model ModuleTable {
+  id          String   @id @default(uuid())
+  moduleId    String
+  tableId     String?  // Reference to existing DatabaseTable
+  name        String
+  description String?
+  status      String   @default("planned") // planned, designing, implemented
+  purpose     String?  // Purpose of this table in the module
+  
+  // Table specifications
+  estimatedRows Int?
+  fields       String? // JSON array of field specifications
+  indexes      String? // JSON array of index specifications
+  relationships String? // JSON array of relationship specifications
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  module      FeatureModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  table       DatabaseTable? @relation(fields: [tableId], references: [id])
+  
+  @@index([moduleId])
+  @@index([tableId])
+  @@index([status])
+  @@unique([moduleId, name])
+  @@map("module_tables")
+}
+
+// Module Task model - Development tasks within a feature module
+model ModuleTask {
+  id          String   @id @default(uuid())
+  moduleId    String
+  title       String
+  description String?
+  type        String   @default("DEVELOPMENT") // DEVELOPMENT, TESTING, DOCUMENTATION, REVIEW
+  status      String   @default("TODO") // TODO, IN_PROGRESS, COMPLETED, BLOCKED
+  priority    String   @default("MEDIUM") // HIGH, MEDIUM, LOW
+  
+  // Assignment and tracking
+  assigneeId  String?
+  assigneeName String?
+  estimatedHours Float?
+  actualHours Float?
+  
+  // Dependencies
+  dependsOn   String?  // JSON array of task IDs this task depends on
+  blockedBy   String?  // JSON array of blocking issues
+  
+  // Lifecycle
+  startDate   DateTime?
+  dueDate     DateTime?
+  completedAt DateTime?
+  
+  // Metadata
+  tags        String?  // JSON array of tags
+  labels      String?  // JSON array of labels
+  sortOrder   Int      @default(0)
+  
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  module      FeatureModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  @@index([moduleId])
+  @@index([status])
+  @@index([assigneeId])
+  @@index([dueDate])
+  @@index([sortOrder])
+  @@map("module_tasks")
+}
+
+// Module Dependency model - Dependencies between feature modules
+model ModuleDependency {
+  id             String   @id @default(uuid())
+  fromModuleId   String
+  toModuleId     String
+  dependencyType String   @default("REQUIRES") // REQUIRES, SUGGESTS, CONFLICTS, EXTENDS
+  description    String?
+  isRequired     Boolean  @default(true)
+  version        String?  // Version constraint
+  
+  createdAt      DateTime @default(now())
+  
+  // Relations
+  fromModule     FeatureModule @relation("FromModule", fields: [fromModuleId], references: [id], onDelete: Cascade)
+  toModule       FeatureModule @relation("ToModule", fields: [toModuleId], references: [id], onDelete: Cascade)
+  
+  @@index([fromModuleId])
+  @@index([toModuleId])
+  @@index([dependencyType])
+  @@unique([fromModuleId, toModuleId])
+  @@map("module_dependencies")
+}
+
+// Module Document model - Documentation for feature modules
+model ModuleDocument {
+  id          String   @id @default(uuid())
+  moduleId    String
+  title       String
+  content     String
+  type        String   @default("SPECIFICATION") // SPECIFICATION, API_DOC, USER_GUIDE, TECHNICAL_DOC
+  format      String   @default("markdown") // markdown, html, pdf
+  language    String   @default("zh-CN")
+  version     String   @default("1.0.0")
+  
+  // Document metadata
+  isPublic    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  tags        String?  // JSON array of tags
+  
+  // Lifecycle
+  createdBy   String?
+  lastModifiedBy String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  approvedBy  String?
+  approvedAt  DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  module      FeatureModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  @@index([moduleId])
+  @@index([type])
+  @@index([isPublic])
+  @@index([sortOrder])
+  @@map("module_documents")
+}
+
+// Feature Module Enums:
+// FeatureStatus: "planned" | "in-progress" | "completed" | "deprecated"
+// FeaturePriority: "HIGH" | "MEDIUM" | "LOW"
+// TaskType: "DEVELOPMENT" | "TESTING" | "DOCUMENTATION" | "REVIEW" | "DEPLOYMENT"
+// TaskStatus: "TODO" | "IN_PROGRESS" | "COMPLETED" | "BLOCKED"
+// DependencyType: "REQUIRES" | "SUGGESTS" | "CONFLICTS" | "EXTENDS"
+// DocumentType: "SPECIFICATION" | "API_DOC" | "USER_GUIDE" | "TECHNICAL_DOC" | "CHANGELOG"
+// DocumentFormat: "markdown" | "html" | "pdf" | "docx"

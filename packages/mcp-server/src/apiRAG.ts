@@ -1,4 +1,4 @@
-import { prisma } from '@devapi/backend/prisma';
+import { getPrismaClient } from './database/index.js';
 import { vectorSearchService } from './vectorSearch.js';
 
 interface APIContext {
@@ -29,6 +29,7 @@ export class APIRAGService {
   async buildAPIContext(): Promise<void> {
     console.log('构建API上下文数据...');
     
+    const prisma = getPrismaClient();
     const apis = await prisma.aPI.findMany({
       include: {
         project: {
@@ -48,7 +49,7 @@ export class APIRAGService {
       },
     });
 
-    this.apiContextCache = apis.map(api => ({
+    this.apiContextCache = apis.map((api: any) => ({
       id: api.id,
       name: api.name,
       method: api.method,
@@ -57,7 +58,7 @@ export class APIRAGService {
       parameters: api.parameters || '',
       responses: api.responses || '',
       projectName: api.project.name,
-      tags: api.apiTags.map(at => at.tag.name),
+      tags: api.apiTags.map((at: any) => at.tag.name),
       relatedAPIs: [], // 将在后续分析中填充
     }));
 
@@ -137,6 +138,7 @@ export class APIRAGService {
     }
     
     if (context?.projectId) {
+      const prisma = getPrismaClient();
       const project = await prisma.project.findUnique({
         where: { id: context.projectId },
         select: { name: true }

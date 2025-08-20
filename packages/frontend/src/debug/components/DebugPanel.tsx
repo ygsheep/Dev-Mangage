@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import useDebugStore from '../DebugStore'
 import ComponentsTab from './ComponentsTab'
 import DraggableWindow from './DraggableWindow'
@@ -11,6 +11,8 @@ type TabType = 'logs' | 'network' | 'performance' | 'components'
 const DebugPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('logs')
   const [position, setPosition] = useState({ x: 100, y: 100 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
   const {
     isVisible,
@@ -45,6 +47,39 @@ const DebugPanel: React.FC = () => {
       totalComponents: componentStates.length,
     }
   }, [logs, networkRequests, performanceMetrics, componentStates])
+
+  /**
+   * 处理拖拽过程中的鼠标移动和释放事件
+   */
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        const newPosition = {
+          x: Math.max(0, Math.min(window.innerWidth - 200, e.clientX - dragOffset.x)),
+          y: Math.max(0, Math.min(window.innerHeight - 100, e.clientY - dragOffset.y)),
+        }
+        setPosition(newPosition)
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.userSelect = 'none'
+    } else {
+      document.body.style.userSelect = ''
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.userSelect = ''
+    }
+  }, [isDragging, dragOffset, position])
 
   if (!isVisible) return null
 
@@ -82,6 +117,23 @@ const DebugPanel: React.FC = () => {
     clearComponentStates()
   }
 
+  /**
+   * 处理工具栏拖拽开始
+   * @param e - 鼠标事件
+   */
+  const handleToolbarMouseDown = (e: React.MouseEvent) => {
+    // 如果点击的是按钮或按钮内的元素，不触发拖拽
+    if ((e.target as HTMLElement).tagName === 'BUTTON' || (e.target as HTMLElement).closest('button')) {
+      return
+    }
+    
+    setIsDragging(true)
+    setDragOffset({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    })
+  }
+
   return (
     <DraggableWindow
       title="DevAPI Manager Debug Console"
@@ -93,32 +145,37 @@ const DebugPanel: React.FC = () => {
       className="debug-panel text-sm"
     >
       <div className="flex flex-col h-full">
-        {/* 工具栏 */}
-        <div className="bg-bg-secondary border-b border-gray-200 px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        {/* 工具栏 - 支持拖拽 */}
+        <div 
+          className={`bg-bg-secondary border-b border-gray-200 px-4 py-2 flex items-center justify-between cursor-move select-none ${
+            isDragging ? 'bg-gray-300' : ''
+          }`}
+          onMouseDown={handleToolbarMouseDown}
+        >
+          <div className="flex items-center space-x-4 pointer-events-none">
             <div className="text-xs text-gray-500">🐛 Debug Console</div>
             <div className="text-xs text-gray-400">
               Ctrl+Shift+D: Toggle | Ctrl+Shift+E: Export | Ctrl+Shift+C: Clear
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 pointer-events-auto">
             <button
               onClick={viewServerLogs}
-              className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
+              className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer"
               title="查看服务器保存的日志"
             >
               服务器日志
             </button>
             <button
               onClick={exportAllData}
-              className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
             >
               导出
             </button>
             <button
               onClick={handleClearAll}
-              className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 cursor-pointer"
             >
               清空全部
             </button>

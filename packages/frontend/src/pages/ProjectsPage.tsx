@@ -1,291 +1,147 @@
-import React, { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { Plus, Search, Filter, Grid, List } from 'lucide-react'
-import { Project, ProjectStatus } from '@shared/types'
-import { apiMethods } from '../utils/api'
-import ProjectCard from '../components/features/project/components/ProjectCard'
-import CreateProjectModal from '../components/features/project/components/modals/CreateProjectModal'
-import DeleteProjectModal from '../components/features/project/components/modals/DeleteProjectModal'
-import { PROJECT_STATUS_LABELS } from '@shared/types'
-import toast from 'react-hot-toast'
+import { Archive, BarChart3, Folder, List, Settings } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import ProjectsManagePage from './ProjectsManagePage'
+import DashboardPage from './DashboardPage'
+import ArchiveManagePage from './ArchiveManagePage'
+import SettingsPage from './SettingsPage'
+
+type TabId = 'list' | 'dashboard' | 'archive' | 'settings'
+
+interface Tab {
+  id: TabId
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+  description: string
+  path: string
+}
 
 const ProjectsPage: React.FC = () => {
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<ProjectStatus | ''>('')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
-  // Fetch projects
-  const { data: projectsData, isLoading, error, refetch } = useQuery({
-    queryKey: ['projects', search, statusFilter],
-    queryFn: () => apiMethods.getProjects({ 
-      search: search || undefined,
-      status: statusFilter || undefined,
-      limit: 50
-    }),
-  })
+  // 定义 tabs
+  const tabs: Tab[] = [
+    {
+      id: 'list',
+      label: '项目列表',
+      icon: List,
+      description: '管理你的所有API项目',
+      path: '/projects',
+    },
+    {
+      id: 'dashboard',
+      label: '仪表板',
+      icon: BarChart3,
+      description: '项目统计和概览数据',
+      path: '/projects/dashboard',
+    },
+    {
+      id: 'archive',
+      label: '归档项目',
+      icon: Archive,
+      description: '查看已归档的项目',
+      path: '/projects/archive',
+    },
+    {
+      id: 'settings',
+      label: '项目设置',
+      icon: Settings,
+      description: '全局项目配置',
+      path: '/projects/settings',
+    },
+  ]
 
-  const projects = projectsData?.data?.projects || []
-
-  const handleEditProject = (project: Project) => {
-    // TODO: Implement edit functionality
-    console.log('Edit project:', project.id)
-    toast.success('编辑功能将在未来版本中实现')
+  // 根据当前路径确定活动的 tab
+  const getActiveTab = (): TabId => {
+    const path = location.pathname
+    if (path === '/projects/dashboard') return 'dashboard'
+    if (path === '/projects/archive') return 'archive'
+    if (path === '/projects/settings') return 'settings'
+    return 'list' // 默认为项目列表
   }
 
-  const handleDeleteProject = (project: Project) => {
-    setSelectedProject(project)
-    setShowDeleteModal(true)
+  const [activeTab, setActiveTab] = useState<TabId>(getActiveTab())
+
+  // 监听路径变化来更新活动 tab
+  useEffect(() => {
+    setActiveTab(getActiveTab())
+  }, [location.pathname])
+
+  // 切换 tab
+  const handleTabChange = (tabId: TabId) => {
+    const targetTab = tabs.find(tab => tab.id === tabId)
+    if (targetTab) {
+      navigate(targetTab.path)
+    }
   }
 
-  const handleConfirmDelete = async (projectId: string) => {
-    try {
-      await apiMethods.deleteProject(projectId)
-      toast.success('项目删除成功')
-      refetch() // Refresh the project list
-      setShowDeleteModal(false)
-      setSelectedProject(null)
-    } catch (error) {
-      console.error('Delete project failed:', error)
-      toast.error('删除项目失败，请重试')
-      throw error // Re-throw to let modal handle loading state
+  // 渲染 tab 内容
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'list':
+        return <ProjectsManagePage />
+      case 'dashboard':
+        return <DashboardPage />
+      case 'archive':
+        return <ArchiveManagePage />
+      case 'settings':
+        return <SettingsPage />
+      default:
+        return <ProjectsManagePage />
     }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">项目管理</h1>
-          <p className="text-text-secondary">管理你的所有API项目</p>
-        </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>新建项目</span>
-        </button>
-      </div>
-
-      {/* Filters and Search */}
-      <div className="card">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary w-4 h-4" />
-              <input
-                type="text"
-                placeholder="搜索项目..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="input pl-10"
-              />
+    <div className="min-h-screen bg-bg-secondary">
+      {/* 页面头部 */}
+      <div className="bg-bg-paper border-b border-border-primary">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* 标题区域 */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                  <Folder className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-semibold text-text-primary">项目管理</h1>
+                  <p className="text-sm text-text-secondary">
+                    {tabs.find(tab => tab.id === activeTab)?.description}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Status Filter */}
-          <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-text-tertiary" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | '')}
-              className="input w-auto min-w-[120px]"
-            >
-              <option value="">所有状态</option>
-              {Object.entries(PROJECT_STATUS_LABELS).map(([status, label]) => (
-                <option key={status} value={status}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Tab 导航 */}
+          <div className="flex space-x-8 overflow-x-auto custom-scrollbar">
+            {tabs.map(tab => {
+              const Icon = tab.icon
+              const isActive = activeTab === tab.id
 
-          {/* View Mode */}
-          <div className="flex items-center space-x-1 border border-border-primary rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded ${
-                viewMode === 'grid'
-                  ? 'bg-primary-100 text-primary-600'
-                  : 'text-text-tertiary hover:text-text-secondary'
-              }`}
-            >
-              <Grid className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded ${
-                viewMode === 'list'
-                  ? 'bg-primary-100 text-primary-600'
-                  : 'text-text-tertiary hover:text-text-secondary'
-              }`}
-            >
-              <List className="w-4 h-4" />
-            </button>
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`flex items-center space-x-2 py-4 px-2 border-b-2 text-sm font-medium transition-colors whitespace-nowrap ${
+                    isActive
+                      ? 'border-primary-500 text-primary-600'
+                      : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border-secondary'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
 
-      {/* Projects Grid/List */}
-      <div className="space-y-4">
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="card animate-pulse">
-                <div className="h-6 bg-bg-tertiary rounded w-3/4 mb-4"></div>
-                <div className="h-4 bg-bg-tertiary rounded w-full mb-2"></div>
-                <div className="h-4 bg-bg-tertiary rounded w-2/3"></div>
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="card text-center py-12">
-            <p className="text-error-600 mb-4">加载项目失败</p>
-            <button onClick={() => refetch()} className="btn-primary">
-              重试
-            </button>
-          </div>
-        ) : projects.length === 0 ? (
-          <div className="card text-center py-12">
-            <div className="text-text-tertiary mb-4">
-              <Plus className="w-12 h-12 mx-auto" />
-            </div>
-            <h3 className="text-lg font-medium text-text-primary mb-2">
-              还没有项目
-            </h3>
-            <p className="text-text-secondary mb-6">
-              创建你的第一个项目开始管理API
-            </p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="btn-primary"
-            >
-              创建项目
-            </button>
-          </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project: Project) => (
-              <div key={project.id} className="relative">
-                <Link to={`/projects/${project.id}`} className="block">
-                  <ProjectCard 
-                    project={project} 
-                    onEdit={handleEditProject}
-                    onDelete={handleDeleteProject}
-                  />
-                </Link>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="card">
-            <div className="overflow-x-auto custom-scrollbar">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border-secondary">
-                    <th className="text-left py-3 px-4 font-medium text-text-primary">
-                      项目名称
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-text-primary">
-                      描述
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-text-primary">
-                      API数量
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-text-primary">
-                      状态
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-text-primary">
-                      更新时间
-                    </th>
-                    <th className="text-right py-3 px-4 font-medium text-text-primary">
-                      操作
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {projects.map((project: Project) => (
-                    <tr key={project.id} className="border-b border-border-tertiary hover:bg-bg-secondary">
-                      <td className="py-3 px-4">
-                        <Link
-                          to={`/projects/${project.id}`}
-                          className="font-medium text-primary-600 hover:text-primary-800"
-                        >
-                          {project.name}
-                        </Link>
-                      </td>
-                      <td className="py-3 px-4 text-text-secondary">
-                        {project.description || '-'}
-                      </td>
-                      <td className="py-3 px-4 text-text-secondary">
-                        {project._count?.apis || 0}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="status-badge bg-success-100 text-success-800">
-                          {PROJECT_STATUS_LABELS[project.status]}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-text-secondary">
-                        {new Date(project.updatedAt).toLocaleDateString('zh-CN')}
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault()
-                              handleEditProject(project)
-                            }}
-                            className="text-sm text-primary-600 hover:text-primary-800"
-                          >
-                            编辑
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault()
-                              handleDeleteProject(project)
-                            }}
-                            className="text-sm text-error-600 hover:text-error-800"
-                          >
-                            删除
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Create Project Modal */}
-      {showCreateModal && (
-        <CreateProjectModal
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
-            setShowCreateModal(false)
-            refetch()
-          }}
-        />
-      )}
-
-      {/* Delete Project Modal */}
-      <DeleteProjectModal
-        project={selectedProject}
-        isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false)
-          setSelectedProject(null)
-        }}
-        onConfirm={handleConfirmDelete}
-      />
+      {/* Tab 内容区域 */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{renderTabContent()}</div>
     </div>
   )
 }

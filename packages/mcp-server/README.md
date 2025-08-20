@@ -1,320 +1,395 @@
-# 🧠 DevAPI Manager - MCP Server
+# DevAPI Manager MCP智能搜索服务器
 
-Model Context Protocol (MCP) 服务器，为 DevAPI Manager 提供强大的向量搜索和RAG增强检索能力。
+一个基于Model Context Protocol (MCP)的智能搜索服务器，为DevAPI Manager项目提供强大的搜索和数据检索能力。
 
-## 🎯 核心功能
+## 🌟 特性
 
-### ✨ 向量语义搜索
+### 核心功能
+- **🔍 多类型搜索** - 支持项目、API端点、标签、数据库表、功能模块和Issues的统一搜索
+- **🧠 智能搜索** - 结合关键词搜索和语义搜索，提供更准确的结果
+- **⚡ 高性能缓存** - 智能索引缓存机制，确保快速响应
+- **🔧 模块化架构** - 可扩展的服务架构，支持灵活配置
 
-- **深度学习模型**: all-MiniLM-L6-v2 (Q4F16量化，28.6MB)
-- **向量维度**: 384维语义向量表示
-- **智能回退**: 网络问题时自动使用TF-IDF算法
-- **本地缓存**: 模型文件本地缓存，减少网络依赖
+### 搜索类型
+- **项目搜索** (`search_projects`) - 根据项目名称、描述等搜索项目
+- **API端点搜索** (`search_api_endpoints`) - 搜索REST API端点，支持方法、路径、状态过滤
+- **标签搜索** (`search_tags`) - 搜索项目标签和分类
+- **数据库表搜索** (`search_tables`) - 搜索数据库表结构和字段
+- **功能模块搜索** (`search_features`) - 搜索项目功能模块
+- **Issues搜索** (`search_issues`) - 搜索项目问题和任务
+- **全局搜索** (`global_search`) - 跨所有类型的综合搜索
 
-### 🔍 搜索算法
+### 辅助功能
+- **搜索建议** (`get_search_suggestions`) - 智能搜索建议和自动补全
+- **最近项目** (`get_recent_items`) - 获取最近更新的项目和资源
+- **索引刷新** (`refresh_search_index`) - 手动刷新搜索索引
 
-- **向量搜索**: 基于余弦相似度的语义匹配
-- **TF-IDF回退**: 专为API搜索优化的关键词匹配
-- **混合搜索**: 结合向量语义和模糊匹配
-- **RAG增强**: 智能上下文分析和API推荐
+## 🏗️ 架构设计
 
-### 🛠️ MCP工具集 (12个)
+### 模块结构
+```
+src/
+├── config/           # 配置管理
+│   └── index.ts     # 统一配置接口
+├── database/        # 数据库服务
+│   └── index.ts     # Prisma客户端封装
+├── server/          # 服务器核心
+│   └── McpServer.ts # MCP服务器主类
+├── services/        # 业务服务
+│   ├── base/        # 基础服务类
+│   ├── ProjectSearchService.ts      # 项目搜索
+│   └── ApiEndpointSearchService.ts  # API端点搜索
+├── tools/           # MCP工具
+│   ├── ToolManager.ts   # 工具管理器
+│   └── SearchTools.ts   # 搜索工具集
+├── utils/           # 工具类
+│   ├── logger.ts    # 日志工具
+│   ├── errors.ts    # 错误处理
+│   └── validation.ts # 参数验证
+└── index.ts         # 主入口
+```
 
-1. `search_projects` - 项目搜索
-2. `search_apis` - API接口搜索
-3. `search_tags` - 标签搜索
-4. `global_search` - 全局搜索
-5. `vector_search` - 向量语义搜索
-6. `hybrid_search` - 混合搜索
-7. `rag_search_apis` - RAG增强API搜索
-8. `get_api_recommendations` - API推荐
-9. `get_search_suggestions` - 搜索建议
-10. `get_recent_items` - 最近项目
-11. `refresh_search_index` - 刷新索引
-12. `build_vector_index` - 构建向量索引
+### 核心组件
 
-### 📊 数据持久化
+#### 1. 配置管理 (Config)
+- 统一的配置接口，支持环境变量覆盖
+- 类型安全的配置验证
+- 多环境配置支持
 
-- **Prisma ORM**: 类型安全的数据库操作
-- **SQLite**: 轻量级本地数据库
-- **索引缓存**: 搜索索引内存缓存
-- **增量更新**: 支持增量索引构建
+#### 2. 数据库服务 (Database)
+- Prisma客户端的封装和管理
+- 连接池和事务管理
+- 健康检查和错误恢复
+
+#### 3. 搜索服务 (Services)
+- **SearchService基类** - 统一的搜索接口和缓存机制
+- **ProjectSearchService** - 项目搜索实现
+- **ApiEndpointSearchService** - API端点搜索实现
+- 支持Fuse.js模糊搜索和相关性排序
+
+#### 4. 工具管理 (Tools)
+- **ToolManager** - 工具注册、验证和执行管理
+- **SearchTools** - 所有搜索工具的定义和实现
+- 支持缓存、限流和统计功能
+
+#### 5. 工具类 (Utils)
+- **Logger** - 结构化日志记录
+- **Errors** - 统一错误处理和分类
+- **Validation** - 参数验证和安全检查
 
 ## 🚀 快速开始
 
-### 安装依赖
+### 环境要求
+- Node.js 18+
+- TypeScript 5.2+
+- SQLite数据库
 
+### 安装依赖
 ```bash
 npm install
 ```
 
-### 构建项目
+### 配置环境变量
+创建 `.env` 文件：
+```env
+# 数据库配置
+DATABASE_URL="file:../backend/prisma/dev.db"
 
-```bash
-npm run build
+# 搜索配置
+SEARCH_DEFAULT_LIMIT=10
+SEARCH_MAX_LIMIT=100
+SEARCH_FUSE_THRESHOLD=0.3
+SEARCH_ENABLE_VECTOR=true
+
+# 服务器配置
+MCP_HTTP_PORT=3000
+LOG_LEVEL=info
 ```
 
 ### 运行服务器
 
+#### STDIO模式 (推荐用于MCP客户端)
 ```bash
-# 开发模式
 npm run dev
+```
 
-# 生产模式
+#### HTTP模式 (用于调试和测试)
+```bash
+npm run dev:http
+```
+
+### 构建生产版本
+```bash
+npm run build
 npm start
 ```
 
-### 数据库操作
+## 📚 API文档
 
-```bash
-# 生成Prisma客户端
-npm run db:generate
+### 搜索工具
 
-# 执行数据库迁移
-npm run db:migrate
-
-# 重置数据库
-npm run db:reset
+#### `search_projects` - 搜索项目
+**参数:**
+```json
+{
+  "query": "搜索查询字符串",
+  "limit": 10,
+  "status": "项目状态过滤",
+  "includeArchived": false
+}
 ```
 
-## 📁 项目结构
-
-```
-packages/mcp-server/
-├── src/
-│   ├── index.ts              # MCP服务器主入口
-│   ├── vectorSearch.ts       # 向量搜索服务
-│   ├── fallbackSearch.ts     # TF-IDF回退搜索
-│   ├── apiRAG.ts            # RAG增强系统
-│   ├── searchUtils.ts       # 搜索工具函数
-│   └── searchDatabase.ts    # 数据库搜索
-├── prisma/
-│   ├── schema.prisma        # 数据库模式
-│   └── migrations/          # 数据库迁移
-├── models/                  # 本地模型文件
-├── .cache/                  # Transformers.js缓存
-├── import-local-models.js   # 模型导入脚本
-├── test-local-model.js      # 模型测试脚本
-└── mcp-vector-demo.js       # 功能演示脚本
-```
-
-## 🔧 配置说明
-
-### 环境变量
-
-```bash
-# 数据库URL
-DATABASE_URL="file:./dev.db"
-
-# 服务端口
-PORT=3000
-
-# 向量搜索配置
-VECTOR_SEARCH_THRESHOLD=0.3
-MAX_SEARCH_RESULTS=10
-
-# 代理配置 (可选)
-HTTP_PROXY=http://proxy:port
-HTTPS_PROXY=https://proxy:port
+**返回示例:**
+```json
+{
+  "type": "projects",
+  "query": "api",
+  "total": 5,
+  "results": [
+    {
+      "id": "uuid",
+      "name": "API项目",
+      "description": "API管理项目",
+      "status": "ACTIVE",
+      "score": 0.95,
+      "_count": {
+        "apis": 15,
+        "tags": 8
+      }
+    }
+  ]
+}
 ```
 
-### 向量模型配置
+#### `search_api_endpoints` - 搜索API端点
+**参数:**
+```json
+{
+  "query": "搜索查询字符串",
+  "projectId": "项目ID",
+  "method": "HTTP方法",
+  "status": "端点状态",
+  "limit": 10
+}
+```
 
+#### `global_search` - 全局搜索
+**参数:**
+```json
+{
+  "query": "搜索查询字符串",
+  "types": ["projects", "endpoints", "tags"],
+  "limit": 15,
+  "projectId": "限制搜索范围"
+}
+```
+
+### 配置选项
+
+#### 搜索配置
 ```typescript
-// 支持的模型列表
-const modelOptions = [
-  'Xenova/all-MiniLM-L6-v2', // 首选：轻量英文模型
-  'Xenova/multilingual-e5-small', // 备选：多语言支持
-  'Xenova/all-MiniLM-L12-v2', // 备选：更强理解能力
-]
+interface SearchConfig {
+  indexCacheTtl: number;        // 索引缓存TTL（毫秒）
+  defaultLimit: number;         // 默认结果限制
+  maxLimit: number;            // 最大结果限制
+  fuseThreshold: number;       // 模糊搜索阈值
+  vectorThreshold: number;     // 向量搜索阈值
+  enableVectorSearch: boolean; // 是否启用向量搜索
+}
 ```
 
-## 🎯 使用示例
-
-### 基础搜索
-
-```javascript
-// 向量语义搜索
-const results = await mcpServer.request({
-  method: 'tools/call',
-  params: {
-    name: 'vector_search',
-    arguments: {
-      query: '用户登录API',
-      limit: 5,
-      threshold: 0.3,
-    },
-  },
-})
-
-// 混合搜索
-const hybridResults = await mcpServer.request({
-  method: 'tools/call',
-  params: {
-    name: 'hybrid_search',
-    arguments: {
-      query: 'GET /api/users',
-      limit: 10,
-      vectorWeight: 0.6,
-      fuzzyWeight: 0.4,
-    },
-  },
-})
+#### 数据库配置
+```typescript
+interface DatabaseConfig {
+  url: string;              // 数据库连接URL
+  maxConnections: number;   // 最大连接数
+  queryTimeout: number;     // 查询超时时间
+}
 ```
 
-### RAG增强搜索
+## 🔧 开发指南
 
-```javascript
-// RAG增强API搜索
-const ragResults = await mcpServer.request({
-  method: 'tools/call',
-  params: {
-    name: 'rag_search_apis',
-    arguments: {
-      query: '需要用户认证的接口',
-      includeContext: true,
-      maxResults: 8,
-    },
-  },
-})
+### 添加新的搜索类型
 
-// 获取API推荐
-const recommendations = await mcpServer.request({
-  method: 'tools/call',
-  params: {
-    name: 'get_api_recommendations',
-    arguments: {
-      baseApi: 'POST /api/users',
-      count: 5,
-    },
-  },
-})
+1. **创建搜索服务**
+```typescript
+// src/services/NewSearchService.ts
+export class NewSearchService extends SearchService<NewDataType> {
+  // 实现抽象方法
+}
 ```
 
-## 📊 性能指标
+2. **创建工具定义**
+```typescript
+// src/tools/NewTools.ts
+export const newTools: Record<string, ToolDefinition> = {
+  searchNew: {
+    tool: { /* 工具定义 */ },
+    handler: newSearchHandler,
+    cacheable: true
+  }
+};
+```
 
-### 向量模型性能
+3. **注册工具**
+```typescript
+// src/server/McpServer.ts
+toolManager.registerTools(newTools);
+```
 
-- **模型大小**: 28.6MB (Q4F16量化)
-- **向量维度**: 384
-- **推理速度**: <50ms
-- **内存使用**: ~100MB
-
-### TF-IDF回退性能
-
-- **算法复杂度**: O(n×m)
-- **响应时间**: <10ms
-- **内存使用**: ~2MB
-- **准确率**: 85%+ (API搜索场景)
-
-### 搜索性能
-
-- **索引大小**: ~1MB (1000个API)
-- **搜索延迟**: <100ms
-- **并发支持**: 100+ QPS
-- **缓存命中率**: 90%+
-
-## 🛡️ 可靠性设计
-
-### 智能回退机制
-
-1. **优先级顺序**: 本地模型 → 在线模型 → TF-IDF回退
-2. **故障检测**: 自动检测网络和模型加载失败
-3. **无缝切换**: 用户无感知的算法降级
-4. **状态监控**: 实时监控服务状态和性能
+### 自定义验证器
+```typescript
+// src/utils/validation.ts
+export const CustomSchemas = {
+  newSearch: z.object({
+    query: BaseSchemas.searchQuery,
+    customField: z.string().optional()
+  })
+};
+```
 
 ### 错误处理
+```typescript
+import { DatabaseError, SearchError, NotFoundError } from '../utils/errors.js';
 
-- **网络超时**: 自动重试和降级
-- **模型加载失败**: 智能回退到TF-IDF
-- **数据库错误**: 优雅降级和错误日志
-- **内存不足**: 自动清理缓存
+// 抛出具体错误
+throw new SearchError('搜索失败', { query, reason: 'index_not_found' });
+```
 
-## 🧪 测试和调试
+## 🧪 测试
 
 ### 运行测试
-
 ```bash
-# 测试向量模型加载
-node test-local-model.js
+# 运行所有测试
+npm test
 
-# 演示MCP功能
-node mcp-vector-demo.js
+# 运行特定测试
+npm test -- --grep "ProjectSearchService"
 
-# 导入本地模型
-node import-local-models.js
+# 覆盖率报告
+npm run test:coverage
 ```
 
-### 调试工具
-
+### 手动测试MCP工具
 ```bash
-# 启用调试日志
-DEBUG=mcp-server:* npm start
+# 启动HTTP服务器
+npm run dev:http
 
-# 性能分析
-NODE_ENV=development npm start
-
-# 检查服务状态
-curl http://localhost:3000/health
+# 测试搜索项目
+curl -X POST http://localhost:3000/tools/search_projects \
+  -H "Content-Type: application/json" \
+  -d '{"query": "api", "limit": 5}'
 ```
 
-## 📈 监控和运维
+## 📊 监控和诊断
 
 ### 健康检查
+服务器提供全面的健康检查接口，包括：
+- 数据库连接状态
+- 搜索服务状态  
+- 工具执行统计
+- 错误率监控
 
-- **HTTP接口**: `GET /health`
-- **服务状态**: 运行时间、内存使用、请求计数
-- **搜索指标**: 响应时间、错误率、缓存命中率
+### 日志记录
+- 结构化日志输出
+- 多级别日志控制
+- 文件和控制台双输出
+- 性能监控装饰器
 
-### 日志系统
+### 统计信息
+```typescript
+// 获取服务器信息
+const info = server.getServerInfo();
 
-- **结构化日志**: JSON格式，便于分析
-- **日志级别**: DEBUG, INFO, WARN, ERROR
-- **日志轮转**: 自动清理过期日志
-- **错误追踪**: 完整的错误堆栈和上下文
+// 获取工具统计
+const stats = toolManager.getToolStats();
+
+// 获取错误统计
+const errors = ErrorStats.getStats();
+```
+
+## 🔒 安全特性
+
+### 输入验证
+- Zod schema严格验证
+- SQL注入防护
+- XSS攻击防护
+- 文件路径验证
+
+### 访问控制
+- 工具级别的认证要求
+- 项目访问权限验证
+- 速率限制保护
+
+### 错误处理
+- 敏感信息隐藏
+- 详细错误分类
+- 安全日志记录
+
+## 📈 性能优化
+
+### 缓存策略
+- 多级缓存架构
+- 智能缓存失效
+- 内存使用控制
+- 定期清理机制
+
+### 搜索优化
+- 索引预构建
+- 并行搜索处理
+- 结果分页支持
+- 相关性排序
+
+## 🛠️ 故障排除
+
+### 常见问题
+
+#### 1. 数据库连接失败
+```bash
+# 检查数据库文件权限
+ls -la ../backend/prisma/dev.db
+
+# 重新生成Prisma客户端 (NixOS环境)
+npx prisma generate
+
+# 推送数据库schema (NixOS环境)  
+npx prisma db push
+```
+
+#### 2. 搜索索引未找到
+```bash
+# 手动刷新索引
+curl -X POST http://localhost:3000/tools/refresh_search_index \
+  -H "Content-Type: application/json" \
+  -d '{"force": true}'
+```
+
+#### 3. 端口冲突
+```bash
+# 检查端口使用
+netstat -ano | findstr ":3000"
+
+# 修改端口
+export MCP_HTTP_PORT=3001
+npm run dev:http
+```
+
+### 调试模式
+```bash
+# 启用详细日志
+export LOG_LEVEL=debug
+npm run dev
+
+# 启用性能追踪
+export ENABLE_PERFORMANCE_TRACKING=true
+npm run dev
+```
 
 ## 🔗 集成指南
 
-### 与 Trae AI 集成
+### 与Claude Desktop集成
 
-#### 标准 stdio 连接（推荐）
-
-```json
-{
-  "mcpServers": {
-    "devapi-manager": {
-      "command": "node",
-      "args": ["d:\\Code\\Dev-Mangage\\packages\\mcp-server\\dist\\index.js"],
-      "env": {
-        "NODE_ENV": "production",
-        "DATABASE_URL": "file:d:\\Code\\Dev-Mangage\\packages\\backend\\prisma\\dev.db",
-        "PORT": "3000"
-      }
-    }
-  }
-}
-```
-
-#### HTTP 连接方式
-
-```json
-{
-  "mcpServers": {
-    "devapi-manager-http": {
-      "command": "node",
-      "args": ["-e", "console.log('HTTP MCP Server: http://localhost:3320')"],
-      "env": {
-        "MCP_SERVER_URL": "http://localhost:3320"
-      }
-    }
-  }
-}
-```
-
-### 与 Claude Desktop 集成
-
-#### 开发环境配置
-
+#### STDIO模式配置 (推荐)
 ```json
 {
   "mcpServers": {
@@ -322,94 +397,77 @@ curl http://localhost:3000/health
       "command": "node",
       "args": ["./packages/mcp-server/dist/index.js"],
       "env": {
-        "NODE_ENV": "development",
-        "DATABASE_URL": "file:./packages/backend/prisma/dev.db",
-        "PORT": "3000"
-      }
-    }
-  }
-}
-```
-
-#### 生产环境配置
-
-```json
-{
-  "mcpServers": {
-    "devapi-manager": {
-      "command": "node",
-      "args": ["./dist/index.js"],
-      "env": {
         "NODE_ENV": "production",
-        "DATABASE_URL": "file:./data/production.db"
+        "DATABASE_URL": "file:./packages/backend/prisma/dev.db",
+        "LOG_LEVEL": "info"
       }
     }
   }
 }
 ```
 
-#### HTTP 连接配置
-
+#### HTTP模式配置
 ```json
 {
   "mcpServers": {
     "devapi-manager-http": {
-      "command": "curl",
-      "args": ["-X", "GET", "http://localhost:3320/mcp/tools"]
+      "url": "http://localhost:3000",
+      "transport": "http"
     }
   }
 }
 ```
 
-### 与DevAPI Manager集成
+### 与Cursor IDE集成
 
-```typescript
-// 前端调用示例
-import { mcpServerAPI } from '@/api/mcpServer'
-
-// 启动MCP服务器
-await mcpServerAPI.start()
-
-// 执行搜索
-const results = await mcpServerAPI.search('用户API', 10, 0.3)
+在 `.cursor/mcp.json` 中配置：
+```json
+{
+  "mcpServers": {
+    "dev-manage-mcp": {
+      "command": "node",
+      "args": ["./packages/mcp-server/dist/index.js"],
+      "env": {
+        "DATABASE_URL": "file:./packages/backend/prisma/dev.db"
+      }
+    }
+  }
+}
 ```
-
-### 与其他系统集成
-
-```javascript
-// HTTP API调用
-const response = await fetch('http://localhost:3320/mcp/tools/vector_search', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    arguments: {
-      query: 'user authentication',
-      limit: 5,
-      threshold: 0.3,
-    },
-  }),
-})
-```
-
-## 📚 相关文档
-
-- [MCP协议规范](https://modelcontextprotocol.io/docs)
-- [Transformers.js文档](https://huggingface.co/docs/transformers.js)
-- [Prisma文档](https://www.prisma.io/docs)
-- [向量搜索详细说明](./README-Vector-Search.md)
 
 ## 🤝 贡献指南
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 开启 Pull Request
+### 代码规范
+- TypeScript严格模式
+- ESLint代码检查
+- Prettier代码格式化
+- 完整的中文注释
+
+### 提交规范
+```
+feat(search): 添加向量搜索功能
+fix(database): 修复连接池内存泄漏
+docs(readme): 更新API文档
+```
+
+### Pull Request流程
+1. Fork项目并创建特性分支
+2. 添加测试覆盖新功能
+3. 确保所有测试通过
+4. 更新相关文档
+5. 提交PR并描述变更
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](../../LICENSE) 文件了解详情。
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+## 🔗 相关链接
+
+- [Model Context Protocol](https://modelcontextprotocol.io/)
+- [Prisma ORM](https://www.prisma.io/)
+- [Fuse.js 模糊搜索](https://fusejs.io/)
+- [Zod 数据验证](https://zod.dev/)
 
 ---
 
-**DevAPI Manager MCP Server** - 让API搜索更智能，让开发更高效！ 🚀
+**DevAPI Manager** - 让API管理更智能，让开发更高效！ 🚀

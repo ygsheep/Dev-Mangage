@@ -3,7 +3,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { spawn, ChildProcess } from 'child_process';
 
-const isDev = process.env.NODE_ENV === 'development' || process.env.ELECTRON_IS_DEV === '1';
+const isDev = process.env.NODE_ENV === 'development' || 
+             process.env.ELECTRON_IS_DEV === '1' ||
+             !app.isPackaged;
 
 // 添加详细的日志记录
 console.log('=== DevAPI Manager Electron Startup ===');
@@ -39,11 +41,11 @@ function createWindow(): void {
 
   // 加载应用
   if (isDev) {
-    console.log('开发模式：尝试连接到 http://localhost:5174');
-    mainWindow.loadURL('http://localhost:5174').catch(err => {
+    console.log('开发模式：尝试连接到 http://localhost:5173');
+    mainWindow.loadURL('http://localhost:5173').catch(err => {
       console.error('开发模式连接失败，尝试备用端口:', err);
-      // 尝试5173端口
-      mainWindow.loadURL('http://localhost:5173').catch(err2 => {
+      // 尝试5174端口
+      mainWindow.loadURL('http://localhost:5174').catch(err2 => {
         console.error('备用端口也连接失败:', err2);
         // 最后尝试加载本地文件
         const localPath = path.join(__dirname, '../../frontend/dist/index.html');

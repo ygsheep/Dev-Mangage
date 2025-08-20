@@ -12,6 +12,98 @@ const router = express.Router()
  * 提供 Issue 的增删改查、关联管理、同步功能
  */
 
+// 获取全局 Issues 列表（跨所有项目）
+router.get('/issues', [
+  query('status').optional().isIn(['OPEN', 'CLOSED']).withMessage('状态参数无效'),
+  query('priority').optional().isIn(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']).withMessage('优先级参数无效'),
+  query('issueType').optional().isIn(['BUG', 'FEATURE', 'ENHANCEMENT', 'TASK', 'DOCUMENTATION', 'QUESTION']).withMessage('Issue类型无效'),
+  query('assignee').optional().isString(),
+  query('search').optional().isString(),
+  query('page').optional().isInt({ min: 1 }).withMessage('页码必须大于0'),
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('限制数量必须在1-100之间'),
+  validateRequest()
+], async (req, res, next) => {
+  try {
+    const {
+      status,
+      priority,
+      issueType,
+      assignee,
+      search,
+      page = 1,
+      limit = 20
+    } = req.query
+
+    logger.info('获取全局Issues列表', {
+      filters: { status, priority, issueType, assignee, search },
+      pagination: { page, limit }
+    })
+
+    // 构建查询条件
+    const where: any = {}
+    
+    if (status) where.status = status
+    if (priority) where.priority = priority
+    if (issueType) where.issueType = issueType
+    if (assignee) where.assignee = assignee
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } }
+      ]
+    }
+
+    // 计算分页
+    const skip = (Number(page) - 1) * Number(limit)
+    const take = Number(limit)
+
+    // 获取Issues列表
+    const [issues, total] = await Promise.all([
+      prisma.issue.findMany({
+        where,
+        include: {
+          project: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        },
+        orderBy: {
+          updatedAt: 'desc'
+        },
+        skip,
+        take
+      }),
+      prisma.issue.count({ where })
+    ])
+
+    // 计算分页信息
+    const totalPages = Math.ceil(total / take)
+    const hasNext = page < totalPages
+    const hasPrev = page > 1
+
+    res.json({
+      success: true,
+      data: {
+        issues,
+        pagination: {
+          total,
+          page: Number(page),
+          limit: take,
+          totalPages,
+          hasNext,
+          hasPrev
+        }
+      }
+    })
+
+  } catch (error) {
+    logger.error('获取全局Issues列表失败', { error: error.message })
+    next(error)
+  }
+})
+
 // 获取项目的 Issues 列表
 router.get('/:projectId/issues', [
   param('projectId').isUUID().withMessage('项目ID格式无效'),

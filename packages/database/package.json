@@ -1,0 +1,27 @@
+{
+  "name": "@devapi/database",
+  "version": "2.0.0",
+  "description": "DevAPI Manager Shared Database Module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./client": "./dist/client.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "prisma": "^5.22.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.2.2"
+  }
+}

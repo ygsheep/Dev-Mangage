@@ -126,7 +126,7 @@ export class FallbackVectorSearchService {
     console.log('🔄 构建回退向量搜索索引...');
     
     try {
-      const { prisma } = await import('@devapi/backend/prisma');
+      const prisma = (await import('./database/index.js')).getPrismaClient();
       
       const [projects, apis, tags] = await Promise.all([
         prisma.project.findMany({
@@ -163,7 +163,7 @@ export class FallbackVectorSearchService {
       const documents: Document[] = [];
 
       // 添加项目文档
-      projects.forEach(project => {
+      projects.forEach((project: any) => {
         documents.push({
           id: `project-${project.id}`,
           content: `${project.name} ${project.description || ''}`.trim(),
@@ -172,7 +172,7 @@ export class FallbackVectorSearchService {
       });
 
       // 添加API文档（重点优化API搜索）
-      apis.forEach(api => {
+      apis.forEach((api: any) => {
         const content = [
           api.name,                    // API名称权重最高
           `${api.method} ${api.path}`, // HTTP方法和路径
@@ -189,7 +189,7 @@ export class FallbackVectorSearchService {
       });
 
       // 添加标签文档
-      tags.forEach(tag => {
+      tags.forEach((tag: any) => {
         documents.push({
           id: `tag-${tag.id}`,
           content: tag.name,

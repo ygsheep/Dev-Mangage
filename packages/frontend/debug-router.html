@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Router 调试页面</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+      color: #333;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #fafafa;
+    }
+    .debug-info {
+      background: #e8f4f8;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .error { background: #ffe6e6; border-color: #ffaaaa; }
+    .success { background: #e8f5e8; border-color: #aaffaa; }
+    .warning { background: #fff4e6; border-color: #ffddaa; }
+    button {
+      background: #007cba;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: #005a87; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 React Router & Desktop 渲染调试工具</h1>
+    
+    <div class="section">
+      <h2>1. 环境检测</h2>
+      <div id="env-check" class="debug-info">检测中...</div>
+    </div>
+    
+    <div class="section">
+      <h2>2. DOM 结构分析</h2>
+      <button onclick="analyzeDOMStructure()">分析DOM结构</button>
+      <div id="dom-analysis" class="debug-info">等待分析...</div>
+    </div>
+    
+    <div class="section">
+      <h2>3. React Router 状态</h2>
+      <button onclick="checkReactRouter()">检查Router状态</button>
+      <div id="router-status" class="debug-info">等待检查...</div>
+    </div>
+    
+    <div class="section">
+      <h2>4. API 连接测试</h2>
+      <button onclick="testAPIConnection()">测试API连接</button>
+      <div id="api-test" class="debug-info">等待测试...</div>
+    </div>
+    
+    <div class="section">
+      <h2>5. 生成诊断报告</h2>
+      <button onclick="generateReport()">生成完整报告</button>
+      <div id="full-report" class="debug-info">等待生成...</div>
+    </div>
+  </div>
+
+  <script>
+    // 环境检测
+    function checkEnvironment() {
+      const info = {
+        userAgent: navigator.userAgent,
+        isElectron: typeof window.electronAPI !== 'undefined',
+        location: window.location,
+        hasReact: typeof window.React !== 'undefined',
+        hasReactDOM: typeof window.ReactDOM !== 'undefined',
+        hasRouter: typeof window.ReactRouter !== 'undefined',
+        consoleErrors: [],
+        timestamp: new Date().toISOString()
+      };
+      
+      document.getElementById('env-check').textContent = JSON.stringify(info, null, 2);
+      return info;
+    }
+    
+    // DOM结构分析
+    function analyzeDOMStructure() {
+      try {
+        const rootElement = document.getElementById('root');
+        const analysis = {
+          hasRoot: !!rootElement,
+          rootChildren: rootElement ? rootElement.children.length : 0,
+          rootHTML: rootElement ? rootElement.innerHTML.substring(0, 500) + '...' : 'Not found',
+          titleBarExists: !!document.querySelector('.h-8.bg-\\[\\#2f2f2f\\]'),
+          layoutExists: !!document.querySelector('[class*="min-h-screen"]'),
+          outletExists: !!document.querySelector('[data-testid="outlet"]') || checkForOutletPattern(),
+          mainContentExists: !!document.querySelector('main'),
+          routerProviderExists: checkForReactRouterProvider()
+        };
+        
+        document.getElementById('dom-analysis').textContent = JSON.stringify(analysis, null, 2);
+        return analysis;
+      } catch (error) {
+        const errorInfo = { error: error.message, stack: error.stack };
+        document.getElementById('dom-analysis').textContent = JSON.stringify(errorInfo, null, 2);
+        return errorInfo;
+      }
+    }
+    
+    function checkForOutletPattern() {
+      // 检查是否有类似Outlet的元素模式
+      const elements = document.querySelectorAll('*');
+      let hasOutletPattern = false;
+      elements.forEach(el => {
+        if (el.textContent && el.textContent.includes('Outlet')) {
+          hasOutletPattern = true;
+        }
+      });
+      return hasOutletPattern;
+    }
+    
+    function checkForReactRouterProvider() {
+      // 检查React Router Provider是否存在
+      return window.location.pathname !== undefined && 
+             (typeof window.history !== 'undefined');
+    }
+    
+    // React Router状态检查
+    function checkReactRouter() {
+      try {
+        const routerInfo = {
+          currentPath: window.location.pathname,
+          currentHash: window.location.hash,
+          currentSearch: window.location.search,
+          historyLength: window.history.length,
+          hasHistoryAPI: typeof window.history.pushState !== 'undefined',
+          reactDevToolsPresent: typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined'
+        };
+        
+        // 尝试检测React应用状态
+        if (window.React && window.React.version) {
+          routerInfo.reactVersion = window.React.version;
+        }
+        
+        document.getElementById('router-status').textContent = JSON.stringify(routerInfo, null, 2);
+        return routerInfo;
+      } catch (error) {
+        const errorInfo = { error: error.message };
+        document.getElementById('router-status').textContent = JSON.stringify(errorInfo, null, 2);
+        return errorInfo;
+      }
+    }
+    
+    // API连接测试
+    async function testAPIConnection() {
+      try {
+        // 测试多个可能的后端端口
+        const testPorts = [3000, 3001, 3002];
+        const results = [];
+        
+        for (const port of testPorts) {
+          try {
+            const response = await fetch(`http://localhost:${port}/api/v1/health`, {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+              timeout: 5000
+            });
+            
+            results.push({
+              port: port,
+              status: response.status,
+              ok: response.ok,
+              data: response.ok ? await response.json() : null
+            });
+          } catch (err) {
+            results.push({
+              port: port,
+              error: err.message,
+              status: 'failed'
+            });
+          }
+        }
+        
+        document.getElementById('api-test').textContent = JSON.stringify(results, null, 2);
+        return results;
+      } catch (error) {
+        const errorInfo = { error: error.message };
+        document.getElementById('api-test').textContent = JSON.stringify(errorInfo, null, 2);
+        return errorInfo;
+      }
+    }
+    
+    // 生成完整报告
+    async function generateReport() {
+      const report = {
+        timestamp: new Date().toISOString(),
+        environment: checkEnvironment(),
+        domAnalysis: analyzeDOMStructure(),
+        routerStatus: checkReactRouter(),
+        apiTest: await testAPIConnection(),
+        consoleErrors: getConsoleErrors(),
+        recommendations: []
+      };
+      
+      // 添加建议
+      if (!report.domAnalysis.outletExists) {
+        report.recommendations.push("主内容区域缺失 - 可能是React Router的Outlet组件未正确渲染");
+      }
+      
+      if (!report.apiTest.some(test => test.ok)) {
+        report.recommendations.push("API连接失败 - 后端服务可能未启动或端口配置错误");
+      }
+      
+      if (!report.environment.isElectron) {
+        report.recommendations.push("非Electron环境 - 在浏览器中测试可能与Desktop应用行为不同");
+      }
+      
+      document.getElementById('full-report').textContent = JSON.stringify(report, null, 2);
+      return report;
+    }
+    
+    // 获取控制台错误
+    function getConsoleErrors() {
+      // 这个函数需要在页面加载前设置才能捕获所有错误
+      return window.consoleErrors || [];
+    }
+    
+    // 捕获控制台错误
+    window.consoleErrors = [];
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+      window.consoleErrors.push({
+        timestamp: new Date().toISOString(),
+        message: args.join(' ')
+      });
+      originalConsoleError.apply(console, args);
+    };
+    
+    // 页面加载完成后自动执行环境检测
+    document.addEventListener('DOMContentLoaded', function() {
+      checkEnvironment();
+    });
+  </script>
+</body>
+</html>

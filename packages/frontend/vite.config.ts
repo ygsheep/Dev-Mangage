@@ -25,11 +25,11 @@ export default defineConfig({
       },
     },
   },
+  // 为Electron设置相对路径基础URL
+  base: './',
   build: {
     outDir: 'dist',
     sourcemap: true,
-    // 为Electron设置相对路径
-    base: './',
   },
   publicDir: 'static',
 })

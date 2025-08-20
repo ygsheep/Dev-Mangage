@@ -25,6 +25,7 @@
     "db:seed": "tsx src/scripts/seed.ts"
   },
   "dependencies": {
+    "@devapi/database": "file:../database",
     "@devapi/shared": "file:../shared",
     "@prisma/client": "^5.22.0",
     "axios": "^1.6.0",

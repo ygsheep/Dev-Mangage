@@ -1,4 +1,4 @@
-import { prisma } from '@devapi/backend/prisma'
+import { getPrismaClient } from './database/index.js'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import cors from 'cors'
 import dotenv from 'dotenv'
@@ -23,6 +23,7 @@ async function initializeSearchIndexes() {
     return // 使用缓存的索引
   }
 
+  const prisma = getPrismaClient();
   const [projects, apis, tags] = await Promise.all([
     prisma.project.findMany({
       select: {

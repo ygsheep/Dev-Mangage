@@ -1,11 +1,15 @@
+import { useQuery } from '@tanstack/react-query'
 import {
   Archive,
-  BarChart3,
+  Bug,
   ChevronDown,
+  Code2,
+  Database,
   Folder,
   HelpCircle,
   Home,
   Languages,
+  Layers,
   LogOut,
   Menu,
   MessageSquare,
@@ -19,6 +23,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
 import { debug, useDebugComponent } from '../../debug'
+import { apiMethods } from '../../utils/api'
 import QuickSearch from '../features/search/components/QuickSearch'
 import './Layout.css'
 
@@ -34,6 +39,59 @@ const Layout: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const { isDark, toggleDarkMode } = useTheme()
   const userMenuRef = useRef<HTMLDivElement>(null)
+
+  // 选中的项目状态管理
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
+    // 从localStorage读取上次选择的项目
+    return localStorage.getItem('devapi-selected-project') || null
+  })
+
+  // 检测是否在项目页面，并获取项目ID
+  const projectMatch = location.pathname.match(/^\/projects\/([a-f0-9\-]{36})/)
+  const currentProjectIdFromPath = projectMatch ? projectMatch[1] : null
+
+  // 从查询参数中获取项目ID
+  const searchParams = new URLSearchParams(location.search)
+  const currentProjectIdFromQuery = searchParams.get('project')
+
+  // 优先使用路径中的项目ID，其次使用查询参数中的项目ID
+  const currentProjectId = currentProjectIdFromPath || currentProjectIdFromQuery
+  const isInProject = !!currentProjectId
+
+  // 当进入项目页面时，自动设置选中的项目
+  useEffect(() => {
+    if (currentProjectId && currentProjectId !== selectedProjectId) {
+      setSelectedProjectId(currentProjectId)
+      localStorage.setItem('devapi-selected-project', currentProjectId)
+    }
+  }, [currentProjectId, selectedProjectId])
+
+  // 使用选中的项目ID（优先使用当前路由的项目ID）
+  const activeProjectId = currentProjectId || selectedProjectId
+
+  // 辅助函数：截断长文本
+  const truncateText = (text: string, maxLength: number = 20): string => {
+    if (!text) return ''
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text
+  }
+
+  // 获取当前项目信息 - 使用activeProjectId以确保数据一致
+  const {
+    data: projectData,
+    isLoading: isProjectLoading,
+    error: projectError,
+  } = useQuery({
+    queryKey: ['project', activeProjectId],
+    queryFn: () => apiMethods.getProject(activeProjectId!),
+    enabled: !!activeProjectId,
+  })
+
+  // 获取项目列表用于侧边栏导航
+  const { data: projectsData } = useQuery({
+    queryKey: ['projects-sidebar'],
+    queryFn: () => apiMethods.getProjects({ limit: 10 }),
+    staleTime: 30000,
+  })
 
   // 检测是否为desktop模式
   const isDesktopMode = window.electronAPI !== undefined
@@ -89,6 +147,34 @@ const Layout: React.FC = () => {
         'Layout'
       )
     }
+  }
+
+  // 项目选择处理逻辑
+  const handleProjectSelect = (e: React.MouseEvent, projectId: string) => {
+    e.preventDefault() // 阻止默认导航
+
+    setSelectedProjectId(projectId)
+    localStorage.setItem('devapi-selected-project', projectId)
+
+    debug.log(
+      '选择项目',
+      {
+        projectId,
+        currentPath: location.pathname,
+        previousProjectId: currentProjectId,
+      },
+      'Layout'
+    )
+
+    // 导航到项目总览页面
+    navigate(`/projects/${projectId}`)
+  }
+
+  // 清除项目选择
+  const clearProjectSelection = () => {
+    setSelectedProjectId(null)
+    localStorage.removeItem('devapi-selected-project')
+    navigate('/')
   }
 
   // 点击外部关闭用户菜单
@@ -178,16 +264,60 @@ const Layout: React.FC = () => {
   const navigation = [{ name: '新建对话', href: '/chats/', icon: Plus, isAction: true }]
   const mainNavigation = [
     { name: '首页', href: '/', icon: Home },
-    { name: '项目', href: '/projects', icon: Folder },
+    { name: '项目', href: '/manage/projects', icon: Folder },
     { name: '对话', href: '/chats', icon: MessageSquare },
     { name: '归档', href: '/archive', icon: Archive },
-    { name: '仪表板', href: '/dashboard', icon: BarChart3 },
   ]
+
+  // 当选中项目时的项目功能导航
+  const projectFunctionNavigation = activeProjectId
+    ? [
+        { name: 'API接口管理', href: `/manage/apis?project=${activeProjectId}`, icon: Code2 },
+        {
+          name: '数据模型管理',
+          href: `/manage/data-models?project=${activeProjectId}`,
+          icon: Database,
+        },
+        { name: '功能模块管理', href: `/projects/${activeProjectId}/features`, icon: Layers },
+        { name: 'Issues管理', href: `/projects/${activeProjectId}/issues`, icon: Bug },
+      ]
+    : []
 
   const isActive = (href: string) => {
     if (href === '/') {
       return location.pathname === '/'
     }
+
+    // 处理带查询参数的链接
+    if (href.includes('?')) {
+      const [hrefPath, hrefQuery] = href.split('?')
+      const currentPath = location.pathname
+      const currentQuery = location.search.slice(1) // 移除开头的?
+
+      // 路径必须匹配，查询参数也要检查
+      if (currentPath === hrefPath) {
+        // 如果有查询参数，检查是否包含相同的参数
+        if (hrefQuery && currentQuery) {
+          const hrefParams = new URLSearchParams(hrefQuery)
+          const currentParams = new URLSearchParams(currentQuery)
+          // 检查href中的所有参数是否在当前URL中都存在且值相同
+          for (const [key, value] of hrefParams.entries()) {
+            if (currentParams.get(key) !== value) {
+              return false
+            }
+          }
+          return true
+        }
+        return !hrefQuery // 如果href没有查询参数，但路径匹配，则激活
+      }
+      return false
+    }
+
+    // 项目链接的特殊处理
+    if (href.startsWith('/projects/')) {
+      return location.pathname.startsWith(href)
+    }
+
     return location.pathname.startsWith(href)
   }
 
@@ -197,9 +327,9 @@ const Layout: React.FC = () => {
       <div
         className={`claude-sidebar group flex-shrink-0 text-[#b8b8b8] transition-all duration-300 ${
           isSidebarCollapsed
-            ? 'w-16 bg-[#2f2f2f] hover:bg-[#1F1E1D] cursor-pointer'
+            ? 'w-12 bg-[#2f2f2f] hover:bg-[#1F1E1D] cursor-pointer'
             : 'w-64 bg-[#2f2f2f]'
-        }`}
+        } ${isDesktopMode ? 'pb-8' : ''}`}
         title={isSidebarCollapsed ? '点击展开侧边栏' : ''}
       >
         <div className="flex h-full flex-col" onClick={e => e.stopPropagation()}>
@@ -208,10 +338,10 @@ const Layout: React.FC = () => {
             <div className="flex items-center gap-2 w-full">
               <button
                 onClick={toggleSidebar}
-                className="px-3 py-2 rounded hover:bg-[#404040] transition-colors duration-300 flex-shrink-0"
+                className="px-2 py-2 rounded hover:bg-[#404040] transition-colors duration-300 flex-shrink-0"
                 title={isSidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
               >
-                <Menu className="h-4 w-4" />
+                <Menu className="w-3 h-3" />
               </button>
               <div
                 className={`overflow-hidden transition-all duration-300 flex-1 flex justify-center ${
@@ -230,12 +360,12 @@ const Layout: React.FC = () => {
                 onClick={() => setIsSearchOpen(true)}
                 className={`w-full flex items-center text-sm rounded-lg transition-all duration-300 ${
                   isSidebarCollapsed
-                    ? 'justify-center w-10 h-10 hover:bg-[#404040]'
+                    ? 'justify-center w-6 h-6 hover:bg-[#404040]'
                     : 'px-3 py-2 text-[#b8b8b8] bg-[#404040] hover:bg-[#505050]'
                 }`}
                 title={isSidebarCollapsed ? '搜索' : '搜索项目、API...'}
               >
-                <Search className="h-4 w-4 flex-shrink-0" />
+                <Search className="w-3 h-3 flex-shrink-0" />
                 <div
                   className={`overflow-hidden transition-all duration-300 ${
                     isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
@@ -262,10 +392,10 @@ const Layout: React.FC = () => {
                       : active
                         ? 'bg-[#404040] text-white'
                         : 'hover:bg-[#404040] hover:text-white'
-                  } ${isSidebarCollapsed ? 'justify-center w-10 h-10' : 'px-3 py-2.5'}`}
+                  } ${isSidebarCollapsed ? 'justify-center w-6 h-6' : 'px-3 py-2.5'}`}
                   title={isSidebarCollapsed ? item.name : ''}
                 >
-                  <item.icon className="h-4 w-4 flex-shrink-0" />
+                  <item.icon className="w-3 h-3 flex-shrink-0" />
                   <div
                     className={`overflow-hidden transition-all duration-300 ${
                       isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
@@ -296,10 +426,10 @@ const Layout: React.FC = () => {
                       : isSidebarCollapsed
                         ? 'hover:bg-[#d97757] hover:text-white'
                         : 'hover:bg-[#404040] hover:text-white'
-                  } ${isSidebarCollapsed ? 'justify-center w-10 h-10' : 'px-3 py-2'}`}
+                  } ${isSidebarCollapsed ? 'justify-center w-6 h-6' : 'px-3 py-2'}`}
                   title={isSidebarCollapsed ? item.name : ''}
                 >
-                  <item.icon className="h-4 w-4 flex-shrink-0" />
+                  <item.icon className="w-3 h-3 flex-shrink-0" />
                   <div
                     className={`overflow-hidden transition-all duration-300 ${
                       isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
@@ -310,6 +440,103 @@ const Layout: React.FC = () => {
                 </Link>
               )
             })}
+
+            {/* 当前选中的项目显示 */}
+            {activeProjectId && (
+              <>
+                {!isSidebarCollapsed && (
+                  <div className="pt-4 pb-2">
+                    <div className="px-2 flex items-center justify-between">
+                      <div className="text-xs font-semibold text-[#888] uppercase tracking-wider">
+                        当前项目
+                      </div>
+                      <button
+                        onClick={clearProjectSelection}
+                        className="text-xs text-[#888] hover:text-white transition-colors"
+                        title="切换项目"
+                      >
+                        切换
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 当前项目信息 - 可点击跳转到项目总览 */}
+                <Link
+                  to={`/projects/${activeProjectId}`}
+                  className={`mx-3 mb-2 block p-2 bg-[#404040] rounded-lg hover:bg-[#4a4a4a] transition-colors ${isSidebarCollapsed ? 'px-1' : ''}`}
+                  title={isSidebarCollapsed ? '点击查看项目总览' : ''}
+                >
+                  {isSidebarCollapsed ? (
+                    <div className="w-full h-8 bg-primary-600 rounded flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">
+                        {projectData?.data?.project?.name?.charAt(0).toUpperCase() || 'P'}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 bg-primary-600 rounded flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-[10px] font-bold">
+                          {projectData?.data?.project?.name?.charAt(0).toUpperCase() || 'P'}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-sm font-medium truncate">
+                          {projectData?.data?.project?.name || '加载中...'}
+                        </p>
+                        <p
+                          className="text-[#888] text-xs truncate"
+                          title={projectData?.data?.project?.description}
+                        >
+                          {projectData?.data?.project?.description
+                            ? truncateText(projectData.data.project.description, 25)
+                            : '暂无项目描述'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </Link>
+
+                {/* 项目功能导航 */}
+                {!isSidebarCollapsed && (
+                  <div className="pb-2">
+                    <div className="px-2">
+                      <div className="text-xs font-semibold text-[#888] uppercase tracking-wider">
+                        项目功能
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {projectFunctionNavigation.map(item => {
+                  const active = isActive(item.href)
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={e => handleMainNavClick(e, item.href)}
+                      className={`claude-nav-item group flex items-center text-sm rounded-lg transition-all duration-300 mx-3 mb-1 ${
+                        active
+                          ? 'bg-[#404040] text-white'
+                          : isSidebarCollapsed
+                            ? 'hover:bg-[#d97757] hover:text-white'
+                            : 'hover:bg-[#404040] hover:text-white'
+                      } ${isSidebarCollapsed ? 'justify-center w-6 h-6' : 'px-3 py-2'}`}
+                      title={isSidebarCollapsed ? item.name : ''}
+                    >
+                      <item.icon className="w-3 h-3 flex-shrink-0" />
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ${
+                          isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
+                        }`}
+                      >
+                        <span className="whitespace-nowrap">{item.name}</span>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </>
+            )}
           </div>
 
           {/* 间隔区域 - 收起时点击可展开 */}
@@ -324,13 +551,13 @@ const Layout: React.FC = () => {
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className={`claude-user-btn flex items-center rounded-lg hover:bg-[#404040] transition-colors duration-300 ${
-                  isSidebarCollapsed ? 'justify-center w-10 h-10' : 'w-full px-2 py-2'
+                  isSidebarCollapsed ? 'justify-center w-6 h-6' : 'w-full px-2 py-2'
                 }`}
                 title={isSidebarCollapsed ? '用户菜单' : ''}
               >
                 <div className="flex-shrink-0">
-                  <div className="h-6 w-6 rounded bg-[#d97757] flex items-center justify-center">
-                    <span className="text-xs font-medium text-white">D</span>
+                  <div className="h-4 w-4 rounded bg-[#d97757] flex items-center justify-center">
+                    <span className="text-[10px] font-medium text-white">D</span>
                   </div>
                 </div>
                 <div
@@ -344,7 +571,7 @@ const Layout: React.FC = () => {
                       <p className="text-xs text-[#888] whitespace-nowrap">免费计划</p>
                     </div>
                     <ChevronDown
-                      className={`h-4 w-4 transition-transform duration-200 flex-shrink-0 ml-2 ${
+                      className={`h-3 w-3 transition-transform duration-200 flex-shrink-0 ml-2 ${
                         isUserMenuOpen ? 'rotate-180' : ''
                       }`}
                     />
@@ -373,7 +600,7 @@ const Layout: React.FC = () => {
                     onClick={toggleDarkMode}
                     className="w-full flex items-center px-3 py-2 text-sm hover:bg-[#404040] transition-colors duration-200"
                   >
-                    {isDark ? <Sun className="h-4 w-4 mr-3" /> : <Moon className="h-4 w-4 mr-3" />}
+                    {isDark ? <Sun className="w-3 h-3 mr-3" /> : <Moon className="w-3 h-3 mr-3" />}
                     {isDark ? '浅色模式' : '暗色模式'}
                   </button>
 
@@ -382,23 +609,23 @@ const Layout: React.FC = () => {
                     className="w-full flex items-center px-3 py-2 text-sm hover:bg-[#404040] transition-colors duration-200"
                     onClick={() => setIsUserMenuOpen(false)}
                   >
-                    <Settings className="h-4 w-4 mr-3" />
+                    <Settings className="w-3 h-3 mr-3" />
                     设置
                   </Link>
 
                   <button className="w-full flex items-center px-3 py-2 text-sm hover:bg-[#404040] transition-colors duration-200">
-                    <Languages className="h-4 w-4 mr-3" />
+                    <Languages className="w-3 h-3 mr-3" />
                     语言
                   </button>
 
                   <button className="w-full flex items-center px-3 py-2 text-sm hover:bg-[#404040] transition-colors duration-200">
-                    <HelpCircle className="h-4 w-4 mr-3" />
+                    <HelpCircle className="w-3 h-3 mr-3" />
                     获取帮助
                   </button>
 
                   <div className="mt-1 pt-1">
                     <button className="w-full flex items-center px-3 py-2 text-sm hover:bg-[#404040] transition-colors duration-200">
-                      <LogOut className="h-4 w-4 mr-3" />
+                      <LogOut className="w-3 h-3 mr-3" />
                       登出
                     </button>
                   </div>
@@ -418,7 +645,7 @@ const Layout: React.FC = () => {
               onClick={() => setIsSearchOpen(true)}
               className="w-full max-w-md flex items-center px-4 py-2 text-sm text-text-tertiary bg-bg-secondary rounded-lg hover:bg-bg-tertiary transition-colors duration-200"
             >
-              <Search className="h-4 w-4 mr-3" />
+              <Search className="w-3 h-3 mr-3" />
               <span className="mr-auto">搜索项目、API...</span>
               <div className="flex items-center space-x-1">
                 <kbd className="px-1.5 py-0.5 text-xs bg-bg-paper border border-border-primary rounded">
@@ -433,7 +660,9 @@ const Layout: React.FC = () => {
         )}
 
         {/* 主内容区域 - 独立的滚动容器，滚动条只在这个区域内 */}
-        <main className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+        <main
+          className={`flex-1 p-6 overflow-y-auto custom-scrollbar ${isDesktopMode ? 'pb-8' : ''}`}
+        >
           <Outlet />
         </main>
       </div>

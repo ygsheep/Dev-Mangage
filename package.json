@@ -12,6 +12,7 @@
     "dev:backend": "npm run dev --workspace=packages/backend",
     "dev:frontend": "npm run dev --workspace=packages/frontend",
     "dev:mcp": "npm run dev --workspace=packages/mcp-server",
+    "dev:desktop": "npm run dev --workspace=packages/desktop",
     "start": "node start-dev.js",
     "build": "npm run build --workspaces",
     "build:backend": "npm run build --workspace=packages/backend",

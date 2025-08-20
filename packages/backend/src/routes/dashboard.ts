@@ -292,11 +292,6 @@ async function getPopularApis(projectId?: string) {
         select: {
           name: true
         }
-      },
-      endpointTags: {
-        include: {
-          tag: true
-        }
       }
     },
     take: 10,
@@ -311,7 +306,7 @@ async function getPopularApis(projectId?: string) {
     method: api.method,
     path: api.path,
     project: api.project.name,
-    tags: api.endpointTags.map(at => at.tag.name),
+    tags: [], // APIEndpoint模型暂时没有tags关系
     // 模拟使用次数
     usageCount: Math.floor(Math.random() * 1000) + 100
   }));

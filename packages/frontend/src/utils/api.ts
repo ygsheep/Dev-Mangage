@@ -134,8 +134,8 @@ export const createAPI = async (data: any) => {
  * @param apis - API接口数据数组
  * @returns 批量创建结果
  */
-export const createBatchAPIs = async (apis: any[]) => {
-  return apiClient.post('/apis/batch', { apis })
+export const createBatchAPIs = async (projectId: string, apis: any[]) => {
+  return apiClient.post('/apis/batch', { projectId, apis })
 }
 
 /**
@@ -241,8 +241,8 @@ export const deleteDataTable = async (id: string) => {
   return apiClient.delete(`/data-models/${id}`)
 }
 
-export const createBatchDataTables = async (tables: any[]) => {
-  return apiClient.post('/data-models/batch', { tables })
+export const createBatchDataTables = async (projectId: string, tables: any[]) => {
+  return apiClient.post('/data-models/batch', { projectId, tables })
 }
 
 // 思维导图相关API
@@ -612,6 +612,10 @@ export const getFeatureModuleStats = async (projectId: string) => {
   return apiClient.get(`/features/${projectId}/modules/stats`)
 }
 
+export const createBatchFeatureModules = async (projectId: string, modules: any[]) => {
+  return apiClient.post(`/features/${projectId}/modules/batch`, { modules })
+}
+
 // 代码模板管理API
 export const getCodeTemplates = async (filters?: {
   category?: string
@@ -693,7 +697,7 @@ export const importCodeTemplates = async (file: File) => {
  * @returns Issues 列表数据
  */
 export const getIssues = async (
-  projectId: string,
+  projectId?: string,
   filters?: {
     status?: string
     priority?: string
@@ -704,7 +708,9 @@ export const getIssues = async (
     limit?: number
   }
 ) => {
-  return apiClient.get(`/${projectId}/issues`, { params: filters })
+  // 如果没有项目ID，获取全局Issues
+  const url = projectId ? `/${projectId}/issues` : '/issues'
+  return apiClient.get(url, { params: filters })
 }
 
 /**
@@ -1122,6 +1128,7 @@ export const apiMethods = {
   updateFeatureModule,
   deleteFeatureModule,
   getFeatureModuleStats,
+  createBatchFeatureModules,
   // 代码模板管理
   getCodeTemplates,
   getCodeTemplate,

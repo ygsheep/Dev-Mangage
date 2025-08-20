@@ -9,10 +9,12 @@
   },
   "homepage": "https://github.com/devapi-team/devapi-manager",
   "scripts": {
-    "dev": "concurrently \"npm run build:watch\" \"electron dist/main.js\"",
+    "dev": "concurrently \"npm run build:watch\" \"electron dist/main.js\" --kill-others",
+    "dev:prod": "NODE_ENV=production npm run dev",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "start": "electron dist/main.js",
+    "start:dev": "cross-env NODE_ENV=development ELECTRON_IS_DEV=1 electron dist/main.js",
     "pack": "electron-builder --dir",
     "dist": "npm run build && electron-builder",
     "build:win": "npm run build && electron-builder --win",
@@ -30,6 +32,7 @@
   "devDependencies": {
     "@types/node": "^20.9.0",
     "concurrently": "^8.2.2",
+    "cross-env": "^10.0.0",
     "electron": "27.1.3",
     "electron-builder": "^24.6.4",
     "typescript": "^5.2.2"

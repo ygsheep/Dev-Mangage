@@ -376,7 +376,7 @@ export class VectorSearchService {
     
     try {
       // 从数据库获取所有项目、API和标签数据
-      const { prisma } = await import('@devapi/backend/prisma');
+      const prisma = (await import('./database/index.js')).getPrismaClient();
       
       const [projects, apis, tags] = await Promise.all([
         prisma.project.findMany({
@@ -413,7 +413,7 @@ export class VectorSearchService {
       const documents: Document[] = [];
 
       // 添加项目文档
-      projects.forEach(project => {
+      projects.forEach((project: any) => {
         documents.push({
           id: `project-${project.id}`,
           content: `项目名称: ${project.name}${project.description ? `\n描述: ${project.description}` : ''}`,
@@ -422,7 +422,7 @@ export class VectorSearchService {
       });
 
       // 添加API文档
-      apis.forEach(api => {
+      apis.forEach((api: any) => {
         const content = [
           `API名称: ${api.name}`,
           `请求方法: ${api.method}`,
@@ -440,7 +440,7 @@ export class VectorSearchService {
       });
 
       // 添加标签文档
-      tags.forEach(tag => {
+      tags.forEach((tag: any) => {
         documents.push({
           id: `tag-${tag.id}`,
           content: `标签名称: ${tag.name}`,

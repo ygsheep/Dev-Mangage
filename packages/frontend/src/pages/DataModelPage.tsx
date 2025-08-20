@@ -42,9 +42,16 @@ import { toast } from 'react-hot-toast'
 
 type TabType = 'overview' | 'diagram' | 'relationships' | 'sql' | 'versions' | 'ai' | 'performance' | 'migration' | 'collaboration' | 'permissions'
 
-const DataModelPage: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>()
+interface DataModelPageProps {
+  projectIdFromQuery?: string
+}
+
+const DataModelPage: React.FC<DataModelPageProps> = ({ projectIdFromQuery }) => {
+  const { projectId: projectIdFromParams } = useParams<{ projectId: string }>()
   const navigate = useNavigate()
+  
+  // 优先使用查询参数传入的项目ID，否则使用路径参数中的项目ID
+  const projectId = projectIdFromQuery || projectIdFromParams
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [tables, setTables] = useState<DatabaseTable[]>([])
   const [relationships, setRelationships] = useState<TableRelationship[]>([])
