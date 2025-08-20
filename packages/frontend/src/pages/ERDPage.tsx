@@ -1,37 +1,36 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { 
-  ArrowLeft, 
-  Database, 
-  Settings, 
-  Download, 
-  Maximize2,
-  Grid,
+import { useQuery } from '@tanstack/react-query'
+import {
+  ArrowLeft,
+  Database,
   Eye,
   EyeOff,
-  HelpCircle
-} from 'lucide-react';
-import ERDViewer from '../components/features/data-visualization/ERDViewer';
-import { api } from '../utils/api';
+  Grid,
+  HelpCircle,
+  Maximize2,
+  Settings,
+} from 'lucide-react'
+import React, { useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import ERDViewer from '../components/features/data-visualization/ERDViewer'
+import { api } from '../utils/api'
 
 export const ERDPage: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>();
-  const [showMinimap, setShowMinimap] = useState(true);
-  const [showBackground, setShowBackground] = useState(true);
-  const [allowEditing, setAllowEditing] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { projectId } = useParams<{ projectId: string }>()
+  const [showMinimap, setShowMinimap] = useState(true)
+  const [showBackground, setShowBackground] = useState(true)
+  const [allowEditing, setAllowEditing] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   // 获取项目信息
   const { data: project, isLoading: projectLoading } = useQuery({
     queryKey: ['project', projectId],
     queryFn: async () => {
-      if (!projectId) throw new Error('Project ID is required');
-      const response = await api.get(`/api/v1/projects/${projectId}`);
-      return response.data;
+      if (!projectId) throw new Error('Project ID is required')
+      const response = await api.get(`/api/v1/projects/${projectId}`)
+      return response.data
     },
     enabled: !!projectId,
-  });
+  })
 
   if (!projectId) {
     return (
@@ -46,43 +45,43 @@ export const ERDPage: React.FC = () => {
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
   const toggleFullscreen = () => {
     if (!isFullscreen) {
-      document.documentElement.requestFullscreen();
+      document.documentElement.requestFullscreen()
     } else {
-      document.exitFullscreen();
+      document.exitFullscreen()
     }
-    setIsFullscreen(!isFullscreen);
-  };
+    setIsFullscreen(!isFullscreen)
+  }
 
   return (
     <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-bg-paper' : 'space-y-6'}`}>
       {/* 页面头部 */}
-      <div className={`${isFullscreen ? 'p-4' : ''} ${isFullscreen ? 'border-b border-gray-200' : 'bg-bg-paper rounded-lg shadow-md p-6'}`}>
+      <div
+        className={`${isFullscreen ? 'p-4' : ''} ${isFullscreen ? 'border-b border-gray-200' : 'bg-bg-paper rounded-lg shadow-md p-6'}`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {!isFullscreen && (
               <Link
                 to={`/projects/${projectId}/data-model`}
-                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
+                className="p-2 text-text-secondary hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
                 title="返回数据模型"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Link>
             )}
-            
+
             <div>
               <div className="flex items-center gap-2">
                 <Database className="w-6 h-6 text-blue-600" />
-                <h1 className="text-2xl font-bold text-gray-900">实体关系图 (ERD)</h1>
+                <h1 className="text-2xl font-bold text-text-primary">实体关系图 (ERD)</h1>
               </div>
               {project && (
-                <p className="text-gray-600 mt-1">
-                  {project.name} - 数据库表关系可视化
-                </p>
+                <p className="text-text-secondary mt-1">{project.name} - 数据库表关系可视化</p>
               )}
             </div>
           </div>
@@ -94,33 +93,33 @@ export const ERDPage: React.FC = () => {
               <button
                 onClick={() => setShowMinimap(!showMinimap)}
                 className={`p-2 rounded transition-colors ${
-                  showMinimap 
-                    ? 'bg-bg-paper text-blue-600 shadow-sm' 
-                    : 'text-gray-600 hover:text-blue-600'
+                  showMinimap
+                    ? 'bg-bg-paper text-blue-600 shadow-sm'
+                    : 'text-text-secondary hover:text-blue-600'
                 }`}
                 title={showMinimap ? '隐藏小地图' : '显示小地图'}
               >
                 {showMinimap ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
-              
+
               <button
                 onClick={() => setShowBackground(!showBackground)}
                 className={`p-2 rounded transition-colors ${
-                  showBackground 
-                    ? 'bg-bg-paper text-blue-600 shadow-sm' 
-                    : 'text-gray-600 hover:text-blue-600'
+                  showBackground
+                    ? 'bg-bg-paper text-blue-600 shadow-sm'
+                    : 'text-text-secondary hover:text-blue-600'
                 }`}
                 title={showBackground ? '隐藏网格背景' : '显示网格背景'}
               >
                 <Grid className="w-4 h-4" />
               </button>
-              
+
               <button
                 onClick={() => setAllowEditing(!allowEditing)}
                 className={`p-2 rounded transition-colors ${
-                  allowEditing 
-                    ? 'bg-bg-paper text-orange-600 shadow-sm' 
-                    : 'text-gray-600 hover:text-orange-600'
+                  allowEditing
+                    ? 'bg-bg-paper text-orange-600 shadow-sm'
+                    : 'text-text-secondary hover:text-orange-600'
                 }`}
                 title={allowEditing ? '禁用编辑模式' : '启用编辑模式'}
               >
@@ -131,7 +130,7 @@ export const ERDPage: React.FC = () => {
             {/* 全屏按钮 */}
             <button
               onClick={toggleFullscreen}
-              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
+              className="p-2 text-text-secondary hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
               title={isFullscreen ? '退出全屏' : '进入全屏'}
             >
               <Maximize2 className="w-5 h-5" />
@@ -141,9 +140,11 @@ export const ERDPage: React.FC = () => {
             <button
               onClick={() => {
                 // 这里可以显示帮助对话框
-                alert('ERD 帮助:\n\n• 拖拽表格来重新排列\n• 使用鼠标滚轮缩放\n• 点击表格标题可以折叠/展开字段\n• 蓝色线条表示外键关系\n• 黄色图标表示主键\n• 蓝色图标表示外键');
+                alert(
+                  'ERD 帮助:\n\n• 拖拽表格来重新排列\n• 使用鼠标滚轮缩放\n• 点击表格标题可以折叠/展开字段\n• 蓝色线条表示外键关系\n• 黄色图标表示主键\n• 蓝色图标表示外键'
+                )
               }}
-              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
+              className="p-2 text-text-secondary hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded-lg transition-colors"
               title="查看帮助"
             >
               <HelpCircle className="w-5 h-5" />
@@ -172,11 +173,21 @@ export const ERDPage: React.FC = () => {
             <div>
               <h3 className="font-medium text-blue-900 mb-2">使用说明</h3>
               <div className="text-sm text-blue-800 space-y-1">
-                <p>• <span className="font-medium">拖拽移动:</span> 拖拽表格来重新排列位置</p>
-                <p>• <span className="font-medium">缩放视图:</span> 使用鼠标滚轮或右侧控制按钮</p>
-                <p>• <span className="font-medium">折叠表格:</span> 点击表格标题右侧的眼睛图标</p>
-                <p>• <span className="font-medium">关系线条:</span> 蓝色线条表示外键关系，箭头指向被引用的表</p>
-                <p>• <span className="font-medium">字段图标:</span> 
+                <p>
+                  • <span className="font-medium">拖拽移动:</span> 拖拽表格来重新排列位置
+                </p>
+                <p>
+                  • <span className="font-medium">缩放视图:</span> 使用鼠标滚轮或右侧控制按钮
+                </p>
+                <p>
+                  • <span className="font-medium">折叠表格:</span> 点击表格标题右侧的眼睛图标
+                </p>
+                <p>
+                  • <span className="font-medium">关系线条:</span>{' '}
+                  蓝色线条表示外键关系，箭头指向被引用的表
+                </p>
+                <p>
+                  • <span className="font-medium">字段图标:</span>
                   <span className="inline-flex items-center gap-1 ml-1">
                     黄色钥匙 = 主键，蓝色井号 = 外键，灰色类型 = 普通字段
                   </span>
@@ -187,7 +198,7 @@ export const ERDPage: React.FC = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ERDPage;
+export default ERDPage

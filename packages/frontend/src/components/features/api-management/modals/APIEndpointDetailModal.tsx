@@ -169,7 +169,7 @@ export const APIEndpointDetailModal: React.FC<APIEndpointDetailModalProps> = ({
           </nav>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
           {/* 基本信息 */}
           {activeTab === 0 && (
             <div className="space-y-6">
@@ -355,7 +355,7 @@ export const APIEndpointDetailModal: React.FC<APIEndpointDetailModalProps> = ({
                 <div>
                   <h3 className="text-lg font-medium text-text-primary mb-4">请求体示例</h3>
                   <div className="relative">
-                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto custom-scrollbar text-sm">
                       <code>{JSON.stringify(endpoint.requestBodyExample, null, 2)}</code>
                     </pre>
                     <button
@@ -393,7 +393,7 @@ export const APIEndpointDetailModal: React.FC<APIEndpointDetailModalProps> = ({
                         </div>
                         {response.example && (
                           <div className="relative mt-3">
-                            <pre className="bg-bg-tertiary p-3 rounded text-sm overflow-x-auto">
+                            <pre className="bg-bg-tertiary p-3 rounded text-sm overflow-x-auto custom-scrollbar">
                               <code>{JSON.stringify(response.example, null, 2)}</code>
                             </pre>
                             <button
@@ -425,7 +425,7 @@ export const APIEndpointDetailModal: React.FC<APIEndpointDetailModalProps> = ({
                 <div>
                   <h3 className="text-lg font-medium text-text-primary mb-4">cURL</h3>
                   <div className="relative">
-                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto custom-scrollbar text-sm">
                       <code>{`curl -X ${endpoint.method} \\\n  "${endpoint.baseUrl || 'https://api.example.com'}${endpoint.path}" \\\n  -H "Content-Type: application/json"`}</code>
                     </pre>
                     <button
@@ -441,7 +441,7 @@ export const APIEndpointDetailModal: React.FC<APIEndpointDetailModalProps> = ({
                 <div>
                   <h3 className="text-lg font-medium text-text-primary mb-4">JavaScript</h3>
                   <div className="relative">
-                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto custom-scrollbar text-sm">
                       <code>{`fetch('${endpoint.baseUrl || 'https://api.example.com'}${endpoint.path}', {\n  method: '${endpoint.method}',\n  headers: {\n    'Content-Type': 'application/json'\n  }\n})\n.then(response => response.json())\n.then(data => console.log(data));`}</code>
                     </pre>
                     <button
@@ -457,7 +457,7 @@ export const APIEndpointDetailModal: React.FC<APIEndpointDetailModalProps> = ({
                 <div>
                   <h3 className="text-lg font-medium text-text-primary mb-4">Python</h3>
                   <div className="relative">
-                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto custom-scrollbar text-sm">
                       <code>{`import requests\n\nresponse = requests.${endpoint.method.toLowerCase()}(\n    '${endpoint.baseUrl || 'https://api.example.com'}${endpoint.path}',\n    headers={'Content-Type': 'application/json'}\n)\nprint(response.json())`}</code>
                     </pre>
                     <button
@@ -473,7 +473,7 @@ export const APIEndpointDetailModal: React.FC<APIEndpointDetailModalProps> = ({
                 <div>
                   <h3 className="text-lg font-medium text-text-primary mb-4">PHP</h3>
                   <div className="relative">
-                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto custom-scrollbar text-sm">
                       <code>{`<?php\n$response = file_get_contents(\n    '${endpoint.baseUrl || 'https://api.example.com'}${endpoint.path}',\n    false,\n    stream_context_create([\n        'http' => [\n            'method' => '${endpoint.method}',\n            'header' => 'Content-Type: application/json'\n        ]\n    ])\n);\necho $response;\n?>`}</code>
                     </pre>
                     <button

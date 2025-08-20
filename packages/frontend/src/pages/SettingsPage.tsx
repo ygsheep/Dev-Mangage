@@ -1,21 +1,21 @@
-import React, { useState } from 'react'
-import { 
-  Settings, 
-  Server, 
-  Database, 
-  Search, 
-  Palette, 
-  Bell, 
-  Shield,
-  Info,
-  Copy,
+import {
+  Bell,
   Code,
+  Copy,
+  Database,
   Download,
-  Type
+  Info,
+  Palette,
+  Search,
+  Server,
+  Settings,
+  Shield,
+  Type,
 } from 'lucide-react'
-import MCPServerControl from '../components/integrations/mcp/MCPServerControl'
-import ThemeSettings from '../components/features/settings/ThemeSettings'
+import React, { useState } from 'react'
 import FontTest from '../components/debug/FontTest'
+import ThemeSettings from '../components/features/settings/ThemeSettings'
+import MCPServerControl from '../components/integrations/mcp/MCPServerControl'
 import { debug, useDebugComponent } from '../debug'
 import { useMCPConfig } from '../hooks/useMCPConfig'
 
@@ -23,7 +23,7 @@ const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('mcp-server')
   const [copiedConfig, setCopiedConfig] = useState<string | null>(null)
   const [clientType, setClientType] = useState<'trae' | 'claude'>('claude')
-  
+
   // 使用 MCP 配置管理
   const { config, urls, updateConfig, isValid, validation } = useMCPConfig()
   const [serverHost, setServerHost] = useState(config.BACKEND_HOST)
@@ -34,30 +34,30 @@ const SettingsPage: React.FC = () => {
     if (clientType === 'trae') {
       return {
         mcpServers: {
-          "devapi-manager": {
-            command: "node",
-            args: ["d:\\Code\\Dev-Mangage\\packages\\mcp-server\\dist\\index.js"],
+          'devapi-manager': {
+            command: 'node',
+            args: ['d:\\Code\\Dev-Mangage\\packages\\mcp-server\\dist\\index.js'],
             env: {
-              NODE_ENV: "development",
-              DATABASE_URL: "file:d:\\Code\\Dev-Mangage\\packages\\backend\\prisma\\dev.db",
-              PORT: serverPort
-            }
-          }
-        }
+              NODE_ENV: 'development',
+              DATABASE_URL: 'file:d:\\Code\\Dev-Mangage\\packages\\backend\\prisma\\dev.db',
+              PORT: serverPort,
+            },
+          },
+        },
       }
     } else {
       return {
         mcpServers: {
-          "devapi-manager": {
-            command: "node",
-            args: ["./packages/mcp-server/dist/index.js"],
+          'devapi-manager': {
+            command: 'node',
+            args: ['./packages/mcp-server/dist/index.js'],
             env: {
-              NODE_ENV: "development",
-              DATABASE_URL: "file:./packages/backend/prisma/dev.db",
-              PORT: serverPort
-            }
-          }
-        }
+              NODE_ENV: 'development',
+              DATABASE_URL: 'file:./packages/backend/prisma/dev.db',
+              PORT: serverPort,
+            },
+          },
+        },
       }
     }
   }
@@ -67,30 +67,30 @@ const SettingsPage: React.FC = () => {
     if (clientType === 'trae') {
       return {
         mcpServers: {
-          "devapi-manager": {
-            command: "node",
-            args: ["d:\\Code\\Dev-Mangage\\packages\\mcp-server\\dist\\index.js"],
+          'devapi-manager': {
+            command: 'node',
+            args: ['d:\\Code\\Dev-Mangage\\packages\\mcp-server\\dist\\index.js'],
             env: {
-              NODE_ENV: "production",
-              DATABASE_URL: "file:d:\\Code\\Dev-Mangage\\packages\\backend\\prisma\\dev.db",
-              PORT: serverPort
-            }
-          }
-        }
+              NODE_ENV: 'production',
+              DATABASE_URL: 'file:d:\\Code\\Dev-Mangage\\packages\\backend\\prisma\\dev.db',
+              PORT: serverPort,
+            },
+          },
+        },
       }
     } else {
       return {
         mcpServers: {
-          "devapi-manager": {
-            command: "node",
-            args: ["./dist/index.js"],
+          'devapi-manager': {
+            command: 'node',
+            args: ['./dist/index.js'],
             env: {
-              NODE_ENV: "production",
-              DATABASE_URL: "file:./data/production.db",
-              PORT: serverPort
-            }
-          }
-        }
+              NODE_ENV: 'production',
+              DATABASE_URL: 'file:./data/production.db',
+              PORT: serverPort,
+            },
+          },
+        },
       }
     }
   }
@@ -99,14 +99,14 @@ const SettingsPage: React.FC = () => {
   const generateTraeHTTPConfig = () => {
     return {
       mcpServers: {
-        "devapi-manager-http": {
-          command: "node",
-          args: ["-e", `console.log('HTTP MCP Server: ${urls.httpServer}')`],
+        'devapi-manager-http': {
+          command: 'node',
+          args: ['-e', `console.log('HTTP MCP Server: ${urls.httpServer}')`],
           env: {
-            MCP_SERVER_URL: urls.httpServer
-          }
-        }
-      }
+            MCP_SERVER_URL: urls.httpServer,
+          },
+        },
+      },
     }
   }
 
@@ -114,11 +114,11 @@ const SettingsPage: React.FC = () => {
   const generateURLConfig = () => {
     return {
       mcpServers: {
-        "dev-manage-mcp-url": {
+        'dev-manage-mcp-url': {
           url: `${urls.httpServer}/mcp`,
-          transport: "http"
-        }
-      }
+          transport: 'http',
+        },
+      },
     }
   }
 
@@ -126,16 +126,18 @@ const SettingsPage: React.FC = () => {
   const generateWebSocketConfig = () => {
     return {
       mcpServers: {
-        "dev-manage-mcp-ws": {
+        'dev-manage-mcp-ws': {
           url: `${urls.websocket}/mcp/ws`,
-          transport: "websocket"
-        }
-      }
+          transport: 'websocket',
+        },
+      },
     }
   }
 
   // 复制配置到剪贴板
-  const copyConfig = (configType: 'development' | 'production' | 'http' | 'websocket' | 'trae-http') => {
+  const copyConfig = (
+    configType: 'development' | 'production' | 'http' | 'websocket' | 'trae-http'
+  ) => {
     let config
     switch (configType) {
       case 'development':
@@ -163,7 +165,9 @@ const SettingsPage: React.FC = () => {
   }
 
   // 下载配置文件
-  const downloadConfig = (configType: 'development' | 'production' | 'http' | 'websocket' | 'trae-http') => {
+  const downloadConfig = (
+    configType: 'development' | 'production' | 'http' | 'websocket' | 'trae-http'
+  ) => {
     let config
     switch (configType) {
       case 'development':
@@ -198,7 +202,7 @@ const SettingsPage: React.FC = () => {
     activeTab,
     serverHost,
     serverPort,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   })
 
   const tabs = [
@@ -206,51 +210,55 @@ const SettingsPage: React.FC = () => {
       id: 'mcp-server',
       name: 'MCP 服务器',
       icon: Server,
-      description: '向量搜索服务管理'
+      description: '向量搜索服务管理',
     },
     {
       id: 'database',
       name: '数据库',
       icon: Database,
-      description: '数据存储设置'
+      description: '数据存储设置',
     },
     {
       id: 'search',
       name: '搜索设置',
       icon: Search,
-      description: '搜索引擎配置'
+      description: '搜索引擎配置',
     },
     {
       id: 'appearance',
       name: '外观',
       icon: Palette,
-      description: '主题和界面设置'
+      description: '主题和界面设置',
     },
     {
       id: 'notifications',
       name: '通知',
       icon: Bell,
-      description: '消息提醒设置'
+      description: '消息提醒设置',
     },
     {
       id: 'security',
       name: '安全',
       icon: Shield,
-      description: '权限和安全设置'
+      description: '权限和安全设置',
     },
     {
       id: 'fonts',
       name: '字体测试',
       icon: Type,
-      description: '字体加载和渲染测试'
-    }
+      description: '字体加载和渲染测试',
+    },
   ]
 
   const handleTabChange = (tabId: string) => {
-    debug.log('用户切换设置标签', { 
-      from: activeTab, 
-      to: tabId 
-    }, 'SettingsPage')
+    debug.log(
+      '用户切换设置标签',
+      {
+        from: activeTab,
+        to: tabId,
+      },
+      'SettingsPage'
+    )
     setActiveTab(tabId)
   }
 
@@ -262,12 +270,13 @@ const SettingsPage: React.FC = () => {
             <div>
               <h2 className="text-2xl font-bold text-text-primary mb-2">MCP 服务器管理</h2>
               <p className="text-text-secondary mb-6">
-                管理和监控 Model Context Protocol (MCP) 服务器，包括向量搜索、数据库连接和API接口服务。
+                管理和监控 Model Context Protocol (MCP)
+                服务器，包括向量搜索、数据库连接和API接口服务。
               </p>
             </div>
-            
+
             <MCPServerControl />
-            
+
             {/* 服务器地址配置 */}
             <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
               <div className="flex items-center justify-between mb-4">
@@ -281,7 +290,7 @@ const SettingsPage: React.FC = () => {
               <p className="text-text-secondary mb-4">
                 配置 MCP 服务器的网络地址，用于生成 URL 形式的客户端配置。
               </p>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-text-primary mb-2">
@@ -290,7 +299,7 @@ const SettingsPage: React.FC = () => {
                   <input
                     type="text"
                     value={serverHost}
-                    onChange={(e) => {
+                    onChange={e => {
                       setServerHost(e.target.value)
                       updateConfig({ BACKEND_HOST: e.target.value })
                     }}
@@ -309,7 +318,7 @@ const SettingsPage: React.FC = () => {
                   <input
                     type="text"
                     value={serverPort}
-                    onChange={(e) => {
+                    onChange={e => {
                       setServerPort(e.target.value)
                       updateConfig({ BACKEND_PORT: e.target.value })
                     }}
@@ -318,11 +327,11 @@ const SettingsPage: React.FC = () => {
                         ? 'border-error-300 focus:ring-error-500'
                         : 'border-border-primary focus:ring-primary-500'
                     } bg-bg-paper text-text-primary`}
-                    placeholder="3001"
+                    placeholder="3000"
                   />
                 </div>
               </div>
-              
+
               {/* 配置验证错误显示 */}
               {validation.errors.length > 0 && (
                 <div className="mt-4 p-3 bg-error-50 border border-error-200 rounded-lg">
@@ -339,7 +348,7 @@ const SettingsPage: React.FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* 当前生成的 URLs 预览 */}
               <div className="mt-4 p-3 bg-bg-secondary border border-border-secondary rounded-lg">
                 <div className="flex items-start space-x-2">
@@ -347,36 +356,50 @@ const SettingsPage: React.FC = () => {
                   <div className="text-sm text-text-primary">
                     <p className="font-medium mb-1">当前配置预览：</p>
                     <ul className="space-y-1 text-xs font-mono">
-                      <li>• <strong>后端 API</strong>: {urls.backend}</li>
-                      <li>• <strong>MCP HTTP</strong>: {urls.httpServer}</li>
-                      <li>• <strong>WebSocket</strong>: {urls.websocket}</li>
+                      <li>
+                        • <strong>后端 API</strong>: {urls.backend}
+                      </li>
+                      <li>
+                        • <strong>MCP HTTP</strong>: {urls.httpServer}
+                      </li>
+                      <li>
+                        • <strong>WebSocket</strong>: {urls.websocket}
+                      </li>
                     </ul>
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-4 p-3 bg-primary-50 border border-primary-200 rounded-lg">
                 <div className="flex items-start space-x-2">
                   <Info className="w-4 h-4 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-primary-800">
                     <p className="font-medium mb-1">地址说明：</p>
                     <ul className="space-y-1 text-xs">
-                      <li>• <strong>localhost</strong>：本地开发环境</li>
-                      <li>• <strong>IP地址</strong>：局域网或远程服务器地址</li>
-                      <li>• <strong>端口</strong>：MCP 服务器监听的端口号（默认 3001）</li>
-                      <li>• <strong>配置实时生效</strong>：修改后立即应用到所有 URL</li>
+                      <li>
+                        • <strong>localhost</strong>：本地开发环境
+                      </li>
+                      <li>
+                        • <strong>IP地址</strong>：局域网或远程服务器地址
+                      </li>
+                      <li>
+                        • <strong>端口</strong>：MCP 服务器监听的端口号（默认 3000）
+                      </li>
+                      <li>
+                        • <strong>配置实时生效</strong>：修改后立即应用到所有 URL
+                      </li>
                     </ul>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             {/* MCP 服务器配置 JSON */}
             <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-text-primary">客户端配置</h3>
               </div>
-              
+
               {/* 客户端类型选择器 */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-text-primary mb-3">
@@ -405,11 +428,12 @@ const SettingsPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-              
+
               <p className="text-text-secondary mb-6">
-                将以下配置添加到您的 {clientType === 'claude' ? 'Claude Desktop' : 'Trae AI'} 配置文件中。选择适合您环境的配置：
+                将以下配置添加到您的 {clientType === 'claude' ? 'Claude Desktop' : 'Trae AI'}{' '}
+                配置文件中。选择适合您环境的配置：
               </p>
-              
+
               {/* 开发环境配置 */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
@@ -434,248 +458,262 @@ const SettingsPage: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-text-primary">开发环境 MCP 配置</span>
                     <Code className="w-4 h-4 text-text-tertiary" />
                   </div>
                   <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
-{JSON.stringify(generateMCPConfig(), null, 2)}
+                    {JSON.stringify(generateMCPConfig(), null, 2)}
                   </pre>
                 </div>
               </div>
-              
+
               {/* 生产环境配置 */}
-               <div className="mb-6">
-                 <div className="flex items-center justify-between mb-3">
-                   <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
-                     <span className="w-3 h-3 bg-success-500 rounded-full"></span>
-                     <span>生产环境配置</span>
-                   </h4>
-                   <div className="flex space-x-2">
-                     <button
-                       onClick={() => copyConfig('production')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
-                     >
-                       <Copy className="w-3 h-3" />
-                       <span>{copiedConfig === 'production' ? '已复制' : '复制'}</span>
-                     </button>
-                     <button
-                       onClick={() => downloadConfig('production')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
-                     >
-                       <Download className="w-3 h-3" />
-                       <span>下载</span>
-                     </button>
-                   </div>
-                 </div>
-                 
-                 <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
-                   <div className="flex items-center justify-between mb-2">
-                     <span className="text-sm font-medium text-text-primary">生产环境 MCP 配置</span>
-                     <Code className="w-4 h-4 text-text-tertiary" />
-                   </div>
-                   <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
-{JSON.stringify(generateProductionConfig(), null, 2)}
-                   </pre>
-                 </div>
-               </div>
-               
-               {/* HTTP URL 配置 */}
-               <div className="mb-6">
-                 <div className="flex items-center justify-between mb-3">
-                   <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
-                     <span className="w-3 h-3 bg-secondary-500 rounded-full"></span>
-                     <span>HTTP URL 配置</span>
-                   </h4>
-                   <div className="flex space-x-2">
-                     <button
-                       onClick={() => copyConfig('http')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
-                     >
-                       <Copy className="w-3 h-3" />
-                       <span>{copiedConfig === 'http' ? '已复制' : '复制'}</span>
-                     </button>
-                     <button
-                       onClick={() => downloadConfig('http')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
-                     >
-                       <Download className="w-3 h-3" />
-                       <span>下载</span>
-                     </button>
-                   </div>
-                 </div>
-                 
-                 <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
-                   <div className="flex items-center justify-between mb-2">
-                     <span className="text-sm font-medium text-text-primary">HTTP 传输 MCP 配置</span>
-                     <Code className="w-4 h-4 text-text-tertiary" />
-                   </div>
-                   <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
-{JSON.stringify(generateURLConfig(), null, 2)}
-                   </pre>
-                 </div>
-               </div>
-               
-               {/* WebSocket 配置 */}
-               <div className="mb-6">
-                 <div className="flex items-center justify-between mb-3">
-                   <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
-                     <span className="w-3 h-3 bg-warning-500 rounded-full"></span>
-                     <span>WebSocket 配置</span>
-                   </h4>
-                   <div className="flex space-x-2">
-                     <button
-                       onClick={() => copyConfig('websocket')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
-                     >
-                       <Copy className="w-3 h-3" />
-                       <span>{copiedConfig === 'websocket' ? '已复制' : '复制'}</span>
-                     </button>
-                     <button
-                       onClick={() => downloadConfig('websocket')}
-                       className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
-                     >
-                       <Download className="w-3 h-3" />
-                       <span>下载</span>
-                     </button>
-                   </div>
-                 </div>
-                 
-                 <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
-                   <div className="flex items-center justify-between mb-2">
-                     <span className="text-sm font-medium text-text-primary">WebSocket 传输 MCP 配置</span>
-                     <Code className="w-4 h-4 text-text-tertiary" />
-                   </div>
-                   <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
-{JSON.stringify(generateWebSocketConfig(), null, 2)}
-                   </pre>
-                 </div>
-               </div>
-               
-               {/* Trae AI HTTP 配置 - 仅在选择 Trae AI 时显示 */}
-               {clientType === 'trae' && (
-                 <div className="mb-6">
-                   <div className="flex items-center justify-between mb-3">
-                     <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
-                       <span className="w-3 h-3 bg-accent-500 rounded-full"></span>
-                       <span>Trae AI HTTP 配置</span>
-                     </h4>
-                     <div className="flex space-x-2">
-                       <button
-                         onClick={() => copyConfig('trae-http')}
-                         className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
-                       >
-                         <Copy className="w-3 h-3" />
-                         <span>{copiedConfig === 'trae-http' ? '已复制' : '复制'}</span>
-                       </button>
-                       <button
-                         onClick={() => downloadConfig('trae-http')}
-                         className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
-                       >
-                         <Download className="w-3 h-3" />
-                         <span>下载</span>
-                       </button>
-                     </div>
-                   </div>
-                   
-                   <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
-                     <div className="flex items-center justify-between mb-2">
-                       <span className="text-sm font-medium text-text-primary">Trae AI HTTP MCP 配置</span>
-                       <Code className="w-4 h-4 text-text-tertiary" />
-                     </div>
-                     <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
-{JSON.stringify(generateTraeHTTPConfig(), null, 2)}
-                     </pre>
-                   </div>
-                 </div>
-               )}
-              
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                    <span className="w-3 h-3 bg-success-500 rounded-full"></span>
+                    <span>生产环境配置</span>
+                  </h4>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => copyConfig('production')}
+                      className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                    >
+                      <Copy className="w-3 h-3" />
+                      <span>{copiedConfig === 'production' ? '已复制' : '复制'}</span>
+                    </button>
+                    <button
+                      onClick={() => downloadConfig('production')}
+                      className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
+                    >
+                      <Download className="w-3 h-3" />
+                      <span>下载</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-text-primary">生产环境 MCP 配置</span>
+                    <Code className="w-4 h-4 text-text-tertiary" />
+                  </div>
+                  <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
+                    {JSON.stringify(generateProductionConfig(), null, 2)}
+                  </pre>
+                </div>
+              </div>
+
+              {/* HTTP URL 配置 */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                    <span className="w-3 h-3 bg-secondary-500 rounded-full"></span>
+                    <span>HTTP URL 配置</span>
+                  </h4>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => copyConfig('http')}
+                      className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                    >
+                      <Copy className="w-3 h-3" />
+                      <span>{copiedConfig === 'http' ? '已复制' : '复制'}</span>
+                    </button>
+                    <button
+                      onClick={() => downloadConfig('http')}
+                      className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
+                    >
+                      <Download className="w-3 h-3" />
+                      <span>下载</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-text-primary">
+                      HTTP 传输 MCP 配置
+                    </span>
+                    <Code className="w-4 h-4 text-text-tertiary" />
+                  </div>
+                  <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
+                    {JSON.stringify(generateURLConfig(), null, 2)}
+                  </pre>
+                </div>
+              </div>
+
+              {/* WebSocket 配置 */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                    <span className="w-3 h-3 bg-warning-500 rounded-full"></span>
+                    <span>WebSocket 配置</span>
+                  </h4>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => copyConfig('websocket')}
+                      className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                    >
+                      <Copy className="w-3 h-3" />
+                      <span>{copiedConfig === 'websocket' ? '已复制' : '复制'}</span>
+                    </button>
+                    <button
+                      onClick={() => downloadConfig('websocket')}
+                      className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
+                    >
+                      <Download className="w-3 h-3" />
+                      <span>下载</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-text-primary">
+                      WebSocket 传输 MCP 配置
+                    </span>
+                    <Code className="w-4 h-4 text-text-tertiary" />
+                  </div>
+                  <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
+                    {JSON.stringify(generateWebSocketConfig(), null, 2)}
+                  </pre>
+                </div>
+              </div>
+
+              {/* Trae AI HTTP 配置 - 仅在选择 Trae AI 时显示 */}
+              {clientType === 'trae' && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-md font-medium text-text-primary flex items-center space-x-2">
+                      <span className="w-3 h-3 bg-accent-500 rounded-full"></span>
+                      <span>Trae AI HTTP 配置</span>
+                    </h4>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => copyConfig('trae-http')}
+                        className="flex items-center space-x-2 px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                      >
+                        <Copy className="w-3 h-3" />
+                        <span>{copiedConfig === 'trae-http' ? '已复制' : '复制'}</span>
+                      </button>
+                      <button
+                        onClick={() => downloadConfig('trae-http')}
+                        className="flex items-center space-x-2 px-3 py-1.5 bg-success-600 text-white text-sm rounded-lg hover:bg-success-700 transition-colors"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>下载</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-bg-secondary rounded-lg p-4 border border-border-secondary">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-text-primary">
+                        Trae AI HTTP MCP 配置
+                      </span>
+                      <Code className="w-4 h-4 text-text-tertiary" />
+                    </div>
+                    <pre className="text-sm text-text-primary overflow-x-auto scrollbar-thin">
+                      {JSON.stringify(generateTraeHTTPConfig(), null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+
               {/* 配置说明 */}
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                 <div className="p-3 bg-primary-50 border border-primary-200 rounded-lg">
-                   <div className="flex items-start space-x-2">
-                     <Info className="w-4 h-4 text-primary-600 mt-0.5 flex-shrink-0" />
-                     <div className="text-sm text-primary-800">
-                       <p className="font-medium mb-1">开发环境：</p>
-                       <ul className="space-y-1 text-xs">
-                         <li>• 本地源码路径</li>
-                         <li>• 完整环境变量</li>
-                         <li>• 开发调试专用</li>
-                       </ul>
-                     </div>
-                   </div>
-                 </div>
-                 
-                 <div className="p-3 bg-success-50 border border-success-200 rounded-lg">
-                   <div className="flex items-start space-x-2">
-                     <Info className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
-                     <div className="text-sm text-success-800">
-                       <p className="font-medium mb-1">生产环境：</p>
-                       <ul className="space-y-1 text-xs">
-                         <li>• 构建后代码</li>
-                         <li>• 优化配置</li>
-                         <li>• 部署环境专用</li>
-                       </ul>
-                     </div>
-                   </div>
-                 </div>
-                 
-                 <div className="p-3 bg-secondary-50 border border-secondary-200 rounded-lg">
-                   <div className="flex items-start space-x-2">
-                     <Info className="w-4 h-4 text-secondary-600 mt-0.5 flex-shrink-0" />
-                     <div className="text-sm text-secondary-800">
-                       <p className="font-medium mb-1">HTTP 传输：</p>
-                       <ul className="space-y-1 text-xs">
-                         <li>• RESTful API</li>
-                         <li>• 简单易用</li>
-                         <li>• 防火墙友好</li>
-                       </ul>
-                     </div>
-                   </div>
-                 </div>
-                 
-                 {clientType === 'claude' ? (
-                   <div className="p-3 bg-warning-50 border border-warning-200 rounded-lg">
-                     <div className="flex items-start space-x-2">
-                       <Info className="w-4 h-4 text-warning-600 mt-0.5 flex-shrink-0" />
-                       <div className="text-sm text-warning-800">
-                         <p className="font-medium mb-1">WebSocket：</p>
-                         <ul className="space-y-1 text-xs">
-                           <li>• 实时双向通信</li>
-                           <li>• 低延迟</li>
-                           <li>• 持久连接</li>
-                         </ul>
-                       </div>
-                     </div>
-                   </div>
-                 ) : (
-                   <div className="p-3 bg-accent-50 border border-accent-200 rounded-lg">
-                     <div className="flex items-start space-x-2">
-                       <Info className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
-                       <div className="text-sm text-accent-800">
-                         <p className="font-medium mb-1">Trae AI HTTP：</p>
-                         <ul className="space-y-1 text-xs">
-                           <li>• 专为 Trae AI 优化</li>
-                           <li>• 绝对路径配置</li>
-                           <li>• 简化连接方式</li>
-                         </ul>
-                       </div>
-                     </div>
-                   </div>
-                 )}
-               </div>
-              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-3 bg-primary-50 border border-primary-200 rounded-lg">
+                  <div className="flex items-start space-x-2">
+                    <Info className="w-4 h-4 text-primary-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-primary-800">
+                      <p className="font-medium mb-1">开发环境：</p>
+                      <ul className="space-y-1 text-xs">
+                        <li>• 本地源码路径</li>
+                        <li>• 完整环境变量</li>
+                        <li>• 开发调试专用</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-success-50 border border-success-200 rounded-lg">
+                  <div className="flex items-start space-x-2">
+                    <Info className="w-4 h-4 text-success-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-success-800">
+                      <p className="font-medium mb-1">生产环境：</p>
+                      <ul className="space-y-1 text-xs">
+                        <li>• 构建后代码</li>
+                        <li>• 优化配置</li>
+                        <li>• 部署环境专用</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-secondary-50 border border-secondary-200 rounded-lg">
+                  <div className="flex items-start space-x-2">
+                    <Info className="w-4 h-4 text-secondary-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-secondary-800">
+                      <p className="font-medium mb-1">HTTP 传输：</p>
+                      <ul className="space-y-1 text-xs">
+                        <li>• RESTful API</li>
+                        <li>• 简单易用</li>
+                        <li>• 防火墙友好</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {clientType === 'claude' ? (
+                  <div className="p-3 bg-warning-50 border border-warning-200 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <Info className="w-4 h-4 text-warning-600 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-warning-800">
+                        <p className="font-medium mb-1">WebSocket：</p>
+                        <ul className="space-y-1 text-xs">
+                          <li>• 实时双向通信</li>
+                          <li>• 低延迟</li>
+                          <li>• 持久连接</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-accent-50 border border-accent-200 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <Info className="w-4 h-4 text-accent-600 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-accent-800">
+                        <p className="font-medium mb-1">Trae AI HTTP：</p>
+                        <ul className="space-y-1 text-xs">
+                          <li>• 专为 Trae AI 优化</li>
+                          <li>• 绝对路径配置</li>
+                          <li>• 简化连接方式</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="mt-4 p-3 bg-warning-50 border border-warning-200 rounded-lg">
                 <div className="flex items-start space-x-2">
                   <Info className="w-4 h-4 text-warning-600 mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-warning-800">
                     <p className="font-medium mb-1">使用步骤：</p>
                     <ol className="space-y-1 text-xs list-decimal list-inside">
-                      <li>确保已运行 <code className="bg-yellow-100 px-1 rounded">npm run build</code> 构建 MCP 服务器</li>
-                      <li>复制对应环境的配置到 {clientType === 'claude' ? 'Claude Desktop' : 'Trae AI'} 配置文件</li>
-                      <li>重启 {clientType === 'claude' ? 'Claude Desktop 应用' : 'Trae AI 客户端'}</li>
+                      <li>
+                        确保已运行 <code className="bg-yellow-100 px-1 rounded">npm run build</code>{' '}
+                        构建 MCP 服务器
+                      </li>
+                      <li>
+                        复制对应环境的配置到{' '}
+                        {clientType === 'claude' ? 'Claude Desktop' : 'Trae AI'} 配置文件
+                      </li>
+                      <li>
+                        重启 {clientType === 'claude' ? 'Claude Desktop 应用' : 'Trae AI 客户端'}
+                      </li>
                       <li>在对话中使用 MCP 工具进行 API 搜索和管理</li>
                       {clientType === 'trae' && (
                         <li>对于 HTTP 配置，确保 MCP 服务器在 http://localhost:3321 运行</li>
@@ -695,11 +733,21 @@ const SettingsPage: React.FC = () => {
                     MCP 服务器提供强大的API搜索和发现功能，支持以下特性：
                   </p>
                   <ul className="text-sm text-primary-700 space-y-1">
-                    <li>• <strong>向量语义搜索</strong> - 使用 all-MiniLM-L6-v2 模型进行深度语义理解</li>
-                    <li>• <strong>智能回退机制</strong> - 网络问题时自动使用 TF-IDF 算法</li>
-                    <li>• <strong>混合搜索</strong> - 结合关键词匹配和语义相似度</li>
-                    <li>• <strong>RAG 增强检索</strong> - 提供智能API推荐和上下文分析</li>
-                    <li>• <strong>12个 MCP 工具</strong> - 涵盖项目、API、标签等多维度搜索</li>
+                    <li>
+                      • <strong>向量语义搜索</strong> - 使用 all-MiniLM-L6-v2 模型进行深度语义理解
+                    </li>
+                    <li>
+                      • <strong>智能回退机制</strong> - 网络问题时自动使用 TF-IDF 算法
+                    </li>
+                    <li>
+                      • <strong>混合搜索</strong> - 结合关键词匹配和语义相似度
+                    </li>
+                    <li>
+                      • <strong>RAG 增强检索</strong> - 提供智能API推荐和上下文分析
+                    </li>
+                    <li>
+                      • <strong>12个 MCP 工具</strong> - 涵盖项目、API、标签等多维度搜索
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -714,7 +762,7 @@ const SettingsPage: React.FC = () => {
               <h2 className="text-2xl font-bold text-text-primary mb-2">数据库设置</h2>
               <p className="text-text-secondary mb-6">配置数据存储和备份选项。</p>
             </div>
-            
+
             <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Prisma 数据库配置</h3>
               <div className="space-y-4">
@@ -732,8 +780,8 @@ const SettingsPage: React.FC = () => {
                   <label className="block text-sm font-medium text-text-primary mb-2">
                     连接字符串
                   </label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-bg-paper text-text-primary placeholder-text-tertiary"
                     placeholder="file:./dev.db"
                     disabled
@@ -751,7 +799,7 @@ const SettingsPage: React.FC = () => {
               <h2 className="text-2xl font-bold text-text-primary mb-2">搜索引擎设置</h2>
               <p className="text-text-secondary mb-6">配置向量搜索和关键词搜索参数。</p>
             </div>
-            
+
             <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
               <h3 className="text-lg font-semibold text-text-primary mb-4">向量搜索配置</h3>
               <div className="space-y-4">
@@ -759,11 +807,11 @@ const SettingsPage: React.FC = () => {
                   <label className="block text-sm font-medium text-text-primary mb-2">
                     相似度阈值 (0.0 - 1.0)
                   </label>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="1" 
-                    step="0.1" 
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
                     defaultValue="0.3"
                     className="w-full"
                   />
@@ -776,10 +824,10 @@ const SettingsPage: React.FC = () => {
                   <label className="block text-sm font-medium text-text-primary mb-2">
                     最大结果数量
                   </label>
-                  <input 
-                    type="number" 
-                    min="1" 
-                    max="50" 
+                  <input
+                    type="number"
+                    min="1"
+                    max="50"
                     defaultValue="10"
                     className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-bg-paper text-text-primary"
                   />
@@ -799,7 +847,7 @@ const SettingsPage: React.FC = () => {
               <h2 className="text-2xl font-bold text-text-primary mb-2">通知设置</h2>
               <p className="text-text-secondary mb-6">管理应用通知和提醒。</p>
             </div>
-            
+
             <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
               <h3 className="text-lg font-semibold text-text-primary mb-4">通知偏好</h3>
               <div className="space-y-4">
@@ -808,14 +856,21 @@ const SettingsPage: React.FC = () => {
                     <h4 className="text-sm font-medium text-text-primary">MCP服务器状态通知</h4>
                     <p className="text-sm text-text-tertiary">服务器启动、停止或出错时通知</p>
                   </div>
-                  <input type="checkbox" className="rounded border-border-primary text-primary-600 focus:ring-primary-500" defaultChecked />
+                  <input
+                    type="checkbox"
+                    className="rounded border-border-primary text-primary-600 focus:ring-primary-500"
+                    defaultChecked
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-sm font-medium text-text-primary">搜索性能警告</h4>
                     <p className="text-sm text-text-tertiary">搜索响应时间过长时提醒</p>
                   </div>
-                  <input type="checkbox" className="rounded border-border-primary text-primary-600 focus:ring-primary-500" />
+                  <input
+                    type="checkbox"
+                    className="rounded border-border-primary text-primary-600 focus:ring-primary-500"
+                  />
                 </div>
               </div>
             </div>
@@ -829,7 +884,7 @@ const SettingsPage: React.FC = () => {
               <h2 className="text-2xl font-bold text-text-primary mb-2">安全设置</h2>
               <p className="text-text-secondary mb-6">配置权限和安全选项。</p>
             </div>
-            
+
             <div className="bg-bg-paper rounded-lg shadow-theme-sm border border-border-primary p-6">
               <h3 className="text-lg font-semibold text-text-primary mb-4">访问控制</h3>
               <div className="space-y-4">
@@ -838,14 +893,21 @@ const SettingsPage: React.FC = () => {
                     <h4 className="text-sm font-medium text-text-primary">MCP服务器认证</h4>
                     <p className="text-sm text-text-tertiary">要求API密钥访问MCP服务</p>
                   </div>
-                  <input type="checkbox" className="rounded border-border-primary text-primary-600 focus:ring-primary-500" />
+                  <input
+                    type="checkbox"
+                    className="rounded border-border-primary text-primary-600 focus:ring-primary-500"
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-sm font-medium text-text-primary">本地网络访问</h4>
                     <p className="text-sm text-text-tertiary">允许局域网内其他设备访问</p>
                   </div>
-                  <input type="checkbox" className="rounded border-border-primary text-primary-600 focus:ring-primary-500" defaultChecked />
+                  <input
+                    type="checkbox"
+                    className="rounded border-border-primary text-primary-600 focus:ring-primary-500"
+                    defaultChecked
+                  />
                 </div>
               </div>
             </div>
@@ -874,7 +936,7 @@ const SettingsPage: React.FC = () => {
         {/* 左侧导航 */}
         <div className="w-64 flex-shrink-0">
           <nav className="space-y-2">
-            {tabs.map((tab) => (
+            {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
@@ -884,9 +946,11 @@ const SettingsPage: React.FC = () => {
                     : 'text-text-secondary hover:bg-bg-tertiary'
                 }`}
               >
-                <tab.icon className={`h-5 w-5 ${
-                  activeTab === tab.id ? 'text-primary-600' : 'text-text-tertiary'
-                }`} />
+                <tab.icon
+                  className={`h-5 w-5 ${
+                    activeTab === tab.id ? 'text-primary-600' : 'text-text-tertiary'
+                  }`}
+                />
                 <div>
                   <div className="font-medium">{tab.name}</div>
                   <div className="text-xs text-text-tertiary">{tab.description}</div>
@@ -897,9 +961,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* 右侧内容区域 */}
-        <div className="flex-1 min-w-0">
-          {renderTabContent()}
-        </div>
+        <div className="flex-1 min-w-0">{renderTabContent()}</div>
       </div>
     </div>
   )

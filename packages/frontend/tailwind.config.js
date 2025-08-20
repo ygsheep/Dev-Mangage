@@ -27,6 +27,7 @@ export default {
         'bg-tertiary': 'var(--color-bg-tertiary)',
         'bg-paper': 'var(--color-bg-paper)',
         'bg-elevated': 'var(--color-bg-elevated)',
+        'bg-code': 'var(--color-bg-code)',
         // 主题文字色
         'text-primary': 'var(--color-text-primary)',
         'text-secondary': 'var(--color-text-secondary)',
@@ -44,18 +45,18 @@ export default {
         'status-warning': 'var(--color-status-warning)',
         'status-error': 'var(--color-status-error)',
         'status-info': 'var(--color-status-info)',
-        // 保留原有颜色用于兼容性
+        // Gray colors with dark mode support using CSS variables
         gray: {
-          50: '#f9fafb',
-          100: '#f3f4f6',
-          200: '#e5e7eb',
-          300: '#d1d5db',
-          400: '#9ca3af',
-          500: '#6b7280',
-          600: '#4b5563',
-          700: '#374151',
-          800: '#1f2937',
-          900: '#111827',
+          50: 'var(--bg-gray-50)',
+          100: 'var(--bg-gray-100)',
+          200: 'var(--bg-gray-200)',
+          300: 'var(--bg-gray-300)',
+          400: 'var(--bg-gray-400)',
+          500: 'var(--bg-gray-500)',
+          600: 'var(--bg-gray-600)',
+          700: 'var(--bg-gray-700)',
+          800: 'var(--bg-gray-800)',
+          900: 'var(--bg-gray-900)',
         },
       },
       // 确保背景色正确映射
@@ -65,6 +66,7 @@ export default {
         'bg-tertiary': 'var(--color-bg-tertiary)',
         'bg-paper': 'var(--color-bg-paper)',
         'bg-elevated': 'var(--color-bg-elevated)',
+        'bg-code': 'var(--color-bg-code)',
       },
       // 添加主题圆角
       borderRadius: {

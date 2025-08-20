@@ -1,6 +1,6 @@
-import React, { memo } from 'react'
-import { Handle, Position, NodeProps } from 'reactflow'
 import { Folder, FolderOpen, Hash } from 'lucide-react'
+import React, { memo } from 'react'
+import { Handle, NodeProps, Position } from 'reactflow'
 
 interface FieldGroupData {
   name: string
@@ -21,7 +21,7 @@ const FieldGroupNode: React.FC<NodeProps<FieldGroupData>> = ({ data }) => {
   return (
     <div className="bg-bg-paper rounded-lg shadow-lg border-2 border-gray-200 min-w-[200px] max-w-[280px]">
       {/* 分组头部 */}
-      <div 
+      <div
         className="px-3 py-2 rounded-t-lg cursor-pointer"
         style={{ backgroundColor: color + '20', borderColor: color }}
         onClick={onToggle}
@@ -32,34 +32,28 @@ const FieldGroupNode: React.FC<NodeProps<FieldGroupData>> = ({ data }) => {
           ) : (
             <Folder className="w-4 h-4" style={{ color }} />
           )}
-          <span className="font-medium text-gray-900 text-sm">{name}</span>
+          <span className="font-medium text-text-primary text-sm">{name}</span>
           <span className="text-xs text-gray-500">({fields.length})</span>
         </div>
       </div>
 
       {/* 字段列表 */}
       {isExpanded && (
-        <div className="px-3 py-2 space-y-1 max-h-48 overflow-y-auto">
-          {fields.map((field) => (
+        <div className="px-3 py-2 space-y-1 max-h-48 overflow-y-auto scrollbar-thin">
+          {fields.map(field => (
             <div key={field.id} className="flex items-center space-x-2 py-1">
               {field.isPrimaryKey ? (
                 <Hash className="w-3 h-3 text-yellow-500" />
               ) : (
                 <div className="w-3 h-3 rounded-full bg-gray-300" />
               )}
-              <span className="text-sm text-text-primary flex-1 truncate">
-                {field.name}
-              </span>
-              <span className="text-xs text-gray-500">
-                {field.type}
-              </span>
+              <span className="text-sm text-text-primary flex-1 truncate">{field.name}</span>
+              <span className="text-xs text-gray-500">{field.type}</span>
             </div>
           ))}
-          
+
           {fields.length === 0 && (
-            <div className="text-center py-2 text-xs text-gray-400">
-              暂无字段
-            </div>
+            <div className="text-center py-2 text-xs text-gray-400">暂无字段</div>
           )}
         </div>
       )}

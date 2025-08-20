@@ -455,7 +455,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
             按表筛选 {selectedTables.size > 0 && `(${selectedTables.size} 个已选择)`}
           </h3>
           
-          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto scrollbar-thin">
             {tables.map(table => (
               <label
                 key={table.id}
@@ -488,7 +488,7 @@ const RelationshipManager: React.FC<RelationshipManagerProps> = ({
           </h3>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="min-w-full divide-y divide-border-primary">
             <thead className="bg-bg-secondary">
               <tr>

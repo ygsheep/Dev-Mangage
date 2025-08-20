@@ -16,11 +16,13 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   title = '文档预览',
   showLineNumbers = false,
   maxHeight = '400px',
-  className = ''
+  className = '',
 }) => {
   if (!content || content.trim() === '') {
     return (
-      <div className={`bg-bg-secondary border border-border-primary rounded-lg p-4 text-center ${className}`}>
+      <div
+        className={`bg-bg-secondary border border-border-primary rounded-lg p-4 text-center ${className}`}
+      >
         <p className="text-gray-500 text-sm">暂无内容</p>
       </div>
     )
@@ -47,7 +49,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   return (
     <div className={className}>
       <div className="mb-2">
-        <h4 className="text-sm font-medium text-gray-900">
+        <h4 className="text-sm font-medium text-text-primary">
           {title} ({type.toUpperCase()})
         </h4>
       </div>

@@ -5,30 +5,35 @@ DevAPI Manager 的前端界面，基于 React + TypeScript + Vite 构建，提�
 ## 🎯 核心功能
 
 ### 📊 项目管理
+
 - **项目仪表板**: 直观的项目概览和统计
 - **项目创建**: 快速创建和配置API项目
 - **项目编辑**: 完整的项目信息管理
 - **批量操作**: 支持项目的批量导入和导出
 
 ### 🔍 API管理
+
 - **接口列表**: 清晰的API接口列表视图
 - **接口详情**: 详细的API文档和参数说明
 - **快速搜索**: 实时的API搜索和筛选
 - **标签管理**: 灵活的标签分类系统
 
 ### 🎨 用户界面
+
 - **响应式设计**: 完美适配桌面和移动设备
 - **主题系统**: 支持浅色/深色主题切换
 - **组件库**: 基于Tailwind CSS的现代UI组件
 - **交互动效**: 流畅的页面转场和交互反馈
 
 ### 🧠 MCP集成
+
 - **可视化控制**: MCP服务器的图形化管理界面
 - **实时监控**: 服务器状态、性能指标实时显示
 - **日志查看**: 实时日志流和历史日志查看
 - **搜索体验**: 集成向量搜索和智能推荐
 
 ### 🛠️ 开发工具
+
 - **调试面板**: 内置的开发调试工具
 - **性能监控**: 实时的性能指标和内存使用
 - **网络监控**: HTTP请求的详细监控和分析
@@ -37,16 +42,19 @@ DevAPI Manager 的前端界面，基于 React + TypeScript + Vite 构建，提�
 ## 🚀 快速开始
 
 ### 系统要求
-- **Node.js**: 18.0+ 
+
+- **Node.js**: 18.0+
 - **NPM**: 8.0+
 - **现代浏览器**: Chrome 90+, Firefox 90+, Safari 14+
 
 ### 安装依赖
+
 ```bash
 npm install
 ```
 
 ### 开发服务器
+
 ```bash
 # 启动开发服务器
 npm run dev
@@ -55,6 +63,7 @@ npm run dev
 ```
 
 ### 构建部署
+
 ```bash
 # 构建生产版本
 npm run build
@@ -118,23 +127,27 @@ packages/frontend/
 ## 🎨 技术栈
 
 ### 核心框架
+
 - **React 18**: 用户界面框架
 - **TypeScript**: 类型安全的JavaScript
 - **Vite**: 现代化的构建工具
 - **React Router**: 客户端路由管理
 
 ### UI框架
+
 - **Tailwind CSS**: 原子化CSS框架
 - **Lucide React**: 现代化图标库
 - **Headless UI**: 无样式可访问组件
 - **Framer Motion**: 动画库
 
 ### 状态管理
+
 - **TanStack Query**: 服务器状态管理
 - **Zustand**: 轻量级状态管理
 - **React Hook Form**: 表单状态管理
 
 ### 开发工具
+
 - **ESLint**: 代码质量检查
 - **Prettier**: 代码格式化
 - **TypeScript**: 静态类型检查
@@ -143,6 +156,7 @@ packages/frontend/
 ## 🔧 配置说明
 
 ### Vite配置
+
 ```typescript
 // vite.config.ts
 export default defineConfig({
@@ -152,9 +166,9 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
-        changeOrigin: true
-      }
-    }
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     outDir: 'dist',
@@ -163,15 +177,16 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          ui: ['@headlessui/react', 'lucide-react']
-        }
-      }
-    }
-  }
+          ui: ['@headlessui/react', 'lucide-react'],
+        },
+      },
+    },
+  },
 })
 ```
 
 ### Tailwind配置
+
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -179,26 +194,24 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['OPPO Sans', 'system-ui', 'sans-serif'],
-        'mono': ['JetBrains Mono Nerd Font', 'monospace']
+        sans: ['OPPO Sans', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono Nerd Font', 'monospace'],
       },
       colors: {
         primary: {
           50: '#eff6ff',
           500: '#3b82f6',
-          900: '#1e3a8a'
-        }
-      }
-    }
+          900: '#1e3a8a',
+        },
+      },
+    },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography')
-  ]
+  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
 }
 ```
 
 ### TypeScript配置
+
 ```json
 {
   "compilerOptions": {
@@ -227,6 +240,7 @@ module.exports = {
 ## 🎯 核心组件
 
 ### 布局组件
+
 ```tsx
 // Layout.tsx - 主布局组件
 const Layout: React.FC = () => {
@@ -234,26 +248,24 @@ const Layout: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-bg-paper">
       {/* 侧边栏 */}
       <Sidebar />
-      
+
       {/* 主内容区域 */}
       <main className="pl-64">
         <Outlet />
       </main>
-      
+
       {/* 快速搜索 */}
-      <QuickSearch 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
-      />
+      <QuickSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </div>
   )
 }
 ```
 
 ### 搜索组件
+
 ```tsx
 // QuickSearch.tsx - 快速搜索组件
 const QuickSearch: React.FC<Props> = ({ isOpen, onClose }) => {
@@ -261,24 +273,16 @@ const QuickSearch: React.FC<Props> = ({ isOpen, onClose }) => {
   const { data: results, isLoading } = useQuery({
     queryKey: ['search', query],
     queryFn: () => searchAPI(query),
-    enabled: query.length > 0
+    enabled: query.length > 0,
   })
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <div className="fixed inset-0 bg-black/25" />
       <div className="fixed inset-0 flex items-start justify-center pt-[15vh]">
-        <Dialog.Panel className="w-full max-w-2xl bg-white rounded-lg shadow-xl">
-          <SearchInput 
-            value={query}
-            onChange={setQuery}
-            placeholder="搜索API、项目、标签..."
-          />
-          <SearchResults 
-            results={results}
-            isLoading={isLoading}
-            onSelect={onClose}
-          />
+        <Dialog.Panel className="w-full max-w-2xl bg-bg-paper rounded-lg shadow-xl">
+          <SearchInput value={query} onChange={setQuery} placeholder="搜索API、项目、标签..." />
+          <SearchResults results={results} isLoading={isLoading} onSelect={onClose} />
         </Dialog.Panel>
       </div>
     </Dialog>
@@ -287,6 +291,7 @@ const QuickSearch: React.FC<Props> = ({ isOpen, onClose }) => {
 ```
 
 ### MCP控制组件
+
 ```tsx
 // MCPServerControl.tsx - MCP服务器控制
 const MCPServerControl: React.FC = () => {
@@ -308,22 +313,18 @@ const MCPServerControl: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow border p-6">
+    <div className="bg-bg-paper rounded-lg shadow border p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">MCP 服务器</h3>
         <ServerStatus status={serverStatus} />
       </div>
-      
+
       <div className="flex space-x-3">
-        <Button 
-          onClick={startServer}
-          disabled={isStarting}
-          className="bg-green-600 text-white"
-        >
+        <Button onClick={startServer} disabled={isStarting} className="bg-green-600 text-white">
           {isStarting ? '启动中...' : '启动服务器'}
         </Button>
       </div>
-      
+
       <ServerMetrics status={serverStatus} />
       <ServerLogs />
     </div>
@@ -334,6 +335,7 @@ const MCPServerControl: React.FC = () => {
 ## 🔌 API集成
 
 ### API请求封装
+
 ```typescript
 // api.ts - API请求封装
 class APIClient {
@@ -341,13 +343,13 @@ class APIClient {
 
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
-    
+
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers
+        ...options.headers,
       },
-      ...options
+      ...options,
     })
 
     if (!response.ok) {
@@ -359,20 +361,20 @@ class APIClient {
 
   // 项目管理
   getProjects = () => this.request<Project[]>('/projects')
-  createProject = (data: CreateProjectData) => 
+  createProject = (data: CreateProjectData) =>
     this.request<Project>('/projects', {
       method: 'POST',
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
 
   // API管理
-  getAPIs = (projectId?: string) => 
+  getAPIs = (projectId?: string) =>
     this.request<API[]>(`/apis${projectId ? `?projectId=${projectId}` : ''}`)
-  
+
   searchAPIs = (query: string, filters?: SearchFilters) =>
     this.request<SearchResult[]>('/apis/search', {
       method: 'POST',
-      body: JSON.stringify({ query, ...filters })
+      body: JSON.stringify({ query, ...filters }),
     })
 }
 
@@ -380,6 +382,7 @@ export const apiClient = new APIClient()
 ```
 
 ### React Query集成
+
 ```typescript
 // hooks/useProjects.ts - 项目数据Hook
 export const useProjects = () => {
@@ -393,17 +396,18 @@ export const useProjects = () => {
 
 export const useCreateProject = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: apiClient.createProject,
     onSuccess: () => {
       queryClient.invalidateQueries(['projects'])
-    }
+    },
   })
 }
 ```
 
 ### MCP搜索Hook
+
 ```typescript
 // hooks/useMCPSearch.ts - MCP搜索Hook
 export const useMCPSearch = (query: string, options: SearchOptions = {}) => {
@@ -411,28 +415,28 @@ export const useMCPSearch = (query: string, options: SearchOptions = {}) => {
     queryKey: ['mcp-search', query, options],
     queryFn: async () => {
       if (!query.trim()) return []
-      
+
       // 使用MCP向量搜索
       const vectorResults = await mcpServerAPI.vectorSearch(query, {
         limit: options.limit || 10,
-        threshold: options.threshold || 0.3
+        threshold: options.threshold || 0.3,
       })
-      
+
       // 混合搜索结果
       const hybridResults = await mcpServerAPI.hybridSearch(query, {
         vectorWeight: 0.6,
-        fuzzyWeight: 0.4
+        fuzzyWeight: 0.4,
       })
-      
+
       return {
         vector: vectorResults,
         hybrid: hybridResults,
-        total: vectorResults.length + hybridResults.length
+        total: vectorResults.length + hybridResults.length,
       }
     },
     enabled: query.length > 0,
     staleTime: 30 * 1000, // 30秒
-    keepPreviousData: true
+    keepPreviousData: true,
   })
 }
 ```
@@ -440,6 +444,7 @@ export const useMCPSearch = (query: string, options: SearchOptions = {}) => {
 ## 🎨 样式系统
 
 ### 颜色系统
+
 ```css
 /* 主题颜色定义 */
 :root {
@@ -448,7 +453,7 @@ export const useMCPSearch = (query: string, options: SearchOptions = {}) => {
   --color-primary-500: #3b82f6;
   --color-primary-600: #2563eb;
   --color-primary-900: #1e3a8a;
-  
+
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
   --color-gray-500: #6b7280;
@@ -457,25 +462,28 @@ export const useMCPSearch = (query: string, options: SearchOptions = {}) => {
 ```
 
 ### 组件样式
+
 ```tsx
 // 使用Tailwind的组件样式
 const Button = ({ variant, size, children, ...props }) => {
-  const baseStyles = "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2"
-  
+  const baseStyles =
+    'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2'
+
   const variants = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
-    secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500",
-    outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+    secondary: 'bg-gray-200 text-text-primary hover:bg-gray-300 focus:ring-gray-500',
+    outline:
+      'border border-gray-300 bg-bg-secondary focus:outline-none bg-bg-paper text-text-secondary hover:bg-bg-tertiary',
   }
-  
+
   const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-sm",
-    lg: "px-6 py-3 text-base"
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base',
   }
-  
+
   const className = `${baseStyles} ${variants[variant]} ${sizes[size]}`
-  
+
   return (
     <button className={className} {...props}>
       {children}
@@ -485,14 +493,15 @@ const Button = ({ variant, size, children, ...props }) => {
 ```
 
 ### 响应式设计
+
 ```tsx
 // 响应式组件布局
 const ProjectGrid = ({ projects }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {projects.map(project => (
-        <ProjectCard 
-          key={project.id} 
+        <ProjectCard
+          key={project.id}
           project={project}
           className="transform hover:scale-105 transition-transform duration-200"
         />
@@ -505,6 +514,7 @@ const ProjectGrid = ({ projects }) => {
 ## 🧪 调试工具
 
 ### 调试面板
+
 ```tsx
 // debug/DebugPanel.tsx - 调试面板
 const DebugPanel: React.FC = () => {
@@ -515,7 +525,7 @@ const DebugPanel: React.FC = () => {
     <DraggableWindow title="调试面板" defaultPosition={{ x: 20, y: 20 }}>
       <div className="w-96 h-64 bg-gray-900 text-green-400 font-mono text-xs">
         <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
-        
+
         <div className="p-2 h-48 overflow-y-auto">
           {activeTab === 'logs' && <LogsTab logs={logs} />}
           {activeTab === 'network' && <NetworkTab requests={networkRequests} />}
@@ -528,35 +538,36 @@ const DebugPanel: React.FC = () => {
 ```
 
 ### 性能监控
+
 ```typescript
 // debug/PerformanceMonitor.ts - 性能监控
 class PerformanceMonitor {
   private metrics: PerformanceMetric[] = []
-  
+
   measureComponentRender(componentName: string) {
     const start = performance.now()
-    
+
     return () => {
       const end = performance.now()
       const duration = end - start
-      
+
       this.addMetric({
         name: `${componentName} Render`,
         value: duration,
         unit: 'ms',
         type: 'timing',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       })
     }
   }
-  
+
   measureAPICall(endpoint: string) {
     const start = performance.now()
-    
+
     return (response: Response) => {
       const end = performance.now()
       const duration = end - start
-      
+
       this.addMetric({
         name: `API ${endpoint}`,
         value: duration,
@@ -565,8 +576,8 @@ class PerformanceMonitor {
         timestamp: Date.now(),
         extra: {
           status: response.status,
-          url: response.url
-        }
+          url: response.url,
+        },
       })
     }
   }
@@ -576,36 +587,35 @@ class PerformanceMonitor {
 ## 📱 响应式设计
 
 ### 断点系统
+
 ```javascript
 // Tailwind断点配置
 const screens = {
-  'sm': '640px',   // 手机横屏
-  'md': '768px',   // 平板
-  'lg': '1024px',  // 小桌面
-  'xl': '1280px',  // 大桌面
-  '2xl': '1536px'  // 超大桌面
+  sm: '640px', // 手机横屏
+  md: '768px', // 平板
+  lg: '1024px', // 小桌面
+  xl: '1280px', // 大桌面
+  '2xl': '1536px', // 超大桌面
 }
 ```
 
 ### 移动端适配
+
 ```tsx
 // 移动端导航组件
 const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false)
-  
+
   return (
     <div className="md:hidden">
-      <button 
-        onClick={() => setIsOpen(true)}
-        className="p-2 rounded-lg bg-gray-100"
-      >
+      <button onClick={() => setIsOpen(true)} className="p-2 rounded-lg bg-gray-100">
         <Menu className="h-6 w-6" />
       </button>
-      
+
       <Transition show={isOpen}>
         <div className="fixed inset-0 z-50">
           <div className="fixed inset-0 bg-black/25" onClick={() => setIsOpen(false)} />
-          <div className="fixed left-0 top-0 h-full w-64 bg-white shadow-xl">
+          <div className="fixed left-0 top-0 h-full w-64 bg-bg-paper shadow-xl">
             <NavigationMenu onItemClick={() => setIsOpen(false)} />
           </div>
         </div>
@@ -618,6 +628,7 @@ const MobileNav = () => {
 ## 🚀 性能优化
 
 ### 代码分割
+
 ```tsx
 // 路由级别的代码分割
 const HomePage = lazy(() => import('./pages/HomePage'))
@@ -640,18 +651,17 @@ const App = () => {
 ```
 
 ### 组件优化
+
 ```tsx
 // 使用memo优化组件重渲染
 const ProjectCard = memo(({ project }: { project: Project }) => {
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      <h3 className="font-semibold text-gray-900">{project.name}</h3>
-      <p className="text-gray-600 text-sm mt-1">{project.description}</p>
+    <div className="bg-bg-paper rounded-lg shadow p-4">
+      <h3 className="font-semibold text-text-primary">{project.name}</h3>
+      <p className="text-text-secondary text-sm mt-1">{project.description}</p>
       <div className="mt-3 flex items-center space-x-2">
         <Badge variant="outline">{project.version}</Badge>
-        <span className="text-xs text-gray-500">
-          {project.apis.length} APIs
-        </span>
+        <span className="text-xs text-gray-500">{project.apis.length} APIs</span>
       </div>
     </div>
   )
@@ -659,6 +669,7 @@ const ProjectCard = memo(({ project }: { project: Project }) => {
 ```
 
 ### 虚拟滚动
+
 ```tsx
 // 大列表虚拟滚动
 import { FixedSizeList as List } from 'react-window'
@@ -671,12 +682,7 @@ const APIList = ({ apis }: { apis: API[] }) => {
   )
 
   return (
-    <List
-      height={600}
-      itemCount={apis.length}
-      itemSize={80}
-      width="100%"
-    >
+    <List height={600} itemCount={apis.length} itemSize={80} width="100%">
       {Row}
     </List>
   )
@@ -686,6 +692,7 @@ const APIList = ({ apis }: { apis: API[] }) => {
 ## 🧪 测试
 
 ### 组件测试
+
 ```tsx
 // __tests__/ProjectCard.test.tsx
 import { render, screen } from '@testing-library/react'
@@ -697,12 +704,12 @@ describe('ProjectCard', () => {
     name: 'Test Project',
     description: 'Test Description',
     version: '1.0.0',
-    apis: []
+    apis: [],
   }
 
   it('renders project information correctly', () => {
     render(<ProjectCard project={mockProject} />)
-    
+
     expect(screen.getByText('Test Project')).toBeInTheDocument()
     expect(screen.getByText('Test Description')).toBeInTheDocument()
     expect(screen.getByText('1.0.0')).toBeInTheDocument()
@@ -711,19 +718,20 @@ describe('ProjectCard', () => {
 ```
 
 ### E2E测试
+
 ```typescript
 // e2e/search.spec.ts
 import { test, expect } from '@playwright/test'
 
 test('search functionality works correctly', async ({ page }) => {
   await page.goto('http://localhost:5173')
-  
+
   // 打开搜索
   await page.keyboard.press('Control+k')
-  
+
   // 输入搜索词
   await page.fill('[data-testid="search-input"]', 'user api')
-  
+
   // 验证搜索结果
   await expect(page.locator('[data-testid="search-results"]')).toBeVisible()
   await expect(page.locator('.search-result-item')).toHaveCount.greaterThan(0)

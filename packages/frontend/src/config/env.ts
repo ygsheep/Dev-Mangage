@@ -5,14 +5,14 @@
 
 // 默认端口配置
 export const DEFAULT_PORTS = {
-  // 后端API服务器
-  BACKEND: 3001,
+  // 后端API服务器 - 注意：后端会自动检测可用端口，通常是3000
+  BACKEND: 3000,
   // MCP HTTP服务器（集成在后端中）
-  MCP_HTTP: 3001,
+  MCP_HTTP: 3000,
   // MCP WebSocket服务器
-  MCP_WS: 3001,
+  MCP_WS: 3000,
   // 独立MCP服务器（开发环境）
-  MCP_STANDALONE: 3004,
+  MCP_STANDALONE: 3000,
   // 前端开发服务器
   FRONTEND: 5173,
 } as const
@@ -33,14 +33,14 @@ export const ENV_CONFIG = {
   // 开发环境标识
   isDev: import.meta.env.DEV,
   isProd: import.meta.env.PROD,
-  
+
   // 后端配置
   backend: {
     host: getEnvVar('VITE_BACKEND_HOST', DEFAULT_HOSTS.LOCALHOST),
     port: parseInt(getEnvVar('VITE_BACKEND_PORT', DEFAULT_PORTS.BACKEND.toString())),
     url: getEnvVar('VITE_API_URL'), // 如果设置了完整URL，优先使用
   },
-  
+
   // MCP配置
   mcp: {
     http: {
@@ -55,7 +55,12 @@ export const ENV_CONFIG = {
 } as const
 
 // URL生成器
-export const createUrl = (protocol: 'http' | 'https' | 'ws' | 'wss', host: string, port: number, path?: string): string => {
+export const createUrl = (
+  protocol: 'http' | 'https' | 'ws' | 'wss',
+  host: string,
+  port: number,
+  path?: string
+): string => {
   const baseUrl = `${protocol}://${host}:${port}`
   return path ? `${baseUrl}${path.startsWith('/') ? path : `/${path}`}` : baseUrl
 }
@@ -91,23 +96,23 @@ export const isValidHost = (host: string): boolean => {
 // 配置验证
 export const validateConfig = () => {
   const errors: string[] = []
-  
+
   if (!isValidHost(ENV_CONFIG.backend.host)) {
     errors.push('后端主机名无效')
   }
-  
+
   if (!isValidPort(ENV_CONFIG.backend.port)) {
     errors.push(`后端端口号无效: ${ENV_CONFIG.backend.port}`)
   }
-  
+
   if (!isValidHost(ENV_CONFIG.mcp.http.host)) {
     errors.push('MCP HTTP主机名无效')
   }
-  
+
   if (!isValidPort(ENV_CONFIG.mcp.http.port)) {
     errors.push(`MCP HTTP端口号无效: ${ENV_CONFIG.mcp.http.port}`)
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors,

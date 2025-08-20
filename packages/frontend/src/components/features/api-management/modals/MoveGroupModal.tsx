@@ -40,7 +40,7 @@ export const MoveGroupModal: React.FC<MoveGroupModalProps> = ({
 
   return (
     // 模态框主容器和遮罩层
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto custom-scrollbar">
       <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         {/* 背景遮罩层，点击可关闭模态框 */}
         <div 

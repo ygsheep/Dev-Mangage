@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
+import { getBackendBaseUrl } from '../config/env';
+
+// 获取后端基础URL
+const API_BASE_URL = getBackendBaseUrl();
 
 interface APIEndpoint {
   id: string;
@@ -86,6 +90,7 @@ export const useAPIEndpoints = (
     pageSize: 20,
     totalPages: 0
   });
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fetchEndpoints = useCallback(async () => {
     if (!projectId) return;
@@ -103,7 +108,7 @@ export const useAPIEndpoints = (
         }
       });
 
-      const response = await fetch(`/api/v1/api-management/endpoints?${queryParams}`, {
+      const response = await fetch(`${API_BASE_URL}/api-management/endpoints?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -134,11 +139,11 @@ export const useAPIEndpoints = (
     } finally {
       setLoading(false);
     }
-  }, [projectId, filters]);
+  }, [projectId, JSON.stringify(filters), refreshTrigger]);
 
   const createEndpoint = useCallback(async (data: any): Promise<APIEndpoint> => {
     try {
-      const response = await fetch('/api/v1/api-management/endpoints', {
+      const response = await fetch(`${API_BASE_URL}/api-management/endpoints`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +158,7 @@ export const useAPIEndpoints = (
       const result = await response.json();
 
       if (result.success) {
-        await fetchEndpoints(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || 'API端点创建成功');
         return result.data;
       } else {
@@ -164,11 +169,11 @@ export const useAPIEndpoints = (
       toast.error(error.message || '创建API端点失败');
       throw error;
     }
-  }, [projectId, fetchEndpoints]);
+  }, [projectId]);
 
   const updateEndpoint = useCallback(async (id: string, data: any): Promise<APIEndpoint> => {
     try {
-      const response = await fetch(`/api/v1/api-management/endpoints/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api-management/endpoints/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +188,7 @@ export const useAPIEndpoints = (
       const result = await response.json();
 
       if (result.success) {
-        await fetchEndpoints(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || 'API端点更新成功');
         return result.data;
       } else {
@@ -194,11 +199,11 @@ export const useAPIEndpoints = (
       toast.error(error.message || '更新API端点失败');
       throw error;
     }
-  }, [fetchEndpoints]);
+  }, []);
 
   const deleteEndpoint = useCallback(async (id: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/v1/api-management/endpoints/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api-management/endpoints/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -212,7 +217,7 @@ export const useAPIEndpoints = (
       const result = await response.json();
 
       if (result.success) {
-        await fetchEndpoints(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || 'API端点删除成功');
       } else {
         throw new Error(result.message || '删除API端点失败');
@@ -222,7 +227,7 @@ export const useAPIEndpoints = (
       toast.error(error.message || '删除API端点失败');
       throw error;
     }
-  }, [fetchEndpoints]);
+  }, []);
 
   const generateFromTable = useCallback(async (
     tableId: string, 
@@ -230,7 +235,7 @@ export const useAPIEndpoints = (
     options: any = {}
   ): Promise<APIEndpoint[]> => {
     try {
-      const response = await fetch('/api/v1/api-management/endpoints/generate-from-table', {
+      const response = await fetch(`${API_BASE_URL}/api-management/endpoints/generate-from-table`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -249,7 +254,7 @@ export const useAPIEndpoints = (
       const result = await response.json();
 
       if (result.success) {
-        await fetchEndpoints(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || 'API端点生成成功');
         return result.data;
       } else {
@@ -260,7 +265,7 @@ export const useAPIEndpoints = (
       toast.error(error.message || '生成API端点失败');
       throw error;
     }
-  }, [fetchEndpoints]);
+  }, []);
 
   useEffect(() => {
     fetchEndpoints();

@@ -23,6 +23,7 @@ export interface ThemeConfig {
       tertiary: string;     // 第三背景
       paper: string;        // 卡片背景
       elevated: string;     // 悬浮背景
+      code: string;         // 代码背景
     };
     // 文字颜色
     text: {
@@ -104,6 +105,7 @@ export const lightTheme: ThemeConfig = {
       tertiary: '#f3f4f6',
       paper: '#ffffff',
       elevated: '#ffffff',
+      code: '#f8f9fa',
     },
     text: {
       primary: '#111827',
@@ -178,6 +180,7 @@ export const darkTheme: ThemeConfig = {
       tertiary: '#3a3a3a',       // 第三背景色 (卡片)
       paper: '#3a3a3a',          // 卡片背景
       elevated: '#404040',       // 悬浮背景 (输入框等)
+      code: '#434343',           // 代码背景
     },
     text: {
       primary: '#eeeeee',        // 主文本 (Claude Desktop 白色文字)

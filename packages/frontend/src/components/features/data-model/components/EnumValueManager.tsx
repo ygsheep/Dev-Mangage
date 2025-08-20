@@ -1,27 +1,21 @@
-import React, { useState, useMemo } from 'react'
+import { DatabaseField, FieldEnumValue } from '@shared/types'
 import {
-  Plus,
-  Edit3,
-  Trash2,
-  Save,
-  X,
-  ArrowUp,
   ArrowDown,
+  ArrowUp,
+  Copy,
+  Edit3,
+  GripVertical,
+  List,
+  Plus,
+  Save,
   Search,
   Star,
   StarOff,
-  Copy,
-  List,
+  Trash2,
   Type,
-  Hash,
-  FileText,
-  CheckCircle,
-  AlertTriangle,
-  Filter,
-  MoreVertical,
-  GripVertical
+  X,
 } from 'lucide-react'
-import { DatabaseField, FieldEnumValue } from '@shared/types'
+import React, { useMemo, useState } from 'react'
 
 interface EnumValueManagerProps {
   fieldId: string
@@ -52,7 +46,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
   onEnumValueDelete,
   onEnumValueReorder,
   onBatchCreate,
-  readonly = false
+  readonly = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
@@ -64,7 +58,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
     value: '',
     label: '',
     description: '',
-    isDefault: false
+    isDefault: false,
   })
 
   // 排序和过滤枚举值
@@ -74,10 +68,11 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
     // 搜索过滤
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(enumValue =>
-        enumValue.value.toLowerCase().includes(query) ||
-        enumValue.label?.toLowerCase().includes(query) ||
-        enumValue.description?.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        enumValue =>
+          enumValue.value.toLowerCase().includes(query) ||
+          enumValue.label?.toLowerCase().includes(query) ||
+          enumValue.description?.toLowerCase().includes(query)
       )
     }
 
@@ -110,7 +105,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
     return {
       total: enumValues.length,
       defaults: enumValues.filter(v => v.isDefault).length,
-      withDescriptions: enumValues.filter(v => v.description).length
+      withDescriptions: enumValues.filter(v => v.description).length,
     }
   }, [enumValues])
 
@@ -122,14 +117,14 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       label: newValue.label || newValue.value,
       description: newValue.description,
       isDefault: newValue.isDefault,
-      sortOrder: maxSortOrder + 1
+      sortOrder: maxSortOrder + 1,
     })
 
     setNewValue({
       value: '',
       label: '',
       description: '',
-      isDefault: false
+      isDefault: false,
     })
     setShowAddForm(false)
   }
@@ -140,7 +135,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       value: enumValue.value,
       label: enumValue.label || '',
       description: enumValue.description || '',
-      isDefault: enumValue.isDefault
+      isDefault: enumValue.isDefault,
     })
   }
 
@@ -150,7 +145,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
         value: editingValue.value,
         label: editingValue.label || editingValue.value,
         description: editingValue.description,
-        isDefault: editingValue.isDefault
+        isDefault: editingValue.isDefault,
       })
       setEditingValue(null)
     }
@@ -159,7 +154,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
   const handleMoveValue = (enumValueId: string, direction: 'up' | 'down') => {
     const sortedValues = [...enumValues].sort((a, b) => a.sortOrder - b.sortOrder)
     const currentIndex = sortedValues.findIndex(v => v.id === enumValueId)
-    
+
     if (currentIndex === -1) return
 
     const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
@@ -196,21 +191,21 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       label: `${enumValue.label || enumValue.value} (副本)`,
       description: enumValue.description,
       isDefault: false,
-      sortOrder: maxSortOrder + 1
+      sortOrder: maxSortOrder + 1,
     })
   }
 
   const validateValue = (value: string): string[] => {
     const errors: string[] = []
-    
+
     if (!value.trim()) {
       errors.push('值不能为空')
     }
-    
+
     if (enumValues.some(v => v.value === value && v.id !== editingValue?.id)) {
       errors.push('值已存在')
     }
-    
+
     if (value.length > 255) {
       errors.push('值长度不能超过255字符')
     }
@@ -229,12 +224,10 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
               <h2 className="text-lg font-medium text-text-primary">
                 枚举值管理 - {field?.name || '字段'}
               </h2>
-              <p className="text-sm text-text-secondary">
-                管理字段的可选值和默认值设置
-              </p>
+              <p className="text-sm text-text-secondary">管理字段的可选值和默认值设置</p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
@@ -246,7 +239,9 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                 <div className="text-xs text-text-secondary">默认值</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-green-600">{enumStats.withDescriptions}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {enumStats.withDescriptions}
+                </div>
                 <div className="text-xs text-text-secondary">有描述</div>
               </div>
             </div>
@@ -273,14 +268,14 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                 type="text"
                 placeholder="搜索枚举值..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="input pl-10 w-64"
               />
             </div>
 
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={e => setSortBy(e.target.value as any)}
               className="input w-auto"
             >
               <option value="sortOrder">排序</option>
@@ -290,7 +285,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
 
             <select
               value={filterType}
-              onChange={(e) => setFilterType(e.target.value as any)}
+              onChange={e => setFilterType(e.target.value as any)}
               className="input w-auto"
             >
               <option value="ALL">所有</option>
@@ -308,7 +303,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                 <List className="w-4 h-4" />
                 <span>批量导入</span>
               </button>
-              
+
               <button
                 onClick={() => setShowAddForm(true)}
                 className="btn-primary flex items-center space-x-2"
@@ -325,33 +320,31 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
       {showAddForm && !readonly && (
         <div className="bg-bg-paper rounded-lg border border-gray-200 p-4">
           <h3 className="text-lg font-medium text-text-primary mb-4">添加新枚举值</h3>
-          
+
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                值 *
-              </label>
+              <label className="block text-sm font-medium text-text-primary mb-1">值 *</label>
               <input
                 type="text"
                 value={newValue.value}
-                onChange={(e) => setNewValue({ ...newValue, value: e.target.value })}
+                onChange={e => setNewValue({ ...newValue, value: e.target.value })}
                 className="input w-full"
                 placeholder="枚举值"
                 required
               />
               {validateValue(newValue.value).map((error, index) => (
-                <p key={index} className="text-red-600 text-xs mt-1">{error}</p>
+                <p key={index} className="text-red-600 text-xs mt-1">
+                  {error}
+                </p>
               ))}
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                显示标签
-              </label>
+              <label className="block text-sm font-medium text-text-primary mb-1">显示标签</label>
               <input
                 type="text"
                 value={newValue.label}
-                onChange={(e) => setNewValue({ ...newValue, label: e.target.value })}
+                onChange={e => setNewValue({ ...newValue, label: e.target.value })}
                 className="input w-full"
                 placeholder="显示给用户的标签"
               />
@@ -359,12 +352,10 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-text-primary mb-1">
-              描述
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-1">描述</label>
             <textarea
               value={newValue.description}
-              onChange={(e) => setNewValue({ ...newValue, description: e.target.value })}
+              onChange={e => setNewValue({ ...newValue, description: e.target.value })}
               className="input w-full"
               rows={2}
               placeholder="描述此枚举值的含义和用途"
@@ -376,17 +367,14 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
               <input
                 type="checkbox"
                 checked={newValue.isDefault}
-                onChange={(e) => setNewValue({ ...newValue, isDefault: e.target.checked })}
-                className="rounded border-gray-300"
+                onChange={e => setNewValue({ ...newValue, isDefault: e.target.checked })}
+                className="rounded border-gray-300 bg-bg-secondary"
               />
               <span className="text-sm text-text-primary">设为默认值</span>
             </label>
 
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setShowAddForm(false)}
-                className="btn-outline"
-              >
+              <button onClick={() => setShowAddForm(false)} className="btn-outline">
                 取消
               </button>
               <button
@@ -409,7 +397,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
           </h3>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-bg-secondary">
               <tr>
@@ -444,13 +432,13 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                       <span className="text-sm text-text-secondary">{enumValue.sortOrder}</span>
                     </div>
                   </td>
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editingValue?.id === enumValue.id ? (
                       <input
                         type="text"
                         value={editingValue.value}
-                        onChange={(e) => setEditingValue({ ...editingValue, value: e.target.value })}
+                        onChange={e => setEditingValue({ ...editingValue, value: e.target.value })}
                         className="input w-full text-sm"
                       />
                     ) : (
@@ -464,13 +452,13 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                       </div>
                     )}
                   </td>
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editingValue?.id === enumValue.id ? (
                       <input
                         type="text"
                         value={editingValue.label}
-                        onChange={(e) => setEditingValue({ ...editingValue, label: e.target.value })}
+                        onChange={e => setEditingValue({ ...editingValue, label: e.target.value })}
                         className="input w-full text-sm"
                       />
                     ) : (
@@ -479,12 +467,14 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                       </span>
                     )}
                   </td>
-                  
+
                   <td className="px-6 py-4">
                     {editingValue?.id === enumValue.id ? (
                       <textarea
                         value={editingValue.description}
-                        onChange={(e) => setEditingValue({ ...editingValue, description: e.target.value })}
+                        onChange={e =>
+                          setEditingValue({ ...editingValue, description: e.target.value })
+                        }
                         className="input w-full text-sm"
                         rows={2}
                       />
@@ -494,7 +484,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                       </span>
                     )}
                   </td>
-                  
+
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       {enumValue.isDefault ? (
@@ -509,7 +499,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                       )}
                     </div>
                   </td>
-                  
+
                   {!readonly && (
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       {editingValue?.id === enumValue.id ? (
@@ -539,7 +529,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           >
                             <ArrowUp className="w-4 h-4" />
                           </button>
-                          
+
                           <button
                             onClick={() => handleMoveValue(enumValue.id, 'down')}
                             disabled={index === filteredAndSortedValues.length - 1}
@@ -548,15 +538,23 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           >
                             <ArrowDown className="w-4 h-4" />
                           </button>
-                          
+
                           <button
                             onClick={() => handleSetDefault(enumValue.id, !enumValue.isDefault)}
-                            className={enumValue.isDefault ? 'text-yellow-600 hover:text-yellow-900' : 'text-text-secondary hover:text-text-primary'}
+                            className={
+                              enumValue.isDefault
+                                ? 'text-yellow-600 hover:text-yellow-900'
+                                : 'text-text-secondary hover:text-text-primary'
+                            }
                             title={enumValue.isDefault ? '取消默认' : '设为默认'}
                           >
-                            {enumValue.isDefault ? <Star className="w-4 h-4 fill-current" /> : <StarOff className="w-4 h-4" />}
+                            {enumValue.isDefault ? (
+                              <Star className="w-4 h-4 fill-current" />
+                            ) : (
+                              <StarOff className="w-4 h-4" />
+                            )}
                           </button>
-                          
+
                           <button
                             onClick={() => handleEditValue(enumValue)}
                             className="text-blue-600 hover:text-blue-900"
@@ -564,7 +562,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
-                          
+
                           <button
                             onClick={() => handleDuplicateValue(enumValue)}
                             className="text-text-secondary hover:text-text-primary"
@@ -572,7 +570,7 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
                           >
                             <Copy className="w-4 h-4" />
                           </button>
-                          
+
                           <button
                             onClick={() => onEnumValueDelete(enumValue.id)}
                             className="text-red-600 hover:text-red-900"
@@ -599,14 +597,10 @@ const EnumValueManager: React.FC<EnumValueManagerProps> = ({
             <p className="text-text-secondary mb-6">
               {searchQuery || filterType !== 'ALL'
                 ? '请尝试调整搜索条件'
-                : '为字段添加可选的枚举值'
-              }
+                : '为字段添加可选的枚举值'}
             </p>
             {!readonly && (
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="btn-primary"
-              >
+              <button onClick={() => setShowAddForm(true)} className="btn-primary">
                 添加第一个枚举值
               </button>
             )}
@@ -641,17 +635,17 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
 
   const parseValues = (): Omit<FieldEnumValue, 'id'>[] => {
     const lines = textInput.split(separator).filter(line => line.trim())
-    
+
     return lines.map((line, index) => {
       const parts = line.split('|').map(part => part.trim())
-      
+
       return {
         fieldId,
         value: parts[0] || '',
         label: hasLabels && parts[1] ? parts[1] : parts[0] || '',
         description: hasDescriptions && parts[hasLabels ? 2 : 1] ? parts[hasLabels ? 2 : 1] : '',
         isDefault: false,
-        sortOrder: index
+        sortOrder: index,
       }
     })
   }
@@ -677,27 +671,22 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
       <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-text-primary">批量导入枚举值</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar max-h-[calc(90vh-200px)]">
           {/* 配置选项 */}
           <div className="space-y-4">
             <h3 className="font-medium text-text-primary">导入配置</h3>
-            
+
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-1">
-                  分隔符
-                </label>
+                <label className="block text-sm font-medium text-text-primary mb-1">分隔符</label>
                 <select
                   value={separator}
-                  onChange={(e) => setSeparator(e.target.value)}
+                  onChange={e => setSeparator(e.target.value)}
                   className="input w-full"
                 >
                   <option value="\n">换行符</option>
@@ -706,26 +695,26 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
                   <option value="\t">制表符</option>
                 </select>
               </div>
-              
+
               <div className="flex items-center">
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     checked={hasLabels}
-                    onChange={(e) => setHasLabels(e.target.checked)}
-                    className="rounded border-gray-300"
+                    onChange={e => setHasLabels(e.target.checked)}
+                    className="rounded border-gray-300 bg-bg-secondary"
                   />
                   <span className="text-sm text-text-primary">包含显示标签</span>
                 </label>
               </div>
-              
+
               <div className="flex items-center">
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     checked={hasDescriptions}
-                    onChange={(e) => setHasDescriptions(e.target.checked)}
-                    className="rounded border-gray-300"
+                    onChange={e => setHasDescriptions(e.target.checked)}
+                    className="rounded border-gray-300 bg-bg-secondary"
                   />
                   <span className="text-sm text-text-primary">包含描述</span>
                 </label>
@@ -744,20 +733,18 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
 
           {/* 输入区域 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-1">
-              枚举值数据
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-1">枚举值数据</label>
             <textarea
               value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
+              onChange={e => setTextInput(e.target.value)}
               className="input w-full"
               rows={8}
               placeholder={
                 hasLabels && hasDescriptions
-                  ? "男|男性|表示男性用户\n女|女性|表示女性用户"
+                  ? '男|男性|表示男性用户\n女|女性|表示女性用户'
                   : hasLabels
-                  ? "男|男性\n女|女性"
-                  : "男\n女\n其他"
+                    ? '男|男性\n女|女性'
+                    : '男\n女\n其他'
               }
             />
           </div>
@@ -768,14 +755,20 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
               <h3 className="font-medium text-text-primary mb-3">
                 预览 ({previewValues.length} 项)
               </h3>
-              
-              <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+
+              <div className="max-h-64 overflow-y-auto scrollbar-thin border border-gray-200 rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-bg-secondary">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">值</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">标签</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">描述</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                        值
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                        标签
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                        描述
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-bg-paper divide-y divide-gray-200">
@@ -785,7 +778,9 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
                           <code className="px-2 py-1 bg-gray-100 rounded">{value.value}</code>
                         </td>
                         <td className="px-4 py-2 text-sm text-text-primary">{value.label}</td>
-                        <td className="px-4 py-2 text-sm text-text-secondary">{value.description || '-'}</td>
+                        <td className="px-4 py-2 text-sm text-text-secondary">
+                          {value.description || '-'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -796,10 +791,7 @@ const BatchImportModal: React.FC<BatchImportModalProps> = ({ fieldId, onClose, o
         </div>
 
         <div className="flex justify-end space-x-3 p-6 border-t border-gray-200">
-          <button
-            onClick={onClose}
-            className="btn-outline"
-          >
+          <button onClick={onClose} className="btn-outline">
             取消
           </button>
           <button

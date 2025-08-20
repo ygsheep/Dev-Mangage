@@ -11,21 +11,20 @@ import {
   Upload,
   FileText,
   Eye,
-  Copy
+  Copy,
+  Clock,
+  Target,
+  CheckCircle
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { API } from '@shared/types'
+import { 
+  FeatureModule,
+  FEATURE_MODULE_STATUS_LABELS,
+  FEATURE_MODULE_STATUS_COLORS,
+  FEATURE_MODULE_PRIORITY_LABELS,
+  FEATURE_MODULE_PRIORITY_COLORS
+} from '../../../../../types'
 import FeatureAPICard from '../../../api/components/FeatureAPICard'
-
-interface FeatureModule {
-  id: string
-  name: string
-  description: string
-  status: 'completed' | 'in-progress' | 'planned'
-  tags: string[]
-  frontendAPIs: API[]
-  backendAPIs: API[]
-}
 
 interface FeatureModuleModalProps {
   module: FeatureModule | null
@@ -39,36 +38,11 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
   isOpen, 
   onClose
 }) => {
-  const [activeTab, setActiveTab] = useState<'frontend' | 'backend' | 'all'>('all')
+  const [activeTab, setActiveTab] = useState<'apis' | 'tasks' | 'docs'>('apis')
   const [searchQuery, setSearchQuery] = useState('')
 
   if (!isOpen || !module) return null
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800'
-      case 'in-progress':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'planned':
-        return 'bg-bg-tertiary text-text-primary'
-      default:
-        return 'bg-bg-tertiary text-text-primary'
-    }
-  }
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return '已完成'
-      case 'in-progress':
-        return '开发中'
-      case 'planned':
-        return '规划中'
-      default:
-        return '未知'
-    }
-  }
 
   const getModuleIcon = (moduleName: string) => {
     switch (moduleName) {
@@ -83,25 +57,9 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
     }
   }
 
-  // Filter APIs based on active tab and search query
+  // Filter APIs based on search query
   const getFilteredAPIs = () => {
-    let apis: API[] = []
-    
-    // 确保API数组存在，否则使用空数组
-    const frontendAPIs = module.frontendAPIs || []
-    const backendAPIs = module.backendAPIs || []
-    
-    switch (activeTab) {
-      case 'frontend':
-        apis = frontendAPIs
-        break
-      case 'backend':
-        apis = backendAPIs
-        break
-      case 'all':
-        apis = [...frontendAPIs, ...backendAPIs]
-        break
-    }
+    let apis = module.apiEndpoints || []
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
@@ -135,13 +93,42 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
         <div className="flex items-center justify-between p-6 border-b border-border-primary bg-gradient-header">
           <div className="flex items-center space-x-4">
             {getModuleIcon(module.name)}
-            <div>
-              <h2 className="text-2xl font-semibold text-text-primary">{module.name}</h2>
-              <p className="text-text-secondary">{module.description}</p>
+            <div className="flex-1">
+              <div className="flex items-center space-x-3 mb-2">
+                <h2 className="text-2xl font-semibold text-text-primary">{module.displayName || module.name}</h2>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${FEATURE_MODULE_STATUS_COLORS[module.status]}`}>
+                  {FEATURE_MODULE_STATUS_LABELS[module.status]}
+                </span>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${FEATURE_MODULE_PRIORITY_COLORS[module.priority]}`}>
+                  {FEATURE_MODULE_PRIORITY_LABELS[module.priority]}
+                </span>
+              </div>
+              <p className="text-text-secondary mb-2">{module.description}</p>
+              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                {module.assigneeName && (
+                  <div className="flex items-center space-x-1">
+                    <Users className="w-4 h-4" />
+                    <span>负责人: {module.assigneeName}</span>
+                  </div>
+                )}
+                {module.estimatedHours && (
+                  <div className="flex items-center space-x-1">
+                    <Clock className="w-4 h-4" />
+                    <span>预估: {module.estimatedHours}h</span>
+                  </div>
+                )}
+                {module.actualHours && (
+                  <div className="flex items-center space-x-1">
+                    <Target className="w-4 h-4" />
+                    <span>实际: {module.actualHours}h</span>
+                  </div>
+                )}
+                <div className="flex items-center space-x-1">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>进度: {module.progress}%</span>
+                </div>
+              </div>
             </div>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(module.status)}`}>
-              {getStatusText(module.status)}
-            </span>
           </div>
           <button
             onClick={onClose}
@@ -248,7 +235,7 @@ const FeatureModuleModal: React.FC<FeatureModuleModalProps> = ({
         </div>
 
         {/* API List */}
-        <div className="p-6 max-h-[50vh] overflow-y-auto">
+        <div className="p-6 max-h-[50vh] overflow-y-auto custom-scrollbar">
           {/* 使用提示 */}
           {filteredAPIs.length > 0 && (
             <div className="mb-4 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg border-l-4 border-blue-400">

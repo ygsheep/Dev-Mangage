@@ -145,7 +145,7 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen])
 
-  // 键盘导航
+  // 键盘导航和全局ESC监听
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const displayResults = query.trim() ? results : recentItems
 
@@ -165,10 +165,29 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
         }
         break
       case 'Escape':
+        e.preventDefault()
         onClose()
         break
     }
   }
+
+  // 全局ESC键监听
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        e.preventDefault()
+        onClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleGlobalKeyDown)
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown)
+    }
+  }, [isOpen, onClose])
 
   // 处理结果选择
   const handleResultSelect = (result: SearchResult) => {
@@ -218,8 +237,14 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
   const showEmpty = query.trim() && !isLoading && results.length === 0
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center pt-20">
-      <div className="bg-bg-paper rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-96">
+    <div 
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-start justify-center pt-20"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-bg-paper rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-96"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* 搜索头部 */}
         <div className="flex items-center px-4 py-3 border-b border-border-primary">
           <Search className="h-5 w-5 text-text-tertiary mr-3" />
@@ -268,7 +293,7 @@ const QuickSearch: React.FC<QuickSearchProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* 搜索结果 */}
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-80 overflow-y-auto scrollbar-thin">
           {isLoading && (
             <div className="flex items-center justify-center py-8">
               <Loader className="h-6 w-6 animate-spin text-blue-600" />

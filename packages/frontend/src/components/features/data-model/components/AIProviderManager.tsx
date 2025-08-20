@@ -1,34 +1,27 @@
-import React, { useState, useEffect } from 'react'
 import {
+  BarChart3,
   Brain,
-  Settings,
-  Plus,
+  Clock,
   Edit3,
-  Trash2,
   Eye,
   EyeOff,
-  Check,
-  X,
-  AlertCircle,
-  Activity,
-  Server,
-  Key,
-  Globe,
-  Zap,
-  Clock,
-  BarChart3,
+  Plus,
   RefreshCw,
-  TestTube
+  Settings,
+  TestTube,
+  Trash2,
+  X,
 } from 'lucide-react'
-import {
-  getAIProviders,
-  createAIProvider,
-  updateAIProvider,
-  deleteAIProvider,
-  testAIProvider,
-  getAIProviderStats
-} from '../../../../utils/api'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import {
+  createAIProvider,
+  deleteAIProvider,
+  getAIProviderStats,
+  getAIProviders,
+  testAIProvider,
+  updateAIProvider,
+} from '../../../../utils/api'
 
 interface AIProvider {
   id: string
@@ -77,7 +70,7 @@ const PROVIDER_TYPES = [
   { value: 'deepseek', label: 'DeepSeek', icon: '🧠', description: 'DeepSeek Coder models' },
   { value: 'ollama', label: 'Ollama', icon: '🦙', description: 'Local Ollama models' },
   { value: 'claude', label: 'Claude', icon: '🎭', description: 'Anthropic Claude models' },
-  { value: 'custom', label: 'Custom', icon: '⚙️', description: 'Custom API endpoint' }
+  { value: 'custom', label: 'Custom', icon: '⚙️', description: 'Custom API endpoint' },
 ]
 
 const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
@@ -98,7 +91,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
     maxTokens: 4000,
     temperature: 0.7,
     isDefault: false,
-    isEnabled: true
+    isEnabled: true,
   })
 
   // 加载AI提供商列表
@@ -118,7 +111,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
               const statsResponse = await getAIProviderStats(provider.id)
               return {
                 ...provider,
-                stats: statsResponse.success ? statsResponse.data : undefined
+                stats: statsResponse.success ? statsResponse.data : undefined,
               }
             } catch (error) {
               return provider
@@ -147,7 +140,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
       maxTokens: 4000,
       temperature: 0.7,
       isDefault: false,
-      isEnabled: true
+      isEnabled: true,
     })
     setShowForm(true)
   }
@@ -164,7 +157,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
       maxTokens: provider.maxTokens || 4000,
       temperature: provider.temperature || 0.7,
       isDefault: provider.isDefault,
-      isEnabled: provider.isEnabled
+      isEnabled: provider.isEnabled,
     })
     setShowForm(true)
   }
@@ -186,7 +179,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
           throw new Error(response.error || '创建失败')
         }
       }
-      
+
       setShowForm(false)
       loadProviders()
     } catch (error: any) {
@@ -234,7 +227,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
   const toggleApiKeyVisibility = (providerId: string) => {
     setShowApiKeys(prev => ({
       ...prev,
-      [providerId]: !prev[providerId]
+      [providerId]: !prev[providerId],
     }))
   }
 
@@ -272,10 +265,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
               <Plus className="w-4 h-4" />
               <span>添加提供商</span>
             </button>
-            <button
-              onClick={loadProviders}
-              className="btn-outline flex items-center space-x-2"
-            >
+            <button onClick={loadProviders} className="btn-outline flex items-center space-x-2">
               <RefreshCw className="w-4 h-4" />
               <span>刷新</span>
             </button>
@@ -291,7 +281,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
         {/* 主内容区域 */}
         <div className="flex h-[calc(90vh-80px)]">
           {/* 左侧：提供商列表 */}
-          <div className="w-1/3 border-r border-gray-200 overflow-y-auto">
+          <div className="w-1/3 border-r border-gray-200 overflow-y-auto custom-scrollbar">
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
@@ -303,23 +293,16 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-text-primary mb-2">
-                    暂无AI提供商
-                  </h3>
-                  <p className="text-text-secondary mb-4">
-                    点击右上角按钮添加第一个AI提供商
-                  </p>
-                  <button
-                    onClick={handleCreateProvider}
-                    className="btn-primary"
-                  >
+                  <h3 className="text-lg font-medium text-text-primary mb-2">暂无AI提供商</h3>
+                  <p className="text-text-secondary mb-4">点击右上角按钮添加第一个AI提供商</p>
+                  <button onClick={handleCreateProvider} className="btn-primary">
                     添加提供商
                   </button>
                 </div>
               </div>
             ) : (
               <div className="p-4 space-y-3">
-                {providers.map((provider) => {
+                {providers.map(provider => {
                   const typeInfo = getProviderTypeInfo(provider.type)
                   return (
                     <div
@@ -327,7 +310,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       className={`p-4 rounded-lg border cursor-pointer transition-all ${
                         selectedProvider?.id === provider.id
                           ? 'border-blue-300 bg-primary-50 dark:bg-primary-900/20'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-bg-secondary'
+                          : 'border-gray-200 hover:border-gray-300 bg-bg-secondary hover:bg-bg-secondary'
                       }`}
                       onClick={() => setSelectedProvider(provider)}
                     >
@@ -350,9 +333,11 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                           </div>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <div className={`w-2 h-2 rounded-full ${
-                            provider.isEnabled ? 'bg-green-400' : 'bg-gray-300'
-                          }`} />
+                          <div
+                            className={`w-2 h-2 rounded-full ${
+                              provider.isEnabled ? 'bg-green-400' : 'bg-gray-300'
+                            }`}
+                          />
                           {provider.stats && (
                             <div className="text-xs text-gray-500">
                               {provider.stats.successfulRequests} 次成功
@@ -368,17 +353,14 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
           </div>
 
           {/* 右侧：详情和表单 */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
             {showForm ? (
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-medium text-text-primary">
                     {editingProvider ? '编辑' : '添加'}AI提供商
                   </h3>
-                  <button
-                    onClick={() => setShowForm(false)}
-                    className="btn-outline"
-                  >
+                  <button onClick={() => setShowForm(false)} className="btn-outline">
                     取消
                   </button>
                 </div>
@@ -393,7 +375,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       <input
                         type="text"
                         value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                         className="input w-full"
                         placeholder="唯一标识名称"
                       />
@@ -405,7 +387,9 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       <input
                         type="text"
                         value={formData.displayName}
-                        onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, displayName: e.target.value }))
+                        }
                         className="input w-full"
                         placeholder="用户友好的显示名称"
                       />
@@ -418,13 +402,13 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       提供商类型 *
                     </label>
                     <div className="grid grid-cols-3 gap-3">
-                      {PROVIDER_TYPES.map((type) => (
+                      {PROVIDER_TYPES.map(type => (
                         <label
                           key={type.value}
                           className={`p-3 border rounded-lg cursor-pointer transition-all ${
                             formData.type === type.value
                               ? 'border-blue-300 bg-primary-50 dark:bg-primary-900/20'
-                              : 'border-gray-200 hover:border-gray-300'
+                              : 'border-gray-200 hover:border-gray-300 bg-bg-secondary'
                           }`}
                         >
                           <input
@@ -432,7 +416,9 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                             name="type"
                             value={type.value}
                             checked={formData.type === type.value}
-                            onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
+                            onChange={e =>
+                              setFormData(prev => ({ ...prev, type: e.target.value as any }))
+                            }
                             className="sr-only"
                           />
                           <div className="text-center">
@@ -455,7 +441,9 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                         <input
                           type="url"
                           value={formData.endpoint}
-                          onChange={(e) => setFormData(prev => ({ ...prev, endpoint: e.target.value }))}
+                          onChange={e =>
+                            setFormData(prev => ({ ...prev, endpoint: e.target.value }))
+                          }
                           className="input w-full"
                           placeholder="https://api.example.com/v1"
                         />
@@ -468,7 +456,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       <input
                         type="password"
                         value={formData.apiKey}
-                        onChange={(e) => setFormData(prev => ({ ...prev, apiKey: e.target.value }))}
+                        onChange={e => setFormData(prev => ({ ...prev, apiKey: e.target.value }))}
                         className="input w-full"
                         placeholder="sk-..."
                       />
@@ -484,7 +472,7 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       <input
                         type="text"
                         value={formData.model}
-                        onChange={(e) => setFormData(prev => ({ ...prev, model: e.target.value }))}
+                        onChange={e => setFormData(prev => ({ ...prev, model: e.target.value }))}
                         className="input w-full"
                         placeholder="gpt-4, deepseek-coder, llama2"
                       />
@@ -496,7 +484,9 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       <input
                         type="number"
                         value={formData.maxTokens}
-                        onChange={(e) => setFormData(prev => ({ ...prev, maxTokens: parseInt(e.target.value) }))}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, maxTokens: parseInt(e.target.value) }))
+                        }
                         className="input w-full"
                         min="100"
                         max="32000"
@@ -509,7 +499,12 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       <input
                         type="number"
                         value={formData.temperature}
-                        onChange={(e) => setFormData(prev => ({ ...prev, temperature: parseFloat(e.target.value) }))}
+                        onChange={e =>
+                          setFormData(prev => ({
+                            ...prev,
+                            temperature: parseFloat(e.target.value),
+                          }))
+                        }
                         className="input w-full"
                         min="0"
                         max="2"
@@ -524,8 +519,10 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       <input
                         type="checkbox"
                         checked={formData.isDefault}
-                        onChange={(e) => setFormData(prev => ({ ...prev, isDefault: e.target.checked }))}
-                        className="rounded border-gray-300"
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, isDefault: e.target.checked }))
+                        }
+                        className="rounded border-gray-300 bg-bg-secondary"
                       />
                       <span className="text-sm text-text-primary">设为默认提供商</span>
                     </label>
@@ -533,8 +530,10 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       <input
                         type="checkbox"
                         checked={formData.isEnabled}
-                        onChange={(e) => setFormData(prev => ({ ...prev, isEnabled: e.target.checked }))}
-                        className="rounded border-gray-300"
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, isEnabled: e.target.checked }))
+                        }
+                        className="rounded border-gray-300 bg-bg-secondary"
                       />
                       <span className="text-sm text-text-primary">启用此提供商</span>
                     </label>
@@ -542,16 +541,10 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
 
                   {/* 操作按钮 */}
                   <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-                    <button
-                      onClick={() => setShowForm(false)}
-                      className="btn-outline"
-                    >
+                    <button onClick={() => setShowForm(false)} className="btn-outline">
                       取消
                     </button>
-                    <button
-                      onClick={handleSubmitForm}
-                      className="btn-primary"
-                    >
+                    <button onClick={handleSubmitForm} className="btn-primary">
                       {editingProvider ? '更新' : '创建'}
                     </button>
                   </div>
@@ -561,7 +554,9 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
-                    <div className="text-3xl">{getProviderTypeInfo(selectedProvider.type).icon}</div>
+                    <div className="text-3xl">
+                      {getProviderTypeInfo(selectedProvider.type).icon}
+                    </div>
                     <div>
                       <h3 className="text-lg font-medium text-text-primary flex items-center space-x-2">
                         <span>{selectedProvider.displayName}</span>
@@ -570,11 +565,15 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                             默认
                           </span>
                         )}
-                        <div className={`w-2 h-2 rounded-full ${
-                          selectedProvider.isEnabled ? 'bg-green-400' : 'bg-gray-300'
-                        }`} />
+                        <div
+                          className={`w-2 h-2 rounded-full ${
+                            selectedProvider.isEnabled ? 'bg-green-400' : 'bg-gray-300'
+                          }`}
+                        />
                       </h3>
-                      <p className="text-text-secondary">{getProviderTypeInfo(selectedProvider.type).label}</p>
+                      <p className="text-text-secondary">
+                        {getProviderTypeInfo(selectedProvider.type).label}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -621,7 +620,9 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                       </div>
                       <div>
                         <span className="text-text-secondary">类型：</span>
-                        <span className="font-medium">{getProviderTypeInfo(selectedProvider.type).label}</span>
+                        <span className="font-medium">
+                          {getProviderTypeInfo(selectedProvider.type).label}
+                        </span>
                       </div>
                       {selectedProvider.endpoint && (
                         <div>
@@ -650,10 +651,9 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                         <span className="text-text-secondary">API密钥：</span>
                         <div className="flex items-center space-x-2 mt-1">
                           <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                            {showApiKeys[selectedProvider.id] 
-                              ? selectedProvider.apiKey 
-                              : '*'.repeat(selectedProvider.apiKey.length)
-                            }
+                            {showApiKeys[selectedProvider.id]
+                              ? selectedProvider.apiKey
+                              : '*'.repeat(selectedProvider.apiKey.length)}
                           </span>
                           <button
                             onClick={() => toggleApiKeyVisibility(selectedProvider.id)}
@@ -689,7 +689,12 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
                           </div>
                           <div className="text-center">
                             <div className="text-2xl font-bold text-green-600">
-                              {Math.round((selectedProvider.stats.successfulRequests / selectedProvider.stats.totalRequests) * 100)}%
+                              {Math.round(
+                                (selectedProvider.stats.successfulRequests /
+                                  selectedProvider.stats.totalRequests) *
+                                  100
+                              )}
+                              %
                             </div>
                             <div className="text-sm text-text-secondary">成功率</div>
                           </div>
@@ -731,12 +736,8 @@ const AIProviderManager: React.FC<AIProviderManagerProps> = ({ onClose }) => {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-text-primary mb-2">
-                    选择AI提供商
-                  </h3>
-                  <p className="text-text-secondary">
-                    从左侧列表中选择一个AI提供商查看详情
-                  </p>
+                  <h3 className="text-lg font-medium text-text-primary mb-2">选择AI提供商</h3>
+                  <p className="text-text-secondary">从左侧列表中选择一个AI提供商查看详情</p>
                 </div>
               </div>
             )}

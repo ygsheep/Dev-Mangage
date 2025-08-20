@@ -19,7 +19,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
 }) => {
   const [config, setConfig] = useState<AIParsingConfig>({
     provider: 'ollama',
-    model: 'qwen2.5-coder:7b',
+    model: 'qwen2.5-coder:7b', // 默认模型，将从已安装模型中自动选择
     baseUrl: 'http://localhost:11434'
   })
   const [isTestingConnection, setIsTestingConnection] = useState(false)
@@ -70,6 +70,15 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
       } else {
         setAvailableModels(models)
         setShowModelInstaller(false)
+        
+        // 如果当前选择的模型不在已安装列表中，自动选择第一个已安装的模型
+        const currentModelExists = models.some(m => m.name === config.model || m.model === config.model)
+        if (!currentModelExists && models.length > 0) {
+          setConfig(prev => ({
+            ...prev,
+            model: models[0].name || models[0].model
+          }))
+        }
       }
     } catch (error) {
       console.error('加载Ollama模型失败:', error)
@@ -230,7 +239,7 @@ const AIConfigModal: React.FC<AIConfigModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
           {/* 详细配置 */}
           <div className="space-y-6">
 

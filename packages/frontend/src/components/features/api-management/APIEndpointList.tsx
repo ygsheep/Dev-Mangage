@@ -138,7 +138,7 @@ export const APIEndpointList: React.FC<APIEndpointListProps> = ({
     <div className="space-y-6">
       {/* 表格视图 */}
       <div className="bg-bg-paper rounded-lg border border-border-primary overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-bg-secondary">
               <tr>

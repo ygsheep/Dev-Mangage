@@ -433,7 +433,7 @@ const IndexPerformanceAnalyzer: React.FC<IndexPerformanceAnalyzerProps> = ({
           <h3 className="text-lg font-medium text-text-primary">表性能评估</h3>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-bg-secondary">
               <tr>

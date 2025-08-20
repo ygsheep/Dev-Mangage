@@ -6,15 +6,15 @@
 export const API_CONFIG = {
   // 服务器配置
   SERVER: {
-    PORT: 3001,
+    PORT: 3000,
     HOST: 'localhost',
-    BASE_URL: 'http://localhost:3001',
+    BASE_URL: 'http://localhost:3000',
   },
-  
+
   // API版本和前缀
   VERSION: 'v1',
   PREFIX: '/api/v1',
-  
+
   // 健康检查
   HEALTH: '/health',
 } as const
@@ -31,7 +31,7 @@ export const API_ENDPOINTS = {
     DELETE: (id: string | number) => `${API_CONFIG.PREFIX}/projects/${id}`,
     SEARCH: `${API_CONFIG.PREFIX}/projects/search`,
   },
-  
+
   // API管理
   APIS: {
     BASE: `${API_CONFIG.PREFIX}/apis`,
@@ -44,7 +44,7 @@ export const API_ENDPOINTS = {
     BY_PROJECT: (projectId: string | number) => `${API_CONFIG.PREFIX}/apis/project/${projectId}`,
     IMPORT_SWAGGER: `${API_CONFIG.PREFIX}/apis/import/swagger`,
   },
-  
+
   // 标签管理
   TAGS: {
     BASE: `${API_CONFIG.PREFIX}/tags`,
@@ -55,7 +55,7 @@ export const API_ENDPOINTS = {
     DELETE: (id: string | number) => `${API_CONFIG.PREFIX}/tags/${id}`,
     SEARCH: `${API_CONFIG.PREFIX}/tags/search`,
   },
-  
+
   // Swagger文档
   SWAGGER: {
     BASE: `${API_CONFIG.PREFIX}/swagger`,
@@ -63,7 +63,7 @@ export const API_ENDPOINTS = {
     UI: `${API_CONFIG.PREFIX}/swagger-ui`,
     DOCS: `${API_CONFIG.PREFIX}/docs`,
   },
-  
+
   // MCP服务
   MCP: {
     BASE: `${API_CONFIG.PREFIX}/mcp`,
@@ -73,7 +73,7 @@ export const API_ENDPOINTS = {
     // 临时兼容路径
     LEGACY: '/__mcp',
   },
-  
+
   // 数据模型
   DATA_MODELS: {
     BASE: `${API_CONFIG.PREFIX}/data-models`,
@@ -91,7 +91,8 @@ export const API_ENDPOINTS = {
     GET_DATA: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}`,
     SAVE_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
     GET_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
-    DELETE_LAYOUT: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
+    DELETE_LAYOUT: (projectId: string | number) =>
+      `${API_CONFIG.PREFIX}/mindmap/${projectId}/layout`,
     GET_STATS: (projectId: string | number) => `${API_CONFIG.PREFIX}/mindmap/${projectId}/stats`,
   },
 
@@ -108,26 +109,38 @@ export const API_ENDPOINTS = {
     BASE: `${API_CONFIG.PREFIX}/issues`,
     LIST: (projectId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues`,
     CREATE: (projectId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues`,
-    GET_BY_ID: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}`,
-    UPDATE: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}`,
-    DELETE: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}`,
+    GET_BY_ID: (projectId: string, issueId: string) =>
+      `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}`,
+    UPDATE: (projectId: string, issueId: string) =>
+      `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}`,
+    DELETE: (projectId: string, issueId: string) =>
+      `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}`,
     STATS: (projectId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/stats`,
-    
+
     // GitHub 同步
-    SYNC_FROM_GITHUB: (projectId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/sync/from-github`,
-    SYNC_TO_GITHUB: (projectId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/sync/to-github`,
-    SYNC_BIDIRECTIONAL: (projectId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/sync/bidirectional`,
+    SYNC_FROM_GITHUB: (projectId: string) =>
+      `${API_CONFIG.PREFIX}/issues/${projectId}/sync/from-github`,
+    SYNC_TO_GITHUB: (projectId: string) =>
+      `${API_CONFIG.PREFIX}/issues/${projectId}/sync/to-github`,
+    SYNC_BIDIRECTIONAL: (projectId: string) =>
+      `${API_CONFIG.PREFIX}/issues/${projectId}/sync/bidirectional`,
     SYNC_STATUS: (projectId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/sync/status`,
-    
+
     // 关联关系
     RELATIONS: {
-      BASE: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations`,
-      APIS: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/apis`,
-      TABLES: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/tables`,
-      FEATURES: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/features`,
-      BATCH: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/batch`,
-      AVAILABLE: (projectId: string, issueId: string) => `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/available`,
-    }
+      BASE: (projectId: string, issueId: string) =>
+        `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations`,
+      APIS: (projectId: string, issueId: string) =>
+        `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/apis`,
+      TABLES: (projectId: string, issueId: string) =>
+        `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/tables`,
+      FEATURES: (projectId: string, issueId: string) =>
+        `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/features`,
+      BATCH: (projectId: string, issueId: string) =>
+        `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/batch`,
+      AVAILABLE: (projectId: string, issueId: string) =>
+        `${API_CONFIG.PREFIX}/issues/${projectId}/issues/${issueId}/relations/available`,
+    },
   },
 
   // GitHub 仓库配置
@@ -135,10 +148,11 @@ export const API_ENDPOINTS = {
     BASE: `${API_CONFIG.PREFIX}/github`,
     REPOSITORIES: `${API_CONFIG.PREFIX}/github/repositories`,
     REPOSITORY: (projectId: string) => `${API_CONFIG.PREFIX}/github/repositories/${projectId}`,
-    VALIDATE: (projectId: string) => `${API_CONFIG.PREFIX}/github/repositories/${projectId}/validate`,
+    VALIDATE: (projectId: string) =>
+      `${API_CONFIG.PREFIX}/github/repositories/${projectId}/validate`,
     WEBHOOK: (projectId: string) => `${API_CONFIG.PREFIX}/github/repositories/${projectId}/webhook`,
   },
-  
+
   // 健康检查
   HEALTH: {
     CHECK: '/health',

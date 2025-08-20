@@ -1,9 +1,9 @@
 // packages/frontend/src/components/MindmapViewer/MindmapSidebar.tsx
 
-import React, { useState, useEffect } from 'react'
-import { X, Edit3, Save, RotateCcw, Eye, Settings, Trash2 } from 'lucide-react'
-import { MindmapNodeData, MindmapEdgeData, MindmapNodeType, MindmapEdgeType } from '../../../../../types/mindmap'
+import { Edit3, Eye, RotateCcw, Save, Settings, Trash2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { useMindmapStore } from '../../../../../stores/mindmapStore'
+import { MindmapEdgeData, MindmapNodeData, MindmapNodeType } from '../../../../../types/mindmap'
 
 interface MindmapSidebarProps {
   selectedNodeIds: string[]
@@ -18,7 +18,7 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
   selectedEdgeIds,
   onNodeUpdate,
   onEdgeUpdate,
-  className = ''
+  className = '',
 }) => {
   const { nodes, edges } = useMindmapStore()
   const [isEditing, setIsEditing] = useState(false)
@@ -69,21 +69,19 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
       <div className={`w-80 bg-bg-paper border-l border-border-primary p-4 ${className}`}>
         <div className="text-center text-gray-500">
           <Eye className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <h3 className="text-sm font-medium text-gray-900 mb-2">选择节点或关系</h3>
-          <p className="text-xs text-gray-500">
-            点击图中的节点或连线查看详细信息
-          </p>
+          <h3 className="text-sm font-medium text-text-primary mb-2">选择节点或关系</h3>
+          <p className="text-xs text-gray-500">点击图中的节点或连线查看详细信息</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className={`w-80 bg-bg-paper border-l border-border-primary overflow-y-auto ${className}`}>
+    <div className={`w-80 bg-bg-paper border-l border-border-primary overflow-y-auto custom-scrollbar ${className}`}>
       {/* 头部 */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-text-primary">
             {selectedNode ? '节点属性' : selectedEdge ? '关系属性' : '属性面板'}
           </h3>
           <div className="flex items-center space-x-2">
@@ -124,7 +122,7 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
           <>
             {/* 基础信息 */}
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-3">基础信息</h4>
+              <h4 className="text-sm font-medium text-text-primary mb-3">基础信息</h4>
               <div className="space-y-3">
                 <div>
                   <label className="block text-xs font-medium text-text-primary mb-1">
@@ -134,27 +132,25 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
                     <input
                       type="text"
                       value={editData.label || ''}
-                      onChange={(e) => setEditData({...editData, label: e.target.value})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      onChange={e => setEditData({ ...editData, label: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 bg-bg-secondary focus:outline-none rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   ) : (
-                    <div className="text-sm text-gray-900">{selectedNode.data.label}</div>
+                    <div className="text-sm text-text-primary">{selectedNode.data.label}</div>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-text-primary mb-1">
-                    描述
-                  </label>
+                  <label className="block text-xs font-medium text-text-primary mb-1">描述</label>
                   {isEditing ? (
                     <textarea
                       value={editData.description || ''}
-                      onChange={(e) => setEditData({...editData, description: e.target.value})}
+                      onChange={e => setEditData({ ...editData, description: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 bg-bg-secondary focus:outline-none rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   ) : (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-text-secondary">
                       {selectedNode.data.description || '暂无描述'}
                     </div>
                   )}
@@ -164,34 +160,35 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
                   <label className="block text-xs font-medium text-text-primary mb-1">
                     节点类型
                   </label>
-                  <div className="text-sm text-gray-900 font-mono bg-bg-secondary px-2 py-1 rounded">
+                  <div className="text-sm text-text-primary font-mono bg-bg-secondary px-2 py-1 rounded">
                     {selectedNode.data.type}
                   </div>
                 </div>
 
                 {selectedNode.data.category && (
                   <div>
-                    <label className="block text-xs font-medium text-text-primary mb-1">
-                      分类
-                    </label>
-                    <div className="text-sm text-gray-900">
-                      {selectedNode.data.category}
-                    </div>
+                    <label className="block text-xs font-medium text-text-primary mb-1">分类</label>
+                    <div className="text-sm text-text-primary">{selectedNode.data.category}</div>
                   </div>
                 )}
 
                 {selectedNode.data.status && (
                   <div>
-                    <label className="block text-xs font-medium text-text-primary mb-1">
-                      状态
-                    </label>
-                    <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                      selectedNode.data.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                      selectedNode.data.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {selectedNode.data.status === 'DRAFT' ? '草稿' : 
-                       selectedNode.data.status === 'ACTIVE' ? '已创建' : '已废弃'}
+                    <label className="block text-xs font-medium text-text-primary mb-1">状态</label>
+                    <span
+                      className={`inline-block px-2 py-1 text-xs rounded-full ${
+                        selectedNode.data.status === 'ACTIVE'
+                          ? 'bg-green-100 text-green-800'
+                          : selectedNode.data.status === 'DRAFT'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {selectedNode.data.status === 'DRAFT'
+                        ? '草稿'
+                        : selectedNode.data.status === 'ACTIVE'
+                          ? '已创建'
+                          : '已废弃'}
                     </span>
                   </div>
                 )}
@@ -201,7 +198,7 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
             {/* 统计信息 */}
             {selectedNode.data.type === MindmapNodeType.TABLE && (
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">统计信息</h4>
+                <h4 className="text-sm font-medium text-text-primary mb-3">统计信息</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-primary-50 dark:bg-primary-900/20 p-3 rounded-md">
                     <div className="text-lg font-semibold text-blue-600">
@@ -234,12 +231,12 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
             {/* 扩展信息 */}
             {selectedNode.data.metadata && Object.keys(selectedNode.data.metadata).length > 0 && (
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">扩展信息</h4>
+                <h4 className="text-sm font-medium text-text-primary mb-3">扩展信息</h4>
                 <div className="space-y-2">
                   {Object.entries(selectedNode.data.metadata).map(([key, value]) => (
                     <div key={key} className="flex justify-between items-center">
                       <span className="text-xs text-gray-500 capitalize">{key}:</span>
-                      <span className="text-xs text-gray-900 font-mono">
+                      <span className="text-xs text-text-primary font-mono">
                         {typeof value === 'object' ? JSON.stringify(value) : String(value)}
                       </span>
                     </div>
@@ -250,7 +247,7 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
 
             {/* 操作按钮 */}
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-3">操作</h4>
+              <h4 className="text-sm font-medium text-text-primary mb-3">操作</h4>
               <div className="space-y-2">
                 {selectedNode.data.entityType === 'table' && (
                   <button
@@ -266,7 +263,7 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
                 )}
 
                 <button
-                  className="w-full flex items-center justify-center space-x-2 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-bg-secondary transition-colors"
+                  className="w-full flex items-center justify-center space-x-2 px-3 py-2 text-sm text-text-secondary border border-gray-300 bg-bg-secondary focus:outline-none rounded-md hover:bg-bg-secondary transition-colors"
                   onClick={() => {
                     console.log('Configure node:', selectedNode.id)
                   }}
@@ -296,7 +293,7 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
           <>
             {/* 关系基础信息 */}
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-3">关系信息</h4>
+              <h4 className="text-sm font-medium text-text-primary mb-3">关系信息</h4>
               <div className="space-y-3">
                 <div>
                   <label className="block text-xs font-medium text-text-primary mb-1">
@@ -306,11 +303,11 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
                     <input
                       type="text"
                       value={editData.label || ''}
-                      onChange={(e) => setEditData({...editData, label: e.target.value})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      onChange={e => setEditData({ ...editData, label: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 bg-bg-secondary focus:outline-none rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   ) : (
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-text-primary">
                       {selectedEdge.data.label || '未命名关系'}
                     </div>
                   )}
@@ -320,23 +317,21 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
                   <label className="block text-xs font-medium text-text-primary mb-1">
                     关系类型
                   </label>
-                  <div className="text-sm text-gray-900 font-mono bg-bg-secondary px-2 py-1 rounded">
+                  <div className="text-sm text-text-primary font-mono bg-bg-secondary px-2 py-1 rounded">
                     {selectedEdge.data.type}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-text-primary mb-1">
-                    源节点
-                  </label>
-                  <div className="text-sm text-gray-900">{selectedEdge.source}</div>
+                  <label className="block text-xs font-medium text-text-primary mb-1">源节点</label>
+                  <div className="text-sm text-text-primary">{selectedEdge.source}</div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-text-primary mb-1">
                     目标节点
                   </label>
-                  <div className="text-sm text-gray-900">{selectedEdge.target}</div>
+                  <div className="text-sm text-text-primary">{selectedEdge.target}</div>
                 </div>
 
                 {selectedEdge.data.constraintType && (
@@ -344,7 +339,7 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
                     <label className="block text-xs font-medium text-text-primary mb-1">
                       约束类型
                     </label>
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-text-primary">
                       {selectedEdge.data.constraintType}
                     </div>
                   </div>
@@ -354,7 +349,7 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
 
             {/* 样式设置 */}
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-3">样式设置</h4>
+              <h4 className="text-sm font-medium text-text-primary mb-3">样式设置</h4>
               <div className="space-y-3">
                 <div>
                   <label className="block text-xs font-medium text-text-primary mb-1">
@@ -363,39 +358,40 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
                   {isEditing ? (
                     <select
                       value={editData.style || 'solid'}
-                      onChange={(e) => setEditData({...editData, style: e.target.value})}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      onChange={e => setEditData({ ...editData, style: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 bg-bg-secondary focus:outline-none rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="solid">实线</option>
                       <option value="dashed">虚线</option>
                       <option value="dotted">点线</option>
                     </select>
                   ) : (
-                    <div className="text-sm text-gray-900">
-                      {selectedEdge.data.style === 'solid' ? '实线' :
-                       selectedEdge.data.style === 'dashed' ? '虚线' : '点线'}
+                    <div className="text-sm text-text-primary">
+                      {selectedEdge.data.style === 'solid'
+                        ? '实线'
+                        : selectedEdge.data.style === 'dashed'
+                          ? '虚线'
+                          : '点线'}
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-text-primary mb-1">
-                    颜色
-                  </label>
+                  <label className="block text-xs font-medium text-text-primary mb-1">颜色</label>
                   {isEditing ? (
                     <input
                       type="color"
                       value={editData.color || '#9CA3AF'}
-                      onChange={(e) => setEditData({...editData, color: e.target.value})}
-                      className="w-full h-10 rounded-md border border-gray-300"
+                      onChange={e => setEditData({ ...editData, color: e.target.value })}
+                      className="w-full h-10 rounded-md border border-gray-300 bg-bg-secondary focus:outline-none"
                     />
                   ) : (
                     <div className="flex items-center space-x-2">
-                      <div 
-                        className="w-4 h-4 rounded border border-gray-300"
+                      <div
+                        className="w-4 h-4 rounded border border-gray-300 bg-bg-secondary focus:outline-none"
                         style={{ backgroundColor: selectedEdge.data.color }}
                       />
-                      <span className="text-sm text-gray-900 font-mono">
+                      <span className="text-sm text-text-primary font-mono">
                         {selectedEdge.data.color}
                       </span>
                     </div>
@@ -407,9 +403,11 @@ const MindmapSidebar: React.FC<MindmapSidebarProps> = ({
                     <input
                       type="checkbox"
                       checked={isEditing ? editData.animated : selectedEdge.data.animated}
-                      onChange={(e) => isEditing && setEditData({...editData, animated: e.target.checked})}
+                      onChange={e =>
+                        isEditing && setEditData({ ...editData, animated: e.target.checked })
+                      }
                       disabled={!isEditing}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 bg-bg-secondary text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-xs text-text-primary">动画效果</span>
                   </label>

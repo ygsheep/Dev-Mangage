@@ -98,6 +98,22 @@ export abstract class BaseAIAdapter implements AIServiceAdapter {
       case DocumentType.EXCEL:
         template = PROMPT_TEMPLATES.DOCUMENT_PARSE.EXCEL
         break
+      // 新增专用文档类型
+      case DocumentType.API_DOCUMENTATION:
+        template = PROMPT_TEMPLATES.DOCUMENT_PARSE.API_DOCUMENTATION
+        break
+      case DocumentType.DATA_MODEL:
+        template = PROMPT_TEMPLATES.DOCUMENT_PARSE.DATA_MODEL
+        break
+      case DocumentType.FEATURE_MODULE:
+        template = PROMPT_TEMPLATES.DOCUMENT_PARSE.FEATURE_MODULE
+        break
+      case DocumentType.BUSINESS_PROCESS:
+        template = PROMPT_TEMPLATES.DOCUMENT_PARSE.BUSINESS_PROCESS
+        break
+      case DocumentType.TECHNICAL_SPEC:
+        template = PROMPT_TEMPLATES.DOCUMENT_PARSE.TECHNICAL_SPEC
+        break
       default:
         template = PROMPT_TEMPLATES.DOCUMENT_PARSE.MARKDOWN
     }

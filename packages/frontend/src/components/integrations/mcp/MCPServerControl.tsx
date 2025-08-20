@@ -1,29 +1,29 @@
-import React, { useState, useEffect } from 'react'
-import { 
-  Server, 
-  Play, 
-  Square, 
-  RefreshCw, 
-  Activity, 
-  Wifi, 
-  WifiOff, 
-  Terminal,
-  Database,
-  Search,
+import {
+  Activity,
   AlertCircle,
   CheckCircle,
   Clock,
-  Zap
+  Database,
+  Play,
+  RefreshCw,
+  Search,
+  Server,
+  Square,
+  Terminal,
+  Wifi,
+  WifiOff,
+  Zap,
 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { MCPServerLog, MCPServerStatus, mcpServerAPI } from '../../../api/mcpServer'
 import { debug, useDebugComponent } from '../../../debug'
-import { mcpServerAPI, MCPServerStatus, MCPServerLog } from '../../../api/mcpServer'
 import { useMCPConfig, useMCPConnection } from '../../../hooks/useMCPConfig'
 
 const MCPServerControl: React.FC = () => {
   // 使用 MCP 配置管理
   const { config, urls, isValid } = useMCPConfig()
   const { isConnected, isChecking } = useMCPConnection()
-  
+
   const [serverStatus, setServerStatus] = useState<MCPServerStatus>({
     isRunning: false,
     port: parseInt(config.BACKEND_PORT),
@@ -31,9 +31,9 @@ const MCPServerControl: React.FC = () => {
     requestCount: 0,
     lastActivity: null,
     vectorSearchStatus: 'idle',
-    databaseStatus: 'disconnected'
+    databaseStatus: 'disconnected',
   })
-  
+
   const [isStarting, setIsStarting] = useState(false)
   const [isStopping, setIsStopping] = useState(false)
   const [logs, setLogs] = useState<MCPServerLog[]>([])
@@ -46,7 +46,7 @@ const MCPServerControl: React.FC = () => {
     isStopping,
     showLogs,
     isConnected,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   })
 
   // 初始化：获取服务器状态
@@ -58,9 +58,9 @@ const MCPServerControl: React.FC = () => {
           setServerStatus(prev => ({
             ...prev,
             ...status,
-            port: parseInt(config.BACKEND_PORT)
+            port: parseInt(config.BACKEND_PORT),
           }))
-          
+
           // 获取最近的日志
           const recentLogs = await mcpServerAPI.getLogs(20)
           setLogs(recentLogs)
@@ -69,7 +69,7 @@ const MCPServerControl: React.FC = () => {
         }
       }
     }
-    
+
     initializeStatus()
   }, [isConnected]) // 移除config依赖，避免过度触发
 
@@ -78,12 +78,12 @@ const MCPServerControl: React.FC = () => {
     if (!isConnected) return
 
     // 创建状态更新流
-    const statusStream = mcpServerAPI.createStatusStream((status) => {
+    const statusStream = mcpServerAPI.createStatusStream(status => {
       setServerStatus(status)
     })
 
     // 创建日志流
-    const logStream = mcpServerAPI.createLogStream((log) => {
+    const logStream = mcpServerAPI.createLogStream(log => {
       setLogs(prev => [...prev.slice(-19), log]) // 保留最近20条
     })
 
@@ -115,24 +115,26 @@ const MCPServerControl: React.FC = () => {
 
   const startServer = async () => {
     if (isStarting || serverStatus.isRunning) return
-    
+
     setIsStarting(true)
-    
+
     try {
       const result = await mcpServerAPI.start()
-      
+
       if (result.success) {
         debug.log('MCP Server启动成功', result, 'MCPServerControl')
         // 状态会通过流更新
       } else {
         debug.error('MCP Server启动失败', result.message, 'MCPServerControl')
-        setLogs(prev => [...prev, {
-          timestamp: new Date().toISOString(),
-          level: 'error',
-          message: result.message
-        }])
+        setLogs(prev => [
+          ...prev,
+          {
+            timestamp: new Date().toISOString(),
+            level: 'error',
+            message: result.message,
+          },
+        ])
       }
-      
     } catch (error) {
       debug.error('启动请求失败', error, 'MCPServerControl')
     } finally {
@@ -142,23 +144,25 @@ const MCPServerControl: React.FC = () => {
 
   const stopServer = async () => {
     if (isStopping || !serverStatus.isRunning) return
-    
+
     setIsStopping(true)
-    
+
     try {
       const result = await mcpServerAPI.stop()
-      
+
       if (result.success) {
         debug.log('MCP Server停止成功', result, 'MCPServerControl')
       } else {
         debug.error('MCP Server停止失败', result.message, 'MCPServerControl')
-        setLogs(prev => [...prev, {
-          timestamp: new Date().toISOString(),
-          level: 'error',
-          message: result.message
-        }])
+        setLogs(prev => [
+          ...prev,
+          {
+            timestamp: new Date().toISOString(),
+            level: 'error',
+            message: result.message,
+          },
+        ])
       }
-      
     } catch (error) {
       debug.error('停止请求失败', error, 'MCPServerControl')
     } finally {
@@ -169,13 +173,12 @@ const MCPServerControl: React.FC = () => {
   const restartServer = async () => {
     try {
       const result = await mcpServerAPI.restart()
-      
+
       if (result.success) {
         debug.log('MCP Server重启成功', result, 'MCPServerControl')
       } else {
         debug.error('MCP Server重启失败', result.message, 'MCPServerControl')
       }
-      
     } catch (error) {
       debug.error('重启请求失败', error, 'MCPServerControl')
     }
@@ -185,7 +188,7 @@ const MCPServerControl: React.FC = () => {
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
     const secs = seconds % 60
-    
+
     if (hours > 0) {
       return `${hours}时${minutes}分${secs}秒`
     } else if (minutes > 0) {
@@ -194,7 +197,6 @@ const MCPServerControl: React.FC = () => {
       return `${secs}秒`
     }
   }
-
 
   const getStatusIcon = () => {
     if (isStarting) return <RefreshCw className="h-5 w-5 animate-spin text-blue-500" />
@@ -209,7 +211,7 @@ const MCPServerControl: React.FC = () => {
         <div className="flex items-center space-x-3">
           {getStatusIcon()}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">MCP 服务器</h3>
+            <h3 className="text-lg font-semibold text-text-primary">MCP 服务器</h3>
             <p className="text-sm text-gray-500">
               {serverStatus.isRunning ? (
                 <span className="flex items-center space-x-2">
@@ -225,7 +227,7 @@ const MCPServerControl: React.FC = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowLogs(!showLogs)}
@@ -234,14 +236,14 @@ const MCPServerControl: React.FC = () => {
           >
             <Terminal className="h-4 w-4" />
           </button>
-          
+
           <button
             onClick={restartServer}
             disabled={isStarting || isStopping}
             className="p-2 text-gray-500 hover:text-text-primary hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
             title="重启服务器"
           >
-            <RefreshCw className={`h-4 w-4 ${(isStarting || isStopping) ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${isStarting || isStopping ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
@@ -289,22 +291,22 @@ const MCPServerControl: React.FC = () => {
             <span className="text-sm font-medium text-text-primary">连接状态</span>
           </div>
           <div className="flex items-center space-x-1">
-            <span className={`text-sm font-medium ${
-              isConnected ? 'text-green-600' : 'text-red-600'
-            }`}>
-              {isChecking ? '检查中...' : (isConnected ? '已连接' : '断开连接')}
+            <span
+              className={`text-sm font-medium ${isConnected ? 'text-green-600' : 'text-red-600'}`}
+            >
+              {isChecking ? '检查中...' : isConnected ? '已连接' : '断开连接'}
             </span>
           </div>
         </div>
-        
+
         <div className="bg-bg-secondary p-3 rounded-lg">
           <div className="flex items-center space-x-2 mb-1">
             <Server className="h-4 w-4 text-gray-500" />
             <span className="text-sm font-medium text-text-primary">服务地址</span>
           </div>
-          <p className="text-xs font-mono text-gray-900">{urls.backend}</p>
+          <p className="text-xs font-mono text-text-primary">{urls.backend}</p>
         </div>
-        
+
         <div className="bg-bg-secondary p-3 rounded-lg">
           <div className="flex items-center space-x-2 mb-1">
             {isValid ? (
@@ -314,9 +316,7 @@ const MCPServerControl: React.FC = () => {
             )}
             <span className="text-sm font-medium text-text-primary">配置状态</span>
           </div>
-          <span className={`text-sm font-medium ${
-            isValid ? 'text-green-600' : 'text-red-600'
-          }`}>
+          <span className={`text-sm font-medium ${isValid ? 'text-green-600' : 'text-red-600'}`}>
             {isValid ? '配置正常' : '配置错误'}
           </span>
         </div>
@@ -330,17 +330,21 @@ const MCPServerControl: React.FC = () => {
               <Clock className="h-4 w-4 text-gray-500" />
               <span className="text-sm font-medium text-text-primary">运行时间</span>
             </div>
-            <p className="text-lg font-semibold text-gray-900">{formatUptime(serverStatus.uptime)}</p>
+            <p className="text-lg font-semibold text-text-primary">
+              {formatUptime(serverStatus.uptime)}
+            </p>
           </div>
-          
+
           <div className="bg-bg-secondary p-3 rounded-lg">
             <div className="flex items-center space-x-2 mb-1">
               <Zap className="h-4 w-4 text-gray-500" />
               <span className="text-sm font-medium text-text-primary">请求数</span>
             </div>
-            <p className="text-lg font-semibold text-gray-900">{serverStatus.requestCount.toLocaleString()}</p>
+            <p className="text-lg font-semibold text-text-primary">
+              {serverStatus.requestCount.toLocaleString()}
+            </p>
           </div>
-          
+
           <div className="bg-bg-secondary p-3 rounded-lg">
             <div className="flex items-center space-x-2 mb-1">
               <Database className="h-4 w-4 text-gray-500" />
@@ -352,12 +356,12 @@ const MCPServerControl: React.FC = () => {
               ) : (
                 <AlertCircle className="h-4 w-4 text-red-500" />
               )}
-              <span className="text-sm font-medium text-gray-900">
+              <span className="text-sm font-medium text-text-primary">
                 {serverStatus.databaseStatus === 'connected' ? '已连接' : '断开'}
               </span>
             </div>
           </div>
-          
+
           <div className="bg-bg-secondary p-3 rounded-lg">
             <div className="flex items-center space-x-2 mb-1">
               <Search className="h-4 w-4 text-gray-500" />
@@ -371,9 +375,12 @@ const MCPServerControl: React.FC = () => {
               ) : (
                 <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />
               )}
-              <span className="text-sm font-medium text-gray-900">
-                {serverStatus.vectorSearchStatus === 'ready' ? '向量模型' : 
-                 serverStatus.vectorSearchStatus === 'fallback' ? 'TF-IDF' : '初始化中'}
+              <span className="text-sm font-medium text-text-primary">
+                {serverStatus.vectorSearchStatus === 'ready'
+                  ? '向量模型'
+                  : serverStatus.vectorSearchStatus === 'fallback'
+                    ? 'TF-IDF'
+                    : '初始化中'}
               </span>
             </div>
           </div>
@@ -384,9 +391,11 @@ const MCPServerControl: React.FC = () => {
       {serverStatus.modelInfo && (
         <div className="bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-lg p-4 mb-6">
           <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-lg ${
-              serverStatus.modelInfo.type === 'vector' ? 'bg-blue-100' : 'bg-yellow-100'
-            }`}>
+            <div
+              className={`p-2 rounded-lg ${
+                serverStatus.modelInfo.type === 'vector' ? 'bg-blue-100' : 'bg-yellow-100'
+              }`}
+            >
               {serverStatus.modelInfo.type === 'vector' ? (
                 <Wifi className="h-5 w-5 text-blue-600" />
               ) : (
@@ -394,11 +403,10 @@ const MCPServerControl: React.FC = () => {
               )}
             </div>
             <div>
-              <h4 className="font-medium text-gray-900">{serverStatus.modelInfo.name}</h4>
-              <p className="text-sm text-gray-600">
-                大小: {serverStatus.modelInfo.size} | 类型: {
-                  serverStatus.modelInfo.type === 'vector' ? '深度学习向量模型' : '关键词匹配算法'
-                }
+              <h4 className="font-medium text-text-primary">{serverStatus.modelInfo.name}</h4>
+              <p className="text-sm text-text-secondary">
+                大小: {serverStatus.modelInfo.size} | 类型:{' '}
+                {serverStatus.modelInfo.type === 'vector' ? '深度学习向量模型' : '关键词匹配算法'}
               </p>
             </div>
           </div>
@@ -422,14 +430,18 @@ const MCPServerControl: React.FC = () => {
 
       {/* 日志显示 */}
       {showLogs && (
-        <div className="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm max-h-64 overflow-y-auto">
+        <div className="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm max-h-64 overflow-y-auto scrollbar-thin">
           {logs.length === 0 ? (
             <p className="text-gray-500">暂无日志</p>
           ) : (
             logs.map((log, index) => {
               const timestamp = new Date(log.timestamp).toLocaleTimeString()
-              const levelColor = log.level === 'error' ? 'text-red-400' : 
-                                log.level === 'warn' ? 'text-yellow-400' : 'text-green-400'
+              const levelColor =
+                log.level === 'error'
+                  ? 'text-red-400'
+                  : log.level === 'warn'
+                    ? 'text-yellow-400'
+                    : 'text-green-400'
               return (
                 <div key={index} className="mb-1">
                   <span className="text-gray-500">[{timestamp}]</span>

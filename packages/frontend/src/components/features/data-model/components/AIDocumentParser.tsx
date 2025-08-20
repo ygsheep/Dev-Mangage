@@ -14,6 +14,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 import { DatabaseTable, DatabaseField } from '@shared/types'
+import { DocumentType } from '../../../../types'
 import { 
   parseDocument, 
   getAIProvidersDetailed, 
@@ -276,27 +277,26 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
   }
 
   // 获取文档类型的辅助函数
-  const getDocumentType = (file: File): string => {
+  const getDocumentType = (file: File): DocumentType => {
     const ext = file.name.toLowerCase().split('.').pop()
     const mimeType = file.type
     
     // 根据文件扩展名和MIME类型确定文档类型
-    if (ext === 'md' || ext === 'markdown') return 'MARKDOWN'
-    if (ext === 'sql') return 'SQL'
-    if (ext === 'xlsx' || ext === 'xls') return 'EXCEL'
-    if (ext === 'csv') return 'CSV'
-    if (ext === 'docx' || ext === 'doc') return 'WORD'
-    if (ext === 'pdf') return 'PDF'
-    if (ext === 'json') return 'JSON'
-    if (ext === 'txt') return 'TEXT'
+    if (ext === 'md' || ext === 'markdown') return DocumentType.MARKDOWN
+    if (ext === 'sql') return DocumentType.SQL
+    if (ext === 'xlsx' || ext === 'xls') return DocumentType.EXCEL
+    if (ext === 'csv') return DocumentType.CSV
+    if (ext === 'docx' || ext === 'doc') return DocumentType.WORD
+    if (ext === 'pdf') return DocumentType.PDF
+    if (ext === 'json') return DocumentType.JSON
     
     // 根据MIME类型推断
-    if (mimeType.includes('json')) return 'JSON'
-    if (mimeType.includes('csv')) return 'CSV'
-    if (mimeType.includes('markdown')) return 'MARKDOWN'
-    if (mimeType.includes('sql')) return 'SQL'
+    if (mimeType.includes('json')) return DocumentType.JSON
+    if (mimeType.includes('csv')) return DocumentType.CSV
+    if (mimeType.includes('markdown')) return DocumentType.MARKDOWN
+    if (mimeType.includes('sql')) return DocumentType.SQL
     
-    return 'TEXT' // 默认类型
+    return DocumentType.MARKDOWN // 默认类型
   }
 
   const handleTableToggle = (tableName: string) => {
@@ -364,7 +364,7 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
           </button>
         </div>
 
-        <div className="p-6 max-h-[calc(90vh-80px)] overflow-y-auto">
+        <div className="p-6 max-h-[calc(90vh-80px)] overflow-y-auto custom-scrollbar">
           {/* 第一步：文件上传 */}
           <div className="space-y-6">
             <div className="bg-bg-secondary rounded-lg p-4">
@@ -575,7 +575,7 @@ const AIDocumentParser: React.FC<AIDocumentParserProps> = ({
                       </div>
                     </div>
                     
-                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                    <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin">
                       {parseResult.tables.map((table) => (
                         <div key={table.name} className="bg-bg-paper rounded-lg border border-border-primary p-3">
                           <label className="flex items-start space-x-3 cursor-pointer">

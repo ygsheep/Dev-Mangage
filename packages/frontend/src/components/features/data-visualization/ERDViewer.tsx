@@ -1,86 +1,70 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query'
+import html2canvas from 'html2canvas'
+import { Database, Download, Eye, EyeOff, Hash, Key, Settings, Type } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import ReactFlow, {
-  Node,
-  Edge,
+  Background,
+  BackgroundVariant,
   Connection,
   ConnectionMode,
   Controls,
-  Background,
+  Edge,
   MiniMap,
-  useNodesState,
-  useEdgesState,
+  Node,
   addEdge,
-  Position,
-  BackgroundVariant,
-} from 'reactflow';
-import { 
-  Database, 
-  Key, 
-  Hash, 
-  Type, 
-  Calendar, 
-  FileText, 
-  ToggleLeft,
-  Settings,
-  ZoomIn,
-  ZoomOut,
-  Maximize2,
-  Download,
-  Eye,
-  EyeOff
-} from 'lucide-react';
-import html2canvas from 'html2canvas';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '../../../utils/api';
-import toast from 'react-hot-toast';
+  useEdgesState,
+  useNodesState,
+} from 'reactflow'
+import { api } from '../../../utils/api'
 
 // 数据类型定义
 interface DatabaseField {
-  id: string;
-  name: string;
-  type: string;
-  isRequired: boolean;
-  isPrimaryKey: boolean;
-  isForeignKey: boolean;
-  defaultValue?: string;
-  description?: string;
+  id: string
+  name: string
+  type: string
+  isRequired: boolean
+  isPrimaryKey: boolean
+  isForeignKey: boolean
+  defaultValue?: string
+  description?: string
   foreignKeyReference?: {
-    tableId: string;
-    tableName: string;
-    fieldId: string;
-    fieldName: string;
-  };
+    tableId: string
+    tableName: string
+    fieldId: string
+    fieldName: string
+  }
 }
 
 interface DatabaseTable {
-  id: string;
-  name: string;
-  description?: string;
-  fields: DatabaseField[];
+  id: string
+  name: string
+  description?: string
+  fields: DatabaseField[]
   indexes: Array<{
-    id: string;
-    name: string;
-    fields: string[];
-    isUnique: boolean;
-  }>;
-  position?: { x: number; y: number };
+    id: string
+    name: string
+    fields: string[]
+    isUnique: boolean
+  }>
+  position?: { x: number; y: number }
 }
 
 interface ERDViewerProps {
-  projectId: string;
-  className?: string;
-  height?: string;
-  showMinimap?: boolean;
-  showBackground?: boolean;
-  allowEditing?: boolean;
+  projectId: string
+  className?: string
+  height?: string
+  showMinimap?: boolean
+  showBackground?: boolean
+  allowEditing?: boolean
 }
 
 // 自定义表格节点组件
 const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
   return (
-    <div className="bg-bg-paper border-2 border-gray-300 rounded-lg shadow-lg min-w-[250px]">
+    <div className="bg-bg-paper border-2 border-gray-300 bg-bg-secondary rounded-lg shadow-lg min-w-[250px]">
       {/* 表头 */}
       <div className="bg-blue-600 text-white px-4 py-3 rounded-t-lg">
         <div className="flex items-center justify-between">
@@ -97,9 +81,7 @@ const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
           </button>
         </div>
         {data.description && (
-          <p className="text-xs text-blue-100 mt-1 opacity-90">
-            {data.description}
-          </p>
+          <p className="text-xs text-blue-100 mt-1 opacity-90">{data.description}</p>
         )}
       </div>
 
@@ -116,35 +98,32 @@ const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
               <div className="flex items-center gap-2 flex-1">
                 {/* 字段图标 */}
                 <div className="flex items-center gap-1">
-                  {field.isPrimaryKey && (
-                    <Key className="w-3 h-3 text-yellow-500" title="主键" />
-                  )}
-                  {field.isForeignKey && (
-                    <Hash className="w-3 h-3 text-blue-500" title="外键" />
-                  )}
+                  {field.isPrimaryKey && <Key className="w-3 h-3 text-yellow-500" title="主键" />}
+                  {field.isForeignKey && <Hash className="w-3 h-3 text-blue-500" title="外键" />}
                   {!field.isPrimaryKey && !field.isForeignKey && (
                     <Type className="w-3 h-3 text-gray-400" />
                   )}
                 </div>
-                
+
                 {/* 字段名和类型 */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium ${
-                      field.isPrimaryKey ? 'text-yellow-700' : 
-                      field.isForeignKey ? 'text-blue-700' : 'text-text-primary'
-                    }`}>
+                    <span
+                      className={`text-sm font-medium ${
+                        field.isPrimaryKey
+                          ? 'text-yellow-700'
+                          : field.isForeignKey
+                            ? 'text-blue-700'
+                            : 'text-text-primary'
+                      }`}
+                    >
                       {field.name}
                     </span>
-                    {field.isRequired && (
-                      <span className="text-red-500 text-xs">*</span>
-                    )}
+                    {field.isRequired && <span className="text-red-500 text-xs">*</span>}
                   </div>
                   <div className="text-xs text-gray-500">
                     {field.type}
-                    {field.defaultValue && (
-                      <span className="ml-1">= {field.defaultValue}</span>
-                    )}
+                    {field.defaultValue && <span className="ml-1">= {field.defaultValue}</span>}
                   </div>
                 </div>
               </div>
@@ -161,7 +140,7 @@ const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
                     transform: 'translateY(-50%)',
                   }}
                 />
-                
+
                 {/* 输出连接点（用于外键引用） */}
                 {field.isForeignKey && (
                   <div
@@ -183,26 +162,25 @@ const TableNode: React.FC<{ data: DatabaseTable }> = ({ data }) => {
       {/* 索引信息 */}
       {!isCollapsed && data.indexes.length > 0 && (
         <div className="border-t border-gray-200 bg-bg-secondary px-4 py-2">
-          <div className="text-xs text-gray-600 mb-1">索引:</div>
-          {data.indexes.map((index) => (
+          <div className="text-xs text-text-secondary mb-1">索引:</div>
+          {data.indexes.map(index => (
             <div key={index.id} className="text-xs text-gray-500 flex items-center gap-1">
               <Hash className="w-3 h-3" />
               <span className={index.isUnique ? 'font-medium' : ''}>
-                {index.name} ({index.fields.join(', ')})
-                {index.isUnique && ' - 唯一'}
+                {index.name} ({index.fields.join(', ')}){index.isUnique && ' - 唯一'}
               </span>
             </div>
           ))}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 // 自定义节点类型
 const nodeTypes = {
   tableNode: TableNode,
-};
+}
 
 export const ERDViewer: React.FC<ERDViewerProps> = ({
   projectId,
@@ -212,120 +190,129 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
   showBackground = true,
   allowEditing = false,
 }) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [selectedLayout, setSelectedLayout] = useState<'auto' | 'horizontal' | 'vertical' | 'circular'>('auto');
-  const [isExporting, setIsExporting] = useState(false);
+  const [nodes, setNodes, onNodesChange] = useNodesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [selectedLayout, setSelectedLayout] = useState<
+    'auto' | 'horizontal' | 'vertical' | 'circular'
+  >('auto')
+  const [isExporting, setIsExporting] = useState(false)
 
   // 获取项目的数据模型
-  const { data: tables, isLoading, error } = useQuery({
+  const {
+    data: tables,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['project-tables', projectId],
     queryFn: async () => {
-      const response = await api.get(`/projects/${projectId}/database-tables`);
-      return response.data as DatabaseTable[];
+      const response = await api.get(`/projects/${projectId}/database-tables`)
+      return response.data as DatabaseTable[]
     },
     enabled: !!projectId,
-  });
+  })
 
   // 自动布局算法
-  const calculateLayout = useCallback((tables: DatabaseTable[], layout: string) => {
-    if (!tables.length) return { nodes: [], edges: [] };
+  const calculateLayout = useCallback(
+    (tables: DatabaseTable[], layout: string) => {
+      if (!tables.length) return { nodes: [], edges: [] }
 
-    const nodeSpacing = { x: 300, y: 250 };
-    const nodes: Node[] = [];
-    const edges: Edge[] = [];
+      const nodeSpacing = { x: 300, y: 250 }
+      const nodes: Node[] = []
+      const edges: Edge[] = []
 
-    // 根据布局类型计算位置
-    tables.forEach((table, index) => {
-      let position = { x: 0, y: 0 };
+      // 根据布局类型计算位置
+      tables.forEach((table, index) => {
+        let position = { x: 0, y: 0 }
 
-      switch (layout) {
-        case 'horizontal':
-          position = {
-            x: index * nodeSpacing.x,
-            y: Math.floor(index / 4) * nodeSpacing.y,
-          };
-          break;
-        case 'vertical':
-          position = {
-            x: Math.floor(index / 4) * nodeSpacing.x,
-            y: index * nodeSpacing.y,
-          };
-          break;
-        case 'circular':
-          const angle = (index / tables.length) * 2 * Math.PI;
-          const radius = Math.max(200, tables.length * 50);
-          position = {
-            x: Math.cos(angle) * radius + radius,
-            y: Math.sin(angle) * radius + radius,
-          };
-          break;
-        default: // auto
-          const cols = Math.ceil(Math.sqrt(tables.length));
-          position = {
-            x: (index % cols) * nodeSpacing.x,
-            y: Math.floor(index / cols) * nodeSpacing.y,
-          };
-      }
-
-      // 使用保存的位置或计算的位置
-      const finalPosition = table.position || position;
-
-      nodes.push({
-        id: table.id,
-        type: 'tableNode',
-        position: finalPosition,
-        data: table,
-        draggable: allowEditing,
-      });
-    });
-
-    // 创建关系边
-    tables.forEach((table) => {
-      table.fields.forEach((field) => {
-        if (field.isForeignKey && field.foreignKeyReference) {
-          const targetTable = tables.find(t => t.id === field.foreignKeyReference!.tableId);
-          if (targetTable) {
-            edges.push({
-              id: `${table.id}-${field.id}-${field.foreignKeyReference.tableId}-${field.foreignKeyReference.fieldId}`,
-              source: table.id,
-              target: field.foreignKeyReference.tableId,
-              sourceHandle: field.id,
-              targetHandle: field.foreignKeyReference.fieldId,
-              label: `${field.name} → ${field.foreignKeyReference.fieldName}`,
-              type: 'smoothstep',
-              style: {
-                stroke: '#3b82f6',
-                strokeWidth: 2,
-              },
-              markerEnd: {
-                type: 'arrowclosed',
-                color: '#3b82f6',
-              },
-            });
-          }
+        switch (layout) {
+          case 'horizontal':
+            position = {
+              x: index * nodeSpacing.x,
+              y: Math.floor(index / 4) * nodeSpacing.y,
+            }
+            break
+          case 'vertical':
+            position = {
+              x: Math.floor(index / 4) * nodeSpacing.x,
+              y: index * nodeSpacing.y,
+            }
+            break
+          case 'circular':
+            const angle = (index / tables.length) * 2 * Math.PI
+            const radius = Math.max(200, tables.length * 50)
+            position = {
+              x: Math.cos(angle) * radius + radius,
+              y: Math.sin(angle) * radius + radius,
+            }
+            break
+          default: // auto
+            const cols = Math.ceil(Math.sqrt(tables.length))
+            position = {
+              x: (index % cols) * nodeSpacing.x,
+              y: Math.floor(index / cols) * nodeSpacing.y,
+            }
         }
-      });
-    });
 
-    return { nodes, edges };
-  }, [allowEditing]);
+        // 使用保存的位置或计算的位置
+        const finalPosition = table.position || position
+
+        nodes.push({
+          id: table.id,
+          type: 'tableNode',
+          position: finalPosition,
+          data: table,
+          draggable: allowEditing,
+        })
+      })
+
+      // 创建关系边
+      tables.forEach(table => {
+        table.fields.forEach(field => {
+          if (field.isForeignKey && field.foreignKeyReference) {
+            const targetTable = tables.find(t => t.id === field.foreignKeyReference!.tableId)
+            if (targetTable) {
+              edges.push({
+                id: `${table.id}-${field.id}-${field.foreignKeyReference.tableId}-${field.foreignKeyReference.fieldId}`,
+                source: table.id,
+                target: field.foreignKeyReference.tableId,
+                sourceHandle: field.id,
+                targetHandle: field.foreignKeyReference.fieldId,
+                label: `${field.name} → ${field.foreignKeyReference.fieldName}`,
+                type: 'smoothstep',
+                style: {
+                  stroke: '#3b82f6',
+                  strokeWidth: 2,
+                },
+                markerEnd: {
+                  type: 'arrowclosed',
+                  color: '#3b82f6',
+                },
+              })
+            }
+          }
+        })
+      })
+
+      return { nodes, edges }
+    },
+    [allowEditing]
+  )
 
   // 当数据加载完成时，初始化节点和边
   useEffect(() => {
     if (tables) {
-      const { nodes: newNodes, edges: newEdges } = calculateLayout(tables, selectedLayout);
-      setNodes(newNodes);
-      setEdges(newEdges);
+      const { nodes: newNodes, edges: newEdges } = calculateLayout(tables, selectedLayout)
+      setNodes(newNodes)
+      setEdges(newEdges)
     }
-  }, [tables, selectedLayout, calculateLayout, setNodes, setEdges]);
+  }, [tables, selectedLayout, calculateLayout, setNodes, setEdges])
 
   // 处理连接创建
   const onConnect = useCallback(
     (params: Connection) => {
-      if (!allowEditing) return;
-      
-      setEdges((eds) =>
+      if (!allowEditing) return
+
+      setEdges(eds =>
         addEdge(
           {
             ...params,
@@ -335,54 +322,54 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
           },
           eds
         )
-      );
+      )
     },
     [allowEditing, setEdges]
-  );
+  )
 
   // 导出为图片
   const exportAsImage = useCallback(async () => {
-    setIsExporting(true);
+    setIsExporting(true)
     try {
-      const element = document.querySelector('.react-flow') as HTMLElement;
+      const element = document.querySelector('.react-flow') as HTMLElement
       if (element) {
         const canvas = await html2canvas(element, {
           backgroundColor: '#ffffff',
           scale: 2,
           logging: false,
-        });
-        
-        const link = document.createElement('a');
-        link.download = `erd-${projectId}-${Date.now()}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-        
-        toast.success('ERD图表已导出');
+        })
+
+        const link = document.createElement('a')
+        link.download = `erd-${projectId}-${Date.now()}.png`
+        link.href = canvas.toDataURL()
+        link.click()
+
+        toast.success('ERD图表已导出')
       }
     } catch (error) {
-      console.error('导出失败:', error);
-      toast.error('导出失败，请重试');
+      console.error('导出失败:', error)
+      toast.error('导出失败，请重试')
     } finally {
-      setIsExporting(false);
+      setIsExporting(false)
     }
-  }, [projectId]);
+  }, [projectId])
 
   // 自动布局
   const applyAutoLayout = useCallback(() => {
     if (tables) {
-      const { nodes: newNodes, edges: newEdges } = calculateLayout(tables, selectedLayout);
-      setNodes(newNodes);
-      setEdges(newEdges);
-      toast.success('布局已更新');
+      const { nodes: newNodes, edges: newEdges } = calculateLayout(tables, selectedLayout)
+      setNodes(newNodes)
+      setEdges(newEdges)
+      toast.success('布局已更新')
     }
-  }, [tables, selectedLayout, calculateLayout, setNodes, setEdges]);
+  }, [tables, selectedLayout, calculateLayout, setNodes, setEdges])
 
   if (isLoading) {
     return (
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -398,7 +385,7 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   if (!tables || tables.length === 0) {
@@ -410,7 +397,7 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
           <p className="text-sm mt-2">请先导入数据模型文档</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -420,8 +407,8 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
         {/* 布局选择 */}
         <select
           value={selectedLayout}
-          onChange={(e) => setSelectedLayout(e.target.value as any)}
-          className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={e => setSelectedLayout(e.target.value as any)}
+          className="px-2 py-1 text-sm border border-gray-300 bg-bg-secondary focus:outline-none rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="auto">自动布局</option>
           <option value="horizontal">水平布局</option>
@@ -432,7 +419,7 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
         {/* 应用布局按钮 */}
         <button
           onClick={applyAutoLayout}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded transition-colors"
+          className="p-2 text-text-secondary hover:text-blue-600 hover:bg-primary-50 dark:bg-primary-900/20 rounded transition-colors"
           title="应用布局"
         >
           <Settings className="w-4 h-4" />
@@ -442,11 +429,11 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
         <button
           onClick={exportAsImage}
           disabled={isExporting}
-          className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors disabled:opacity-50"
+          className="p-2 text-text-secondary hover:text-green-600 hover:bg-green-50 rounded transition-colors disabled:opacity-50"
           title="导出为图片"
         >
           {isExporting ? (
-            <div className="w-4 h-4 animate-spin border-2 border-gray-300 border-t-green-600 rounded-full" />
+            <div className="w-4 h-4 animate-spin border-2 border-gray-300 bg-bg-secondary border-t-green-600 rounded-full" />
           ) : (
             <Download className="w-4 h-4" />
           )}
@@ -479,27 +466,22 @@ export const ERDViewer: React.FC<ERDViewerProps> = ({
 
         {/* 背景 */}
         {showBackground && (
-          <Background
-            variant={BackgroundVariant.Dots}
-            gap={20}
-            size={1}
-            color="#e5e7eb"
-          />
+          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#e5e7eb" />
         )}
 
         {/* 小地图 */}
         {showMinimap && (
           <MiniMap
             nodeStrokeWidth={3}
-            nodeColor={(node) => {
-              return '#3b82f6';
+            nodeColor={node => {
+              return '#3b82f6'
             }}
             className="bg-bg-paper border border-gray-200 rounded-lg"
           />
         )}
       </ReactFlow>
     </div>
-  );
-};
+  )
+}
 
-export default ERDViewer;
+export default ERDViewer

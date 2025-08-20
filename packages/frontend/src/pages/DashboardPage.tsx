@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, TrendingDown, Users, Server, Database, GitBranch,
-  Calendar, Clock, Eye, Edit, Download, Activity 
+  Calendar, Clock, Eye, Edit, Download, Activity, Bug 
 } from 'lucide-react';
 import { api } from '../utils/api';
 import toast from 'react-hot-toast';
@@ -17,6 +17,8 @@ interface DashboardStats {
     totalApis: number;
     totalTags: number;
     totalTables: number;
+    totalIssues: number;
+    openIssues: number;
     lastUpdated?: string;
   };
   apiStats?: {
@@ -39,6 +41,7 @@ interface DashboardStats {
       apis: number;
       tags: number;
       tables: number;
+      issues: number;
     };
   }>;
   globalApiStats?: Array<{ name: string; value: number; color: string }>;
@@ -47,6 +50,7 @@ interface DashboardStats {
     apis?: number;
     tags?: number;
     tables?: number;
+    issues?: number;
     projects?: number;
     activeUsers?: number;
   }>;
@@ -212,7 +216,7 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 概览统计卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
           title={selectedProject ? "API接口" : "总项目数"}
           value={selectedProject ? stats?.overview.totalApis || 0 : stats?.overview.totalProjects || 0}
@@ -235,10 +239,17 @@ export const DashboardPage: React.FC = () => {
           trend={null}
         />
         <StatCard
-          title={selectedProject ? "标签总数" : "活跃用户"}
-          value={selectedProject ? stats?.overview.totalTags || 0 : analytics?.userEngagement.dailyActiveUsers || 0}
-          icon={Users}
+          title="Issues"
+          value={stats?.overview.totalIssues || 0}
+          icon={Bug}
           color="orange"
+          trend={null}
+        />
+        <StatCard
+          title={selectedProject ? "开放Issues" : "活跃用户"}
+          value={selectedProject ? stats?.overview.openIssues || 0 : analytics?.userEngagement.dailyActiveUsers || 0}
+          icon={selectedProject ? Bug : Users}
+          color={selectedProject ? "orange" : "blue"}
           trend={null}
         />
       </div>
@@ -306,12 +317,14 @@ export const DashboardPage: React.FC = () => {
                   <Line type="monotone" dataKey="apis" stroke="var(--color-primary-600)" name="API数量" />
                   <Line type="monotone" dataKey="tags" stroke="var(--color-success-600)" name="标签数量" />
                   <Line type="monotone" dataKey="tables" stroke="var(--color-secondary-600)" name="数据表数量" />
+                  <Line type="monotone" dataKey="issues" stroke="var(--color-warning-600)" name="Issues数量" />
                 </>
               ) : (
                 <>
                   <Line type="monotone" dataKey="projects" stroke="var(--color-primary-600)" name="项目数量" />
                   <Line type="monotone" dataKey="apis" stroke="var(--color-success-600)" name="API数量" />
-                  <Line type="monotone" dataKey="activeUsers" stroke="var(--color-warning-600)" name="活跃用户" />
+                  <Line type="monotone" dataKey="issues" stroke="var(--color-warning-600)" name="Issues数量" />
+                  <Line type="monotone" dataKey="activeUsers" stroke="var(--color-danger-600)" name="活跃用户" />
                 </>
               )}
             </LineChart>
@@ -390,9 +403,10 @@ export const DashboardPage: React.FC = () => {
                 <p className="text-sm text-text-secondary mt-1 line-clamp-2">{project.description}</p>
                 <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span>{project.stats.apis} APIs</span>
+                    <span>{project.stats.apiEndpoints} APIs</span>
                     <span>{project.stats.tags} 标签</span>
                     <span>{project.stats.tables} 表</span>
+                    <span>{project.stats.issues} Issues</span>
                   </div>
                   <span className="text-xs text-gray-400">
                     {new Date(project.updatedAt).toLocaleDateString()}

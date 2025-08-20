@@ -1,0 +1,261 @@
+/* Markdown 内容样式 - 适配项目主题 */
+
+.markdown-content .wmde-markdown,
+.comment-content .wmde-markdown {
+  font-family: inherit;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 标题样式 */
+.markdown-content .wmde-markdown h1,
+.comment-content .wmde-markdown h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 1rem 0 0.5rem 0;
+  border-bottom: 2px solid var(--border-primary);
+  padding-bottom: 0.5rem;
+}
+
+.markdown-content .wmde-markdown h2,
+.comment-content .wmde-markdown h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0.75rem 0 0.375rem 0;
+}
+
+.markdown-content .wmde-markdown h3,
+.comment-content .wmde-markdown h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0.5rem 0 0.25rem 0;
+}
+
+.markdown-content .wmde-markdown h4,
+.comment-content .wmde-markdown h4,
+.markdown-content .wmde-markdown h5,
+.comment-content .wmde-markdown h5,
+.markdown-content .wmde-markdown h6,
+.comment-content .wmde-markdown h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0.5rem 0 0.25rem 0;
+}
+
+/* 段落样式 */
+.markdown-content .wmde-markdown p,
+.comment-content .wmde-markdown p {
+  margin: 0.5rem 0;
+  color: var(--text-secondary);
+}
+
+/* 代码样式 */
+.markdown-content .wmde-markdown code,
+.comment-content .wmde-markdown code {
+  background-color: var(--color-bg-code);
+  color: #d63384;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+}
+
+.markdown-content .wmde-markdown pre,
+.comment-content .wmde-markdown pre {
+  background-color: var(--color-bg-code);
+  border-radius: 0.375rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.markdown-content .wmde-markdown pre code,
+.comment-content .wmde-markdown pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* 引用样式 */
+.markdown-content .wmde-markdown blockquote,
+.comment-content .wmde-markdown blockquote {
+  border-left: 4px solid #3b82f6;
+  background-color: rgba(59, 130, 246, 0.05);
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  color: var(--text-secondary);
+}
+
+/* 链接样式 */
+.markdown-content .wmde-markdown a,
+.comment-content .wmde-markdown a {
+  color: #3b82f6;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom-color 0.2s;
+}
+
+.markdown-content .wmde-markdown a:hover,
+.comment-content .wmde-markdown a:hover {
+  border-bottom-color: #3b82f6;
+}
+
+/* 列表样式 */
+.markdown-content .wmde-markdown ul,
+.comment-content .wmde-markdown ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-content .wmde-markdown ol,
+.comment-content .wmde-markdown ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-content .wmde-markdown li,
+.comment-content .wmde-markdown li {
+  margin: 0.25rem 0;
+  color: var(--text-secondary);
+}
+
+/* 表格样式 */
+.markdown-content .wmde-markdown table,
+.comment-content .wmde-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+}
+
+.markdown-content .wmde-markdown th,
+.comment-content .wmde-markdown th {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 0.5rem;
+  border: 1px solid var(--border-primary);
+  text-align: left;
+}
+
+.markdown-content .wmde-markdown td,
+.comment-content .wmde-markdown td {
+  padding: 0.5rem;
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+
+.markdown-content .wmde-markdown tr:nth-child(even),
+.comment-content .wmde-markdown tr:nth-child(even) {
+  background-color: var(--bg-secondary);
+}
+
+/* 水平分割线 */
+.markdown-content .wmde-markdown hr,
+.comment-content .wmde-markdown hr {
+  border: none;
+  border-top: 1px solid var(--border-primary);
+  margin: 1.5rem 0;
+}
+
+/* 强调样式 */
+.markdown-content .wmde-markdown strong,
+.comment-content .wmde-markdown strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.markdown-content .wmde-markdown em,
+.comment-content .wmde-markdown em {
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+/* 删除线 */
+.markdown-content .wmde-markdown del,
+.comment-content .wmde-markdown del {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+/* 任务列表 */
+.markdown-content .wmde-markdown input[type="checkbox"],
+.comment-content .wmde-markdown input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+/* 图片样式 */
+.markdown-content .wmde-markdown img,
+.comment-content .wmde-markdown img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+  margin: 1rem 0;
+}
+
+/* 评论特定样式 - 更紧凑 */
+.comment-content .wmde-markdown {
+  font-size: 0.875rem;
+}
+
+.comment-content .wmde-markdown h1,
+.comment-content .wmde-markdown h2,
+.comment-content .wmde-markdown h3 {
+  margin: 0.5rem 0 0.25rem 0;
+}
+
+.comment-content .wmde-markdown p {
+  margin: 0.25rem 0;
+}
+
+.comment-content .wmde-markdown ul,
+.comment-content .wmde-markdown ol {
+  margin: 0.25rem 0;
+}
+
+/* 暗色模式特定样式 */
+[data-color-mode="dark"] .markdown-content .wmde-markdown blockquote,
+[data-color-mode="dark"] .comment-content .wmde-markdown blockquote {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+[data-color-mode="dark"] .markdown-content .wmde-markdown code,
+[data-color-mode="dark"] .comment-content .wmde-markdown code {
+  background-color: var(--color-bg-code);
+  color: #ff79c6;
+}
+
+[data-color-mode="dark"] .markdown-content .wmde-markdown pre,
+[data-color-mode="dark"] .comment-content .wmde-markdown pre {
+  background-color: var(--color-bg-code);
+}
+
+[data-color-mode="dark"] .markdown-content .wmde-markdown pre code,
+[data-color-mode="dark"] .comment-content .wmde-markdown pre code {
+  color: #f8f8f2;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .markdown-content .wmde-markdown,
+  .comment-content .wmde-markdown {
+    font-size: 0.875rem;
+  }
+  
+  .markdown-content .wmde-markdown h1 {
+    font-size: 1.25rem;
+  }
+  
+  .markdown-content .wmde-markdown h2 {
+    font-size: 1.125rem;
+  }
+  
+  .markdown-content .wmde-markdown pre {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+}

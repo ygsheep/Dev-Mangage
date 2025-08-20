@@ -52,17 +52,12 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
   const [databaseParseError, setDatabaseParseError] = useState<string | null>(null)
   const [databasePreviewContent, setDatabasePreviewContent] = useState<string>('')
   const [useAI, setUseAI] = useState(true)
-  const [aiConfig, setAiConfig] = useState<AIParsingConfig>(() => {
-    const saved = localStorage.getItem('ai-parsing-config')
-    if (saved) {
-      try {
-        return JSON.parse(saved)
-      } catch (e) {
-        console.error('Failed to parse AI config from localStorage:', e)
-      }
-    }
-    return AI_PARSING_PRESETS.ollama_qwen
-  })
+  // 不再使用本地AI解析服务，而是调用后端API
+  const [aiConfig, setAiConfig] = useState<AIParsingConfig>({
+    provider: 'backend',
+    model: 'backend-ai',
+    baseUrl: ''
+  } as any)
   
   // 文档分析和进度相关状态
   const [documentStats, setDocumentStats] = useState<{
@@ -139,33 +134,31 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
     try {
       console.log('开始解析数据库文档，内容长度:', content.length)
       
-      const aiService = createAIParsingService(aiConfig)
-      
       // 检查是否包含Mermaid图表
       const hasMermaid = content.includes('```mermaid') || content.includes('graph ') || content.includes('flowchart ')
       if (hasMermaid) {
         console.log('检测到Mermaid图表格式')
       }
       
-      // 分析文档统计信息
-      const stats = documentStats || analyzeDocument(content)
+      // 调用后端AI解析API
+      const response = await apiMethods.parseDocument({
+        projectId,
+        content,
+        type: 'DATA_MODEL',
+        filename: dbFile?.name || 'database_schema.md'
+      })
       
-      let result: ParsedDatabaseDocument
-      if (stats.willNeedChunking) {
-        // 分块解析
-        setParsingProgress({ current: 0, total: stats.chunks })
-        
-        result = await aiService.parseDatabaseDocumentWithProgress?.(content, (progress) => {
-          setParsingProgress({
-            current: progress.current,
-            total: progress.total,
-            chunk: progress.chunk
-          })
-        }) || await aiService.parseDatabaseDocument(content)
-      } else {
-        // 普通解析
-        result = await aiService.parseDatabaseDocument(content)
+      console.log('后端数据库解析结果:', response)
+      
+      if (!response.success || !response.data) {
+        const errorMessage = response.message || '后端数据库解析失败'
+        setDatabaseParseError(errorMessage)
+        setCurrentStep('import')
+        toast.error('数据库解析失败: ' + errorMessage)
+        return
       }
+      
+      const result = response.data
       
       console.log('数据库解析结果:', result)
       
@@ -568,39 +561,27 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
       console.log('开始解析文件内容，长度:', content.length)
       
       if (useAI) {
-        console.log('使用AI解析，配置:', aiConfig)
-        const aiService = createAIParsingService(aiConfig)
+        console.log('使用后端AI解析')
         
-        // 检查是否需要显示进度
-        const stats = documentStats || analyzeDocument(content)
+        // 调用后端AI解析API
+        const response = await apiMethods.parseDocument({
+          projectId,
+          content,
+          type: 'API_DOCUMENTATION',
+          filename: apiFile.name
+        })
         
-        let result
-        if (stats.willNeedChunking) {
-          // 显示进度的分块解析
-          setParseProgress({ current: 0, total: stats.chunks, currentChunk: null, startTime: Date.now() })
-          
-          result = await aiService.parseAPIDocumentWithProgress(content, projectId, (progress) => {
-            setParseProgress({
-              current: progress.current,
-              total: progress.total,
-              currentChunk: progress.chunk,
-              startTime: Date.now()
-            })
-          })
-        } else {
-          // 普通解析
-          result = await aiService.parseAPIDocument(content, projectId)
-        }
-        
-        console.log('AI解析结果:', result)
+        console.log('后端AI解析结果:', response)
         
         // 检查是否有解析错误
-        if (!result.success || (result.errors && result.errors.length > 0)) {
-          const errorMessage = result.errors?.join(', ') || 'AI解析失败'
+        if (!response.success || !response.data) {
+          const errorMessage = response.message || '后端AI解析失败'
           setApiParseError(errorMessage)
           toast.error('AI解析失败: ' + errorMessage)
           return
         }
+        
+        const result = response.data
         
         // 检查是否解析到API
         if (!result.apis || result.apis.length === 0) {
@@ -758,7 +739,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
         </div>
         
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[calc(90vh-140px)]">
           {/* API文档导入 */}
           {activeTab === 'api-doc' && (
             <div className="p-6">
@@ -1017,7 +998,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                       {apiPreviewContent && (
                         <div className="space-y-2">
                           <h4 className="text-sm font-medium text-text-primary">文档预览</h4>
-                          <div className="bg-bg-tertiary border border-border-primary rounded-lg p-3 max-h-32 overflow-y-auto">
+                          <div className="bg-bg-tertiary border border-border-primary rounded-lg p-3 max-h-32 overflow-y-auto scrollbar-thin">
                             <pre className="text-xs text-text-secondary whitespace-pre-wrap">{apiPreviewContent}</pre>
                           </div>
                         </div>
@@ -1049,7 +1030,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                             </div>
                           </div>
                           
-                          <div className="bg-bg-paper border border-border-primary rounded-lg divide-y divide-border-primary max-h-64 overflow-y-auto">
+                          <div className="bg-bg-paper border border-border-primary rounded-lg divide-y divide-border-primary max-h-64 overflow-y-auto scrollbar-thin">
                             {parsedAPIs.map((api, index) => (
                               <div key={index} className="p-3">
                                 <div className="flex items-center justify-between">
@@ -1417,7 +1398,7 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
                     </button>
                   </div>
 
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                  <div className="space-y-4 max-h-96 overflow-y-auto scrollbar-thin">
                     {parsedTables.map((table, index) => (
                       <div key={table.id || index} className="border border-border-primary rounded-lg p-4">
                         <div className="flex items-start justify-between mb-3">
@@ -1503,10 +1484,45 @@ const UnifiedImportModal: React.FC<UnifiedImportModalProps> = ({
         <AIConfigModal
           isOpen={showAIConfig}
           onClose={() => setShowAIConfig(false)}
-          onSave={(config) => {
-            setAiConfig(config)
-            setShowAIConfig(false)
-            localStorage.setItem('ai-parsing-config', JSON.stringify(config))
+          onSave={async (config) => {
+            try {
+              // 如果是ollama、deepseek或openai提供商，同步到后端
+              if (['ollama', 'deepseek', 'openai'].includes(config.provider)) {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/api/v1/ai/config`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    provider: config.provider,
+                    model: config.model,
+                    baseUrl: config.baseUrl,
+                    apiKey: config.apiKey,
+                    timeout: 120000, // 2分钟超时
+                    temperature: 0.1
+                  }),
+                })
+
+                if (!response.ok) {
+                  throw new Error('同步AI配置到后端失败')
+                }
+
+                const result = await response.json()
+                if (result.success) {
+                  toast.success('AI配置已同步到后端')
+                } else {
+                  throw new Error(result.error?.message || '同步失败')
+                }
+              }
+
+              // 保存到本地配置
+              setAiConfig(config)
+              localStorage.setItem('ai-parsing-config', JSON.stringify(config))
+              setShowAIConfig(false)
+            } catch (error) {
+              console.error('保存AI配置失败:', error)
+              toast.error(`保存AI配置失败: ${error.message}`)
+            }
           }}
           currentConfig={aiConfig}
         />

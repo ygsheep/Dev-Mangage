@@ -721,6 +721,80 @@ export class AIServiceManager {
       ...healthCheck
     }
   }
+
+  /**
+   * 更新提供者配置
+   */
+  async updateProviderConfig(providerName: string, newConfig: Partial<AIServiceConfig>): Promise<boolean> {
+    try {
+      const currentConfig = this.configs.get(providerName)
+      if (!currentConfig) {
+        throw new Error(`提供者 '${providerName}' 不存在`)
+      }
+
+      // 合并新配置
+      const updatedConfig: AIServiceConfig = {
+        ...currentConfig,
+        ...newConfig,
+        enabled: true // 更新配置时启用该提供者
+      }
+
+      // 更新内存中的配置
+      this.configs.set(providerName, updatedConfig)
+
+      // 重新初始化该提供者
+      this.initializeProvider(providerName, updatedConfig)
+
+      // 如果更新成功，设置为默认提供者
+      this.defaultProvider = providerName
+
+      logger.info('AI提供者配置已更新', { 
+        provider: providerName, 
+        model: newConfig.model,
+        hasApiKey: !!newConfig.apiKey
+      })
+
+      return true
+    } catch (error) {
+      logger.error('更新AI提供者配置失败', { 
+        provider: providerName, 
+        error: error.message 
+      })
+      return false
+    }
+  }
+
+  /**
+   * 获取当前配置
+   */
+  async getCurrentConfig(): Promise<any> {
+    const defaultProvider = this.getDefaultProvider()
+    const config = this.configs.get(defaultProvider)
+    const adapter = this.providers.get(defaultProvider)
+
+    if (!config || !adapter) {
+      return {
+        provider: defaultProvider,
+        model: 'unknown',
+        enabled: false,
+        available: false
+      }
+    }
+
+    const isAvailable = await adapter.isAvailable()
+
+    return {
+      provider: defaultProvider,
+      model: adapter.getModelVersion(),
+      baseUrl: config.apiUrl,
+      enabled: config.enabled,
+      available: isAvailable,
+      timeout: config.timeout || 120000,
+      temperature: config.temperature || 0.1,
+      hasApiKey: !!config.apiKey
+    }
+  }
+
 }
 
 // 单例实例

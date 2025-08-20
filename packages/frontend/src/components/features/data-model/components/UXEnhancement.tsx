@@ -1,24 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react'
 import {
-  Keyboard,
-  HelpCircle,
-  X,
-  Search,
-  Plus,
-  Save,
-  Copy,
-  Download,
-  Upload,
-  Eye,
-  Edit3,
-  Trash2,
   ArrowLeft,
   ArrowRight,
-  Command,
-  Zap,
+  Edit3,
+  HelpCircle,
+  Info,
+  Keyboard,
   MousePointer,
-  Info
+  Plus,
+  X,
+  Zap,
 } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
 interface Shortcut {
@@ -46,25 +38,25 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
       id: 'goto-overview',
       keys: ['g', 'o'],
       description: '跳转到概览页面',
-      category: 'navigation'
+      category: 'navigation',
     },
     {
       id: 'goto-diagram',
       keys: ['g', 'd'],
       description: '跳转到ER图设计',
-      category: 'navigation'
+      category: 'navigation',
     },
     {
       id: 'goto-relationships',
       keys: ['g', 'r'],
       description: '跳转到关系管理',
-      category: 'navigation'
+      category: 'navigation',
     },
     {
       id: 'goto-sql',
       keys: ['g', 's'],
       description: '跳转到SQL生成',
-      category: 'navigation'
+      category: 'navigation',
     },
 
     // 编辑类
@@ -72,25 +64,25 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
       id: 'create-table',
       keys: ['c', 't'],
       description: '创建新表',
-      category: 'editing'
+      category: 'editing',
     },
     {
       id: 'create-field',
       keys: ['c', 'f'],
       description: '添加字段',
-      category: 'editing'
+      category: 'editing',
     },
     {
       id: 'create-index',
       keys: ['c', 'i'],
       description: '创建索引',
-      category: 'editing'
+      category: 'editing',
     },
     {
       id: 'create-relationship',
       keys: ['c', 'r'],
       description: '创建关系',
-      category: 'editing'
+      category: 'editing',
     },
 
     // 操作类
@@ -98,25 +90,25 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
       id: 'search',
       keys: ['/', '/'],
       description: '全局搜索',
-      category: 'actions'
+      category: 'actions',
     },
     {
       id: 'save',
       keys: ['Ctrl', 's'],
       description: '保存当前修改',
-      category: 'actions'
+      category: 'actions',
     },
     {
       id: 'copy',
       keys: ['Ctrl', 'c'],
       description: '复制选中内容',
-      category: 'actions'
+      category: 'actions',
     },
     {
       id: 'export',
       keys: ['Ctrl', 'e'],
       description: '导出SQL',
-      category: 'actions'
+      category: 'actions',
     },
 
     // 通用类
@@ -124,26 +116,26 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
       id: 'help',
       keys: ['?'],
       description: '显示帮助',
-      category: 'general'
+      category: 'general',
     },
     {
       id: 'shortcuts',
       keys: ['Ctrl', 'k'],
       description: '显示快捷键',
-      category: 'general'
+      category: 'general',
     },
     {
       id: 'undo',
       keys: ['Ctrl', 'z'],
       description: '撤销操作',
-      category: 'general'
+      category: 'general',
     },
     {
       id: 'redo',
       keys: ['Ctrl', 'y'],
       description: '重做操作',
-      category: 'general'
-    }
+      category: 'general',
+    },
   ]
 
   // 使用提示
@@ -151,74 +143,84 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
     {
       title: '快速创建表',
       description: '使用快捷键 C + T 可以快速打开创建表对话框',
-      icon: Plus
+      icon: Plus,
     },
     {
       title: '拖拽排序',
       description: '在字段列表中可以通过拖拽来调整字段顺序',
-      icon: MousePointer
+      icon: MousePointer,
     },
     {
       title: '批量操作',
       description: '选中多个字段或索引后，可以进行批量删除操作',
-      icon: Edit3
+      icon: Edit3,
     },
     {
       title: 'AI智能建议',
       description: '系统会根据表结构自动推荐最优的索引配置',
-      icon: Zap
+      icon: Zap,
     },
     {
       title: '实时协作',
       description: '团队成员可以实时查看和评论您的数据模型变更',
-      icon: Info
-    }
+      icon: Info,
+    },
   ]
 
   // 键盘事件处理
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    const key = event.key.toLowerCase()
-    const newPressedKeys = new Set(pressedKeys)
-    
-    // 添加特殊键
-    if (event.ctrlKey) newPressedKeys.add('ctrl')
-    if (event.altKey) newPressedKeys.add('alt')
-    if (event.shiftKey) newPressedKeys.add('shift')
-    if (event.metaKey) newPressedKeys.add('cmd')
-    
-    newPressedKeys.add(key)
-    setPressedKeys(newPressedKeys)
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase()
+      const newPressedKeys = new Set(pressedKeys)
 
-    // 检查快捷键匹配
-    const matchedShortcut = shortcuts.find(shortcut => {
-      const shortcutKeys = shortcut.keys.map(k => k.toLowerCase())
-      return shortcutKeys.length === newPressedKeys.size &&
-             shortcutKeys.every(k => newPressedKeys.has(k))
-    })
+      // 添加特殊键
+      if (event.ctrlKey) newPressedKeys.add('ctrl')
+      if (event.altKey) newPressedKeys.add('alt')
+      if (event.shiftKey) newPressedKeys.add('shift')
+      if (event.metaKey) newPressedKeys.add('cmd')
 
-    if (matchedShortcut) {
-      // 特殊处理某些快捷键，避免干扰浏览器默认行为
-      if (matchedShortcut.id === 'copy') {
-        const selection = window.getSelection()
-        if (selection && selection.toString().length > 0) {
-          // 有文本选中，不阻止默认行为，让浏览器执行复制
-          return
+      newPressedKeys.add(key)
+      setPressedKeys(newPressedKeys)
+
+      // 检查快捷键匹配
+      const matchedShortcut = shortcuts.find(shortcut => {
+        const shortcutKeys = shortcut.keys.map(k => k.toLowerCase())
+        return (
+          shortcutKeys.length === newPressedKeys.size &&
+          shortcutKeys.every(k => newPressedKeys.has(k))
+        )
+      })
+
+      if (matchedShortcut) {
+        // 特殊处理某些快捷键，避免干扰浏览器默认行为
+        if (matchedShortcut.id === 'copy') {
+          const selection = window.getSelection()
+          if (selection && selection.toString().length > 0) {
+            // 有文本选中，不阻止默认行为，让浏览器执行复制
+            return
+          }
         }
-      }
-      
-      // 特殊处理 Ctrl+S：在输入框焦点时允许默认行为
-      if (matchedShortcut.id === 'save') {
-        const activeElement = document.activeElement
-        if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable)) {
-          // 在输入框中，不阻止默认行为
-          return
+
+        // 特殊处理 Ctrl+S：在输入框焦点时允许默认行为
+        if (matchedShortcut.id === 'save') {
+          const activeElement = document.activeElement
+          if (
+            activeElement &&
+            (activeElement.tagName === 'INPUT' ||
+              activeElement.tagName === 'TEXTAREA' ||
+              activeElement.isContentEditable)
+          ) {
+            // 在输入框中，不阻止默认行为
+            return
+          }
         }
+
+        event.preventDefault()
+        handleShortcutAction(matchedShortcut)
       }
-      
-      event.preventDefault()
-      handleShortcutAction(matchedShortcut)
-    }
-  }, [pressedKeys, shortcuts])
+    },
+    [pressedKeys, shortcuts]
+  )
 
   const handleKeyUp = useCallback((event: KeyboardEvent) => {
     // 清空按键状态
@@ -254,7 +256,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown)
     document.addEventListener('keyup', handleKeyUp)
-    
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
@@ -273,12 +275,12 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
 
   // 下一个提示
   const nextTip = () => {
-    setCurrentTip((prev) => (prev + 1) % tips.length)
+    setCurrentTip(prev => (prev + 1) % tips.length)
   }
 
   // 上一个提示
   const prevTip = () => {
-    setCurrentTip((prev) => (prev - 1 + tips.length) % tips.length)
+    setCurrentTip(prev => (prev - 1 + tips.length) % tips.length)
   }
 
   // 关闭提示并记录
@@ -288,19 +290,22 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
   }
 
   // 按类别分组快捷键
-  const groupedShortcuts = shortcuts.reduce((groups, shortcut) => {
-    if (!groups[shortcut.category]) {
-      groups[shortcut.category] = []
-    }
-    groups[shortcut.category].push(shortcut)
-    return groups
-  }, {} as Record<string, Shortcut[]>)
+  const groupedShortcuts = shortcuts.reduce(
+    (groups, shortcut) => {
+      if (!groups[shortcut.category]) {
+        groups[shortcut.category] = []
+      }
+      groups[shortcut.category].push(shortcut)
+      return groups
+    },
+    {} as Record<string, Shortcut[]>
+  )
 
   const categoryNames = {
     navigation: '导航',
     editing: '编辑',
     actions: '操作',
-    general: '通用'
+    general: '通用',
   }
 
   return (
@@ -312,7 +317,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center space-x-3">
                 <Keyboard className="w-6 h-6 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-900">快捷键指南</h2>
+                <h2 className="text-xl font-semibold text-text-primary">快捷键指南</h2>
               </div>
               <button
                 onClick={() => setShowShortcuts(false)}
@@ -322,25 +327,30 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto max-h-[70vh]">
+            <div className="p-6 overflow-y-auto custom-scrollbar max-h-[70vh]">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {Object.entries(groupedShortcuts).map(([category, shortcuts]) => (
                   <div key={category}>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    <h3 className="text-lg font-medium text-text-primary mb-4">
                       {categoryNames[category as keyof typeof categoryNames]}
                     </h3>
                     <div className="space-y-3">
-                      {shortcuts.map((shortcut) => (
+                      {shortcuts.map(shortcut => (
                         <div key={shortcut.id} className="flex items-center justify-between">
                           <span className="text-sm text-text-primary">{shortcut.description}</span>
                           <div className="flex items-center space-x-1">
                             {shortcut.keys.map((key, index) => (
                               <React.Fragment key={index}>
-                                <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">
-                                  {key === 'ctrl' ? '⌃' : 
-                                   key === 'cmd' ? '⌘' : 
-                                   key === 'alt' ? '⌥' : 
-                                   key === 'shift' ? '⇧' : key.toUpperCase()}
+                                <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 bg-bg-secondary focus:outline-none rounded text-xs font-mono">
+                                  {key === 'ctrl'
+                                    ? '⌃'
+                                    : key === 'cmd'
+                                      ? '⌘'
+                                      : key === 'alt'
+                                        ? '⌥'
+                                        : key === 'shift'
+                                          ? '⇧'
+                                          : key.toUpperCase()}
                                 </kbd>
                                 {index < shortcut.keys.length - 1 && (
                                   <span className="text-gray-400">+</span>
@@ -358,13 +368,14 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
 
             <div className="p-6 border-t border-gray-200 bg-bg-secondary">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  按 <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Ctrl + K</kbd> 随时打开此面板
+                <div className="text-sm text-text-secondary">
+                  按{' '}
+                  <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 bg-bg-secondary focus:outline-none rounded text-xs font-mono">
+                    Ctrl + K
+                  </kbd>{' '}
+                  随时打开此面板
                 </div>
-                <button
-                  onClick={() => setShowShortcuts(false)}
-                  className="btn-primary"
-                >
+                <button onClick={() => setShowShortcuts(false)} className="btn-primary">
                   关闭
                 </button>
               </div>
@@ -380,7 +391,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center space-x-3">
                 <HelpCircle className="w-6 h-6 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-900">使用技巧</h2>
+                <h2 className="text-xl font-semibold text-text-primary">使用技巧</h2>
               </div>
               <button
                 onClick={closeTips}
@@ -394,17 +405,15 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   {React.createElement(tips[currentTip].icon, {
-                    className: "w-8 h-8 text-blue-600"
+                    className: 'w-8 h-8 text-blue-600',
                   })}
                 </div>
-                
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+
+                <h3 className="text-lg font-semibold text-text-primary mb-2">
                   {tips[currentTip].title}
                 </h3>
-                
-                <p className="text-gray-600 mb-6">
-                  {tips[currentTip].description}
-                </p>
+
+                <p className="text-text-secondary mb-6">{tips[currentTip].description}</p>
 
                 <div className="flex items-center justify-center space-x-2 mb-6">
                   {tips.map((_, index) => (
@@ -412,7 +421,9 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
                       key={index}
                       onClick={() => setCurrentTip(index)}
                       className={`w-2 h-2 rounded-full transition-colors ${
-                        index === currentTip ? 'bg-primary-50 dark:bg-primary-900/20' : 'bg-gray-300'
+                        index === currentTip
+                          ? 'bg-primary-50 dark:bg-primary-900/20'
+                          : 'bg-gray-300'
                       }`}
                     />
                   ))}
@@ -456,7 +467,7 @@ const UXEnhancement: React.FC<UXEnhancementProps> = ({ onShortcutTrigger }) => {
           >
             <Keyboard className="w-5 h-5" />
           </button>
-          
+
           <button
             onClick={() => setShowTips(true)}
             className="w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg transition-colors flex items-center justify-center"

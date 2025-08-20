@@ -37,6 +37,9 @@ model Project {
   // GitHub Integration Relations
   issues            Issue[]
   githubRepository  GitHubRepository?
+  
+  // Feature Module Relations
+  featureModules    FeatureModule[]
 
   @@map("projects")
 }
@@ -136,6 +139,7 @@ model DatabaseTable {
   apiMappings     APITableMapping[]
   relatedEndpoints APIEndpoint[]
   relatedIssues   IssueTableRelation[]
+  moduleReferences ModuleTable[]
 
   @@index([projectId])
   @@index([status])
@@ -482,6 +486,7 @@ model APIEndpoint {
   history          APIHistory[]
   tableMappings    APITableMapping[]
   relatedIssues    IssueAPIRelation[]
+  moduleReferences ModuleEndpoint[]
 
   @@index([projectId])
   @@index([groupId])
@@ -1101,7 +1106,7 @@ model IssueTableRelation {
 model IssueFeatureRelation {
   id           String   @id @default(uuid())
   issueId      String
-  featureName  String   // Name of the feature/module
+  featureId    String   // Reference to FeatureModule ID
   component    String?  // Specific component within the feature
   relationType String   @default("RELATES_TO") // RELATES_TO, IMPLEMENTS, ENHANCES, REFACTORS
   description  String?
@@ -1109,11 +1114,13 @@ model IssueFeatureRelation {
   createdAt    DateTime @default(now())
   
   // Relations
-  issue        Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  issue        Issue         @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  feature      FeatureModule @relation(fields: [featureId], references: [id], onDelete: Cascade)
   
   @@index([issueId])
-  @@index([featureName])
+  @@index([featureId])
   @@index([relationType])
+  @@unique([issueId, featureId])
   @@map("issue_feature_relations")
 }
 
@@ -1224,3 +1231,250 @@ model GitHubRepository {
 // SyncStatus: "LOCAL" | "SYNCED" | "SYNC_PENDING" | "SYNC_FAILED"
 // RelationType: "RELATES_TO" | "BLOCKS" | "BLOCKED_BY" | "IMPLEMENTS" | "FIXES" | "AFFECTS" | "MODIFIES" | "CREATES" | "DROPS" | "ENHANCES" | "REFACTORS"
 // MilestoneStatus: "ACTIVE" | "COMPLETED" | "CANCELLED"
+
+// ==================================================
+// Feature Module Management Models
+// ==================================================
+
+// Feature Module model - Core feature management
+model FeatureModule {
+  id            String   @id @default(uuid())
+  projectId     String
+  name          String
+  displayName   String?
+  description   String?
+  category      String   @default("通用")
+  status        String   @default("planned") // planned, in-progress, completed, deprecated
+  priority      String   @default("MEDIUM") // HIGH, MEDIUM, LOW
+  
+  // Progress tracking
+  progress      Int      @default(0) // Progress percentage 0-100
+  estimatedHours Float?
+  actualHours   Float?
+  
+  // Dependencies and constraints
+  dependencies  String?  // JSON array of dependency module IDs or names
+  prerequisites String?  // JSON array of required conditions
+  
+  // Technical specifications
+  techStack     String?  // JSON array of technologies
+  architecture  String?  // JSON object for architectural details
+  
+  // Metadata
+  tags          String?  // JSON array of tags
+  icon          String?  // Icon identifier
+  color         String   @default("#3B82F6")
+  sortOrder     Int      @default(0)
+  
+  // Assignment and ownership
+  assigneeId    String?
+  assigneeName  String?
+  ownerId       String?
+  ownerName     String?
+  
+  // Lifecycle tracking
+  startDate     DateTime?
+  dueDate       DateTime?
+  completedAt   DateTime?
+  createdBy     String?
+  lastModifiedBy String?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  project       Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  endpoints     ModuleEndpoint[]
+  tables        ModuleTable[]
+  tasks         ModuleTask[]
+  dependencies_from ModuleDependency[] @relation("FromModule")
+  dependencies_to   ModuleDependency[] @relation("ToModule")
+  relatedIssues IssueFeatureRelation[]
+  documents     ModuleDocument[]
+  
+  @@index([projectId])
+  @@index([status])
+  @@index([category])
+  @@index([priority])
+  @@index([assigneeId])
+  @@index([dueDate])
+  @@index([sortOrder])
+  @@unique([projectId, name])
+  @@map("feature_modules")
+}
+
+// Module Endpoint model - API endpoints within a feature module
+model ModuleEndpoint {
+  id          String   @id @default(uuid())
+  moduleId    String
+  endpointId  String?  // Reference to existing APIEndpoint
+  name        String
+  method      String   // HTTP method
+  path        String
+  description String?
+  status      String   @default("planned") // planned, implementing, implemented, tested
+  priority    String   @default("MEDIUM")
+  
+  // Implementation details
+  requestSchema  String? // JSON schema for request
+  responseSchema String? // JSON schema for response
+  mockData      String? // JSON mock data
+  testCases     String? // JSON array of test cases
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  module      FeatureModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  endpoint    APIEndpoint?  @relation(fields: [endpointId], references: [id])
+  
+  @@index([moduleId])
+  @@index([endpointId])
+  @@index([status])
+  @@unique([moduleId, method, path])
+  @@map("module_endpoints")
+}
+
+// Module Table model - Database tables within a feature module
+model ModuleTable {
+  id          String   @id @default(uuid())
+  moduleId    String
+  tableId     String?  // Reference to existing DatabaseTable
+  name        String
+  description String?
+  status      String   @default("planned") // planned, designing, implemented
+  purpose     String?  // Purpose of this table in the module
+  
+  // Table specifications
+  estimatedRows Int?
+  fields       String? // JSON array of field specifications
+  indexes      String? // JSON array of index specifications
+  relationships String? // JSON array of relationship specifications
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  module      FeatureModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  table       DatabaseTable? @relation(fields: [tableId], references: [id])
+  
+  @@index([moduleId])
+  @@index([tableId])
+  @@index([status])
+  @@unique([moduleId, name])
+  @@map("module_tables")
+}
+
+// Module Task model - Development tasks within a feature module
+model ModuleTask {
+  id          String   @id @default(uuid())
+  moduleId    String
+  title       String
+  description String?
+  type        String   @default("DEVELOPMENT") // DEVELOPMENT, TESTING, DOCUMENTATION, REVIEW
+  status      String   @default("TODO") // TODO, IN_PROGRESS, COMPLETED, BLOCKED
+  priority    String   @default("MEDIUM") // HIGH, MEDIUM, LOW
+  
+  // Assignment and tracking
+  assigneeId  String?
+  assigneeName String?
+  estimatedHours Float?
+  actualHours Float?
+  
+  // Dependencies
+  dependsOn   String?  // JSON array of task IDs this task depends on
+  blockedBy   String?  // JSON array of blocking issues
+  
+  // Lifecycle
+  startDate   DateTime?
+  dueDate     DateTime?
+  completedAt DateTime?
+  
+  // Metadata
+  tags        String?  // JSON array of tags
+  labels      String?  // JSON array of labels
+  sortOrder   Int      @default(0)
+  
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  module      FeatureModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  @@index([moduleId])
+  @@index([status])
+  @@index([assigneeId])
+  @@index([dueDate])
+  @@index([sortOrder])
+  @@map("module_tasks")
+}
+
+// Module Dependency model - Dependencies between feature modules
+model ModuleDependency {
+  id             String   @id @default(uuid())
+  fromModuleId   String
+  toModuleId     String
+  dependencyType String   @default("REQUIRES") // REQUIRES, SUGGESTS, CONFLICTS, EXTENDS
+  description    String?
+  isRequired     Boolean  @default(true)
+  version        String?  // Version constraint
+  
+  createdAt      DateTime @default(now())
+  
+  // Relations
+  fromModule     FeatureModule @relation("FromModule", fields: [fromModuleId], references: [id], onDelete: Cascade)
+  toModule       FeatureModule @relation("ToModule", fields: [toModuleId], references: [id], onDelete: Cascade)
+  
+  @@index([fromModuleId])
+  @@index([toModuleId])
+  @@index([dependencyType])
+  @@unique([fromModuleId, toModuleId])
+  @@map("module_dependencies")
+}
+
+// Module Document model - Documentation for feature modules
+model ModuleDocument {
+  id          String   @id @default(uuid())
+  moduleId    String
+  title       String
+  content     String
+  type        String   @default("SPECIFICATION") // SPECIFICATION, API_DOC, USER_GUIDE, TECHNICAL_DOC
+  format      String   @default("markdown") // markdown, html, pdf
+  language    String   @default("zh-CN")
+  version     String   @default("1.0.0")
+  
+  // Document metadata
+  isPublic    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  tags        String?  // JSON array of tags
+  
+  // Lifecycle
+  createdBy   String?
+  lastModifiedBy String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  approvedBy  String?
+  approvedAt  DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  module      FeatureModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  @@index([moduleId])
+  @@index([type])
+  @@index([isPublic])
+  @@index([sortOrder])
+  @@map("module_documents")
+}
+
+// Feature Module Enums:
+// FeatureStatus: "planned" | "in-progress" | "completed" | "deprecated"
+// FeaturePriority: "HIGH" | "MEDIUM" | "LOW"
+// TaskType: "DEVELOPMENT" | "TESTING" | "DOCUMENTATION" | "REVIEW" | "DEPLOYMENT"
+// TaskStatus: "TODO" | "IN_PROGRESS" | "COMPLETED" | "BLOCKED"
+// DependencyType: "REQUIRES" | "SUGGESTS" | "CONFLICTS" | "EXTENDS"
+// DocumentType: "SPECIFICATION" | "API_DOC" | "USER_GUIDE" | "TECHNICAL_DOC" | "CHANGELOG"
+// DocumentFormat: "markdown" | "html" | "pdf" | "docx"

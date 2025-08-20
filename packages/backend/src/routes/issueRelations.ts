@@ -39,16 +39,6 @@ router.get('/:projectId/issues/:issueId/relations', [
       prisma.issueAPIRelation.findMany({
         where: { issueId },
         include: {
-          api: {
-            select: {
-              id: true,
-              name: true,
-              method: true,
-              path: true,
-              status: true,
-              description: true
-            }
-          },
           endpoint: {
             select: {
               id: true,
@@ -87,7 +77,7 @@ router.get('/:projectId/issues/:issueId/relations', [
     ])
 
     const relations = {
-      apis: apiRelations,
+      apiEndpoints: apiRelations,
       tables: tableRelations,
       features: featureRelations,
       summary: {
@@ -117,7 +107,7 @@ router.get('/:projectId/issues/:issueId/relations', [
 router.post('/:projectId/issues/:issueId/relations/apis', [
   param('projectId').isUUID().withMessage('项目ID格式无效'),
   param('issueId').isUUID().withMessage('IssueID格式无效'),
-  body('apiId').optional().isUUID().withMessage('API ID格式无效'),
+  body('endpointId').optional().isUUID().withMessage('API ID格式无效'),
   body('endpointId').optional().isUUID().withMessage('端点ID格式无效'),
   body('relationType').isIn(['RELATES_TO', 'BLOCKS', 'BLOCKED_BY', 'IMPLEMENTS', 'FIXES']).withMessage('关联类型无效'),
   body('description').optional().isString(),
@@ -125,11 +115,11 @@ router.post('/:projectId/issues/:issueId/relations/apis', [
 ], async (req, res, next) => {
   try {
     const { projectId, issueId } = req.params
-    const { apiId, endpointId, relationType, description } = req.body
+    const { endpointId, relationType, description } = req.body
 
-    // 验证必须提供 apiId 或 endpointId 其中之一
-    if (!apiId && !endpointId) {
-      return next(new AppError('必须提供 apiId 或 endpointId', 400))
+    // 验证必须提供 endpointId
+    if (!endpointId) {
+      return next(new AppError('必须提供 endpointId', 400))
     }
 
     // 验证 Issue 是否存在
@@ -145,16 +135,16 @@ router.post('/:projectId/issues/:issueId/relations/apis', [
     }
 
     // 验证 API 或端点是否存在
-    if (apiId) {
-      const api = await prisma.aPI.findFirst({
+    if (endpointId) {
+      const api = await prisma.aPIEndpoint.findFirst({
         where: {
-          id: apiId,
+          id: endpointId,
           projectId
         }
       })
 
       if (!api) {
-        return next(new AppError('API不存在', 404))
+        return next(new AppError('API端点不存在', 404))
       }
     }
 
@@ -175,7 +165,6 @@ router.post('/:projectId/issues/:issueId/relations/apis', [
     const existingRelation = await prisma.issueAPIRelation.findFirst({
       where: {
         issueId,
-        ...(apiId && { apiId }),
         ...(endpointId && { endpointId })
       }
     })
@@ -188,13 +177,13 @@ router.post('/:projectId/issues/:issueId/relations/apis', [
     const relation = await prisma.issueAPIRelation.create({
       data: {
         issueId,
-        apiId,
+        endpointId,
         endpointId,
         relationType,
         description
       },
       include: {
-        api: apiId ? {
+        api: endpointId ? {
           select: {
             id: true,
             name: true,
@@ -219,7 +208,7 @@ router.post('/:projectId/issues/:issueId/relations/apis', [
     logger.info('创建Issue-API关联', {
       projectId,
       issueId,
-      apiId,
+      endpointId,
       endpointId,
       relationType
     })
@@ -562,7 +551,6 @@ router.post('/:projectId/issues/:issueId/relations/batch', [
             const existing = await tx.issueAPIRelation.findFirst({
               where: {
                 issueId,
-                ...(relation.apiId && { apiId: relation.apiId }),
                 ...(relation.endpointId && { endpointId: relation.endpointId })
               }
             })
@@ -571,7 +559,6 @@ router.post('/:projectId/issues/:issueId/relations/batch', [
               await tx.issueAPIRelation.create({
                 data: {
                   issueId,
-                  apiId: relation.apiId,
                   endpointId: relation.endpointId,
                   relationType: relation.relationType,
                   description: relation.description
@@ -676,8 +663,8 @@ router.get('/:projectId/issues/:issueId/relations/available', [
 
     if (!type || type === 'api') {
       // 获取未关联的 API
-      const [apis, endpoints] = await Promise.all([
-        prisma.aPI.findMany({
+      const [apiEndpoints, endpoints] = await Promise.all([
+        prisma.aPIEndpoint.findMany({
           where: {
             projectId,
             relatedIssues: {
@@ -759,7 +746,7 @@ router.get('/:projectId/issues/:issueId/relations/available', [
       issueId,
       type,
       counts: {
-        apis: available.apis?.length || 0,
+        apiEndpoints: available.apis?.length || 0,
         endpoints: available.endpoints?.length || 0,
         tables: available.tables?.length || 0,
         features: available.features?.length || 0

@@ -1,39 +1,31 @@
-import React, { useState, useEffect } from 'react'
 import {
-  ArrowRight,
+  Calendar,
+  Clock,
+  Download,
+  Eye,
   GitBranch,
   Play,
-  Pause,
-  Square,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Clock,
-  Database,
-  FileText,
-  Download,
-  Upload,
   Plus,
-  Trash2,
-  Eye,
-  Settings,
-  RotateCcw,
   RefreshCw,
-  Code,
-  Calendar,
-  User,
-  Target
+  Target,
+  Trash2,
 } from 'lucide-react'
-import { 
-  generateMigrationScript, 
-  generateMigrationPlan,
-  generateRollbackScript
-} from '../../../../utils/api'
+import React, { useState } from 'react'
 import { toast } from 'react-hot-toast'
+import { generateMigrationScript } from '../../../../utils/api'
 
 interface MigrationStep {
   id: string
-  type: 'CREATE_TABLE' | 'ALTER_TABLE' | 'DROP_TABLE' | 'ADD_COLUMN' | 'DROP_COLUMN' | 'ADD_INDEX' | 'DROP_INDEX' | 'ADD_CONSTRAINT' | 'DROP_CONSTRAINT'
+  type:
+    | 'CREATE_TABLE'
+    | 'ALTER_TABLE'
+    | 'DROP_TABLE'
+    | 'ADD_COLUMN'
+    | 'DROP_COLUMN'
+    | 'ADD_INDEX'
+    | 'DROP_INDEX'
+    | 'ADD_CONSTRAINT'
+    | 'DROP_CONSTRAINT'
   description: string
   sql: string
   rollbackSql?: string
@@ -91,7 +83,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
   currentModel,
   targetModel,
   onMigrationCreate,
-  onMigrationExecute
+  onMigrationExecute,
 }) => {
   const [plans, setPlans] = useState<MigrationPlan[]>([])
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
@@ -108,7 +100,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
     includeRollback: boolean
   }) => {
     setGenerating(true)
-    
+
     try {
       // 生成主迁移脚本
       const migrationResponse = await generateMigrationScript({
@@ -118,23 +110,24 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
         options: {
           generateRollback: options.includeRollback,
           includeComments: true,
-          safeMode: true
-        }
+          safeMode: true,
+        },
       })
 
       if (migrationResponse.success) {
-        const steps: MigrationStep[] = migrationResponse.data.steps?.map((step: any, index: number) => ({
-          id: `step_${index}`,
-          type: step.type || 'ALTER_TABLE',
-          description: step.description || `迁移步骤 ${index + 1}`,
-          sql: step.sql || '',
-          rollbackSql: step.rollbackSql,
-          dependencies: step.dependencies || [],
-          estimatedTime: step.estimatedTime || 30,
-          riskLevel: step.riskLevel || 'MEDIUM',
-          affectedTables: step.affectedTables || [],
-          warnings: step.warnings || []
-        })) || []
+        const steps: MigrationStep[] =
+          migrationResponse.data.steps?.map((step: any, index: number) => ({
+            id: `step_${index}`,
+            type: step.type || 'ALTER_TABLE',
+            description: step.description || `迁移步骤 ${index + 1}`,
+            sql: step.sql || '',
+            rollbackSql: step.rollbackSql,
+            dependencies: step.dependencies || [],
+            estimatedTime: step.estimatedTime || 30,
+            riskLevel: step.riskLevel || 'MEDIUM',
+            affectedTables: step.affectedTables || [],
+            warnings: step.warnings || [],
+          })) || []
 
         const newPlan: MigrationPlan = {
           id: `plan_${Date.now()}`,
@@ -146,7 +139,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           status: 'DRAFT',
           createdAt: new Date(),
           createdBy: '当前用户',
-          targetDatabase: options.dialect
+          targetDatabase: options.dialect,
         }
 
         setPlans(prev => [...prev, newPlan])
@@ -157,7 +150,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
       }
     } catch (error) {
       console.error('Migration generation failed:', error)
-      
+
       // 生成模拟迁移计划
       const mockPlan = generateMockMigrationPlan(options)
       setPlans(prev => [...prev, mockPlan])
@@ -185,19 +178,19 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
         estimatedTime: 45,
         riskLevel: 'LOW',
         affectedTables: ['new_users'],
-        warnings: []
+        warnings: [],
       },
       {
         id: 'step_2',
         type: 'ADD_COLUMN',
         description: '添加用户状态字段',
-        sql: 'ALTER TABLE users ADD COLUMN status ENUM(\'active\', \'inactive\') DEFAULT \'active\';',
+        sql: "ALTER TABLE users ADD COLUMN status ENUM('active', 'inactive') DEFAULT 'active';",
         rollbackSql: 'ALTER TABLE users DROP COLUMN status;',
         dependencies: [],
         estimatedTime: 60,
         riskLevel: 'MEDIUM',
         affectedTables: ['users'],
-        warnings: ['此操作可能需要锁定表']
+        warnings: ['此操作可能需要锁定表'],
       },
       {
         id: 'step_3',
@@ -209,8 +202,8 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
         estimatedTime: 90,
         riskLevel: 'HIGH',
         affectedTables: ['users'],
-        warnings: ['检查数据唯一性', '可能失败如果存在重复邮箱']
-      }
+        warnings: ['检查数据唯一性', '可能失败如果存在重复邮箱'],
+      },
     ]
 
     return {
@@ -223,7 +216,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
       status: 'DRAFT',
       createdAt: new Date(),
       createdBy: '当前用户',
-      targetDatabase: options.dialect
+      targetDatabase: options.dialect,
     }
   }
 
@@ -242,9 +235,9 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
         {
           timestamp: new Date(),
           level: 'INFO',
-          message: `开始执行迁移计划: ${plan.name}`
-        }
-      ]
+          message: `开始执行迁移计划: ${plan.name}`,
+        },
+      ],
     }
 
     setExecution(newExecution)
@@ -257,48 +250,54 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
   // 模拟迁移执行
   const simulateExecution = (exec: MigrationExecution, plan: MigrationPlan) => {
     let currentStep = 0
-    
+
     const executeNextStep = () => {
       if (currentStep >= plan.steps.length) {
         // 执行完成
-        setExecution(prev => prev ? {
-          ...prev,
-          status: 'COMPLETED',
-          currentStep: plan.steps.length,
-          endTime: new Date(),
-          logs: [
-            ...prev.logs,
-            {
-              timestamp: new Date(),
-              level: 'INFO',
-              message: '迁移计划执行完成'
-            }
-          ]
-        } : null)
-        
-        setPlans(prev => prev.map(p => 
-          p.id === plan.id ? { ...p, status: 'COMPLETED' } : p
-        ))
-        
+        setExecution(prev =>
+          prev
+            ? {
+                ...prev,
+                status: 'COMPLETED',
+                currentStep: plan.steps.length,
+                endTime: new Date(),
+                logs: [
+                  ...prev.logs,
+                  {
+                    timestamp: new Date(),
+                    level: 'INFO',
+                    message: '迁移计划执行完成',
+                  },
+                ],
+              }
+            : null
+        )
+
+        setPlans(prev => prev.map(p => (p.id === plan.id ? { ...p, status: 'COMPLETED' } : p)))
+
         toast.success('迁移执行完成')
         return
       }
 
       const step = plan.steps[currentStep]
-      
-      setExecution(prev => prev ? {
-        ...prev,
-        currentStep: currentStep + 1,
-        logs: [
-          ...prev.logs,
-          {
-            timestamp: new Date(),
-            level: 'INFO',
-            message: `执行步骤 ${currentStep + 1}: ${step.description}`,
-            stepId: step.id
-          }
-        ]
-      } : null)
+
+      setExecution(prev =>
+        prev
+          ? {
+              ...prev,
+              currentStep: currentStep + 1,
+              logs: [
+                ...prev.logs,
+                {
+                  timestamp: new Date(),
+                  level: 'INFO',
+                  message: `执行步骤 ${currentStep + 1}: ${step.description}`,
+                  stepId: step.id,
+                },
+              ],
+            }
+          : null
+      )
 
       // 模拟执行时间
       setTimeout(() => {
@@ -306,48 +305,54 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
         const success = Math.random() > 0.1
 
         if (success) {
-          setExecution(prev => prev ? {
-            ...prev,
-            logs: [
-              ...prev.logs,
-              {
-                timestamp: new Date(),
-                level: 'INFO',
-                message: `步骤 ${currentStep + 1} 执行成功`,
-                stepId: step.id
-              }
-            ]
-          } : null)
-          
+          setExecution(prev =>
+            prev
+              ? {
+                  ...prev,
+                  logs: [
+                    ...prev.logs,
+                    {
+                      timestamp: new Date(),
+                      level: 'INFO',
+                      message: `步骤 ${currentStep + 1} 执行成功`,
+                      stepId: step.id,
+                    },
+                  ],
+                }
+              : null
+          )
+
           currentStep++
           setTimeout(executeNextStep, 1000)
         } else {
           // 模拟执行失败
-          setExecution(prev => prev ? {
-            ...prev,
-            status: 'FAILED',
-            logs: [
-              ...prev.logs,
-              {
-                timestamp: new Date(),
-                level: 'ERROR',
-                message: `步骤 ${currentStep + 1} 执行失败: 模拟错误`,
-                stepId: step.id
-              }
-            ],
-            errors: [
-              {
-                stepId: step.id,
-                error: '模拟的执行错误',
-                sqlState: '23000'
-              }
-            ]
-          } : null)
-          
-          setPlans(prev => prev.map(p => 
-            p.id === plan.id ? { ...p, status: 'FAILED' } : p
-          ))
-          
+          setExecution(prev =>
+            prev
+              ? {
+                  ...prev,
+                  status: 'FAILED',
+                  logs: [
+                    ...prev.logs,
+                    {
+                      timestamp: new Date(),
+                      level: 'ERROR',
+                      message: `步骤 ${currentStep + 1} 执行失败: 模拟错误`,
+                      stepId: step.id,
+                    },
+                  ],
+                  errors: [
+                    {
+                      stepId: step.id,
+                      error: '模拟的执行错误',
+                      sqlState: '23000',
+                    },
+                  ],
+                }
+              : null
+          )
+
+          setPlans(prev => prev.map(p => (p.id === plan.id ? { ...p, status: 'FAILED' } : p)))
+
           toast.error('迁移执行失败')
         }
       }, step.estimatedTime * 10) // 加速模拟
@@ -359,23 +364,34 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
   // 获取状态颜色
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'DRAFT': return 'bg-gray-100 text-gray-800'
-      case 'READY': return 'bg-blue-100 text-blue-800'
-      case 'RUNNING': return 'bg-yellow-100 text-yellow-800'
-      case 'COMPLETED': return 'bg-green-100 text-green-800'
-      case 'FAILED': return 'bg-red-100 text-red-800'
-      case 'CANCELLED': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'DRAFT':
+        return 'bg-gray-100 text-gray-800'
+      case 'READY':
+        return 'bg-blue-100 text-blue-800'
+      case 'RUNNING':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'COMPLETED':
+        return 'bg-green-100 text-green-800'
+      case 'FAILED':
+        return 'bg-red-100 text-red-800'
+      case 'CANCELLED':
+        return 'bg-gray-100 text-gray-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   // 获取风险级别颜色
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'LOW': return 'text-green-600'
-      case 'MEDIUM': return 'text-yellow-600'
-      case 'HIGH': return 'text-red-600'
-      default: return 'text-text-secondary'
+      case 'LOW':
+        return 'text-green-600'
+      case 'MEDIUM':
+        return 'text-yellow-600'
+      case 'HIGH':
+        return 'text-red-600'
+      default:
+        return 'text-text-secondary'
     }
   }
 
@@ -391,7 +407,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <p className="text-text-secondary">可视化设计和执行数据库迁移计划</p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
@@ -405,7 +421,9 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <button
                 onClick={() => setView('designer')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  view === 'designer' ? 'bg-bg-paper text-text-primary shadow' : 'text-text-secondary'
+                  view === 'designer'
+                    ? 'bg-bg-paper text-text-primary shadow'
+                    : 'text-text-secondary'
                 }`}
               >
                 可视化设计
@@ -413,14 +431,16 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
               <button
                 onClick={() => setView('execution')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  view === 'execution' ? 'bg-bg-paper text-text-primary shadow' : 'text-text-secondary'
+                  view === 'execution'
+                    ? 'bg-bg-paper text-text-primary shadow'
+                    : 'text-text-secondary'
                 }`}
                 disabled={!execution}
               >
                 执行监控
               </button>
             </div>
-            
+
             <button
               onClick={() => setShowPlanModal(true)}
               className="btn-primary flex items-center space-x-2"
@@ -436,12 +456,10 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
       {view === 'list' && (
         <div className="bg-bg-paper rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-text-primary">
-              迁移计划 ({plans.length})
-            </h3>
+            <h3 className="text-lg font-medium text-text-primary">迁移计划 ({plans.length})</h3>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto custom-scrollbar">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-bg-secondary">
                 <tr>
@@ -469,39 +487,37 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                 </tr>
               </thead>
               <tbody className="bg-bg-paper divide-y divide-gray-200">
-                {plans.map((plan) => (
+                {plans.map(plan => (
                   <tr key={plan.id} className="hover:bg-bg-secondary">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <GitBranch className="w-4 h-4 text-gray-400 mr-2" />
                         <div>
-                          <div className="text-sm font-medium text-text-primary">
-                            {plan.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {plan.description}
-                          </div>
+                          <div className="text-sm font-medium text-text-primary">{plan.name}</div>
+                          <div className="text-sm text-gray-500">{plan.description}</div>
                         </div>
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
                       {plan.version}
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
                       {plan.steps.length}
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm text-text-primary">
                         <Clock className="w-4 h-4 mr-1" />
                         {Math.round(plan.totalEstimatedTime / 60)}分钟
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(plan.status)}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(plan.status)}`}
+                      >
                         {plan.status === 'DRAFT' && '草稿'}
                         {plan.status === 'READY' && '就绪'}
                         {plan.status === 'RUNNING' && '执行中'}
@@ -510,11 +526,11 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                         {plan.status === 'CANCELLED' && '已取消'}
                       </span>
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {plan.createdAt.toLocaleDateString()}
                     </td>
-                    
+
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
                         <button
@@ -524,7 +540,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        
+
                         {plan.status === 'DRAFT' && (
                           <button
                             onClick={() => executePlan(plan.id)}
@@ -534,11 +550,8 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                             <Play className="w-4 h-4" />
                           </button>
                         )}
-                        
-                        <button
-                          className="text-red-600 hover:text-red-900"
-                          title="删除计划"
-                        >
+
+                        <button className="text-red-600 hover:text-red-900" title="删除计划">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -552,16 +565,9 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           {plans.length === 0 && (
             <div className="text-center py-12">
               <GitBranch className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-text-primary mb-2">
-                暂无迁移计划
-              </h3>
-              <p className="text-text-secondary mb-6">
-                创建第一个迁移计划来开始数据库版本管理
-              </p>
-              <button
-                onClick={() => setShowPlanModal(true)}
-                className="btn-primary"
-              >
+              <h3 className="text-lg font-medium text-text-primary mb-2">暂无迁移计划</h3>
+              <p className="text-text-secondary mb-6">创建第一个迁移计划来开始数据库版本管理</p>
+              <button onClick={() => setShowPlanModal(true)} className="btn-primary">
                 创建迁移计划
               </button>
             </div>
@@ -576,14 +582,12 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           <div className="bg-bg-paper rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-medium text-text-primary">
-                  迁移执行监控
-                </h3>
+                <h3 className="text-lg font-medium text-text-primary">迁移执行监控</h3>
                 <p className="text-text-secondary">
                   计划: {plans.find(p => p.id === execution.planId)?.name}
                 </p>
               </div>
-              
+
               <div className="flex items-center space-x-4">
                 <div className="text-right">
                   <div className="text-sm text-text-secondary">进度</div>
@@ -591,20 +595,25 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                     {execution.currentStep} / {execution.totalSteps}
                   </div>
                 </div>
-                
+
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     className={`h-2 rounded-full transition-all duration-300 ${
-                      execution.status === 'COMPLETED' ? 'bg-green-500' :
-                      execution.status === 'FAILED' ? 'bg-red-500' : 'bg-primary-50 dark:bg-primary-900/20'
+                      execution.status === 'COMPLETED'
+                        ? 'bg-green-500'
+                        : execution.status === 'FAILED'
+                          ? 'bg-red-500'
+                          : 'bg-primary-50 dark:bg-primary-900/20'
                     }`}
-                    style={{ 
-                      width: `${(execution.currentStep / execution.totalSteps) * 100}%` 
+                    style={{
+                      width: `${(execution.currentStep / execution.totalSteps) * 100}%`,
                     }}
                   />
                 </div>
-                
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(execution.status)}`}>
+
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(execution.status)}`}
+                >
                   {execution.status === 'RUNNING' && '执行中'}
                   {execution.status === 'COMPLETED' && '已完成'}
                   {execution.status === 'FAILED' && '失败'}
@@ -626,22 +635,21 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-bg-secondary rounded-lg p-4">
                 <div className="flex items-center">
                   <Clock className="w-5 h-5 text-gray-400 mr-2" />
                   <div>
                     <div className="text-sm text-text-secondary">已用时间</div>
                     <div className="font-medium">
-                      {execution.startTime ? 
-                        Math.round((Date.now() - execution.startTime.getTime()) / 1000) + 's' : 
-                        '-'
-                      }
+                      {execution.startTime
+                        ? Math.round((Date.now() - execution.startTime.getTime()) / 1000) + 's'
+                        : '-'}
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-bg-secondary rounded-lg p-4">
                 <div className="flex items-center">
                   <Target className="w-5 h-5 text-gray-400 mr-2" />
@@ -659,36 +667,36 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
           {/* 执行日志 */}
           <div className="bg-bg-paper rounded-lg border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-text-primary">
-                执行日志
-              </h3>
+              <h3 className="text-lg font-medium text-text-primary">执行日志</h3>
               <button className="btn-outline flex items-center space-x-2">
                 <Download className="w-4 h-4" />
                 <span>导出日志</span>
               </button>
             </div>
-            
+
             <div className="p-6">
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-thin">
                 {execution.logs.map((log, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start space-x-3 text-sm font-mono"
-                  >
+                  <div key={index} className="flex items-start space-x-3 text-sm font-mono">
                     <span className="text-gray-500 flex-shrink-0">
                       {log.timestamp.toLocaleTimeString()}
                     </span>
-                    <span className={`flex-shrink-0 font-medium ${
-                      log.level === 'ERROR' ? 'text-red-600' :
-                      log.level === 'WARN' ? 'text-yellow-600' : 'text-text-secondary'
-                    }`}>
+                    <span
+                      className={`flex-shrink-0 font-medium ${
+                        log.level === 'ERROR'
+                          ? 'text-red-600'
+                          : log.level === 'WARN'
+                            ? 'text-yellow-600'
+                            : 'text-text-secondary'
+                      }`}
+                    >
                       [{log.level}]
                     </span>
                     <span className="text-text-primary">{log.message}</span>
                   </div>
                 ))}
               </div>
-              
+
               {execution.errors && execution.errors.length > 0 && (
                 <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <h4 className="font-medium text-red-900 mb-2">执行错误</h4>
@@ -697,9 +705,7 @@ const MigrationPlanner: React.FC<MigrationPlannerProps> = ({
                       <div key={index} className="text-sm text-red-700">
                         <strong>步骤 {error.stepId}:</strong> {error.error}
                         {error.sqlState && (
-                          <span className="ml-2 text-red-600">
-                            (SQL状态: {error.sqlState})
-                          </span>
+                          <span className="ml-2 text-red-600">(SQL状态: {error.sqlState})</span>
                         )}
                       </div>
                     ))}
@@ -741,13 +747,13 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  loading
+  loading,
 }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     dialect: 'mysql',
-    includeRollback: true
+    includeRollback: true,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -769,13 +775,11 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-1">
-              计划名称 *
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-1">计划名称 *</label>
             <input
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
               className="input w-full"
               placeholder="如: 用户表结构优化"
               required
@@ -783,12 +787,10 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-1">
-              计划描述
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-1">计划描述</label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
               className="input w-full"
               rows={3}
               placeholder="描述此次迁移的目的和主要变更..."
@@ -796,12 +798,10 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-1">
-              目标数据库
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-1">目标数据库</label>
             <select
               value={formData.dialect}
-              onChange={(e) => setFormData(prev => ({ ...prev, dialect: e.target.value }))}
+              onChange={e => setFormData(prev => ({ ...prev, dialect: e.target.value }))}
               className="input w-full"
             >
               <option value="mysql">MySQL</option>
@@ -816,20 +816,17 @@ const CreateMigrationPlanModal: React.FC<CreateMigrationPlanModalProps> = ({
               <input
                 type="checkbox"
                 checked={formData.includeRollback}
-                onChange={(e) => setFormData(prev => ({ ...prev, includeRollback: e.target.checked }))}
-                className="rounded border-gray-300"
+                onChange={e =>
+                  setFormData(prev => ({ ...prev, includeRollback: e.target.checked }))
+                }
+                className="rounded border-gray-300 bg-bg-secondary"
               />
               <span className="text-sm text-text-primary">生成回滚脚本</span>
             </label>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-outline"
-              disabled={loading}
-            >
+            <button type="button" onClick={onClose} className="btn-outline" disabled={loading}>
               取消
             </button>
             <button

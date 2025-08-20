@@ -250,7 +250,7 @@ ${fieldDefinitions.join(',\n')}
         </div>
 
         {/* Tab Content */}
-        <div className="p-6 max-h-[50vh] overflow-y-auto">
+        <div className="p-6 max-h-[50vh] overflow-y-auto custom-scrollbar">
           {activeTab === 'fields' && (
             <div className="space-y-4">
               {/* Search and Filter */}
@@ -282,7 +282,7 @@ ${fieldDefinitions.join(',\n')}
               </div>
 
               {/* Fields Table */}
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto custom-scrollbar">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-bg-tertiary">
                     <tr>

@@ -118,7 +118,7 @@ export const CreateAPIGroupModal: React.FC<CreateAPIGroupModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
             {/* 基本信息 */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-text-primary">基本信息</h3>

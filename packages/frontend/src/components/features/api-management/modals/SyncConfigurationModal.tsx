@@ -160,7 +160,7 @@ export const SyncConfigurationModal: React.FC<SyncConfigurationModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
             {/* 基本设置 */}
             {activeTab === 0 && (
               <div className="space-y-6">

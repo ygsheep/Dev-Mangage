@@ -26,6 +26,55 @@ export enum HTTPMethod {
   OPTIONS = 'OPTIONS'
 }
 
+// 文档类型 (与后端保持一致)
+export enum DocumentType {
+  MARKDOWN = 'MARKDOWN',
+  SQL = 'SQL',
+  EXCEL = 'EXCEL',
+  WORD = 'WORD',
+  PDF = 'PDF',
+  JSON = 'JSON',
+  CSV = 'CSV',
+  // 专用文档类型
+  API_DOCUMENTATION = 'API_DOCUMENTATION',
+  DATA_MODEL = 'DATA_MODEL',
+  FEATURE_MODULE = 'FEATURE_MODULE',
+  BUSINESS_PROCESS = 'BUSINESS_PROCESS',
+  TECHNICAL_SPEC = 'TECHNICAL_SPEC'
+}
+
+// 文档类型中文映射
+export const DOCUMENT_TYPE_LABELS = {
+  [DocumentType.MARKDOWN]: 'Markdown文档',
+  [DocumentType.SQL]: 'SQL脚本',
+  [DocumentType.EXCEL]: 'Excel表格',
+  [DocumentType.WORD]: 'Word文档',
+  [DocumentType.PDF]: 'PDF文档',
+  [DocumentType.JSON]: 'JSON数据',
+  [DocumentType.CSV]: 'CSV表格',
+  [DocumentType.API_DOCUMENTATION]: 'API接口文档',
+  [DocumentType.DATA_MODEL]: '数据模型文档',
+  [DocumentType.FEATURE_MODULE]: '功能模块文档',
+  [DocumentType.BUSINESS_PROCESS]: '业务流程文档',
+  [DocumentType.TECHNICAL_SPEC]: '技术规格文档'
+}
+
+// 文档类型颜色映射
+export const DOCUMENT_TYPE_COLORS = {
+  [DocumentType.MARKDOWN]: 'bg-blue-100 text-blue-800',
+  [DocumentType.SQL]: 'bg-green-100 text-green-800',
+  [DocumentType.EXCEL]: 'bg-yellow-100 text-yellow-800',
+  [DocumentType.WORD]: 'bg-purple-100 text-purple-800',
+  [DocumentType.PDF]: 'bg-red-100 text-red-800',
+  [DocumentType.JSON]: 'bg-orange-100 text-orange-800',
+  [DocumentType.CSV]: 'bg-teal-100 text-teal-800',
+  [DocumentType.API_DOCUMENTATION]: 'bg-indigo-100 text-indigo-800',
+  [DocumentType.DATA_MODEL]: 'bg-cyan-100 text-cyan-800',
+  [DocumentType.FEATURE_MODULE]: 'bg-pink-100 text-pink-800',
+  [DocumentType.BUSINESS_PROCESS]: 'bg-amber-100 text-amber-800',
+  [DocumentType.TECHNICAL_SPEC]: 'bg-slate-100 text-slate-800'
+}
+
 // API状态中文映射
 export const API_STATUS_LABELS = {
   [APIStatus.NOT_STARTED]: '未开发',
@@ -186,6 +235,36 @@ export enum RelationType {
   DROPS = 'DROPS',
   ENHANCES = 'ENHANCES',
   REFACTORS = 'REFACTORS'
+}
+
+// 关联类型中文映射
+export const RELATION_TYPE_LABELS = {
+  [RelationType.RELATES_TO]: '关联',
+  [RelationType.BLOCKS]: '阻塞',
+  [RelationType.BLOCKED_BY]: '被阻塞',
+  [RelationType.IMPLEMENTS]: '实现',
+  [RelationType.FIXES]: '修复',
+  [RelationType.AFFECTS]: '影响',
+  [RelationType.MODIFIES]: '修改',
+  [RelationType.CREATES]: '创建',
+  [RelationType.DROPS]: '删除',
+  [RelationType.ENHANCES]: '增强',
+  [RelationType.REFACTORS]: '重构'
+}
+
+// 关联类型颜色映射
+export const RELATION_TYPE_COLORS = {
+  [RelationType.RELATES_TO]: 'bg-blue-100 text-blue-800',
+  [RelationType.BLOCKS]: 'bg-red-100 text-red-800',
+  [RelationType.BLOCKED_BY]: 'bg-orange-100 text-orange-800',
+  [RelationType.IMPLEMENTS]: 'bg-green-100 text-green-800',
+  [RelationType.FIXES]: 'bg-purple-100 text-purple-800',
+  [RelationType.AFFECTS]: 'bg-yellow-100 text-yellow-800',
+  [RelationType.MODIFIES]: 'bg-indigo-100 text-indigo-800',
+  [RelationType.CREATES]: 'bg-teal-100 text-teal-800',
+  [RelationType.DROPS]: 'bg-pink-100 text-pink-800',
+  [RelationType.ENHANCES]: 'bg-cyan-100 text-cyan-800',
+  [RelationType.REFACTORS]: 'bg-amber-100 text-amber-800'
 }
 
 // Issue 标签接口
@@ -515,8 +594,8 @@ export const ISSUE_STATUS_LABELS = {
 
 // Issue 状态颜色映射
 export const ISSUE_STATUS_COLORS = {
-  [IssueStatus.OPEN]: 'bg-green-100 text-green-800',
-  [IssueStatus.CLOSED]: 'bg-gray-100 text-gray-800'
+  [IssueStatus.OPEN]: 'bg-green-600 text-white',
+  [IssueStatus.CLOSED]: 'bg-gray-600 text-white'
 }
 
 // Issue 优先级中文映射
@@ -529,10 +608,10 @@ export const ISSUE_PRIORITY_LABELS = {
 
 // Issue 优先级颜色映射
 export const ISSUE_PRIORITY_COLORS = {
-  [IssuePriority.CRITICAL]: 'bg-red-100 text-red-800',
-  [IssuePriority.HIGH]: 'bg-orange-100 text-orange-800',
-  [IssuePriority.MEDIUM]: 'bg-yellow-100 text-yellow-800',
-  [IssuePriority.LOW]: 'bg-blue-100 text-blue-800'
+  [IssuePriority.CRITICAL]: 'bg-red-600 text-white',
+  [IssuePriority.HIGH]: 'bg-orange-600 text-white',
+  [IssuePriority.MEDIUM]: 'bg-yellow-600 text-white',
+  [IssuePriority.LOW]: 'bg-blue-600 text-white'
 }
 
 // Issue 类型中文映射
@@ -547,12 +626,30 @@ export const ISSUE_TYPE_LABELS = {
 
 // Issue 类型颜色映射
 export const ISSUE_TYPE_COLORS = {
-  [IssueType.BUG]: 'bg-red-100 text-red-800',
-  [IssueType.FEATURE]: 'bg-green-100 text-green-800',
-  [IssueType.ENHANCEMENT]: 'bg-blue-100 text-blue-800',
-  [IssueType.TASK]: 'bg-purple-100 text-purple-800',
-  [IssueType.DOCUMENTATION]: 'bg-indigo-100 text-indigo-800',
-  [IssueType.QUESTION]: 'bg-gray-100 text-gray-800'
+  [IssueType.BUG]: 'bg-red-600 text-white',
+  [IssueType.FEATURE]: 'bg-green-600 text-white',
+  [IssueType.ENHANCEMENT]: 'bg-blue-600 text-white',
+  [IssueType.TASK]: 'bg-purple-600 text-white',
+  [IssueType.DOCUMENTATION]: 'bg-indigo-600 text-white',
+  [IssueType.QUESTION]: 'bg-gray-600 text-white'
+}
+
+// Issue 严重程度中文映射
+export const ISSUE_SEVERITY_LABELS = {
+  [IssueSeverity.CRITICAL]: '致命',
+  [IssueSeverity.MAJOR]: '严重',
+  [IssueSeverity.MINOR]: '一般',
+  [IssueSeverity.NORMAL]: '正常',
+  [IssueSeverity.TRIVIAL]: '轻微'
+}
+
+// Issue 严重程度颜色映射
+export const ISSUE_SEVERITY_COLORS = {
+  [IssueSeverity.CRITICAL]: 'bg-red-100 text-red-800',
+  [IssueSeverity.MAJOR]: 'bg-orange-100 text-orange-800',
+  [IssueSeverity.MINOR]: 'bg-yellow-100 text-yellow-800',
+  [IssueSeverity.NORMAL]: 'bg-blue-100 text-blue-800',
+  [IssueSeverity.TRIVIAL]: 'bg-gray-100 text-gray-800'
 }
 
 // 同步状态中文映射
@@ -569,4 +666,168 @@ export const SYNC_STATUS_COLORS = {
   [SyncStatus.SYNCED]: 'bg-green-100 text-green-800',
   [SyncStatus.SYNC_PENDING]: 'bg-yellow-100 text-yellow-800',
   [SyncStatus.SYNC_FAILED]: 'bg-red-100 text-red-800'
+}
+
+// ========== 功能模块管理 ==========
+
+// 功能模块状态
+export enum FeatureModuleStatus {
+  PLANNED = 'planned',
+  IN_PROGRESS = 'in-progress',
+  COMPLETED = 'completed',
+  DEPRECATED = 'deprecated'
+}
+
+// 优先级
+export enum FeatureModulePriority {
+  HIGH = 'HIGH',
+  MEDIUM = 'MEDIUM',
+  LOW = 'LOW'
+}
+
+// 任务状态
+export enum ModuleTaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
+}
+
+// 端点状态
+export enum ModuleEndpointStatus {
+  PLANNED = 'planned',
+  IMPLEMENTING = 'implementing',
+  IMPLEMENTED = 'implemented',
+  TESTING = 'testing',
+  DEPRECATED = 'deprecated'
+}
+
+// API端点接口
+export interface APIEndpoint {
+  id: string
+  name: string
+  method: string
+  path: string
+  status: ModuleEndpointStatus
+  description?: string
+}
+
+// 功能模块统计信息
+export interface FeatureModuleStats {
+  totalEndpoints: number
+  totalTasks: number
+  totalDocuments: number
+  completedTasks: number
+}
+
+// 功能模块接口
+export interface FeatureModule {
+  id: string
+  projectId: string
+  name: string
+  displayName?: string
+  description?: string
+  status: FeatureModuleStatus
+  category?: string
+  priority: FeatureModulePriority
+  progress: number
+  tags: string[]
+  techStack: string[]
+  estimatedHours?: number
+  actualHours?: number
+  assigneeId?: string
+  assigneeName?: string
+  ownerId?: string
+  ownerName?: string
+  startDate?: string
+  dueDate?: string
+  completedAt?: string
+  createdAt: string
+  updatedAt: string
+  apiEndpoints: APIEndpoint[]
+  stats: FeatureModuleStats
+}
+
+// 功能模块创建参数
+export interface CreateFeatureModuleData {
+  name: string
+  displayName?: string
+  description?: string
+  category?: string
+  priority?: FeatureModulePriority
+  tags?: string[]
+  techStack?: string[]
+  estimatedHours?: number
+  assigneeId?: string
+  assigneeName?: string
+  startDate?: string
+  dueDate?: string
+}
+
+// 功能模块更新参数
+export interface UpdateFeatureModuleData {
+  name?: string
+  displayName?: string
+  description?: string
+  category?: string
+  priority?: FeatureModulePriority
+  status?: FeatureModuleStatus
+  progress?: number
+  tags?: string[]
+  techStack?: string[]
+  estimatedHours?: number
+  actualHours?: number
+  assigneeId?: string
+  assigneeName?: string
+  startDate?: string
+  dueDate?: string
+  completedAt?: string
+}
+
+// 功能模块查询参数
+export interface FeatureModuleQueryParams {
+  status?: FeatureModuleStatus
+  search?: string
+}
+
+// 功能模块API响应
+export interface FeatureModulesResponse {
+  modules: FeatureModule[]
+  total: number
+  summary: {
+    planned: number
+    inProgress: number
+    completed: number
+    total: number
+  }
+}
+
+// 功能模块状态中文映射
+export const FEATURE_MODULE_STATUS_LABELS = {
+  [FeatureModuleStatus.PLANNED]: '计划中',
+  [FeatureModuleStatus.IN_PROGRESS]: '开发中',
+  [FeatureModuleStatus.COMPLETED]: '已完成',
+  [FeatureModuleStatus.DEPRECATED]: '已废弃'
+}
+
+// 功能模块状态颜色映射
+export const FEATURE_MODULE_STATUS_COLORS = {
+  [FeatureModuleStatus.PLANNED]: 'bg-gray-100 text-gray-800',
+  [FeatureModuleStatus.IN_PROGRESS]: 'bg-blue-100 text-blue-800',
+  [FeatureModuleStatus.COMPLETED]: 'bg-green-100 text-green-800',
+  [FeatureModuleStatus.DEPRECATED]: 'bg-red-100 text-red-800'
+}
+
+// 优先级中文映射
+export const FEATURE_MODULE_PRIORITY_LABELS = {
+  [FeatureModulePriority.HIGH]: '高',
+  [FeatureModulePriority.MEDIUM]: '中',
+  [FeatureModulePriority.LOW]: '低'
+}
+
+// 优先级颜色映射
+export const FEATURE_MODULE_PRIORITY_COLORS = {
+  [FeatureModulePriority.HIGH]: 'bg-red-100 text-red-800',
+  [FeatureModulePriority.MEDIUM]: 'bg-yellow-100 text-yellow-800',
+  [FeatureModulePriority.LOW]: 'bg-green-100 text-green-800'
 }

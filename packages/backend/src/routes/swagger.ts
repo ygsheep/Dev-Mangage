@@ -148,7 +148,7 @@ async function importSwaggerToProject(api: any, projectId: string, options: any)
     imported: 0,
     skipped: 0,
     errors: 0,
-    apis: [] as any[],
+    apiEndpoints: [] as any[],
     tags: [] as any[],
   }
 
@@ -192,7 +192,7 @@ async function importSwaggerToProject(api: any, projectId: string, options: any)
 
         // Check if API already exists
         if (!overwriteExisting) {
-          const existing = await prisma.aPI.findFirst({
+          const existing = await prisma.aPIEndpoint.findFirst({
             where: {
               projectId,
               method: httpMethod,
@@ -219,14 +219,14 @@ async function importSwaggerToProject(api: any, projectId: string, options: any)
         }
 
         // Create API
-        const createdAPI = await prisma.aPI.upsert({
+        const createdAPI = await prisma.aPIEndpoint.upsert({
           where: {
             id: `${projectId}_${httpMethod}_${path}`, // Use a simple unique identifier
           },
           create: apiData,
           update: overwriteExisting ? apiData : {},
           include: {
-            apiTags: {
+            endpointTags: {
               include: { tag: true },
             },
           },
@@ -239,10 +239,10 @@ async function importSwaggerToProject(api: any, projectId: string, options: any)
             .filter(Boolean)
 
           if (tagIds.length > 0) {
-            await prisma.aPI.update({
+            await prisma.aPIEndpoint.update({
               where: { id: createdAPI.id },
               data: {
-                apiTags: {
+                endpointTags: {
                   create: tagIds.map(tagId => ({ tagId })),
                 },
               },

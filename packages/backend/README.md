@@ -5,24 +5,28 @@ DevAPI Manager 的后端服务，提供RESTful API、数据库管理和MCP服务
 ## 🎯 核心功能
 
 ### 📊 API管理
+
 - **项目管理**: 创建、编辑、删除API项目
 - **接口管理**: API接口的CRUD操作
 - **标签系统**: 灵活的标签分类和管理
 - **批量导入**: 支持Swagger/OpenAPI规范导入
 
 ### 🔍 搜索服务
+
 - **全文搜索**: 基于数据库的全文搜索
 - **标签筛选**: 按标签快速筛选API
 - **模糊匹配**: 智能的模糊搜索算法
 - **搜索建议**: 实时搜索建议和自动补全
 
 ### 🧠 MCP集成
+
 - **服务器控制**: 启动、停止、重启MCP服务器
 - **状态监控**: 实时监控MCP服务器状态
 - **日志管理**: 日志流推送和历史查看
 - **配置管理**: MCP服务器配置和参数调整
 
 ### 📁 数据持久化
+
 - **Prisma ORM**: 类型安全的数据库操作
 - **SQLite**: 开发环境默认数据库
 - **数据迁移**: 自动化数据库架构管理
@@ -31,11 +35,13 @@ DevAPI Manager 的后端服务，提供RESTful API、数据库管理和MCP服务
 ## 🚀 快速开始
 
 ### 安装依赖
+
 ```bash
 npm install
 ```
 
 ### 环境配置
+
 ```bash
 # 复制环境变量模板
 cp .env.example .env
@@ -47,6 +53,7 @@ cp .env.example .env
 ```
 
 ### 数据库设置
+
 ```bash
 # 生成Prisma客户端
 npm run db:generate
@@ -59,6 +66,7 @@ npm run db:seed
 ```
 
 ### 启动服务
+
 ```bash
 # 开发模式
 npm run dev
@@ -100,6 +108,7 @@ packages/backend/
 ## 🔌 API接口
 
 ### 项目管理
+
 ```
 GET    /api/projects           # 获取项目列表
 POST   /api/projects           # 创建新项目
@@ -109,6 +118,7 @@ DELETE /api/projects/:id       # 删除项目
 ```
 
 ### 接口管理
+
 ```
 GET    /api/apis               # 获取API列表
 POST   /api/apis               # 创建新API
@@ -119,6 +129,7 @@ GET    /api/apis/search        # 搜索API
 ```
 
 ### 标签管理
+
 ```
 GET    /api/tags               # 获取标签列表
 POST   /api/tags               # 创建新标签
@@ -128,6 +139,7 @@ DELETE /api/tags/:id           # 删除标签
 ```
 
 ### Swagger导入
+
 ```
 POST   /api/swagger/import     # 导入Swagger文档
 POST   /api/swagger/validate   # 验证Swagger文档
@@ -135,6 +147,7 @@ GET    /api/swagger/templates  # 获取导入模板
 ```
 
 ### MCP服务器控制
+
 ```
 GET    /api/mcp/status         # 获取MCP服务器状态
 POST   /api/mcp/start          # 启动MCP服务器
@@ -146,6 +159,7 @@ GET    /api/mcp/logs/stream    # 日志实时流 (SSE)
 ```
 
 ### 调试工具
+
 ```
 GET    /api/debug/health       # 服务健康状态
 GET    /api/debug/metrics      # 性能指标
@@ -156,6 +170,7 @@ POST   /api/debug/reset        # 重置调试数据
 ## 🔧 配置说明
 
 ### 环境变量
+
 ```bash
 # 服务配置
 PORT=3000                      # 服务端口
@@ -169,7 +184,7 @@ DATABASE_URL="file:./dev.db"  # SQLite数据库路径
 CORS_ORIGIN=http://localhost:5173  # 允许的前端域名
 
 # MCP服务器配置
-MCP_SERVER_PORT=3001          # MCP服务器端口
+MCP_SERVER_PORT=3000          # MCP服务器端口
 MCP_SERVER_AUTO_START=false   # 是否自动启动MCP服务器
 
 # 日志配置
@@ -178,6 +193,7 @@ LOG_FILE=./logs/app.log       # 日志文件路径
 ```
 
 ### 数据库配置
+
 ```prisma
 // prisma/schema.prisma
 generator client {
@@ -193,6 +209,7 @@ datasource db {
 ## 📊 数据模型
 
 ### 项目模型
+
 ```typescript
 interface Project {
   id: string
@@ -208,6 +225,7 @@ interface Project {
 ```
 
 ### API模型
+
 ```typescript
 interface Api {
   id: string
@@ -226,6 +244,7 @@ interface Api {
 ```
 
 ### 标签模型
+
 ```typescript
 interface Tag {
   id: string
@@ -242,6 +261,7 @@ interface Tag {
 ## 🎯 使用示例
 
 ### 项目管理
+
 ```javascript
 // 创建项目
 const response = await fetch('/api/projects', {
@@ -251,8 +271,8 @@ const response = await fetch('/api/projects', {
     name: 'User Management API',
     description: '用户管理相关接口',
     version: '1.0.0',
-    baseUrl: 'https://api.example.com'
-  })
+    baseUrl: 'https://api.example.com',
+  }),
 })
 
 // 获取项目列表
@@ -260,6 +280,7 @@ const projects = await fetch('/api/projects').then(r => r.json())
 ```
 
 ### API管理
+
 ```javascript
 // 创建API
 const api = await fetch('/api/apis', {
@@ -271,25 +292,27 @@ const api = await fetch('/api/apis', {
     path: '/api/users/:id',
     description: '根据用户ID获取用户详细信息',
     projectId: 'project-id-here',
-    tagIds: ['tag1', 'tag2']
-  })
+    tagIds: ['tag1', 'tag2'],
+  }),
 })
 
 // 搜索API
-const searchResults = await fetch('/api/apis/search?q=用户&method=GET&tags=auth')
-  .then(r => r.json())
+const searchResults = await fetch('/api/apis/search?q=用户&method=GET&tags=auth').then(r =>
+  r.json()
+)
 ```
 
 ### MCP服务器控制
+
 ```javascript
 // 启动MCP服务器
 const startResult = await fetch('/api/mcp/start', {
-  method: 'POST'
+  method: 'POST',
 }).then(r => r.json())
 
 // 获取实时状态
 const eventSource = new EventSource('/api/mcp/status/stream')
-eventSource.onmessage = (event) => {
+eventSource.onmessage = event => {
   const status = JSON.parse(event.data)
   console.log('MCP服务器状态:', status)
 }
@@ -298,54 +321,60 @@ eventSource.onmessage = (event) => {
 ## 🔍 搜索功能
 
 ### 全文搜索
+
 ```sql
 -- 基于SQLite FTS的全文搜索
-SELECT * FROM apis 
+SELECT * FROM apis
 WHERE apis MATCH ?
 ORDER BY rank
 ```
 
 ### 标签筛选
+
 ```typescript
 // 按标签筛选API
 const filteredApis = await prisma.api.findMany({
   where: {
     tags: {
       some: {
-        name: { in: ['authentication', 'user'] }
-      }
-    }
+        name: { in: ['authentication', 'user'] },
+      },
+    },
   },
-  include: { tags: true, project: true }
+  include: { tags: true, project: true },
 })
 ```
 
 ### 复合搜索
+
 ```typescript
 // 组合搜索条件
 const searchResults = await prisma.api.findMany({
   where: {
     AND: [
-      { 
+      {
         OR: [
           { name: { contains: query } },
           { description: { contains: query } },
-          { path: { contains: query } }
-        ]
+          { path: { contains: query } },
+        ],
       },
       method ? { method: method.toUpperCase() } : {},
       projectId ? { projectId } : {},
-      tags?.length ? {
-        tags: { some: { name: { in: tags } } }
-      } : {}
-    ]
-  }
+      tags?.length
+        ? {
+            tags: { some: { name: { in: tags } } },
+          }
+        : {},
+    ],
+  },
 })
 ```
 
 ## 🛡️ 安全和验证
 
 ### 输入验证
+
 ```typescript
 // 使用Zod进行数据验证
 import { z } from 'zod'
@@ -354,80 +383,86 @@ const createProjectSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
   version: z.string().regex(/^\d+\.\d+\.\d+$/),
-  baseUrl: z.string().url().optional()
+  baseUrl: z.string().url().optional(),
 })
 ```
 
 ### 错误处理
+
 ```typescript
 // 统一错误处理中间件
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   console.error('API错误:', error)
-  
+
   if (error instanceof ValidationError) {
     return res.status(400).json({
       error: '数据验证失败',
-      details: error.details
+      details: error.details,
     })
   }
-  
+
   res.status(500).json({
     error: '服务器内部错误',
-    message: process.env.NODE_ENV === 'development' ? error.message : '请稍后重试'
+    message: process.env.NODE_ENV === 'development' ? error.message : '请稍后重试',
   })
 })
 ```
 
 ### CORS配置
+
 ```typescript
 // CORS中间件配置
-app.use(cors({
-  origin: [
-    'http://localhost:5173',  // 开发环境前端
-    'http://localhost:3000',  // 生产环境前端
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}))
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173', // 开发环境前端
+      'http://localhost:3000', // 生产环境前端
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+)
 ```
 
 ## 📈 监控和日志
 
 ### 性能监控
+
 ```typescript
 // 请求性能中间件
 app.use((req, res, next) => {
   const start = Date.now()
-  
+
   res.on('finish', () => {
     const duration = Date.now() - start
     console.log(`${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`)
   })
-  
+
   next()
 })
 ```
 
 ### 健康检查
+
 ```typescript
 // 健康检查端点
 app.get('/health', async (req, res) => {
   try {
     // 检查数据库连接
     await prisma.$queryRaw`SELECT 1`
-    
+
     res.json({
       status: 'OK',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-      database: 'connected'
+      database: 'connected',
     })
   } catch (error) {
     res.status(503).json({
       status: 'ERROR',
-      error: error.message
+      error: error.message,
     })
   }
 })
@@ -436,6 +471,7 @@ app.get('/health', async (req, res) => {
 ## 🧪 测试
 
 ### 单元测试
+
 ```bash
 # 运行测试
 npm test
@@ -448,6 +484,7 @@ npm run test:watch
 ```
 
 ### API测试
+
 ```javascript
 // 使用Jest和Supertest进行API测试
 describe('Projects API', () => {
@@ -456,10 +493,10 @@ describe('Projects API', () => {
       .post('/api/projects')
       .send({
         name: 'Test Project',
-        version: '1.0.0'
+        version: '1.0.0',
       })
       .expect(201)
-    
+
     expect(response.body.name).toBe('Test Project')
   })
 })
@@ -468,6 +505,7 @@ describe('Projects API', () => {
 ## 🚀 部署
 
 ### 生产环境
+
 ```bash
 # 构建项目
 npm run build
@@ -480,6 +518,7 @@ npm start
 ```
 
 ### Docker部署
+
 ```dockerfile
 FROM node:18-alpine
 
@@ -495,6 +534,7 @@ CMD ["npm", "start"]
 ```
 
 ### 环境变量 (生产)
+
 ```bash
 NODE_ENV=production
 PORT=3000

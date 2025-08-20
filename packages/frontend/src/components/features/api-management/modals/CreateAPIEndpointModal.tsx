@@ -217,7 +217,7 @@ export const CreateAPIEndpointModal: React.FC<CreateAPIEndpointModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto custom-scrollbar">
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="fixed inset-0 bg-black bg-opacity-25" onClick={handleClose} />
         
@@ -238,7 +238,7 @@ export const CreateAPIEndpointModal: React.FC<CreateAPIEndpointModalProps> = ({
 
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Body with Tabs */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
               {/* Tab Navigation */}
               <div className="flex space-x-1 mb-6 border-b">
                 {['基本信息', '参数定义', '响应定义', '高级设置'].map((tab, index) => (

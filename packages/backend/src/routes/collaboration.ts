@@ -23,11 +23,28 @@ router.get('/:projectId/comments', [
     const { projectId } = req.params
     const { targetType, targetId, limit = 20, offset = 0 } = req.query
 
-    // 模拟评论数据 - 在实际项目中这里会从数据库获取
-    const mockComments = [
+    // TODO: 从数据库获取真实评论数据
+    // 临时添加一些 Markdown 测试数据用于演示
+    const comments = [
       {
         id: 'comment-1',
-        content: '这个字段的命名需要更加规范，建议使用驼峰命名法。',
+        content: `## 代码审查反馈
+
+这个字段的命名需要更加规范，建议使用驼峰命名法。
+
+### 建议修改
+- 将 \`user_name\` 改为 \`userName\`
+- 将 \`create_time\` 改为 \`createTime\`
+
+**示例代码：**
+\`\`\`typescript
+interface User {
+  userName: string;  // ✅ 推荐
+  createTime: Date;  // ✅ 推荐
+}
+\`\`\`
+
+> 💡 **提示**: 遵循一致的命名规范有助于提高代码可读性`,
         authorId: 'user-1',
         authorName: '张三',
         authorAvatar: '',
@@ -38,27 +55,30 @@ router.get('/:projectId/comments', [
           id: targetId || 'general',
           name: '目标对象'
         },
-        isResolved: false,
-        replies: [
-          {
-            id: 'comment-2',
-            content: '同意，我来修改一下字段名称。',
-            authorId: 'current-user',
-            authorName: '当前用户',
-            createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
-            updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
-            parentId: 'comment-1',
-            target: {
-              type: targetType || 'table',
-              id: targetId || 'general',
-              name: '目标对象'
-            }
-          }
-        ]
+        isResolved: false
       },
       {
-        id: 'comment-3',
-        content: '添加索引时需要考虑查询性能的影响，建议先测试一下。',
+        id: 'comment-2',
+        content: `## 性能优化建议
+
+添加索引时需要考虑查询性能的影响，建议先测试一下。
+
+### 测试计划
+1. **基准测试**: 记录当前查询性能
+2. **索引创建**: 添加复合索引
+3. **性能对比**: 测试优化效果
+
+#### 建议的索引策略
+- [ ] 为 \`user_id\` 和 \`status\` 创建复合索引
+- [ ] 监控索引使用情况
+- [ ] 定期清理无用索引
+
+\`\`\`sql
+-- 推荐的索引创建语句
+CREATE INDEX idx_user_status ON user_actions(user_id, status, created_at);
+\`\`\`
+
+**参考文档**: [数据库索引最佳实践](https://example.com/db-index-best-practices)`,
         authorId: 'user-2',
         authorName: '李四',
         createdAt: new Date(Date.now() - 30 * 60 * 1000),
@@ -68,7 +88,7 @@ router.get('/:projectId/comments', [
           id: targetId || 'general',
           name: '目标对象'
         },
-        isResolved: true
+        isResolved: false
       }
     ]
 
@@ -83,8 +103,8 @@ router.get('/:projectId/comments', [
     res.json({
       success: true,
       data: {
-        comments: mockComments,
-        total: mockComments.length,
+        comments: comments,
+        total: comments.length,
         hasMore: false
       }
     })

@@ -1,31 +1,26 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import { DatabaseIndex, DatabaseTable, TableRelationship } from '@shared/types'
 import {
+  AlertCircle,
+  Brain,
+  CheckCircle,
+  Code,
+  Copy,
   Database,
   Download,
-  Copy,
-  Settings,
-  Play,
-  FileText,
-  Code,
-  CheckCircle,
-  AlertCircle,
-  Eye,
   EyeOff,
   Layers,
-  GitBranch,
   Loader2,
-  Brain,
-  Wrench,
-  History
+  Play,
+  Settings,
 } from 'lucide-react'
-import { DatabaseTable, TableRelationship, DatabaseIndex } from '@shared/types'
-import { 
-  generateSQL as generateSQLAPI,
-  generateMigrationScript,
-  getCodeTemplates,
-  renderCodeTemplate
-} from '../../../../utils/api'
+import React, { useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import {
+  generateMigrationScript,
+  generateSQL as generateSQLAPI,
+  getCodeTemplates,
+  renderCodeTemplate,
+} from '../../../../utils/api'
 import SQLPreview from '../../../common/SQLPreview'
 
 interface SQLGeneratorProps {
@@ -42,7 +37,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
   projectId,
   tables,
   relationships,
-  indexes = []
+  indexes = [],
 }) => {
   const [selectedDialect, setSelectedDialect] = useState<SQLDialect>('mysql')
   const [selectedType, setSelectedType] = useState<GenerationType>('create')
@@ -63,7 +58,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
     generateDownMigrations: true,
     includeData: false,
     safeMode: true,
-    chunkLargeOperations: true
+    chunkLargeOperations: true,
   })
   const [sqlMetadata, setSqlMetadata] = useState<any>(null)
 
@@ -90,8 +85,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         JSON: 'JSON',
         ENUM: 'ENUM',
         BLOB: 'BLOB',
-        LONGBLOB: 'LONGBLOB'
-      }
+        LONGBLOB: 'LONGBLOB',
+      },
     },
     postgresql: {
       name: 'PostgreSQL',
@@ -114,8 +109,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         JSON: 'JSONB',
         ENUM: 'VARCHAR', // PostgreSQL uses custom types for enums
         BLOB: 'BYTEA',
-        LONGBLOB: 'BYTEA'
-      }
+        LONGBLOB: 'BYTEA',
+      },
     },
     sqlite: {
       name: 'SQLite',
@@ -138,8 +133,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         JSON: 'TEXT',
         ENUM: 'TEXT',
         BLOB: 'BLOB',
-        LONGBLOB: 'BLOB'
-      }
+        LONGBLOB: 'BLOB',
+      },
     },
     mssql: {
       name: 'SQL Server',
@@ -162,9 +157,9 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         JSON: 'NVARCHAR(MAX)',
         ENUM: 'NVARCHAR(50)',
         BLOB: 'VARBINARY(MAX)',
-        LONGBLOB: 'VARBINARY(MAX)'
-      }
-    }
+        LONGBLOB: 'VARBINARY(MAX)',
+      },
+    },
   }
 
   // 加载代码模板
@@ -172,7 +167,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
     const loadTemplates = async () => {
       try {
         const response = await getCodeTemplates({
-          dialect: selectedDialect.toUpperCase()
+          dialect: selectedDialect.toUpperCase(),
         })
         setAvailableTemplates(response.data || [])
       } catch (error) {
@@ -188,8 +183,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
     setIsGenerating(true)
     try {
       // 构建数据模型
-      const selectedTableObjects = tables.filter(t => 
-        selectedTables.size === 0 || selectedTables.has(t.id)
+      const selectedTableObjects = tables.filter(
+        t => selectedTables.size === 0 || selectedTables.has(t.id)
       )
 
       const model = {
@@ -199,36 +194,41 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           name: table.name,
           displayName: table.displayName,
           comment: table.comment,
-          fields: table.fields?.map(field => ({
-            name: field.name,
-            type: field.type,
-            length: field.length,
-            precision: field.precision,
-            scale: field.scale,
-            nullable: field.nullable,
-            defaultValue: field.defaultValue,
-            comment: field.comment,
-            isPrimaryKey: field.isPrimaryKey,
-            isAutoIncrement: field.isAutoIncrement,
-            isUnique: field.isUnique,
-            isIndex: field.isIndex,
-            referencedTable: field.referencedTable,
-            referencedField: field.referencedField
-          })) || []
+          fields:
+            table.fields?.map(field => ({
+              name: field.name,
+              type: field.type,
+              length: field.length,
+              precision: field.precision,
+              scale: field.scale,
+              nullable: field.nullable,
+              defaultValue: field.defaultValue,
+              comment: field.comment,
+              isPrimaryKey: field.isPrimaryKey,
+              isAutoIncrement: field.isAutoIncrement,
+              isUnique: field.isUnique,
+              isIndex: field.isIndex,
+              referencedTable: field.referencedTable,
+              referencedField: field.referencedField,
+            })) || [],
         })),
         relationships: relationships.map(rel => ({
           fromTable: tables.find(t => t.id === rel.fromTableId)?.name,
           toTable: tables.find(t => t.id === rel.toTableId)?.name,
-          fromField: tables.find(t => t.id === rel.fromTableId)?.fields?.find(f => f.id === rel.fromFieldId)?.name,
-          toField: tables.find(t => t.id === rel.toTableId)?.fields?.find(f => f.id === rel.toFieldId)?.name,
+          fromField: tables
+            .find(t => t.id === rel.fromTableId)
+            ?.fields?.find(f => f.id === rel.fromFieldId)?.name,
+          toField: tables
+            .find(t => t.id === rel.toTableId)
+            ?.fields?.find(f => f.id === rel.toFieldId)?.name,
           type: rel.type,
           onUpdate: rel.onUpdate,
-          onDelete: rel.onDelete
-        }))
+          onDelete: rel.onDelete,
+        })),
       }
 
       let sqlResult
-      
+
       if (selectedType === 'migration') {
         // 生成迁移脚本
         sqlResult = await generateMigrationScript({
@@ -238,8 +238,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
             ...migrationOptions,
             includeComments,
             includeIndexes,
-            includeConstraints
-          }
+            includeConstraints,
+          },
         })
       } else if (selectedTemplate) {
         // 使用模板生成
@@ -251,8 +251,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
             includeIndexes,
             includeConstraints,
             includeDropStatements,
-            generateIfNotExists
-          }
+            generateIfNotExists,
+          },
         })
       } else {
         // 常规SQL生成
@@ -264,7 +264,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           includeConstraints,
           includeForeignKeys: includeConstraints,
           useIFNotExists: generateIfNotExists,
-          formatStyle: 'pretty'
+          formatStyle: 'pretty',
         })
       }
 
@@ -277,17 +277,17 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           sql += `-- Version: ${migration.version}\n`
           sql += `-- Description: ${migration.metadata.description}\n`
           sql += `-- Generated at: ${new Date().toISOString()}\n\n`
-          
+
           if (migration.upQueries && migration.upQueries.length > 0) {
             sql += `-- UP Migration\n`
             sql += migration.upQueries.join('\n\n') + '\n\n'
           }
-          
+
           if (migration.downQueries && migration.downQueries.length > 0) {
             sql += `-- DOWN Migration (Rollback)\n`
             sql += migration.downQueries.join('\n\n')
           }
-          
+
           setGeneratedSQL(sql)
         } else {
           const statements = sqlResult.data.data?.statements || sqlResult.data.statements || []
@@ -295,7 +295,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           setGeneratedSQL(sql)
           setSqlMetadata(sqlResult.data.metadata)
         }
-        
+
         toast.success('SQL代码生成成功')
       } else {
         throw new Error(sqlResult.error || '生成失败')
@@ -303,7 +303,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
     } catch (error: any) {
       console.error('AI SQL生成失败:', error)
       toast.error('SQL生成失败: ' + (error.message || '未知错误'))
-      
+
       // 回退到本地生成
       const localSQL = generateSQL
       setGeneratedSQL(localSQL)
@@ -317,10 +317,10 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
   // Drop语句生成
   const generateDropStatements = (tables: DatabaseTable[], config: any) => {
     let sql = '-- Drop Tables\n'
-    
+
     // 按依赖关系排序（有外键的表先删除）
     const sortedTables = [...tables].reverse()
-    
+
     sortedTables.forEach(table => {
       if (selectedDialect === 'mysql') {
         sql += `DROP TABLE IF EXISTS \`${table.name}\`;\n`
@@ -332,46 +332,46 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         sql += `IF OBJECT_ID('${table.name}', 'U') IS NOT NULL DROP TABLE [${table.name}];\n`
       }
     })
-    
+
     return sql + '\n'
   }
 
   const generateCreateStatements = (tables: DatabaseTable[], config: any) => {
     let sql = '-- Create Tables\n'
-    
+
     tables.forEach(table => {
       sql += generateTableSQL(table, config) + '\n'
     })
-    
+
     return sql
   }
 
   const generateTableSQL = (table: DatabaseTable, config: any) => {
     const tableName = selectedDialect === 'mysql' ? `\`${table.name}\`` : `"${table.name}"`
     const ifNotExists = generateIfNotExists && selectedDialect !== 'mssql' ? 'IF NOT EXISTS ' : ''
-    
+
     let sql = `CREATE TABLE ${ifNotExists}${tableName} (\n`
-    
+
     // 字段定义
     const fieldDefinitions: string[] = []
-    
+
     table.fields?.forEach(field => {
       let fieldDef = `  ${selectedDialect === 'mysql' ? `\`${field.name}\`` : `"${field.name}"`}`
-      
+
       // 数据类型
       const mappedType = config.typeMapping[field.type] || field.type
       fieldDef += ` ${mappedType}`
-      
+
       // 长度/精度
       if (field.length && ['VARCHAR', 'CHAR', 'DECIMAL'].some(t => mappedType.includes(t))) {
         fieldDef += `(${field.length})`
       }
-      
+
       // NULL约束
       if (!field.nullable) {
         fieldDef += ' NOT NULL'
       }
-      
+
       // 自增
       if (field.isAutoIncrement) {
         if (selectedDialect === 'mysql') {
@@ -384,7 +384,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           fieldDef += ' IDENTITY(1,1)'
         }
       }
-      
+
       // 默认值
       if (field.defaultValue) {
         if (field.defaultValue === 'CURRENT_TIMESTAMP') {
@@ -401,7 +401,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           fieldDef += ` DEFAULT ${field.defaultValue}`
         }
       }
-      
+
       // 注释
       if (field.comment && includeComments) {
         if (selectedDialect === 'mysql') {
@@ -409,22 +409,22 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         }
         // PostgreSQL和SQLite的注释需要单独的COMMENT语句
       }
-      
+
       fieldDefinitions.push(fieldDef)
     })
-    
+
     // 主键约束
     const primaryKeys = table.fields?.filter(f => f.isPrimaryKey).map(f => f.name) || []
     if (primaryKeys.length > 0) {
-      const pkFields = primaryKeys.map(name => 
-        selectedDialect === 'mysql' ? `\`${name}\`` : `"${name}"`
-      ).join(', ')
+      const pkFields = primaryKeys
+        .map(name => (selectedDialect === 'mysql' ? `\`${name}\`` : `"${name}"`))
+        .join(', ')
       fieldDefinitions.push(`  PRIMARY KEY (${pkFields})`)
     }
-    
+
     sql += fieldDefinitions.join(',\n')
     sql += '\n)'
-    
+
     // 表选项
     if (selectedDialect === 'mysql') {
       sql += ` ENGINE=${table.engine || 'InnoDB'}`
@@ -436,13 +436,13 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         sql += ` COMMENT='${table.comment}'`
       }
     }
-    
+
     sql += ';\n'
-    
+
     // PostgreSQL表注释
     if (selectedDialect === 'postgresql' && table.comment && includeComments) {
       sql += `COMMENT ON TABLE "${table.name}" IS '${table.comment}';\n`
-      
+
       // 字段注释
       table.fields?.forEach(field => {
         if (field.comment) {
@@ -450,56 +450,60 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
         }
       })
     }
-    
+
     return sql
   }
 
   const generateIndexStatements = (tables: DatabaseTable[], config: any) => {
     let sql = '-- Create Indexes\n'
-    
+
     tables.forEach(table => {
       table.indexes?.forEach(index => {
         if (index.type === 'PRIMARY') return // 主键索引已经在表创建时生成
-        
+
         const tableName = selectedDialect === 'mysql' ? `\`${table.name}\`` : `"${table.name}"`
         const indexName = selectedDialect === 'mysql' ? `\`${index.name}\`` : `"${index.name}"`
-        
+
         // 处理索引字段，支持新的数据结构
         const indexFields = index.fields || []
-        const fieldNames = indexFields.map((field: any) => 
+        const fieldNames = indexFields.map((field: any) =>
           typeof field === 'string' ? field : field.fieldName
         )
-        const fields = fieldNames.map(fieldName => 
-          selectedDialect === 'mysql' ? `\`${fieldName}\`` : `"${fieldName}"`
-        ).join(', ')
-        
+        const fields = fieldNames
+          .map(fieldName => (selectedDialect === 'mysql' ? `\`${fieldName}\`` : `"${fieldName}"`))
+          .join(', ')
+
         let indexSQL = 'CREATE '
-        
+
         if (index.isUnique) {
           indexSQL += 'UNIQUE '
         }
-        
+
         indexSQL += `INDEX ${indexName} ON ${tableName} (${fields});\n`
-        
+
         sql += indexSQL
       })
     })
-    
+
     return sql + '\n'
   }
 
-  const generateConstraintStatements = (tables: DatabaseTable[], relationships: TableRelationship[], config: any) => {
+  const generateConstraintStatements = (
+    tables: DatabaseTable[],
+    relationships: TableRelationship[],
+    config: any
+  ) => {
     let sql = '-- Add Foreign Key Constraints\n'
-    
+
     relationships.forEach(rel => {
       const fromTable = tables.find(t => t.id === rel.fromTableId)
       const toTable = tables.find(t => t.id === rel.toTableId)
       const fromField = fromTable?.fields?.find(f => f.id === rel.fromFieldId)
       const toField = toTable?.fields?.find(f => f.id === rel.toFieldId)
-      
+
       if (fromTable && toTable && fromField && toField) {
         const constraintName = rel.name || `fk_${fromTable.name}_${toTable.name}`
-        
+
         if (selectedDialect === 'mysql') {
           sql += `ALTER TABLE \`${fromTable.name}\` ADD CONSTRAINT \`${constraintName}\` `
           sql += `FOREIGN KEY (\`${fromField.name}\`) REFERENCES \`${toTable.name}\`(\`${toField.name}\`)`
@@ -507,37 +511,37 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           sql += `ALTER TABLE "${fromTable.name}" ADD CONSTRAINT "${constraintName}" `
           sql += `FOREIGN KEY ("${fromField.name}") REFERENCES "${toTable.name}"("${toField.name}")`
         }
-        
+
         if (rel.onUpdate !== 'RESTRICT') {
           sql += ` ON UPDATE ${rel.onUpdate}`
         }
         if (rel.onDelete !== 'RESTRICT') {
           sql += ` ON DELETE ${rel.onDelete}`
         }
-        
+
         sql += ';\n'
       }
     })
-    
+
     return sql + '\n'
   }
 
   const generateSeedData = (tables: DatabaseTable[], config: any) => {
     let sql = '-- Seed Data (Sample)\n'
-    
+
     tables.forEach(table => {
       const tableName = selectedDialect === 'mysql' ? `\`${table.name}\`` : `"${table.name}"`
       sql += `-- INSERT INTO ${tableName} VALUES (...);\n`
     })
-    
+
     return sql + '\n'
   }
 
   // 生成SQL语句
   const generateSQL = useMemo(() => {
     const config = dialectConfigs[selectedDialect]
-    const selectedTableObjects = tables.filter(t => 
-      selectedTables.size === 0 || selectedTables.has(t.id)
+    const selectedTableObjects = tables.filter(
+      t => selectedTables.size === 0 || selectedTables.has(t.id)
     )
 
     let sql = ''
@@ -570,8 +574,19 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
     }
 
     return sql
-
-  }, [selectedDialect, selectedType, selectedTables, tables, relationships, includeIndexes, includeConstraints, includeComments, includeDropStatements, generateIfNotExists, projectId])
+  }, [
+    selectedDialect,
+    selectedType,
+    selectedTables,
+    tables,
+    relationships,
+    includeIndexes,
+    includeConstraints,
+    includeComments,
+    includeDropStatements,
+    generateIfNotExists,
+    projectId,
+  ])
 
   const handleTableToggle = (tableId: string) => {
     const newSelected = new Set(selectedTables)
@@ -625,16 +640,14 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
           <Settings className="w-5 h-5 mr-2" />
           SQL生成配置
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           {/* 数据库方言 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              数据库类型
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-2">数据库类型</label>
             <select
               value={selectedDialect}
-              onChange={(e) => setSelectedDialect(e.target.value as SQLDialect)}
+              onChange={e => setSelectedDialect(e.target.value as SQLDialect)}
               className="input w-full"
             >
               {Object.entries(dialectConfigs).map(([key, config]) => (
@@ -644,15 +657,13 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
               ))}
             </select>
           </div>
-          
+
           {/* 生成类型 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              生成类型
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-2">生成类型</label>
             <select
               value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value as GenerationType)}
+              onChange={e => setSelectedType(e.target.value as GenerationType)}
               className="input w-full"
             >
               <option value="create">CREATE TABLE</option>
@@ -664,9 +675,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
 
           {/* AI增强选项 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              生成方式
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-2">生成方式</label>
             <div className="flex space-x-2">
               <label className="flex items-center">
                 <input
@@ -674,7 +683,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                   name="generationMode"
                   checked={!useAIGeneration}
                   onChange={() => setUseAIGeneration(false)}
-                  className="rounded border-gray-300"
+                  className="rounded border-gray-300 bg-bg-secondary"
                 />
                 <span className="ml-1 text-sm">本地</span>
               </label>
@@ -684,32 +693,27 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                   name="generationMode"
                   checked={useAIGeneration}
                   onChange={() => setUseAIGeneration(true)}
-                  className="rounded border-gray-300"
+                  className="rounded border-gray-300 bg-bg-secondary"
                 />
                 <Brain className="w-3 h-3 ml-1 mr-1 text-blue-500" />
                 <span className="text-sm">AI增强</span>
               </label>
             </div>
           </div>
-          
+
           {/* 表选择 */}
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">
               表选择 ({selectedTables.size}/{tables.length})
             </label>
-            <button
-              onClick={handleSelectAll}
-              className="w-full btn-outline text-sm"
-            >
+            <button onClick={handleSelectAll} className="w-full btn-outline text-sm">
               {selectedTables.size === tables.length ? '取消全选' : '全选'}
             </button>
           </div>
-          
+
           {/* 生成按钮 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              生成SQL
-            </label>
+            <label className="block text-sm font-medium text-text-primary mb-2">生成SQL</label>
             <button
               onClick={handleGenerate}
               disabled={isGenerating}
@@ -749,12 +753,10 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* 代码模板选择 */}
               <div>
-                <label className="block text-sm font-medium text-blue-900 mb-2">
-                  代码模板
-                </label>
+                <label className="block text-sm font-medium text-blue-900 mb-2">代码模板</label>
                 <select
                   value={selectedTemplate}
-                  onChange={(e) => setSelectedTemplate(e.target.value)}
+                  onChange={e => setSelectedTemplate(e.target.value)}
                   className="input w-full"
                 >
                   <option value="">使用默认生成</option>
@@ -773,11 +775,13 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                     <input
                       type="checkbox"
                       checked={migrationOptions.generateDownMigrations}
-                      onChange={(e) => setMigrationOptions(prev => ({ 
-                        ...prev, 
-                        generateDownMigrations: e.target.checked 
-                      }))}
-                      className="rounded border-gray-300"
+                      onChange={e =>
+                        setMigrationOptions(prev => ({
+                          ...prev,
+                          generateDownMigrations: e.target.checked,
+                        }))
+                      }
+                      className="rounded border-gray-300 bg-bg-secondary"
                     />
                     <span className="text-sm">生成回滚</span>
                   </label>
@@ -785,11 +789,13 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                     <input
                       type="checkbox"
                       checked={migrationOptions.includeData}
-                      onChange={(e) => setMigrationOptions(prev => ({ 
-                        ...prev, 
-                        includeData: e.target.checked 
-                      }))}
-                      className="rounded border-gray-300"
+                      onChange={e =>
+                        setMigrationOptions(prev => ({
+                          ...prev,
+                          includeData: e.target.checked,
+                        }))
+                      }
+                      className="rounded border-gray-300 bg-bg-secondary"
                     />
                     <span className="text-sm">包含数据</span>
                   </label>
@@ -797,11 +803,13 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                     <input
                       type="checkbox"
                       checked={migrationOptions.safeMode}
-                      onChange={(e) => setMigrationOptions(prev => ({ 
-                        ...prev, 
-                        safeMode: e.target.checked 
-                      }))}
-                      className="rounded border-gray-300"
+                      onChange={e =>
+                        setMigrationOptions(prev => ({
+                          ...prev,
+                          safeMode: e.target.checked,
+                        }))
+                      }
+                      className="rounded border-gray-300 bg-bg-secondary"
                     />
                     <span className="text-sm">安全模式</span>
                   </label>
@@ -809,11 +817,13 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                     <input
                       type="checkbox"
                       checked={migrationOptions.chunkLargeOperations}
-                      onChange={(e) => setMigrationOptions(prev => ({ 
-                        ...prev, 
-                        chunkLargeOperations: e.target.checked 
-                      }))}
-                      className="rounded border-gray-300"
+                      onChange={e =>
+                        setMigrationOptions(prev => ({
+                          ...prev,
+                          chunkLargeOperations: e.target.checked,
+                        }))
+                      }
+                      className="rounded border-gray-300 bg-bg-secondary"
                     />
                     <span className="text-sm">分块处理</span>
                   </label>
@@ -822,65 +832,65 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
             </div>
           </div>
         )}
-        
+
         {/* 生成选项 */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={includeIndexes}
-              onChange={(e) => setIncludeIndexes(e.target.checked)}
-              className="rounded border-gray-300"
+              onChange={e => setIncludeIndexes(e.target.checked)}
+              className="rounded border-gray-300 bg-bg-secondary"
             />
             <span className="text-sm">包含索引</span>
           </label>
-          
+
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={includeConstraints}
-              onChange={(e) => setIncludeConstraints(e.target.checked)}
-              className="rounded border-gray-300"
+              onChange={e => setIncludeConstraints(e.target.checked)}
+              className="rounded border-gray-300 bg-bg-secondary"
             />
             <span className="text-sm">包含约束</span>
           </label>
-          
+
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={includeComments}
-              onChange={(e) => setIncludeComments(e.target.checked)}
-              className="rounded border-gray-300"
+              onChange={e => setIncludeComments(e.target.checked)}
+              className="rounded border-gray-300 bg-bg-secondary"
             />
             <span className="text-sm">包含注释</span>
           </label>
-          
+
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={includeDropStatements}
-              onChange={(e) => setIncludeDropStatements(e.target.checked)}
-              className="rounded border-gray-300"
+              onChange={e => setIncludeDropStatements(e.target.checked)}
+              className="rounded border-gray-300 bg-bg-secondary"
             />
             <span className="text-sm">包含DROP</span>
           </label>
-          
+
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={generateIfNotExists}
-              onChange={(e) => setGenerateIfNotExists(e.target.checked)}
-              className="rounded border-gray-300"
+              onChange={e => setGenerateIfNotExists(e.target.checked)}
+              className="rounded border-gray-300 bg-bg-secondary"
             />
             <span className="text-sm">IF NOT EXISTS</span>
           </label>
-          
+
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
               checked={showPreview}
-              onChange={(e) => setShowPreview(e.target.checked)}
-              className="rounded border-gray-300"
+              onChange={e => setShowPreview(e.target.checked)}
+              className="rounded border-gray-300 bg-bg-secondary"
             />
             <span className="text-sm">显示预览</span>
           </label>
@@ -894,8 +904,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
             <Layers className="w-5 h-5 mr-2" />
             选择表 ({selectedTables.size} / {tables.length})
           </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto scrollbar-thin">
             {tables.map(table => (
               <label
                 key={table.id}
@@ -909,7 +919,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                   type="checkbox"
                   checked={selectedTables.has(table.id)}
                   onChange={() => handleTableToggle(table.id)}
-                  className="rounded border-gray-300"
+                  className="rounded border-gray-300 bg-bg-secondary"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2">
@@ -936,7 +946,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
               <Code className="w-5 h-5 mr-2" />
               SQL预览 - {dialectConfigs[selectedDialect].name}
             </h3>
-            
+
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowPreview(false)}
@@ -945,7 +955,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
               >
                 <EyeOff className="w-4 h-4" />
               </button>
-              
+
               {generatedSQL && (
                 <>
                   <button
@@ -955,7 +965,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                     <Copy className="w-4 h-4" />
                     <span>复制</span>
                   </button>
-                  
+
                   <button
                     onClick={handleDownloadSQL}
                     className="btn-primary flex items-center space-x-2"
@@ -967,7 +977,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
               )}
             </div>
           </div>
-          
+
           <div className="p-4">
             {generatedSQL ? (
               <div className="space-y-4">
@@ -977,7 +987,9 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
                         <span className="text-blue-700 font-medium">生成时间：</span>
-                        <span className="text-blue-900">{new Date(sqlMetadata.generatedAt).toLocaleString()}</span>
+                        <span className="text-blue-900">
+                          {new Date(sqlMetadata.generatedAt).toLocaleString()}
+                        </span>
                       </div>
                       <div>
                         <span className="text-blue-700 font-medium">语句数量：</span>
@@ -989,12 +1001,14 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                       </div>
                       <div>
                         <span className="text-blue-700 font-medium">警告数量：</span>
-                        <span className={`font-medium ${sqlMetadata.warnings?.length > 0 ? 'text-yellow-600' : 'text-green-600'}`}>
+                        <span
+                          className={`font-medium ${sqlMetadata.warnings?.length > 0 ? 'text-yellow-600' : 'text-green-600'}`}
+                        >
                           {sqlMetadata.warnings?.length || 0}
                         </span>
                       </div>
                     </div>
-                    
+
                     {sqlMetadata.warnings && sqlMetadata.warnings.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-blue-200">
                         <h5 className="text-sm font-medium text-blue-900 mb-2 flex items-center">
@@ -1003,7 +1017,10 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                         </h5>
                         <div className="space-y-1">
                           {sqlMetadata.warnings.map((warning: string, index: number) => (
-                            <p key={index} className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded">
+                            <p
+                              key={index}
+                              className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded"
+                            >
                               {warning}
                             </p>
                           ))}
@@ -1012,7 +1029,7 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
                     )}
                   </div>
                 )}
-                
+
                 <SQLPreview
                   sql={generatedSQL}
                   dialect={dialectConfigs[selectedDialect].name}
@@ -1024,12 +1041,8 @@ const SQLGenerator: React.FC<SQLGeneratorProps> = ({
             ) : (
               <div className="text-center py-12">
                 <Code className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-text-primary mb-2">
-                  SQL代码预览
-                </h3>
-                <p className="text-text-secondary mb-6">
-                  配置生成选项后点击"生成"按钮查看SQL代码
-                </p>
+                <h3 className="text-lg font-medium text-text-primary mb-2">SQL代码预览</h3>
+                <p className="text-text-secondary mb-6">配置生成选项后点击"生成"按钮查看SQL代码</p>
                 <button
                   onClick={handleGenerate}
                   disabled={isGenerating || tables.length === 0}

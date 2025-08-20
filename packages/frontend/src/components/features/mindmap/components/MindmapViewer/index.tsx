@@ -413,7 +413,7 @@ const MindmapViewerInner: React.FC<MindmapViewerProps> = ({
       {/* 主视图区域 */}
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* 侧边栏 */}
-        <div className="flex-shrink-0 w-80 border-r border-border-primary bg-bg-paper overflow-y-auto">
+        <div className="flex-shrink-0 w-80 border-r border-border-primary bg-bg-paper overflow-y-auto custom-scrollbar">
           <MindmapSidebar
             selectedNodeIds={selectedNodeIds}
             selectedEdgeIds={selectedEdgeIds}

@@ -69,6 +69,42 @@ const HomePage: React.FC = () => {
         </p>
       </header>
 
+      {/* Gray Background Test Area */}
+      <section className="mb-12">
+        <div className="bg-bg-paper rounded-xl p-6 shadow-theme-sm border border-border-primary">
+          <h2 className="text-xl font-semibold text-text-primary mb-4">Gray Background Test (暗色模式测试)</h2>
+          <div className="grid grid-cols-5 gap-4">
+             <div className="bg-gray-100 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">bg-gray-100</div>
+             </div>
+             <div className="bg-gray-200 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">bg-gray-200</div>
+             </div>
+             <div className="bg-gray-300 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">bg-gray-300</div>
+             </div>
+             <div className="bg-gray-400 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">bg-gray-400</div>
+             </div>
+             <div className="bg-gray-500 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-100 dark:text-gray-900">bg-gray-500</div>
+             </div>
+             <div className="bg-gray-600 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-100 dark:text-gray-900">bg-gray-600</div>
+             </div>
+             <div className="bg-gray-700 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-100 dark:text-gray-900">bg-gray-700</div>
+             </div>
+             <div className="bg-gray-800 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-100 dark:text-gray-900">bg-gray-800</div>
+             </div>
+             <div className="bg-gray-900 p-4 rounded text-center">
+               <div className="text-sm font-medium text-gray-100 dark:text-gray-900">bg-gray-900</div>
+             </div>
+           </div>
+        </div>
+      </section>
+
       {/* 快速操作 */}
       <section className="mb-12">
         <h2 className="text-2xl font-semibold text-text-primary mb-6">快速开始</h2>

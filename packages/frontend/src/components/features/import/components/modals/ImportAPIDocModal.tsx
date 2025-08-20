@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { X, Upload, FileText, AlertCircle, CheckCircle, Code, Download, Brain, Settings } from 'lucide-react'
 import { API, HTTPMethod, APIStatus, APIParameter, APIResponseSchema } from '@shared/types'
-import { createAIParsingService, AIParsingConfig, AI_PARSING_PRESETS } from '../../../../../services/aiParsingService'
-import AIConfigModal from '../../../../integrations/ai/AIConfigModal'
+import { apiMethods } from '../../../../../utils/api'
 import toast from 'react-hot-toast'
 
 interface ImportAPIDocModalProps {
@@ -33,18 +32,7 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
   const [parseError, setParseError] = useState<string>('')
   const [previewContent, setPreviewContent] = useState<string>('')
   const [useAI, setUseAI] = useState(true)
-  const [aiConfig, setAiConfig] = useState<AIParsingConfig>(() => {
-    // 从localStorage读取配置
-    const saved = localStorage.getItem('ai-parsing-config')
-    if (saved) {
-      try {
-        return JSON.parse(saved)
-      } catch (e) {
-        console.error('Failed to parse AI config from localStorage:', e)
-      }
-    }
-    return AI_PARSING_PRESETS.ollama_qwen
-  })
+  // 使用后端AI服务，不再需要本地AI配置
   const [showAIConfig, setShowAIConfig] = useState(false)
   const [parseConfidence, setParseConfidence] = useState<number>(0)
 
@@ -209,26 +197,38 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
       const content = await file.text()
       
       if (useAI) {
-        // 使用AI解析
-        const aiService = createAIParsingService(aiConfig)
-        const result = await aiService.parseAPIDocument(content, projectId)
+        // 使用后端AI解析
+        const response = await apiMethods.parseDocument({
+          projectId,
+          content,
+          type: 'API_DOCUMENTATION',
+          filename: file.name
+        })
         
-        if (result.success && result.apis.length > 0) {
+        if (response.success && response.data) {
+          const result = response.data
+          
+          // 检查解析结果的数据结构
+          if (!result.apis || !Array.isArray(result.apis) || result.apis.length === 0) {
+            throw new Error('AI解析未找到任何API接口')
+          }
+          
           // 转换AI解析结果为组件需要的格式
           const convertedAPIs: ParsedAPI[] = result.apis.map(api => ({
-            name: api.name,
-            method: api.method,
-            path: api.path,
-            description: api.description,
-            parameters: [], // AI解析的参数信息会在这里
-            responses: []   // AI解析的响应信息会在这里
+            name: api.name || '未命名API',
+            method: api.method || 'GET',
+            path: api.path || '/unknown',
+            description: api.description || '',
+            parameters: api.parameters || [], // AI解析的参数信息
+            responses: api.responses || []     // AI解析的响应信息
           }))
           
           setParsedAPIs(convertedAPIs)
-          setParseConfidence(result.confidence)
-          toast.success(`AI成功解析到 ${result.apis.length} 个API接口 (置信度: ${Math.round(result.confidence * 100)}%)`)
+          setParseConfidence(result.confidence || 0.8)
+          toast.success(`AI成功解析到 ${result.apis.length} 个API接口 (置信度: ${Math.round((result.confidence || 0.8) * 100)}%)`)
         } else {
-          throw new Error(result.errors.join(', ') || 'AI解析失败')
+          const errorMsg = response.data?.errors?.join(', ') || response.message || 'AI解析失败'
+          throw new Error(errorMsg)
         }
       } else {
         // 使用传统规则解析
@@ -295,7 +295,7 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
           {!file ? (
             <div className="space-y-6">
               {/* 文件上传区域 */}
@@ -325,7 +325,7 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
               {/* 支持格式说明 */}
               <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-blue-800 mb-2">支持的文档格式示例:</h4>
-                <pre className="text-xs text-blue-700 bg-blue-100 p-3 rounded overflow-x-auto">
+                <pre className="text-xs text-blue-700 bg-blue-100 p-3 rounded overflow-x-auto custom-scrollbar">
 {`## 用户登录 - POST /api/v1/auth/login
 用户登录接口，支持用户名/邮箱登录
 
@@ -411,8 +411,8 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
                   {/* AI配置状态显示 */}
                   {useAI && (
                     <div className="text-xs text-blue-700">
-                      <div>当前使用: {aiConfig.provider === 'ollama' ? 'Ollama本地' : aiConfig.provider === 'deepseek' ? 'DeepSeek在线' : 'OpenAI在线'}</div>
-                      <div>模型: {aiConfig.model}</div>
+                      <div>当前使用: 后端AI服务</div>
+                      <div>模型: 自动选择最佳模型</div>
                     </div>
                   )}
 
@@ -429,7 +429,7 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
               {previewContent && (
                 <div>
                   <h4 className="text-sm font-medium text-text-secondary mb-2">文档预览:</h4>
-                  <pre className="bg-bg-tertiary rounded-lg p-4 text-xs text-text-secondary overflow-x-auto max-h-40">
+                  <pre className="bg-bg-tertiary rounded-lg p-4 text-xs text-text-secondary overflow-x-auto custom-scrollbar max-h-40">
                     {previewContent}
                   </pre>
                 </div>
@@ -478,7 +478,7 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
                     )}
                   </div>
                   
-                  <div className="space-y-3 max-h-60 overflow-y-auto">
+                  <div className="space-y-3 max-h-60 overflow-y-auto scrollbar-thin">
                     {parsedAPIs.map((api, index) => (
                       <div key={index} className="bg-bg-paper border border-border-primary rounded-lg p-4">
                         <div className="flex items-center space-x-3 mb-2">
@@ -557,18 +557,23 @@ const ImportAPIDocModal: React.FC<ImportAPIDocModalProps> = ({
         </div>
       </div>
 
-      {/* AI配置弹窗 */}
-      <AIConfigModal
-        isOpen={showAIConfig}
-        onClose={() => setShowAIConfig(false)}
-        onSave={(config) => {
-          setAiConfig(config)
-          setShowAIConfig(false)
-          // 保存到localStorage
-          localStorage.setItem('ai-parsing-config', JSON.stringify(config))
-        }}
-        currentConfig={aiConfig}
-      />
+      {/* AI配置弹窗 - 使用后端配置，不再需要本地配置 */}
+      {showAIConfig && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-bg-paper rounded-lg shadow-xl p-6 max-w-md">
+            <h3 className="text-lg font-semibold text-text-primary mb-4">AI配置信息</h3>
+            <p className="text-text-secondary mb-4">
+              当前使用后端AI服务，所有配置由服务器管理，无需本地配置。
+            </p>
+            <button
+              onClick={() => setShowAIConfig(false)}
+              className="btn-primary w-full"
+            >
+              确定
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

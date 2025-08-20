@@ -2,6 +2,8 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { asyncHandler } from '../middleware/errorHandler'
 import { validateBody, validateParams, validateQuery } from '../middleware/validation'
+import { prisma } from '../lib/prisma'
+import { AppError } from '../middleware/errorHandler'
 
 const router = Router()
 
@@ -22,13 +24,24 @@ const moduleQuerySchema = z.object({
 
 const createModuleSchema = z.object({
   name: z.string().min(1).max(100),
+  displayName: z.string().max(100).optional(),
   description: z.string().max(500).optional(),
   category: z.string().optional(),
+  priority: z.enum(['HIGH', 'MEDIUM', 'LOW']).default('MEDIUM'),
   tags: z.array(z.string()).optional(),
+  techStack: z.array(z.string()).optional(),
+  estimatedHours: z.number().min(0).optional(),
+  assigneeId: z.string().optional(),
+  assigneeName: z.string().optional(),
+  startDate: z.string().datetime().optional(),
+  dueDate: z.string().datetime().optional(),
 })
 
 const updateModuleSchema = createModuleSchema.partial().extend({
-  status: z.enum(['planned', 'in-progress', 'completed']).optional(),
+  status: z.enum(['planned', 'in-progress', 'completed', 'deprecated']).optional(),
+  progress: z.number().min(0).max(100).optional(),
+  actualHours: z.number().min(0).optional(),
+  completedAt: z.string().datetime().optional(),
 })
 
 /**
@@ -41,199 +54,126 @@ router.get('/:projectId/modules',
     const { projectId } = req.params
     const { status, search } = req.query as any
 
-    // 模拟功能模块数据 - 基于真实项目需求
-    const allModules = [
-      {
-        id: 'user-management',
-        projectId,
-        name: '用户管理',
-        description: '用户注册、登录、密码重置、用户信息管理等基础认证功能',
-        status: 'completed',
-        tags: ['JWT认证', '邮箱验证', '密码加密'],
-        category: '用户系统',
-        apis: [
-          {
-            id: 'user-register',
-            name: '用户注册',
-            method: 'POST',
-            path: '/api/v1/auth/register',
-            description: '用户注册接口'
-          },
-          {
-            id: 'user-login',
-            name: '用户登录',
-            method: 'POST',
-            path: '/api/v1/auth/login',
-            description: '用户登录接口'
-          },
-          {
-            id: 'user-profile',
-            name: '获取用户信息',
-            method: 'GET',
-            path: '/api/v1/users/profile',
-            description: '获取当前用户信息'
-          },
-          {
-            id: 'user-update',
-            name: '更新用户信息',
-            method: 'PUT',
-            path: '/api/v1/users/profile',
-            description: '更新用户基本信息'
-          }
-        ],
-        createdAt: new Date('2024-01-01').toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'permission-management',
-        projectId,
-        name: '权限管理',
-        description: '基于角色的权限控制(RBAC)、菜单权限、数据权限、API权限管理',
-        status: 'in-progress',
-        tags: ['RBAC', '菜单控制', '数据权限'],
-        category: '权限系统',
-        apis: [
-          {
-            id: 'role-list',
-            name: '获取角色列表',
-            method: 'GET',
-            path: '/api/v1/roles',
-            description: '获取系统角色列表'
-          },
-          {
-            id: 'permission-check',
-            name: '权限检查',
-            method: 'POST',
-            path: '/api/v1/permissions/check',
-            description: '检查用户是否有指定权限'
-          },
-          {
-            id: 'user-roles',
-            name: '用户角色管理',
-            method: 'PUT',
-            path: '/api/v1/users/{id}/roles',
-            description: '分配用户角色'
-          }
-        ],
-        createdAt: new Date('2024-01-15').toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'file-management',
-        projectId,
-        name: '文件管理',
-        description: '文件上传、下载、预览、存储管理、缩略图生成等文件操作功能',
-        status: 'planned',
-        tags: ['OSS存储', '缩略图', '文件预览'],
-        category: '文件系统',
-        apis: [
-          {
-            id: 'file-upload',
-            name: '文件上传',
-            method: 'POST',
-            path: '/api/v1/files/upload',
-            description: '单文件或多文件上传'
-          },
-          {
-            id: 'file-download',
-            name: '文件下载',
-            method: 'GET',
-            path: '/api/v1/files/{id}/download',
-            description: '文件下载接口'
-          },
-          {
-            id: 'file-list',
-            name: '文件列表',
-            method: 'GET',
-            path: '/api/v1/files',
-            description: '获取文件列表'
-          }
-        ],
-        createdAt: new Date('2024-02-01').toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'notification-system',
-        projectId,
-        name: '消息通知',
-        description: '系统消息、邮件通知、短信通知、推送通知等消息管理功能',
-        status: 'planned',
-        tags: ['邮件通知', '短信', '推送'],
-        category: '消息系统',
-        apis: [
-          {
-            id: 'send-notification',
-            name: '发送通知',
-            method: 'POST',
-            path: '/api/v1/notifications/send',
-            description: '发送系统通知'
-          },
-          {
-            id: 'notification-list',
-            name: '通知列表',
-            method: 'GET',
-            path: '/api/v1/notifications',
-            description: '获取用户通知列表'
-          }
-        ],
-        createdAt: new Date('2024-02-15').toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'data-export',
-        projectId,
-        name: '数据导出',
-        description: 'Excel导出、PDF报告、数据备份、批量导出等数据导出功能',
-        status: 'completed',
-        tags: ['Excel导出', 'PDF生成', '数据备份'],
-        category: '数据系统',
-        apis: [
-          {
-            id: 'export-excel',
-            name: 'Excel导出',
-            method: 'POST',
-            path: '/api/v1/export/excel',
-            description: '导出Excel文件'
-          },
-          {
-            id: 'export-pdf',
-            name: 'PDF导出',
-            method: 'POST',
-            path: '/api/v1/export/pdf',
-            description: '导出PDF报告'
-          }
-        ],
-        createdAt: new Date('2024-01-20').toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-    ]
+    // 验证项目是否存在
+    const project = await prisma.project.findUnique({
+      where: { id: projectId }
+    })
 
-    // 应用筛选条件
-    let filteredModules = allModules
+    if (!project) {
+      throw new AppError('项目不存在', 404)
+    }
+
+    // 构建查询条件
+    const where: any = {
+      projectId,
+    }
 
     if (status) {
-      filteredModules = filteredModules.filter(module => module.status === status)
+      where.status = status
     }
 
     if (search) {
-      const searchLower = search.toString().toLowerCase()
-      filteredModules = filteredModules.filter(module => 
-        module.name.toLowerCase().includes(searchLower) ||
-        module.description.toLowerCase().includes(searchLower) ||
-        module.tags.some(tag => tag.toLowerCase().includes(searchLower))
-      )
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { displayName: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { category: { contains: search, mode: 'insensitive' } },
+      ]
     }
+
+    // 查询功能模块
+    const modules = await prisma.featureModule.findMany({
+      where,
+      include: {
+        endpoints: {
+          select: {
+            id: true,
+            name: true,
+            method: true,
+            path: true,
+            status: true,
+          }
+        },
+        tasks: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            priority: true,
+          }
+        },
+        _count: {
+          select: {
+            endpoints: true,
+            tasks: true,
+            documents: true,
+          }
+        }
+      },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { updatedAt: 'desc' }
+      ]
+    })
+
+    // 计算统计信息
+    const allModules = await prisma.featureModule.findMany({
+      where: { projectId },
+      select: { status: true }
+    })
+
+    const summary = {
+      planned: allModules.filter(m => m.status === 'planned').length,
+      inProgress: allModules.filter(m => m.status === 'in-progress').length,
+      completed: allModules.filter(m => m.status === 'completed').length,
+      total: allModules.length,
+    }
+
+    // 转换数据格式以保持API兼容性
+    const formattedModules = modules.map(module => ({
+      id: module.id,
+      projectId: module.projectId,
+      name: module.name,
+      displayName: module.displayName || module.name,
+      description: module.description,
+      status: module.status,
+      category: module.category,
+      priority: module.priority,
+      progress: module.progress,
+      tags: module.tags ? JSON.parse(module.tags) : [],
+      techStack: module.techStack ? JSON.parse(module.techStack) : [],
+      estimatedHours: module.estimatedHours,
+      actualHours: module.actualHours,
+      assigneeId: module.assigneeId,
+      assigneeName: module.assigneeName,
+      startDate: module.startDate,
+      dueDate: module.dueDate,
+      completedAt: module.completedAt,
+      createdAt: module.createdAt.toISOString(),
+      updatedAt: module.updatedAt.toISOString(),
+      // 添加API端点信息以保持兼容性
+      apiEndpoints: module.endpoints.map(endpoint => ({
+        id: endpoint.id,
+        name: endpoint.name,
+        method: endpoint.method,
+        path: endpoint.path,
+        status: endpoint.status,
+      })),
+      // 统计信息
+      stats: {
+        totalEndpoints: module._count.endpoints,
+        totalTasks: module._count.tasks,
+        totalDocuments: module._count.documents,
+        completedTasks: module.tasks.filter(t => t.status === 'COMPLETED').length,
+      }
+    }))
 
     res.json({
       success: true,
       data: {
-        modules: filteredModules,
-        total: filteredModules.length,
-        summary: {
-          planned: allModules.filter(m => m.status === 'planned').length,
-          inProgress: allModules.filter(m => m.status === 'in-progress').length,
-          completed: allModules.filter(m => m.status === 'completed').length
-        }
+        modules: formattedModules,
+        total: formattedModules.length,
+        summary
       },
       message: '功能模块获取成功'
     })
@@ -248,41 +188,192 @@ router.get('/:projectId/modules/:moduleId',
   asyncHandler(async (req, res) => {
     const { projectId, moduleId } = req.params
 
-    // 模拟单个功能模块详情数据
-    const moduleDetails = {
-      id: moduleId,
-      projectId,
-      name: '用户管理',
-      description: '用户注册、登录、密码重置、用户信息管理等基础认证功能',
-      status: 'completed',
-      tags: ['JWT认证', '邮箱验证', '密码加密'],
-      category: '用户系统',
-      progress: 85,
-      apis: [
-        {
-          id: 'user-register',
-          name: '用户注册',
-          method: 'POST',
-          path: '/api/v1/auth/register',
-          description: '用户注册接口',
-          status: 'completed',
-          requestBody: {
-            username: 'string',
-            email: 'string',
-            password: 'string'
-          },
-          responseBody: {
-            id: 'string',
-            username: 'string',
-            email: 'string',
-            token: 'string'
+    const module = await prisma.featureModule.findFirst({
+      where: {
+        id: moduleId,
+        projectId
+      },
+      include: {
+        endpoints: {
+          include: {
+            endpoint: {
+              select: {
+                id: true,
+                name: true,
+                method: true,
+                path: true,
+                status: true,
+                description: true,
+              }
+            }
           }
+        },
+        tables: {
+          include: {
+            table: {
+              select: {
+                id: true,
+                name: true,
+                displayName: true,
+                status: true,
+                comment: true,
+              }
+            }
+          }
+        },
+        tasks: {
+          orderBy: { sortOrder: 'asc' }
+        },
+        dependencies_from: {
+          include: {
+            toModule: {
+              select: {
+                id: true,
+                name: true,
+                status: true,
+              }
+            }
+          }
+        },
+        dependencies_to: {
+          include: {
+            fromModule: {
+              select: {
+                id: true,
+                name: true,
+                status: true,
+              }
+            }
+          }
+        },
+        documents: {
+          orderBy: { sortOrder: 'asc' }
         }
-      ],
-      dependencies: ['数据库连接', '邮件服务'],
-      techStack: ['Node.js', 'Express', 'JWT', 'bcrypt'],
-      createdAt: new Date('2024-01-01').toISOString(),
-      updatedAt: new Date().toISOString()
+      }
+    })
+
+    if (!module) {
+      throw new AppError('功能模块不存在', 404)
+    }
+
+    // 格式化详细信息
+    const moduleDetails = {
+      id: module.id,
+      projectId: module.projectId,
+      name: module.name,
+      displayName: module.displayName || module.name,
+      description: module.description,
+      status: module.status,
+      category: module.category,
+      priority: module.priority,
+      progress: module.progress,
+      tags: module.tags ? JSON.parse(module.tags) : [],
+      techStack: module.techStack ? JSON.parse(module.techStack) : [],
+      estimatedHours: module.estimatedHours,
+      actualHours: module.actualHours,
+      assigneeId: module.assigneeId,
+      assigneeName: module.assigneeName,
+      ownerId: module.ownerId,
+      ownerName: module.ownerName,
+      startDate: module.startDate,
+      dueDate: module.dueDate,
+      completedAt: module.completedAt,
+      createdAt: module.createdAt.toISOString(),
+      updatedAt: module.updatedAt.toISOString(),
+
+      // API端点
+      apiEndpoints: module.endpoints.map(ep => ({
+        id: ep.id,
+        moduleId: ep.moduleId,
+        endpointId: ep.endpointId,
+        name: ep.name,
+        method: ep.method,
+        path: ep.path,
+        description: ep.description,
+        status: ep.status,
+        priority: ep.priority,
+        // 如果关联了实际的API端点，包含其信息
+        ...(ep.endpoint && {
+          linkedEndpoint: ep.endpoint
+        })
+      })),
+
+      // 数据库表
+      databaseTables: module.tables.map(t => ({
+        id: t.id,
+        moduleId: t.moduleId,
+        tableId: t.tableId,
+        name: t.name,
+        description: t.description,
+        status: t.status,
+        purpose: t.purpose,
+        // 如果关联了实际的数据库表，包含其信息
+        ...(t.table && {
+          linkedTable: t.table
+        })
+      })),
+
+      // 开发任务
+      tasks: module.tasks.map(task => ({
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        type: task.type,
+        status: task.status,
+        priority: task.priority,
+        assigneeId: task.assigneeId,
+        assigneeName: task.assigneeName,
+        estimatedHours: task.estimatedHours,
+        actualHours: task.actualHours,
+        startDate: task.startDate,
+        dueDate: task.dueDate,
+        completedAt: task.completedAt,
+        tags: task.tags ? JSON.parse(task.tags) : [],
+        labels: task.labels ? JSON.parse(task.labels) : [],
+        dependsOn: task.dependsOn ? JSON.parse(task.dependsOn) : [],
+        blockedBy: task.blockedBy ? JSON.parse(task.blockedBy) : [],
+      })),
+
+      // 依赖关系
+      dependencies: {
+        requires: module.dependencies_from.map(dep => ({
+          id: dep.id,
+          toModuleId: dep.toModuleId,
+          module: dep.toModule,
+          dependencyType: dep.dependencyType,
+          description: dep.description,
+          isRequired: dep.isRequired,
+          version: dep.version,
+        })),
+        requiredBy: module.dependencies_to.map(dep => ({
+          id: dep.id,
+          fromModuleId: dep.fromModuleId,
+          module: dep.fromModule,
+          dependencyType: dep.dependencyType,
+          description: dep.description,
+          isRequired: dep.isRequired,
+          version: dep.version,
+        }))
+      },
+
+      // 文档
+      documents: module.documents.map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        type: doc.type,
+        format: doc.format,
+        language: doc.language,
+        version: doc.version,
+        isPublic: doc.isPublic,
+        createdBy: doc.createdBy,
+        lastModifiedBy: doc.lastModifiedBy,
+        reviewedBy: doc.reviewedBy,
+        reviewedAt: doc.reviewedAt,
+        approvedBy: doc.approvedBy,
+        approvedAt: doc.approvedAt,
+        createdAt: doc.createdAt.toISOString(),
+        updatedAt: doc.updatedAt.toISOString(),
+      }))
     }
 
     res.json({
@@ -301,24 +392,104 @@ router.post('/:projectId/modules',
   validateBody(createModuleSchema),
   asyncHandler(async (req, res) => {
     const { projectId } = req.params
-    const { name, description, category, tags } = req.body
-
-    const newModule = {
-      id: `module-${Date.now()}`,
-      projectId,
+    const {
       name,
-      description: description || '',
-      category: category || '通用',
-      tags: tags || [],
-      status: 'planned',
-      apis: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      displayName,
+      description,
+      category,
+      priority,
+      tags,
+      techStack,
+      estimatedHours,
+      assigneeId,
+      assigneeName,
+      startDate,
+      dueDate
+    } = req.body
+
+    // 验证项目是否存在
+    const project = await prisma.project.findUnique({
+      where: { id: projectId }
+    })
+
+    if (!project) {
+      throw new AppError('项目不存在', 404)
+    }
+
+    // 检查模块名称是否重复
+    const existingModule = await prisma.featureModule.findFirst({
+      where: {
+        projectId,
+        name
+      }
+    })
+
+    if (existingModule) {
+      throw new AppError('模块名称已存在', 400)
+    }
+
+    // 创建功能模块
+    const newModule = await prisma.featureModule.create({
+      data: {
+        projectId,
+        name,
+        displayName,
+        description,
+        category: category || '通用',
+        priority,
+        tags: tags ? JSON.stringify(tags) : null,
+        techStack: techStack ? JSON.stringify(techStack) : null,
+        estimatedHours,
+        assigneeId,
+        assigneeName,
+        startDate: startDate ? new Date(startDate) : null,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        createdBy: 'system', // TODO: 从认证中获取用户ID
+      },
+      include: {
+        _count: {
+          select: {
+            endpoints: true,
+            tasks: true,
+            documents: true,
+          }
+        }
+      }
+    })
+
+    const formattedModule = {
+      id: newModule.id,
+      projectId: newModule.projectId,
+      name: newModule.name,
+      displayName: newModule.displayName || newModule.name,
+      description: newModule.description,
+      status: newModule.status,
+      category: newModule.category,
+      priority: newModule.priority,
+      progress: newModule.progress,
+      tags: newModule.tags ? JSON.parse(newModule.tags) : [],
+      techStack: newModule.techStack ? JSON.parse(newModule.techStack) : [],
+      estimatedHours: newModule.estimatedHours,
+      actualHours: newModule.actualHours,
+      assigneeId: newModule.assigneeId,
+      assigneeName: newModule.assigneeName,
+      startDate: newModule.startDate,
+      dueDate: newModule.dueDate,
+      completedAt: newModule.completedAt,
+      createdAt: newModule.createdAt.toISOString(),
+      updatedAt: newModule.updatedAt.toISOString(),
+      apiEndpoints: [],
+      stats: {
+        totalEndpoints: newModule._count.endpoints,
+        totalTasks: newModule._count.tasks,
+        totalDocuments: newModule._count.documents,
+        completedTasks: 0,
+      }
     }
 
     res.status(201).json({
       success: true,
-      data: newModule,
+      data: formattedModule,
       message: '功能模块创建成功'
     })
   })
@@ -334,16 +505,136 @@ router.put('/:projectId/modules/:moduleId',
     const { projectId, moduleId } = req.params
     const updateData = req.body
 
-    const updatedModule = {
-      id: moduleId,
-      projectId,
+    // 验证模块是否存在
+    const existingModule = await prisma.featureModule.findFirst({
+      where: {
+        id: moduleId,
+        projectId
+      }
+    })
+
+    if (!existingModule) {
+      throw new AppError('功能模块不存在', 404)
+    }
+
+    // 如果更新名称，检查是否重复
+    if (updateData.name && updateData.name !== existingModule.name) {
+      const duplicateModule = await prisma.featureModule.findFirst({
+        where: {
+          projectId,
+          name: updateData.name,
+          id: { not: moduleId }
+        }
+      })
+
+      if (duplicateModule) {
+        throw new AppError('模块名称已存在', 400)
+      }
+    }
+
+    // 准备更新数据
+    const updatePayload: any = {
       ...updateData,
-      updatedAt: new Date().toISOString()
+      lastModifiedBy: 'system', // TODO: 从认证中获取用户ID
+    }
+
+    if (updateData.tags) {
+      updatePayload.tags = JSON.stringify(updateData.tags)
+    }
+
+    if (updateData.techStack) {
+      updatePayload.techStack = JSON.stringify(updateData.techStack)
+    }
+
+    if (updateData.startDate) {
+      updatePayload.startDate = new Date(updateData.startDate)
+    }
+
+    if (updateData.dueDate) {
+      updatePayload.dueDate = new Date(updateData.dueDate)
+    }
+
+    if (updateData.completedAt) {
+      updatePayload.completedAt = new Date(updateData.completedAt)
+    }
+
+    // 如果状态变为completed，自动设置完成时间
+    if (updateData.status === 'completed' && !updateData.completedAt) {
+      updatePayload.completedAt = new Date()
+      updatePayload.progress = 100
+    }
+
+    // 更新模块
+    const updatedModule = await prisma.featureModule.update({
+      where: { id: moduleId },
+      data: updatePayload,
+      include: {
+        endpoints: {
+          select: {
+            id: true,
+            name: true,
+            method: true,
+            path: true,
+            status: true,
+          }
+        },
+        tasks: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            priority: true,
+          }
+        },
+        _count: {
+          select: {
+            endpoints: true,
+            tasks: true,
+            documents: true,
+          }
+        }
+      }
+    })
+
+    const formattedModule = {
+      id: updatedModule.id,
+      projectId: updatedModule.projectId,
+      name: updatedModule.name,
+      displayName: updatedModule.displayName || updatedModule.name,
+      description: updatedModule.description,
+      status: updatedModule.status,
+      category: updatedModule.category,
+      priority: updatedModule.priority,
+      progress: updatedModule.progress,
+      tags: updatedModule.tags ? JSON.parse(updatedModule.tags) : [],
+      techStack: updatedModule.techStack ? JSON.parse(updatedModule.techStack) : [],
+      estimatedHours: updatedModule.estimatedHours,
+      actualHours: updatedModule.actualHours,
+      assigneeId: updatedModule.assigneeId,
+      assigneeName: updatedModule.assigneeName,
+      startDate: updatedModule.startDate,
+      dueDate: updatedModule.dueDate,
+      completedAt: updatedModule.completedAt,
+      createdAt: updatedModule.createdAt.toISOString(),
+      updatedAt: updatedModule.updatedAt.toISOString(),
+      apiEndpoints: updatedModule.endpoints.map(endpoint => ({
+        id: endpoint.id,
+        name: endpoint.name,
+        method: endpoint.method,
+        path: endpoint.path,
+        status: endpoint.status,
+      })),
+      stats: {
+        totalEndpoints: updatedModule._count.endpoints,
+        totalTasks: updatedModule._count.tasks,
+        totalDocuments: updatedModule._count.documents,
+        completedTasks: updatedModule.tasks.filter(t => t.status === 'COMPLETED').length,
+      }
     }
 
     res.json({
       success: true,
-      data: updatedModule,
+      data: formattedModule,
       message: '功能模块更新成功'
     })
   })
@@ -355,6 +646,25 @@ router.put('/:projectId/modules/:moduleId',
 router.delete('/:projectId/modules/:moduleId',
   validateParams(moduleParamsSchema),
   asyncHandler(async (req, res) => {
+    const { projectId, moduleId } = req.params
+
+    // 验证模块是否存在
+    const existingModule = await prisma.featureModule.findFirst({
+      where: {
+        id: moduleId,
+        projectId
+      }
+    })
+
+    if (!existingModule) {
+      throw new AppError('功能模块不存在', 404)
+    }
+
+    // 删除模块（级联删除相关数据）
+    await prisma.featureModule.delete({
+      where: { id: moduleId }
+    })
+
     res.json({
       success: true,
       message: '功能模块删除成功'
@@ -368,19 +678,99 @@ router.delete('/:projectId/modules/:moduleId',
 router.get('/:projectId/modules/stats',
   validateParams(projectParamsSchema),
   asyncHandler(async (req, res) => {
+    const { projectId } = req.params
+
+    // 验证项目是否存在
+    const project = await prisma.project.findUnique({
+      where: { id: projectId }
+    })
+
+    if (!project) {
+      throw new AppError('项目不存在', 404)
+    }
+
+    // 获取统计数据
+    const [
+      totalModules,
+      modulesByStatus,
+      modulesByCategory,
+      totalEndpoints,
+      totalTasks,
+      completedTasks
+    ] = await Promise.all([
+      // 总模块数
+      prisma.featureModule.count({
+        where: { projectId }
+      }),
+      // 按状态分组
+      prisma.featureModule.groupBy({
+        by: ['status'],
+        where: { projectId },
+        _count: { id: true }
+      }),
+      // 按分类分组
+      prisma.featureModule.groupBy({
+        by: ['category'],
+        where: { projectId },
+        _count: { id: true }
+      }),
+      // 总端点数
+      prisma.moduleEndpoint.count({
+        where: {
+          module: { projectId }
+        }
+      }),
+      // 总任务数
+      prisma.moduleTask.count({
+        where: {
+          module: { projectId }
+        }
+      }),
+      // 已完成任务数
+      prisma.moduleTask.count({
+        where: {
+          module: { projectId },
+          status: 'COMPLETED'
+        }
+      })
+    ])
+
+    // 构建统计对象
+    const statusCounts = {
+      planned: 0,
+      'in-progress': 0,
+      completed: 0,
+      deprecated: 0,
+    }
+
+    modulesByStatus.forEach(group => {
+      statusCounts[group.status as keyof typeof statusCounts] = group._count.id
+    })
+
+    const categoryCounts: Record<string, number> = {}
+    modulesByCategory.forEach(group => {
+      categoryCounts[group.category || '未分类'] = group._count.id
+    })
+
+    const completionRate = totalModules > 0 
+      ? Math.round((statusCounts.completed / totalModules) * 100)
+      : 0
+
     const stats = {
-      totalModules: 5,
-      completedModules: 2,
-      inProgressModules: 1,
-      plannedModules: 2,
-      totalApis: 12,
-      completionRate: 40,
-      categories: {
-        '用户系统': 2,
-        '权限系统': 1,
-        '文件系统': 1,
-        '消息系统': 1
-      }
+      totalModules,
+      completedModules: statusCounts.completed,
+      inProgressModules: statusCounts['in-progress'],
+      plannedModules: statusCounts.planned,
+      deprecatedModules: statusCounts.deprecated,
+      totalApis: totalEndpoints,
+      totalTasks,
+      completedTasks,
+      completionRate,
+      taskCompletionRate: totalTasks > 0 
+        ? Math.round((completedTasks / totalTasks) * 100)
+        : 0,
+      categories: categoryCounts,
+      statusDistribution: statusCounts
     }
 
     res.json({

@@ -1,8 +1,8 @@
+import { APIStatus, HTTPMethod } from '@devapi/shared'
 import { Router } from 'express'
 import { z } from 'zod'
-import { APIStatus, HTTPMethod } from '@devapi/shared'
 import { prisma } from '../database'
-import { asyncHandler, AppError } from '../middleware/errorHandler'
+import { AppError, asyncHandler } from '../middleware/errorHandler'
 import { validateBody, validateParams, validateQuery } from '../middleware/validation'
 
 const router = Router()
@@ -19,7 +19,7 @@ const createAPISchema = z.object({
   status: z.nativeEnum(APIStatus).default(APIStatus.NOT_STARTED),
   frontendCode: z.string().optional(),
   backendCode: z.string().optional(),
-  tagIds: z.array(z.string().uuid()).optional(),
+  tags: z.string().optional(), // JSON array string
 })
 
 const updateAPISchema = createAPISchema.partial()
@@ -33,7 +33,7 @@ const apiQuerySchema = z.object({
   status: z.nativeEnum(APIStatus).optional(),
   method: z.nativeEnum(HTTPMethod).optional(),
   search: z.string().optional(),
-  tagIds: z.string().optional().transform((val) => val ? val.split(',') : undefined),
+  tags: z.string().optional(), // Comma-separated tag names for filtering
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
 })
@@ -43,7 +43,7 @@ router.get(
   '/',
   validateQuery(apiQuerySchema),
   asyncHandler(async (req, res) => {
-    const { projectId, status, method, search, tagIds, page, limit } = req.query as any
+    const { projectId, status, method, search, tags, page, limit } = req.query as any
 
     const where = {
       ...(projectId && { projectId }),
@@ -56,37 +56,30 @@ router.get(
           { path: { contains: search } },
         ],
       }),
-      ...(tagIds && {
-        apiTags: {
-          some: {
-            tagId: { in: tagIds },
-          },
-        },
+      ...(tags && {
+        tags: { contains: tags },
       }),
     }
 
-    const [apis, total] = await Promise.all([
-      prisma.aPI.findMany({
+    const [apiEndpoints, total] = await Promise.all([
+      prisma.aPIEndpoint.findMany({
         where,
         include: {
           project: {
             select: { id: true, name: true },
-          },
-          apiTags: {
-            include: { tag: true },
           },
         },
         orderBy: { updatedAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.aPI.count({ where }),
+      prisma.aPIEndpoint.count({ where }),
     ])
 
     res.json({
       success: true,
       data: {
-        apis,
+        apiEndpoints,
         pagination: {
           page,
           limit,
@@ -105,14 +98,11 @@ router.get(
   asyncHandler(async (req, res) => {
     const { id } = req.params
 
-    const api = await prisma.aPI.findUnique({
+    const api = await prisma.aPIEndpoint.findUnique({
       where: { id },
       include: {
         project: {
           select: { id: true, name: true, description: true },
-        },
-        apiTags: {
-          include: { tag: true },
         },
       },
     })
@@ -133,7 +123,7 @@ router.post(
   '/',
   validateBody(createAPISchema),
   asyncHandler(async (req, res) => {
-    const { tagIds, ...apiData } = req.body
+    const apiData = req.body
 
     // Check if project exists
     const project = await prisma.project.findUnique({
@@ -144,22 +134,12 @@ router.post(
       throw new AppError('Project not found', 404)
     }
 
-    // Create API with tags
-    const api = await prisma.aPI.create({
-      data: {
-        ...apiData,
-        ...(tagIds && {
-          apiTags: {
-            create: tagIds.map((tagId: string) => ({ tagId })),
-          },
-        }),
-      },
+    // Create API
+    const api = await prisma.aPIEndpoint.create({
+      data: apiData,
       include: {
         project: {
           select: { id: true, name: true },
-        },
-        apiTags: {
-          include: { tag: true },
         },
       },
     })
@@ -178,26 +158,14 @@ router.put(
   validateBody(updateAPISchema),
   asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { tagIds, ...updateData } = req.body
+    const updateData = req.body
 
-    // If updating tags, handle the relationship
-    const api = await prisma.aPI.update({
+    const api = await prisma.aPIEndpoint.update({
       where: { id },
-      data: {
-        ...updateData,
-        ...(tagIds && {
-          apiTags: {
-            deleteMany: {},
-            create: tagIds.map((tagId: string) => ({ tagId })),
-          },
-        }),
-      },
+      data: updateData,
       include: {
         project: {
           select: { id: true, name: true },
-        },
-        apiTags: {
-          include: { tag: true },
         },
       },
     })
@@ -216,7 +184,7 @@ router.delete(
   asyncHandler(async (req, res) => {
     const { id } = req.params
 
-    await prisma.aPI.delete({
+    await prisma.aPIEndpoint.delete({
       where: { id },
     })
 
@@ -233,15 +201,12 @@ router.patch(
     const { id } = req.params
     const { status } = req.body
 
-    const api = await prisma.aPI.update({
+    const api = await prisma.aPIEndpoint.update({
       where: { id },
       data: { status },
       include: {
         project: {
           select: { id: true, name: true },
-        },
-        apiTags: {
-          include: { tag: true },
         },
       },
     })
@@ -257,15 +222,17 @@ router.patch(
 router.post(
   '/:id/generate-code',
   validateParams(apiParamsSchema),
-  validateBody(z.object({ 
-    type: z.enum(['frontend', 'backend', 'both']),
-    framework: z.string().optional(),
-  })),
+  validateBody(
+    z.object({
+      type: z.enum(['frontend', 'backend', 'both']),
+      framework: z.string().optional(),
+    })
+  ),
   asyncHandler(async (req, res) => {
     const { id } = req.params
     const { type, framework = 'express' } = req.body
 
-    const api = await prisma.aPI.findUnique({
+    const api = await prisma.aPIEndpoint.findUnique({
       where: { id },
     })
 
@@ -283,14 +250,14 @@ router.post(
     }
 
     // Update API with generated code
-    const updatedAPI = await prisma.aPI.update({
+    const updatedAPI = await prisma.aPIEndpoint.update({
       where: { id },
       data: generatedCode,
     })
 
     res.json({
       success: true,
-      data: { 
+      data: {
         api: updatedAPI,
         generatedCode,
       },
@@ -300,67 +267,46 @@ router.post(
 
 // Batch create APIs
 const createBatchAPISchema = z.object({
-  apis: z.array(createAPISchema).min(1),
+  apiEndpoints: z.array(createAPISchema).min(1),
 })
 
 router.post(
   '/batch',
   validateBody(createBatchAPISchema),
   asyncHandler(async (req, res) => {
-    const { apis } = req.body
-    
+    const { apiEndpoints } = req.body
+
     const createdAPIs = []
     const errors = []
-    
-    for (const apiData of apis) {
+
+    for (const apiData of apiEndpoints) {
       try {
-        const { tagIds, ...data } = apiData
-        
-        const api = await prisma.aPI.create({
+        const data = apiData
+
+        const api = await prisma.aPIEndpoint.create({
           data,
           include: {
             project: { select: { id: true, name: true } },
-            apiTags: {
-              include: { tag: true },
-            },
           },
         })
 
-        // Add tags if provided
-        if (tagIds && tagIds.length > 0) {
-          await prisma.aPI.update({
-            where: { id: api.id },
-            data: {
-              apiTags: {
-                create: tagIds.map((tagId: string) => ({ tagId })),
-              },
-            },
-            include: {
-              project: { select: { id: true, name: true } },
-              apiTags: {
-                include: { tag: true },
-              },
-            },
-          })
-        }
-        
         createdAPIs.push(api)
       } catch (error: any) {
         errors.push({
           api: apiData,
-          error: error.message
+          error: error.message,
         })
       }
     }
 
     res.status(201).json({
       success: true,
-      data: { 
+      data: {
         created: createdAPIs,
-        total: apis.length,
+        total: apiEndpoints.length,
         success: createdAPIs.length,
         failed: errors.length,
-        errors
+        errors,
       },
     })
   })
@@ -368,9 +314,9 @@ router.post(
 
 // Helper functions for code generation
 function generateFrontendCode(api: any, framework: string): string {
-  const baseUrl = 'http://localhost:3001/api/v1'
+  const baseUrl = 'http://localhost:3000/api/v1'
   const method = api.method.toLowerCase()
-  
+
   return `// Generated ${method.toUpperCase()} request for ${api.name}
 import axios from 'axios'
 
@@ -387,7 +333,7 @@ export const ${toCamelCase(api.name)} = async (${method === 'get' ? 'params?' : 
 
 function generateBackendCode(api: any, framework: string): string {
   const method = api.method.toLowerCase()
-  
+
   return `// Generated ${method.toUpperCase()} endpoint for ${api.name}
 import { Router } from 'express'
 const router = Router()
@@ -396,7 +342,7 @@ router.${method}('${api.path}', async (req, res) => {
   try {
     // TODO: Implement ${api.name} logic
     ${method === 'get' ? 'const data = {}' : 'const result = {}'}
-    
+
     res.json({
       success: true,
       data: ${method === 'get' ? 'data' : 'result'}
@@ -413,9 +359,11 @@ export default router`
 }
 
 function toCamelCase(str: string): string {
-  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
-    return index === 0 ? word.toLowerCase() : word.toUpperCase()
-  }).replace(/\s+/g, '')
+  return str
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
+      return index === 0 ? word.toLowerCase() : word.toUpperCase()
+    })
+    .replace(/\s+/g, '')
 }
 
 export { router as apisRouter }

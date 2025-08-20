@@ -22,7 +22,7 @@ export class MCPService {
       return // 使用缓存的索引
     }
 
-    const [projects, apis, tags] = await Promise.all([
+    const [projects, apiEndpoints, tags] = await Promise.all([
       prisma.project.findMany({
         select: {
           id: true,
@@ -33,7 +33,7 @@ export class MCPService {
           status: true,
         },
       }),
-      prisma.aPI.findMany({
+      prisma.aPIEndpoint.findMany({
         select: {
           id: true,
           projectId: true,
@@ -59,7 +59,7 @@ export class MCPService {
       threshold: 0.3,
     })
 
-    apisIndex = new Fuse(apis, {
+    apisIndex = new Fuse(apiEndpoints, {
       keys: ['name', 'description', 'path', 'method'],
       threshold: 0.3,
     })
@@ -112,7 +112,7 @@ export class MCPService {
     if (method) where.method = method
     if (status) where.status = status
     
-    const apis = await prisma.aPI.findMany({
+    const apiEndpoints = await prisma.aPIEndpoint.findMany({
       where,
       select: {
         id: true,
@@ -131,7 +131,7 @@ export class MCPService {
     })
     
     // 使用Fuse进行模糊搜索
-    const fuseIndex = new Fuse(apis, {
+    const fuseIndex = new Fuse(apiEndpoints, {
       keys: ['name', 'description', 'path', 'method'],
       threshold: 0.3,
     })
@@ -264,7 +264,7 @@ export class MCPService {
    */
   async getSearchSuggestions(query: string, limit: number = 5) {
     // 获取项目、API和标签名称作为搜索建议
-    const [projects, apis, tags] = await Promise.all([
+    const [projects, apiEndpoints, tags] = await Promise.all([
       prisma.project.findMany({
         select: { name: true },
         where: {
@@ -274,7 +274,7 @@ export class MCPService {
         },
         take: limit,
       }),
-      prisma.aPI.findMany({
+      prisma.aPIEndpoint.findMany({
         select: { name: true, path: true },
         where: {
           OR: [
@@ -297,7 +297,7 @@ export class MCPService {
 
     const suggestions = [
       ...projects.map(p => ({ type: 'project', text: p.name })),
-      ...apis.map(a => ({ type: 'api', text: a.name, path: a.path })),
+      ...apiEndpoints.map(a => ({ type: 'api', text: a.name, path: a.path })),
       ...tags.map(t => ({ type: 'tag', text: t.name })),
     ].slice(0, limit)
 
@@ -324,7 +324,7 @@ export class MCPService {
         orderBy: { updatedAt: 'desc' },
         take: Math.ceil(limit / 2),
       }),
-      prisma.aPI.findMany({
+      prisma.aPIEndpoint.findMany({
         select: {
           id: true,
           name: true,
@@ -343,7 +343,7 @@ export class MCPService {
     return {
       tool: 'get_recent_items',
       projects: recentProjects,
-      apis: recentAPIs,
+      apiEndpoints: recentAPIs,
       total: recentProjects.length + recentAPIs.length
     }
   }

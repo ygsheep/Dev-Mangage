@@ -474,7 +474,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({
               </div>
 
               {/* 表统计列表 */}
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto custom-scrollbar">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-bg-secondary">
                     <tr>

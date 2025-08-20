@@ -82,7 +82,7 @@ const CodeHighlight: React.FC<CodeHighlightProps> = ({
 
       {/* 代码区域 */}
       <div 
-        className="overflow-auto text-sm"
+        className="overflow-auto custom-scrollbar text-sm"
         style={{ maxHeight }}
       >
         <pre 

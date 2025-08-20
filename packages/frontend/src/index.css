@@ -1,3 +1,6 @@
+/* Markdown 样式 */
+@import './styles/markdown.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,7 +36,20 @@
 /* 字体加载失败时的样式 */
 @supports not (font-display: swap) {
   body {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      'Roboto',
+      'Oxygen',
+      'Ubuntu',
+      'Cantarell',
+      'Fira Sans',
+      'Droid Sans',
+      'Helvetica Neue',
+      sans-serif;
   }
 }
 
@@ -41,116 +57,418 @@
   html {
     font-family: 'OPPO Sans', 'Inter', system-ui, sans-serif;
   }
-  
+
   body {
     background-color: var(--color-bg-secondary);
     color: var(--color-text-primary);
     font-family: 'OPPO Sans', 'Inter', system-ui, sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow: hidden; /* 隐藏body滚动条，避免与主内容区域滚动条冲突 */
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  /* Gray background color variables for light mode - redesigned for consistency */
+  :root {
+    --bg-gray-50: #fafafa;
+    --bg-gray-100: #f5f5f5;
+    --bg-gray-200: #eeeeee;
+    --bg-gray-300: #e0e0e0;
+    --bg-gray-400: #bdbdbd;
+    --bg-gray-500: #9e9e9e;
+    --bg-gray-600: #757575;
+    --bg-gray-700: #616161;
+    --bg-gray-800: #424242;
+    --bg-gray-900: #212121;
+
+    /* Text colors for light mode - redesigned for better contrast */
+    --text-gray-50: #fafafa;
+    --text-gray-100: #f5f5f5;
+    --text-gray-200: #eeeeee;
+    --text-gray-300: #e0e0e0;
+    --text-gray-400: #bdbdbd;
+    --text-gray-500: #9e9e9e;
+    --text-gray-600: #757575;
+    --text-gray-700: #616161;
+    --text-gray-800: #424242;
+    --text-gray-900: #212121;
+  }
+
+  /* Gray background color variables for dark mode - redesigned based on #2a2a2a */
+  .dark {
+    --bg-gray-50: #1a1a1a;
+    --bg-gray-100: #2a2a2a;
+    --bg-gray-200: #3a3a3a;
+    --bg-gray-300: #4a4a4a;
+    --bg-gray-400: #5a5a5a;
+    --bg-gray-500: #6a6a6a;
+    --bg-gray-600: #8a8a8a;
+    --bg-gray-700: #3a3a3a;
+    --bg-gray-800: #2a2a2a;
+    --bg-gray-900: #1a1a1a;
+
+    /* Text colors for dark mode - redesigned for better contrast */
+    --text-gray-50: #eeeeee;
+    --text-gray-100: #cccccc;
+    --text-gray-200: #aaaaaa;
+    --text-gray-300: #8a8a8a;
+    --text-gray-400: #6a6a6a;
+    --text-gray-500: #5a5a5a;
+    --text-gray-600: #4a4a4a;
+    --text-gray-700: #aaaaaa;
+    --text-gray-800: #aaaaaa;
+    --text-gray-900: #eeeeee;
   }
 }
 
 @layer components {
   /* 代码和调试相关的字体类 */
   .font-mono-nerd {
-    font-family: 'JetBrains Mono Nerd Font', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-family:
+      'JetBrains Mono Nerd Font', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
   }
-  
+
   .font-ui {
     font-family: 'OPPO Sans', 'Inter', system-ui, sans-serif;
   }
-  
+
   .debug-panel {
-    font-family: 'JetBrains Mono Nerd Font', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-family:
+      'JetBrains Mono Nerd Font', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
   }
-  
+
   .debug-console {
-    font-family: 'JetBrains Mono Nerd Font', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
-    font-feature-settings: 'liga' 1, 'calt' 1;
+    font-family:
+      'JetBrains Mono Nerd Font', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-feature-settings:
+      'liga' 1,
+      'calt' 1;
   }
 
   .btn-primary {
     @apply bg-primary-600 hover:bg-primary-700 font-medium py-2 px-4 rounded-theme-lg transition-colors duration-200;
     color: var(--color-text-inverse);
   }
-  
+
   .btn-secondary {
     background-color: var(--color-bg-tertiary);
     color: var(--color-text-primary);
     @apply hover:opacity-80 font-medium py-2 px-4 rounded-theme-lg transition-all duration-200;
   }
-  
+
   .btn-outline {
     border: 1px solid var(--color-border-primary);
     background-color: transparent;
     color: var(--color-text-secondary);
     @apply hover:bg-bg-tertiary font-medium py-2 px-4 rounded-theme-lg transition-all duration-200;
   }
-  
+
   .card {
     background-color: var(--color-bg-paper);
     border: 1px solid var(--color-border-primary);
     box-shadow: var(--card-shadow);
     @apply rounded-theme-lg p-6 transition-all duration-200;
   }
-  
+
   .input {
     background-color: var(--color-bg-paper);
     border: 1px solid var(--color-border-primary);
     color: var(--color-text-primary);
     @apply block w-full px-3 py-2 rounded-theme-md shadow-theme-sm focus:outline-none transition-all duration-200;
   }
-  
+
   .input:focus {
     border-color: var(--color-focus);
     box-shadow: var(--focus-ring);
   }
-  
+
   .input::placeholder {
     color: var(--color-text-tertiary);
   }
-  
+
   .label {
     color: var(--color-text-secondary);
     @apply block text-sm font-medium mb-2;
   }
-  
+
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
-  
+
   .method-badge {
     @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold tracking-wide uppercase;
   }
-  
+
   .status-badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
 }
 
 @layer utilities {
-  .scrollbar-thin {
+  /* Gray background utilities with dark mode support - using !important to override Tailwind defaults */
+  .bg-gray-50 {
+    background-color: var(--bg-gray-50) !important;
+  }
+  .bg-gray-100 {
+    background-color: var(--bg-gray-100) !important;
+  }
+  .bg-gray-200 {
+    background-color: var(--bg-gray-200) !important;
+  }
+  .bg-gray-300 {
+    background-color: var(--bg-gray-300) !important;
+  }
+  .bg-gray-400 {
+    background-color: var(--bg-gray-400) !important;
+  }
+  .bg-gray-500 {
+    background-color: var(--bg-gray-500) !important;
+  }
+  .bg-gray-600 {
+    background-color: var(--bg-gray-600) !important;
+  }
+  .bg-gray-700 {
+    background-color: var(--bg-gray-700) !important;
+  }
+  .bg-gray-800 {
+    background-color: var(--bg-gray-800) !important;
+  }
+  .bg-gray-900 {
+    background-color: var(--bg-gray-900) !important;
+  }
+
+  /* Gray text utilities with dark mode support - using !important to override Tailwind defaults */
+  .text-gray-50 {
+    color: var(--text-gray-50) !important;
+  }
+  .text-gray-100 {
+    color: var(--text-gray-100) !important;
+  }
+  .text-gray-200 {
+    color: var(--text-gray-200) !important;
+  }
+  .text-gray-300 {
+    color: var(--text-gray-300) !important;
+  }
+  .text-gray-400 {
+    color: var(--text-gray-400) !important;
+  }
+  .text-gray-500 {
+    color: var(--text-gray-500) !important;
+  }
+  .text-gray-600 {
+    color: var(--text-gray-600) !important;
+  }
+  .text-gray-700 {
+    color: var(--text-gray-700) !important;
+  }
+  .text-gray-800 {
+    color: var(--text-gray-800) !important;
+  }
+  .text-gray-900 {
+    color: var(--text-gray-900) !important;
+  }
+
+  /* 滚动条基础样式 */
+  .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: var(--color-border-secondary) transparent;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
   }
-  
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
+
+  /* WebKit 滚动条样式 */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
-  
-  .scrollbar-thin::-webkit-scrollbar-track {
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.3);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: all 0.2s ease;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.6);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
     background: transparent;
   }
-  
+
+  /* 细滚动条样式 */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 6px;
+  }
+
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: var(--color-border-secondary);
-    border-radius: 3px;
+    background: rgba(156, 163, 175, 0.25);
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background-clip: content-box;
+    transition: all 0.2s ease;
   }
-  
+
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-border-primary);
+    background: rgba(156, 163, 175, 0.5);
   }
-  
+
+  .scrollbar-thin::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* 隐藏滚动条但保持滚动功能 */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 暗色主题滚动条样式 */
+  .dark .custom-scrollbar {
+    scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.3);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(75, 85, 99, 0.6);
+  }
+
+  .dark .scrollbar-thin {
+    scrollbar-color: rgba(75, 85, 99, 0.3) transparent;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.25);
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(75, 85, 99, 0.5);
+  }
+
+  /* 高对比度滚动条（用于代码编辑器等） */
+  .scrollbar-contrast {
+    scrollbar-width: auto;
+    scrollbar-color: rgba(59, 130, 246, 0.6) rgba(229, 231, 235, 0.2);
+  }
+
+  .scrollbar-contrast::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scrollbar-contrast::-webkit-scrollbar-track {
+    background: rgba(229, 231, 235, 0.2);
+    border-radius: 10px;
+  }
+
+  .scrollbar-contrast::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.6);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .scrollbar-contrast::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.8);
+  }
+
+  .dark .scrollbar-contrast {
+    scrollbar-color: rgba(59, 130, 246, 0.7) rgba(55, 65, 81, 0.3);
+  }
+
+  .dark .scrollbar-contrast::-webkit-scrollbar-track {
+    background: rgba(55, 65, 81, 0.3);
+  }
+
+  .dark .scrollbar-contrast::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  .dark .scrollbar-contrast::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.9);
+  }
+
+  /* 应用全局默认滚动条样式 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 8px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.3);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: all 0.2s ease;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.6);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* 暗色主题全局滚动条 */
+  .dark * {
+    scrollbar-color: rgba(75, 85, 99, 0.3) transparent;
+  }
+
+  .dark textarea,
+  select,
+  input {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+  }
+  .dark button:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+  }
+
+  .dark *::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.3);
+  }
+
+  .dark *::-webkit-scrollbar-thumb:hover {
+    background: rgba(75, 85, 99, 0.6);
+  }
+
   /* Override space-y-6 margins */
   .space-y-6 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-y-reverse: 0;
@@ -244,16 +562,11 @@
   .title-bar-title {
     font-size: 13px;
   }
-  
+
   .title-bar-button {
     width: 44px;
     height: 44px;
   }
-}
-
-/* 确保内容不被标题栏遮挡 */
-.app-with-titlebar {
-  padding-top: 48px;
 }
 
 /* 暗色主题优化 */
@@ -297,17 +610,17 @@
 
 /* Prism.js theme overrides */
 .token.string {
-  color: #10B981;
+  color: #10b981;
 }
 
 .token.keyword {
-  color: #3B82F6;
+  color: #3b82f6;
 }
 
 .token.function {
-  color: #8B5CF6;
+  color: #8b5cf6;
 }
 
 .token.comment {
-  color: #6B7280;
+  color: #6b7280;
 }

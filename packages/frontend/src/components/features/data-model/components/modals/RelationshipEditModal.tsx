@@ -247,7 +247,7 @@ const RelationshipEditModal: React.FC<RelationshipEditModalProps> = ({
           </div>
         </div>
 
-        <div className="p-6 max-h-[calc(90vh-80px)] overflow-y-auto">
+        <div className="p-6 max-h-[calc(90vh-80px)] overflow-y-auto custom-scrollbar">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 基础配置 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

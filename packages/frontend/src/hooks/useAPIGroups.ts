@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
+import { getBackendBaseUrl } from '../config/env';
+
+// 获取后端基础URL
+const API_BASE_URL = getBackendBaseUrl();
 
 interface APIGroup {
   id: string;
@@ -41,6 +45,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
   const [groups, setGroups] = useState<APIGroup[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fetchGroups = useCallback(async () => {
     if (!projectId) return;
@@ -49,7 +54,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/v1/api-management/groups?projectId=${projectId}`, {
+      const response = await fetch(`${API_BASE_URL}/api-management/groups?projectId=${projectId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +79,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, refreshTrigger]);
 
   const createGroup = useCallback(async (data: any): Promise<APIGroup> => {
     try {
@@ -93,7 +98,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchGroups(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || 'API分组创建成功');
         return result.data;
       } else {
@@ -104,11 +109,11 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
       toast.error(error.message || '创建API分组失败');
       throw error;
     }
-  }, [projectId, fetchGroups]);
+  }, [projectId]);
 
   const updateGroup = useCallback(async (id: string, data: any): Promise<APIGroup> => {
     try {
-      const response = await fetch(`/api/v1/api-management/groups/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api-management/groups/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +128,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchGroups(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || 'API分组更新成功');
         return result.data;
       } else {
@@ -134,7 +139,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
       toast.error(error.message || '更新API分组失败');
       throw error;
     }
-  }, [fetchGroups]);
+  }, []);
 
   const deleteGroup = useCallback(async (
     id: string, 
@@ -146,7 +151,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
         queryParams.append('moveEndpointsToGroup', options.moveEndpointsToGroup);
       }
 
-      const url = `/api/v1/api-management/groups/${id}${queryParams.toString() ? `?${queryParams}` : ''}`;
+      const url = `${API_BASE_URL}/api-management/groups/${id}${queryParams.toString() ? `?${queryParams}` : ''}`;
       
       const response = await fetch(url, {
         method: 'DELETE',
@@ -162,7 +167,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchGroups(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || 'API分组删除成功');
       } else {
         throw new Error(result.message || '删除API分组失败');
@@ -172,11 +177,11 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
       toast.error(error.message || '删除API分组失败');
       throw error;
     }
-  }, [fetchGroups]);
+  }, []);
 
   const moveGroup = useCallback(async (id: string, newParentId?: string): Promise<APIGroup> => {
     try {
-      const response = await fetch(`/api/v1/api-management/groups/${id}/move`, {
+      const response = await fetch(`${API_BASE_URL}/api-management/groups/${id}/move`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -191,7 +196,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchGroups(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || 'API分组移动成功');
         return result.data;
       } else {
@@ -202,7 +207,7 @@ export const useAPIGroups = (projectId: string): UseAPIGroupsReturn => {
       toast.error(error.message || '移动API分组失败');
       throw error;
     }
-  }, [fetchGroups]);
+  }, []);
 
   const reorderGroups = useCallback(async (
     projectId: string,

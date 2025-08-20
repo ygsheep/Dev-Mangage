@@ -6,6 +6,12 @@
 
 import axios from 'axios'
 import { getBackendBaseUrl } from '../config/env'
+import { 
+  FeatureModuleQueryParams, 
+  CreateFeatureModuleData, 
+  UpdateFeatureModuleData,
+  FeatureModulesResponse 
+} from '../types'
 
 // 获取API基础URL，使用统一的环境配置管理
 const API_BASE_URL = getBackendBaseUrl()
@@ -25,11 +31,11 @@ const apiClient = axios.create({
  * 在发送请求前自动添加认证信息、公共头部等
  */
 apiClient.interceptors.request.use(
-  (config) => {
+  config => {
     // TODO: 在这里添加认证token、请求ID等公共头部
     return config
   },
-  (error) => {
+  error => {
     return Promise.reject(error)
   }
 )
@@ -39,8 +45,8 @@ apiClient.interceptors.request.use(
  * 统一处理响应数据和错误，简化上层调用
  */
 apiClient.interceptors.response.use(
-  (response) => response.data, // 直接返回数据部分，简化调用
-  (error) => {
+  response => response.data, // 直接返回数据部分，简化调用
+  error => {
     console.error('API Error:', error)
     throw error // 抛出错误供上层处理
   }
@@ -367,8 +373,8 @@ export const batchParseDocuments = async (data: {
 }
 
 export const getParseHistory = async (projectId: string, limit?: number) => {
-  return apiClient.get(`/ai/history/${projectId}`, { 
-    params: { limit } 
+  return apiClient.get(`/ai/history/${projectId}`, {
+    params: { limit },
   })
 }
 
@@ -424,10 +430,13 @@ export const generateMigrationPlan = async (migrations: any[]) => {
   return apiClient.post('/ai/generate/migration-plan', { migrations })
 }
 
-export const generateRollbackScript = async (migrationId: string, data: {
-  migration: any
-  targetVersion?: string
-}) => {
+export const generateRollbackScript = async (
+  migrationId: string,
+  data: {
+    migration: any
+    targetVersion?: string
+  }
+) => {
   return apiClient.post(`/ai/generate/rollback/${migrationId}`, data)
 }
 
@@ -436,18 +445,18 @@ export const optimizeProjectSchema = async (projectId: string, options?: any) =>
   return apiClient.post(`/ai/optimize/schema/${projectId}`, options || {})
 }
 
-export const suggestTableIndexes = async (tableId: string, data?: {
-  queryPatterns?: string[]
-  provider?: string
-}) => {
+export const suggestTableIndexes = async (
+  tableId: string,
+  data?: {
+    queryPatterns?: string[]
+    provider?: string
+  }
+) => {
   return apiClient.post(`/ai/suggest/indexes/${tableId}`, data || {})
 }
 
 // 模型验证和修正API
-export const validateModel = async (data: {
-  model: any
-  options?: any
-}) => {
+export const validateModel = async (data: { model: any; options?: any }) => {
   return apiClient.post('/ai/validate/model', data)
 }
 
@@ -460,44 +469,48 @@ export const validateAndCorrectModel = async (data: {
   return apiClient.post('/ai/validate/correct', data)
 }
 
-export const smartCorrectModel = async (data: {
-  model: any
-  options?: any
-}) => {
+export const smartCorrectModel = async (data: { model: any; options?: any }) => {
   return apiClient.post('/ai/correct/smart', data)
 }
 
-export const generateQualityReport = async (data: {
-  model: any
-  validationResult?: any
-}) => {
+export const generateQualityReport = async (data: { model: any; validationResult?: any }) => {
   return apiClient.post('/ai/report/quality', data)
 }
 
 // 协作管理API
-export const getComments = async (projectId: string, params?: {
-  targetType?: string
-  targetId?: string
-  limit?: number
-  offset?: number
-}) => {
+export const getComments = async (
+  projectId: string,
+  params?: {
+    targetType?: string
+    targetId?: string
+    limit?: number
+    offset?: number
+  }
+) => {
   return apiClient.get(`/collaboration/${projectId}/comments`, { params })
 }
 
-export const createComment = async (projectId: string, data: {
-  content: string
-  targetType: string
-  targetId: string
-  targetName: string
-  parentId?: string
-  mentions?: string[]
-}) => {
+export const createComment = async (
+  projectId: string,
+  data: {
+    content: string
+    targetType: string
+    targetId: string
+    targetName: string
+    parentId?: string
+    mentions?: string[]
+  }
+) => {
   return apiClient.post(`/collaboration/${projectId}/comments`, data)
 }
 
-export const updateComment = async (projectId: string, commentId: string, data: {
-  content: string
-}) => {
+export const updateComment = async (
+  projectId: string,
+  commentId: string,
+  data: {
+    content: string
+  }
+) => {
   return apiClient.put(`/collaboration/${projectId}/comments/${commentId}`, data)
 }
 
@@ -506,7 +519,9 @@ export const deleteComment = async (projectId: string, commentId: string) => {
 }
 
 export const resolveComment = async (projectId: string, commentId: string, isResolved: boolean) => {
-  return apiClient.patch(`/collaboration/${projectId}/comments/${commentId}/resolve`, { isResolved })
+  return apiClient.patch(`/collaboration/${projectId}/comments/${commentId}/resolve`, {
+    isResolved,
+  })
 }
 
 export const getCommentStats = async (projectId: string) => {
@@ -514,19 +529,25 @@ export const getCommentStats = async (projectId: string) => {
 }
 
 // 权限管理API
-export const getTeamMembers = async (projectId: string, params?: {
-  role?: string
-  status?: string
-  search?: string
-}) => {
+export const getTeamMembers = async (
+  projectId: string,
+  params?: {
+    role?: string
+    status?: string
+    search?: string
+  }
+) => {
   return apiClient.get(`/permissions/${projectId}/members`, { params })
 }
 
-export const inviteMember = async (projectId: string, data: {
-  email: string
-  role: string
-  message?: string
-}) => {
+export const inviteMember = async (
+  projectId: string,
+  data: {
+    email: string
+    role: string
+    message?: string
+  }
+) => {
   return apiClient.post(`/permissions/${projectId}/members/invite`, data)
 }
 
@@ -542,10 +563,13 @@ export const getRolesAndPermissions = async (projectId: string) => {
   return apiClient.get(`/permissions/${projectId}/roles`)
 }
 
-export const checkPermission = async (projectId: string, params: {
-  permission: string
-  userId?: string
-}) => {
+export const checkPermission = async (
+  projectId: string,
+  params: {
+    permission: string
+    userId?: string
+  }
+) => {
   return apiClient.get(`/permissions/${projectId}/permissions/check`, { params })
 }
 
@@ -554,10 +578,10 @@ export const getPermissionStats = async (projectId: string) => {
 }
 
 // 功能模块管理API
-export const getFeatureModules = async (projectId: string, params?: {
-  status?: 'planned' | 'in-progress' | 'completed'
-  search?: string
-}) => {
+export const getFeatureModules = async (
+  projectId: string,
+  params?: FeatureModuleQueryParams
+): Promise<{ success: boolean; data: FeatureModulesResponse; message: string }> => {
   return apiClient.get(`/features/${projectId}/modules`, { params })
 }
 
@@ -565,16 +589,18 @@ export const getFeatureModule = async (projectId: string, moduleId: string) => {
   return apiClient.get(`/features/${projectId}/modules/${moduleId}`)
 }
 
-export const createFeatureModule = async (projectId: string, data: {
-  name: string
-  description?: string
-  category?: string
-  tags?: string[]
-}) => {
+export const createFeatureModule = async (
+  projectId: string,
+  data: CreateFeatureModuleData
+) => {
   return apiClient.post(`/features/${projectId}/modules`, data)
 }
 
-export const updateFeatureModule = async (projectId: string, moduleId: string, data: any) => {
+export const updateFeatureModule = async (
+  projectId: string, 
+  moduleId: string, 
+  data: UpdateFeatureModuleData
+) => {
   return apiClient.put(`/features/${projectId}/modules/${moduleId}`, data)
 }
 
@@ -604,11 +630,14 @@ export const renderCodeTemplate = async (templateId: string, variables: Record<s
   return apiClient.post(`/ai/templates/${templateId}/render`, { variables })
 }
 
-export const previewCodeTemplate = async (templateId: string, context: {
-  model: any
-  dialect: string
-  [key: string]: any
-}) => {
+export const previewCodeTemplate = async (
+  templateId: string,
+  context: {
+    model: any
+    dialect: string
+    [key: string]: any
+  }
+) => {
   return apiClient.post(`/ai/templates/${templateId}/preview`, { context })
 }
 
@@ -650,8 +679,8 @@ export const importCodeTemplates = async (file: File) => {
   formData.append('file', file)
   return apiClient.post('/ai/templates/import', formData, {
     headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+      'Content-Type': 'multipart/form-data',
+    },
   })
 }
 
@@ -663,15 +692,18 @@ export const importCodeTemplates = async (file: File) => {
  * @param filters - 筛选条件
  * @returns Issues 列表数据
  */
-export const getIssues = async (projectId: string, filters?: {
-  status?: string
-  priority?: string
-  issueType?: string
-  assignee?: string
-  search?: string
-  page?: number
-  limit?: number
-}) => {
+export const getIssues = async (
+  projectId: string,
+  filters?: {
+    status?: string
+    priority?: string
+    issueType?: string
+    assignee?: string
+    search?: string
+    page?: number
+    limit?: number
+  }
+) => {
   return apiClient.get(`/${projectId}/issues`, { params: filters })
 }
 
@@ -744,13 +776,17 @@ export const getIssueRelations = async (projectId: string, issueId: string) => {
  * @param data - 关联数据
  * @returns 创建的关联关系
  */
-export const createIssueAPIRelation = async (projectId: string, issueId: string, data: {
-  apiId?: string
-  endpointId?: string
-  relationType: string
-  description?: string
-}) => {
-  return apiClient.post(`/${projectId}/issues/${issueId}/relations/apis`, data)
+export const createIssueAPIRelation = async (
+  projectId: string,
+  issueId: string,
+  data: {
+    apiId?: string
+    endpointId?: string
+    relationType: string
+    description?: string
+  }
+) => {
+  return apiClient.post(`/${projectId}/issues/${issueId}/relations/api`, data)
 }
 
 /**
@@ -760,12 +796,16 @@ export const createIssueAPIRelation = async (projectId: string, issueId: string,
  * @param data - 关联数据
  * @returns 创建的关联关系
  */
-export const createIssueTableRelation = async (projectId: string, issueId: string, data: {
-  tableId: string
-  relationType: string
-  description?: string
-}) => {
-  return apiClient.post(`/${projectId}/issues/${issueId}/relations/tables`, data)
+export const createIssueTableRelation = async (
+  projectId: string,
+  issueId: string,
+  data: {
+    tableId: string
+    relationType: string
+    description?: string
+  }
+) => {
+  return apiClient.post(`/${projectId}/issues/${issueId}/relations/table`, data)
 }
 
 /**
@@ -775,13 +815,27 @@ export const createIssueTableRelation = async (projectId: string, issueId: strin
  * @param data - 关联数据
  * @returns 创建的关联关系
  */
-export const createIssueFeatureRelation = async (projectId: string, issueId: string, data: {
-  featureName: string
-  component?: string
-  relationType: string
-  description?: string
-}) => {
-  return apiClient.post(`/${projectId}/issues/${issueId}/relations/features`, data)
+export const createIssueFeatureRelation = async (
+  projectId: string,
+  issueId: string,
+  data: {
+    featureName?: string
+    featureId?: string  // 兼容旧的调用方式
+    component?: string
+    relationType: string
+    description?: string
+  }
+) => {
+  // 如果传入的是 featureId，需要转换为 featureName 和 component
+  const requestData = { ...data }
+  if (data.featureId && !data.featureName) {
+    const parts = data.featureId.split('-')
+    requestData.featureName = parts[0]
+    requestData.component = parts.slice(1).join('-') || undefined
+    delete requestData.featureId
+  }
+  
+  return apiClient.post(`/${projectId}/issues/${issueId}/relations/feature`, requestData)
 }
 
 /**
@@ -791,8 +845,12 @@ export const createIssueFeatureRelation = async (projectId: string, issueId: str
  * @param relationId - 关联 ID
  * @returns 删除结果
  */
-export const deleteIssueAPIRelation = async (projectId: string, issueId: string, relationId: string) => {
-  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/apis/${relationId}`)
+export const deleteIssueAPIRelation = async (
+  projectId: string,
+  issueId: string,
+  relationId: string
+) => {
+  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/api/${relationId}`)
 }
 
 /**
@@ -802,8 +860,12 @@ export const deleteIssueAPIRelation = async (projectId: string, issueId: string,
  * @param relationId - 关联 ID
  * @returns 删除结果
  */
-export const deleteIssueTableRelation = async (projectId: string, issueId: string, relationId: string) => {
-  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/tables/${relationId}`)
+export const deleteIssueTableRelation = async (
+  projectId: string,
+  issueId: string,
+  relationId: string
+) => {
+  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/table/${relationId}`)
 }
 
 /**
@@ -813,8 +875,12 @@ export const deleteIssueTableRelation = async (projectId: string, issueId: strin
  * @param relationId - 关联 ID
  * @returns 删除结果
  */
-export const deleteIssueFeatureRelation = async (projectId: string, issueId: string, relationId: string) => {
-  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/features/${relationId}`)
+export const deleteIssueFeatureRelation = async (
+  projectId: string,
+  issueId: string,
+  relationId: string
+) => {
+  return apiClient.delete(`/${projectId}/issues/${issueId}/relations/feature/${relationId}`)
 }
 
 /**
@@ -824,13 +890,17 @@ export const deleteIssueFeatureRelation = async (projectId: string, issueId: str
  * @param data - 批量关联数据
  * @returns 批量创建结果
  */
-export const createBatchIssueRelations = async (projectId: string, issueId: string, data: {
-  relations: Array<{
-    type: 'api' | 'table' | 'feature'
-    relationType: string
-    [key: string]: any
-  }>
-}) => {
+export const createBatchIssueRelations = async (
+  projectId: string,
+  issueId: string,
+  data: {
+    relations: Array<{
+      type: 'api' | 'table' | 'feature'
+      relationType: string
+      [key: string]: any
+    }>
+  }
+) => {
   return apiClient.post(`/${projectId}/issues/${issueId}/relations/batch`, data)
 }
 
@@ -841,9 +911,13 @@ export const createBatchIssueRelations = async (projectId: string, issueId: stri
  * @param type - 资源类型
  * @returns 可关联的资源
  */
-export const getAvailableIssueRelations = async (projectId: string, issueId: string, type?: 'api' | 'table' | 'feature') => {
+export const getAvailableIssueRelations = async (
+  projectId: string,
+  issueId: string,
+  type?: 'api' | 'table' | 'feature'
+) => {
   return apiClient.get(`/${projectId}/issues/${issueId}/relations/available`, {
-    params: { type }
+    params: { type },
   })
 }
 
@@ -864,13 +938,16 @@ export const getGitHubRepository = async (projectId: string) => {
  * @param data - 仓库配置数据
  * @returns 配置结果
  */
-export const configureGitHubRepository = async (projectId: string, data: {
-  owner: string
-  name: string
-  accessToken: string
-  autoSync?: boolean
-  syncInterval?: number
-}) => {
+export const configureGitHubRepository = async (
+  projectId: string,
+  data: {
+    owner: string
+    name: string
+    accessToken: string
+    autoSync?: boolean
+    syncInterval?: number
+  }
+) => {
   return apiClient.post(`/${projectId}/github/repository`, data)
 }
 
@@ -880,11 +957,14 @@ export const configureGitHubRepository = async (projectId: string, data: {
  * @param data - 验证数据
  * @returns 验证结果
  */
-export const validateGitHubRepository = async (projectId: string, data: {
-  owner: string
-  name: string
-  accessToken: string
-}) => {
+export const validateGitHubRepository = async (
+  projectId: string,
+  data: {
+    owner: string
+    name: string
+    accessToken: string
+  }
+) => {
   return apiClient.post(`/${projectId}/github/repository/validate`, data)
 }
 
@@ -894,12 +974,15 @@ export const validateGitHubRepository = async (projectId: string, data: {
  * @param options - 同步选项
  * @returns 同步结果
  */
-export const syncIssuesFromGitHub = async (projectId: string, options?: {
-  syncLabels?: boolean
-  syncComments?: boolean
-  syncMilestones?: boolean
-  dryRun?: boolean
-}) => {
+export const syncIssuesFromGitHub = async (
+  projectId: string,
+  options?: {
+    syncLabels?: boolean
+    syncComments?: boolean
+    syncMilestones?: boolean
+    dryRun?: boolean
+  }
+) => {
   return apiClient.post(`/${projectId}/github/sync/from-github`, options || {})
 }
 
@@ -909,11 +992,14 @@ export const syncIssuesFromGitHub = async (projectId: string, options?: {
  * @param options - 同步选项
  * @returns 同步结果
  */
-export const syncIssuesToGitHub = async (projectId: string, options?: {
-  syncLabels?: boolean
-  syncComments?: boolean
-  dryRun?: boolean
-}) => {
+export const syncIssuesToGitHub = async (
+  projectId: string,
+  options?: {
+    syncLabels?: boolean
+    syncComments?: boolean
+    dryRun?: boolean
+  }
+) => {
   return apiClient.post(`/${projectId}/github/sync/to-github`, options || {})
 }
 
@@ -923,12 +1009,15 @@ export const syncIssuesToGitHub = async (projectId: string, options?: {
  * @param options - 同步选项
  * @returns 同步结果
  */
-export const syncIssuesBidirectional = async (projectId: string, options?: {
-  syncLabels?: boolean
-  syncComments?: boolean
-  syncMilestones?: boolean
-  dryRun?: boolean
-}) => {
+export const syncIssuesBidirectional = async (
+  projectId: string,
+  options?: {
+    syncLabels?: boolean
+    syncComments?: boolean
+    syncMilestones?: boolean
+    dryRun?: boolean
+  }
+) => {
   return apiClient.post(`/${projectId}/github/sync/bidirectional`, options || {})
 }
 

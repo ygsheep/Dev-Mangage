@@ -31,7 +31,7 @@ const statusUrl = mcpConfig.getMCPStatusUrl()
 ```typescript
 // 替换硬编码的地址
 // ❌ 旧方式
-const response = await fetch('http://localhost:3001/api/v1/mcp/status')
+const response = await fetch('http://localhost:3000/api/v1/mcp/status')
 
 // ✅ 新方式
 const response = await fetch(mcpConfig.getMCPStatusUrl())
@@ -45,14 +45,14 @@ import { getMCPUrls } from './mcpConfig'
 const urls = getMCPUrls()
 console.log(urls)
 // {
-//   backend: 'http://localhost:3001/api/v1',
+//   backend: 'http://localhost:3000/api/v1',
 //   httpServer: 'http://localhost:3320',
-//   websocket: 'ws://localhost:3001',
-//   status: 'http://localhost:3001/api/v1/mcp/status',
-//   logs: 'http://localhost:3001/api/v1/mcp/logs',
-//   start: 'http://localhost:3001/api/v1/mcp/start',
-//   stop: 'http://localhost:3001/api/v1/mcp/stop',
-//   ping: 'http://localhost:3001/api/v1/mcp/ping'
+//   websocket: 'ws://localhost:3000',
+//   status: 'http://localhost:3000/api/v1/mcp/status',
+//   logs: 'http://localhost:3000/api/v1/mcp/logs',
+//   start: 'http://localhost:3000/api/v1/mcp/start',
+//   stop: 'http://localhost:3000/api/v1/mcp/stop',
+//   ping: 'http://localhost:3000/api/v1/mcp/ping'
 // }
 ```
 
@@ -63,7 +63,7 @@ console.log(urls)
 ```bash
 # 后端服务器配置
 VITE_BACKEND_HOST=localhost
-VITE_BACKEND_PORT=3001
+VITE_BACKEND_PORT=3000
 
 # MCP HTTP 服务器配置
 VITE_MCP_HTTP_HOST=localhost
@@ -71,7 +71,7 @@ VITE_MCP_HTTP_PORT=3320
 
 # MCP WebSocket 服务器配置
 VITE_MCP_WS_HOST=localhost
-VITE_MCP_WS_PORT=3001
+VITE_MCP_WS_PORT=3000
 ```
 
 ## API 参考
@@ -80,23 +80,23 @@ VITE_MCP_WS_PORT=3001
 
 #### 方法列表
 
-| 方法 | 返回值 | 描述 |
-|------|--------|------|
-| `getBackendBaseUrl()` | `string` | 获取后端 API 基础 URL |
-| `getMCPHttpUrl()` | `string` | 获取 MCP HTTP 服务器 URL |
-| `getMCPWebSocketUrl()` | `string` | 获取 MCP WebSocket 服务器 URL |
-| `getMCPToolUrl(toolName)` | `string` | 获取 MCP 工具调用 URL |
-| `getMCPStatusUrl()` | `string` | 获取 MCP 状态 URL |
-| `getMCPLogsUrl()` | `string` | 获取 MCP 日志 URL |
-| `getMCPStatusStreamUrl()` | `string` | 获取 MCP 状态流 URL (SSE) |
-| `getMCPLogStreamUrl()` | `string` | 获取 MCP 日志流 URL (SSE) |
-| `getMCPStartUrl()` | `string` | 获取 MCP 启动 URL |
-| `getMCPStopUrl()` | `string` | 获取 MCP 停止 URL |
-| `getMCPPingUrl()` | `string` | 获取连接测试 URL |
-| `updateConfig(config)` | `void` | 更新配置 |
-| `getCurrentConfig()` | `object` | 获取当前配置 |
-| `resetToDefault()` | `void` | 重置为默认配置 |
-| `validateConfig()` | `object` | 验证配置有效性 |
+| 方法                      | 返回值   | 描述                          |
+| ------------------------- | -------- | ----------------------------- |
+| `getBackendBaseUrl()`     | `string` | 获取后端 API 基础 URL         |
+| `getMCPHttpUrl()`         | `string` | 获取 MCP HTTP 服务器 URL      |
+| `getMCPWebSocketUrl()`    | `string` | 获取 MCP WebSocket 服务器 URL |
+| `getMCPToolUrl(toolName)` | `string` | 获取 MCP 工具调用 URL         |
+| `getMCPStatusUrl()`       | `string` | 获取 MCP 状态 URL             |
+| `getMCPLogsUrl()`         | `string` | 获取 MCP 日志 URL             |
+| `getMCPStatusStreamUrl()` | `string` | 获取 MCP 状态流 URL (SSE)     |
+| `getMCPLogStreamUrl()`    | `string` | 获取 MCP 日志流 URL (SSE)     |
+| `getMCPStartUrl()`        | `string` | 获取 MCP 启动 URL             |
+| `getMCPStopUrl()`         | `string` | 获取 MCP 停止 URL             |
+| `getMCPPingUrl()`         | `string` | 获取连接测试 URL              |
+| `updateConfig(config)`    | `void`   | 更新配置                      |
+| `getCurrentConfig()`      | `object` | 获取当前配置                  |
+| `resetToDefault()`        | `void`   | 重置为默认配置                |
+| `validateConfig()`        | `object` | 验证配置有效性                |
 
 ### 配置验证
 
@@ -113,7 +113,7 @@ if (!validation.isValid) {
 // 更新配置
 mcpConfig.updateConfig({
   BACKEND_HOST: '192.168.1.100',
-  BACKEND_PORT: '3001'
+  BACKEND_PORT: '3000',
 })
 
 // 重置配置
@@ -125,24 +125,27 @@ mcpConfig.resetToDefault()
 ### 从硬编码地址迁移
 
 1. **导入配置管理**
+
    ```typescript
    import { mcpConfig } from '../config/mcpConfig'
    ```
 
 2. **替换硬编码地址**
+
    ```typescript
    // ❌ 替换前
-   const baseUrl = 'http://localhost:3001/api/v1'
-   
+   const baseUrl = 'http://localhost:3000/api/v1'
+
    // ✅ 替换后
    // 删除 baseUrl 变量，直接使用配置方法
    ```
 
 3. **更新 fetch 调用**
+
    ```typescript
    // ❌ 替换前
    fetch(`${baseUrl}/mcp/status`)
-   
+
    // ✅ 替换后
    fetch(mcpConfig.getMCPStatusUrl())
    ```
@@ -156,16 +159,18 @@ mcpConfig.resetToDefault()
 ## 最佳实践
 
 1. **使用配置方法而不是直接访问配置对象**
+
    ```typescript
    // ✅ 推荐
    const url = mcpConfig.getMCPStatusUrl()
-   
+
    // ❌ 不推荐
    const config = mcpConfig.getCurrentConfig()
    const url = `http://${config.BACKEND_HOST}:${config.BACKEND_PORT}/api/v1/mcp/status`
    ```
 
 2. **在组件中缓存 URL**
+
    ```typescript
    const statusUrl = useMemo(() => mcpConfig.getMCPStatusUrl(), [])
    ```
@@ -176,7 +181,7 @@ mcpConfig.resetToDefault()
    if (import.meta.env.DEV) {
      mcpConfig.updateConfig({
        BACKEND_HOST: 'localhost',
-       MCP_HTTP_PORT: '3320'
+       MCP_HTTP_PORT: '3320',
      })
    }
    ```

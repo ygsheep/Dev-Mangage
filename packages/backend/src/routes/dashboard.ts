@@ -18,9 +18,9 @@ router.get('/stats', async (req, res, next) => {
       const project = await prisma.project.findUnique({
         where: { id: projectId as string },
         include: {
-          apis: {
+          apiEndpoints: {
             include: {
-              apiTags: {
+              endpointTags: {
                 include: {
                   tag: true
                 }
@@ -42,20 +42,20 @@ router.get('/stats', async (req, res, next) => {
       }
 
       // API状态分布
-      const apiStatusStats = project.apis.reduce((acc: any, api) => {
+      const apiStatusStats = project.apiEndpoints.reduce((acc: any, api) => {
         acc[api.status] = (acc[api.status] || 0) + 1;
         return acc;
       }, {});
 
       // HTTP方法分布
-      const methodStats = project.apis.reduce((acc: any, api) => {
+      const methodStats = project.apiEndpoints.reduce((acc: any, api) => {
         acc[api.method] = (acc[api.method] || 0) + 1;
         return acc;
       }, {});
 
       // 标签使用统计
-      const tagStats = project.apis.flatMap(api => 
-        api.apiTags.map(at => at.tag.name)
+      const tagStats = project.apiEndpoints.flatMap(api => 
+        api.endpointTags.map(at => at.tag.name)
       ).reduce((acc: any, tagName) => {
         acc[tagName] = (acc[tagName] || 0) + 1;
         return acc;
@@ -73,7 +73,7 @@ router.get('/stats', async (req, res, next) => {
 
       const projectStats = {
         overview: {
-          totalApis: project.apis.length,
+          totalApis: project.apiEndpoints.length,
           totalTags: project.tags.length,
           totalTables: project.databaseTables.length,
           lastUpdated: project.updatedAt
@@ -103,7 +103,7 @@ router.get('/stats', async (req, res, next) => {
       // 全局统计
       const [totalProjects, totalApis, totalTags, totalTables] = await Promise.all([
         prisma.project.count(),
-        prisma.aPI.count(),
+        prisma.aPIEndpoint.count(),
         prisma.tag.count(),
         prisma.databaseTable.count()
       ]);
@@ -115,7 +115,7 @@ router.get('/stats', async (req, res, next) => {
         include: {
           _count: {
             select: {
-              apis: true,
+              apiEndpoints: true,
               tags: true,
               databaseTables: true
             }
@@ -124,7 +124,7 @@ router.get('/stats', async (req, res, next) => {
       });
 
       // 获取全局API状态分布
-      const allApis = await prisma.aPI.groupBy({
+      const allApis = await prisma.aPIEndpoint.groupBy({
         by: ['status'],
         _count: {
           status: true
@@ -144,7 +144,7 @@ router.get('/stats', async (req, res, next) => {
           description: project.description,
           updatedAt: project.updatedAt,
           stats: {
-            apis: project._count.apis,
+            apiEndpoints: project._count.apiEndpoints,
             tags: project._count.tags,
             tables: project._count.databaseTables
           }
@@ -239,7 +239,7 @@ async function getProjectTrends(projectId: string) {
     date.setDate(date.getDate() - i);
     return {
       date: date.toISOString().split('T')[0],
-      apis: Math.floor(Math.random() * 5) + 1,
+      apiEndpoints: Math.floor(Math.random() * 5) + 1,
       tags: Math.floor(Math.random() * 3),
       tables: Math.floor(Math.random() * 2)
     };
@@ -256,7 +256,7 @@ async function getGlobalTrends() {
     return {
       date: date.toISOString().split('T')[0],
       projects: Math.floor(Math.random() * 3),
-      apis: Math.floor(Math.random() * 15) + 5,
+      apiEndpoints: Math.floor(Math.random() * 15) + 5,
       activeUsers: Math.floor(Math.random() * 10) + 5
     };
   }).reverse();
@@ -285,7 +285,7 @@ function generateMockActivityData(startDate: Date, endDate: Date) {
 async function getPopularApis(projectId?: string) {
   const whereClause = projectId ? { projectId } : {};
   
-  const apis = await prisma.aPI.findMany({
+  const apiEndpoints = await prisma.aPIEndpoint.findMany({
     where: whereClause,
     include: {
       project: {
@@ -293,7 +293,7 @@ async function getPopularApis(projectId?: string) {
           name: true
         }
       },
-      apiTags: {
+      endpointTags: {
         include: {
           tag: true
         }
@@ -305,13 +305,13 @@ async function getPopularApis(projectId?: string) {
     }
   });
 
-  return apis.map(api => ({
+  return apiEndpoints.map(api => ({
     id: api.id,
     name: api.name,
     method: api.method,
     path: api.path,
     project: api.project.name,
-    tags: api.apiTags.map(at => at.tag.name),
+    tags: api.endpointTags.map(at => at.tag.name),
     // 模拟使用次数
     usageCount: Math.floor(Math.random() * 1000) + 100
   }));

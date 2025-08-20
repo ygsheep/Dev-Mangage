@@ -330,7 +330,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
         <div className="flex-1 overflow-hidden">
           {/* 表信息标签页 */}
           {activeTab === 'info' && (
-            <div className="p-6 space-y-6 h-full overflow-y-auto">
+            <div className="p-6 space-y-6 h-full overflow-y-auto custom-scrollbar">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
@@ -575,7 +575,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
               </div>
 
               {/* 字段列表 */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto custom-scrollbar">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-bg-tertiary sticky top-0">
                     <tr>
@@ -788,7 +788,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
               </div>
 
               {/* 索引列表 */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {(table.indexes?.length || 0) > 0 ? (
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-bg-tertiary sticky top-0">

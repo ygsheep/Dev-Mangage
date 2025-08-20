@@ -70,7 +70,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onSucc
 
   return (
     // 模态框容器和遮罩层
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto custom-scrollbar">
       <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         {/* 背景遮罩，点击关闭模态框 */}
         <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />

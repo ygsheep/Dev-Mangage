@@ -61,7 +61,7 @@ const CreateAPIModal: React.FC<CreateAPIModalProps> = ({ projectId, onClose, onS
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto custom-scrollbar">
       <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         <div className="fixed inset-0 bg-bg-tertiary0 bg-opacity-75 transition-opacity" onClick={onClose} />
         

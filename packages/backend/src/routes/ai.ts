@@ -94,6 +94,72 @@ router.post('/models/auto-select', [
   }
 })
 
+// 更新AI服务配置
+router.post('/config', [
+  body('provider').isString().withMessage('提供者名称必须是字符串'),
+  body('model').isString().withMessage('模型名称必须是字符串'),
+  body('baseUrl').optional().isString().withMessage('基础URL必须是字符串'),
+  body('apiKey').optional().isString().withMessage('API密钥必须是字符串'),
+  body('timeout').optional().isInt({ min: 1000, max: 300000 }).withMessage('超时时间必须在1-300秒之间'),
+  body('temperature').optional().isFloat({ min: 0, max: 2 }).withMessage('温度值必须在0-2之间'),
+  validateRequest()
+], async (req, res, next) => {
+  try {
+    const { provider, model, baseUrl, apiKey, timeout, temperature } = req.body
+    
+    // 验证提供者是否支持
+    const availableProviders = await aiServiceManager.getAvailableProviders()
+    if (!availableProviders.includes(provider)) {
+      return next(new AppError(`不支持的AI提供者: ${provider}`, 400))
+    }
+
+    // 更新AI服务配置
+    const success = await aiServiceManager.updateProviderConfig(provider, {
+      model,
+      baseUrl,
+      apiKey,
+      timeout: timeout || 120000,
+      temperature: temperature || 0.1
+    })
+
+    if (!success) {
+      return next(new AppError('更新AI配置失败', 500))
+    }
+
+    logger.info('AI配置已更新', { 
+      provider, 
+      model, 
+      hasApiKey: !!apiKey,
+      timeout: timeout || 120000 
+    })
+
+    res.json({
+      success: true,
+      data: {
+        message: 'AI配置更新成功',
+        provider,
+        model,
+        timestamp: new Date().toISOString()
+      }
+    })
+  } catch (error) {
+    next(new AppError(`更新AI配置失败: ${error.message}`, 500))
+  }
+})
+
+// 获取当前AI配置
+router.get('/config', async (req, res, next) => {
+  try {
+    const config = await aiServiceManager.getCurrentConfig()
+    res.json({
+      success: true,
+      data: config
+    })
+  } catch (error) {
+    next(new AppError(`获取AI配置失败: ${error.message}`, 500))
+  }
+})
+
 // 获取AI服务使用统计
 router.get('/usage', async (req, res, next) => {
   try {

@@ -14,9 +14,9 @@ npm install
 npm run dev
 
 # 或单独启动服务
-npm run dev:backend   # 后端服务（端口 3001）
+npm run dev:backend   # 后端服务（端口 3000）
 npm run dev:frontend  # 前端服务（端口 5173）
-npm run dev:mcp       # MCP 服务（端口 3004）
+npm run dev:mcp       # MCP 服务（端口 3000）
 ```
 
 ### 代码质量检查
@@ -43,7 +43,7 @@ npm run test
 /**
  * [模块名称]
  * [功能描述]
- * 
+ *
  * 主要功能：
  * - [功能1]
  * - [功能2]
@@ -56,7 +56,7 @@ npm run test
 /**
  * [函数功能描述]
  * @param param1 - 参数1说明
- * @param param2 - 参数2说明  
+ * @param param2 - 参数2说明
  * @returns 返回值说明
  * @throws {ErrorType} 错误条件说明
  */
@@ -84,7 +84,7 @@ const Component: React.FC<ComponentProps> = ({ prop }) => {
 ### 提交类型
 
 - `feat`: 新功能
-- `fix`: 修复 bug  
+- `fix`: 修复 bug
 - `docs`: 文档更新
 - `style`: 格式修改
 - `refactor`: 代码重构
@@ -156,7 +156,7 @@ function useFeature(param: string) {
 res.json({
   success: true,
   data: result,
-  message: '操作成功'
+  message: '操作成功',
 })
 
 // 错误响应
@@ -164,8 +164,8 @@ res.status(400).json({
   success: false,
   error: {
     code: 'ERROR_CODE',
-    message: '错误信息'
-  }
+    message: '错误信息',
+  },
 })
 ```
 
@@ -175,7 +175,7 @@ res.status(400).json({
 const schema = z.object({
   name: z.string().min(1, '名称不能为空'),
   email: z.string().email('邮箱格式不正确'),
-  age: z.number().min(0, '年龄必须大于0')
+  age: z.number().min(0, '年龄必须大于0'),
 })
 
 type FormData = z.infer<typeof schema>
@@ -187,7 +187,7 @@ type FormData = z.infer<typeof schema>
 // 查询数据
 const { data, isLoading, error } = useQuery({
   queryKey: ['users', filters],
-  queryFn: () => api.getUsers(filters)
+  queryFn: () => api.getUsers(filters),
 })
 
 // 变更数据
@@ -196,7 +196,7 @@ const mutation = useMutation({
   onSuccess: () => {
     queryClient.invalidateQueries(['users'])
     toast.success('创建成功')
-  }
+  },
 })
 ```
 
@@ -223,7 +223,7 @@ utils/
 interface User {
   id: string
   name: string
-  email?: string  // 可选属性
+  email?: string // 可选属性
 }
 
 // 联合类型
@@ -240,9 +240,7 @@ interface ApiResponse<T> {
 
 ```typescript
 // Result 模式
-type Result<T, E = Error> = 
-  | { success: true; data: T }
-  | { success: false; error: E }
+type Result<T, E = Error> = { success: true; data: T } | { success: false; error: E }
 
 // 使用示例
 const result = await fetchUser(id)
@@ -262,10 +260,10 @@ describe('UserService', () => {
   it('应该成功创建用户', async () => {
     // Arrange
     const userData = { name: 'John', email: 'john@example.com' }
-    
+
     // Act
     const result = await userService.createUser(userData)
-    
+
     // Assert
     expect(result.success).toBe(true)
     expect(result.data.name).toBe('John')
@@ -282,9 +280,9 @@ import UserCard from './UserCard'
 describe('UserCard', () => {
   it('应该显示用户信息', () => {
     const user = { id: '1', name: 'John', email: 'john@example.com' }
-    
+
     render(<UserCard user={user} />)
-    
+
     expect(screen.getByText('John')).toBeInTheDocument()
     expect(screen.getByText('john@example.com')).toBeInTheDocument()
   })
@@ -363,7 +361,7 @@ if (cachedResult) {
 
 ```bash
 # 查看端口使用情况
-netstat -ano | findstr ":3001"
+netstat -ano | findstr ":3000"
 
 # 杀死占用端口的进程
 taskkill /PID <PID> /F

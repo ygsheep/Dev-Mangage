@@ -192,7 +192,7 @@ app.${api.method.toLowerCase()}('${api.path}', async (req, res) => {
         </div>
 
         {/* Tab Content */}
-        <div className="p-6 max-h-[60vh] overflow-y-auto">
+        <div className="p-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
           {activeTab === 'frontend' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">

@@ -310,7 +310,7 @@ const APITestModal: React.FC<APITestModalProps> = ({
         </div>
 
         {/* Tab Content */}
-        <div className="p-6 max-h-[50vh] overflow-y-auto">
+        <div className="p-6 max-h-[50vh] overflow-y-auto custom-scrollbar">
           {activeTab === 'request' && (
             <div className="space-y-6">
               {/* Headers */}

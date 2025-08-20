@@ -5,7 +5,6 @@ import {
   Folder,
   HelpCircle,
   Home,
-  Import,
   Languages,
   LogOut,
   Menu,
@@ -35,6 +34,9 @@ const Layout: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const { isDark, toggleDarkMode } = useTheme()
   const userMenuRef = useRef<HTMLDivElement>(null)
+
+  // 检测是否为desktop模式
+  const isDesktopMode = window.electronAPI !== undefined
 
   // 调试组件状态跟踪
   useDebugComponent('Layout', {
@@ -173,20 +175,13 @@ const Layout: React.FC = () => {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [location.pathname, isSidebarCollapsed])
 
-  const navigation = [
-    { name: '新建项目', href: '/projects/new', icon: Plus, isAction: true },
-    { name: '对话', href: '/chats', icon: MessageSquare },
-    { name: '归档', href: '/archive', icon: Archive },
-  ]
-
-  const recentItems = ['中文文档翻译', 'API管理系统', '数据库设计', '项目开发进度']
-
+  const navigation = [{ name: '新建对话', href: '/chats/', icon: Plus, isAction: true }]
   const mainNavigation = [
     { name: '首页', href: '/', icon: Home },
-    { name: '仪表板', href: '/dashboard', icon: BarChart3 },
     { name: '项目', href: '/projects', icon: Folder },
-    { name: '导入', href: '/import/documents', icon: Import },
-    { name: '设置', href: '/settings', icon: Settings },
+    { name: '对话', href: '/chats', icon: MessageSquare },
+    { name: '归档', href: '/archive', icon: Archive },
+    { name: '仪表板', href: '/dashboard', icon: BarChart3 },
   ]
 
   const isActive = (href: string) => {
@@ -197,36 +192,60 @@ const Layout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-bg-secondary transition-colors duration-300">
+    <div className="flex h-screen bg-bg-secondary">
       {/* Claude Desktop 风格侧边栏 */}
       <div
-        className={`claude-sidebar group fixed inset-y-0 left-0 z-50 text-[#b8b8b8] transition-all duration-300 ${
+        className={`claude-sidebar group flex-shrink-0 text-[#b8b8b8] transition-all duration-300 ${
           isSidebarCollapsed
             ? 'w-16 bg-[#2f2f2f] hover:bg-[#1F1E1D] cursor-pointer'
             : 'w-64 bg-[#2f2f2f]'
         }`}
         title={isSidebarCollapsed ? '点击展开侧边栏' : ''}
       >
-        <div className="flex h-full flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="flex h-full flex-col" onClick={e => e.stopPropagation()}>
           {/* 顶部Logo和收起按钮 */}
-          <div className="flex h-12 items-center justify-between px-3">
-            <div className="flex items-center gap-2">
+          <div className="flex h-12 items-center px-3">
+            <div className="flex items-center gap-2 w-full">
               <button
                 onClick={toggleSidebar}
-                className="p-1.5 rounded hover:bg-[#404040] transition-colors duration-300"
+                className="px-3 py-2 rounded hover:bg-[#404040] transition-colors duration-300 flex-shrink-0"
                 title={isSidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
               >
                 <Menu className="h-4 w-4" />
               </button>
-              <div className={`overflow-hidden transition-all duration-300 ${
-                isSidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
-              }`}>
-                <span className="text-lg font-semibold text-white whitespace-nowrap">
-                  DevAPI
-                </span>
+              <div
+                className={`overflow-hidden transition-all duration-300 flex-1 flex justify-center ${
+                  isSidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+                }`}
+              >
+                <span className="text-lg font-semibold text-white whitespace-nowrap">DevAPI</span>
               </div>
             </div>
           </div>
+
+          {/* Desktop模式下的搜索组件 */}
+          {isDesktopMode && (
+            <div className="px-3 py-2">
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className={`w-full flex items-center text-sm rounded-lg transition-all duration-300 ${
+                  isSidebarCollapsed
+                    ? 'justify-center w-10 h-10 hover:bg-[#404040]'
+                    : 'px-3 py-2 text-[#b8b8b8] bg-[#404040] hover:bg-[#505050]'
+                }`}
+                title={isSidebarCollapsed ? '搜索' : '搜索项目、API...'}
+              >
+                <Search className="h-4 w-4 flex-shrink-0" />
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
+                  }`}
+                >
+                  <span className="whitespace-nowrap">搜索项目、API...</span>
+                </div>
+              </button>
+            </div>
+          )}
 
           {/* 主要功能按钮 */}
           <div className="p-3 space-y-1">
@@ -247,9 +266,11 @@ const Layout: React.FC = () => {
                   title={isSidebarCollapsed ? item.name : ''}
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
-                  <div className={`overflow-hidden transition-all duration-300 ${
-                    isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
-                  }`}>
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ${
+                      isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
+                    }`}
+                  >
                     <span className="whitespace-nowrap">{item.name}</span>
                   </div>
                 </Link>
@@ -261,7 +282,7 @@ const Layout: React.FC = () => {
           <div className="mx-3 my-2"></div>
 
           {/* 功能模块导航 */}
-          <div className="px-3 space-y-1">
+          <div className="px-3 flex-1 space-y-1">
             {mainNavigation.map(item => {
               const active = isActive(item.href)
               return (
@@ -279,9 +300,11 @@ const Layout: React.FC = () => {
                   title={isSidebarCollapsed ? item.name : ''}
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
-                  <div className={`overflow-hidden transition-all duration-300 ${
-                    isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
-                  }`}>
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ${
+                      isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
+                    }`}
+                  >
                     <span className="whitespace-nowrap">{item.name}</span>
                   </div>
                 </Link>
@@ -289,31 +312,8 @@ const Layout: React.FC = () => {
             })}
           </div>
 
-          {/* 最近项目 */}
-          <div
-            className={`px-3 py-2 transition-all duration-300 overflow-hidden ${
-              isSidebarCollapsed ? 'opacity-0 max-h-0 py-0' : 'opacity-100 max-h-96 py-2'
-            }`}
-          >
-            <h3 className="text-xs font-medium text-[#888] uppercase tracking-wider mb-2">
-              最近项目
-            </h3>
-            <div className="space-y-1">
-              {recentItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={`/recent/${index}`}
-                  onClick={e => handleSidebarInteraction(e, `/recent/${index}`)}
-                  className="block px-3 py-1.5 text-sm rounded hover:bg-[#404040] hover:text-white transition-colors duration-200 truncate"
-                >
-                  {item}
-                </Link>
-              ))}
-            </div>
-          </div>
-
           {/* 间隔区域 - 收起时点击可展开 */}
-          <div 
+          <div
             className={`flex-1 ${isSidebarCollapsed ? 'cursor-pointer' : ''}`}
             onClick={isSidebarCollapsed ? toggleSidebar : undefined}
           />
@@ -333,9 +333,11 @@ const Layout: React.FC = () => {
                     <span className="text-xs font-medium text-white">D</span>
                   </div>
                 </div>
-                <div className={`overflow-hidden transition-all duration-300 ${
-                  isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-2'
-                }`}>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-2'
+                  }`}
+                >
                   <div className="flex items-center">
                     <div className="flex-1 text-left">
                       <p className="text-sm font-medium text-white whitespace-nowrap">开发者</p>
@@ -407,32 +409,31 @@ const Layout: React.FC = () => {
         </div>
       </div>
 
-      {/* 主内容区域 */}
-      <div
-        className={`content-transition transition-all duration-300 ease-in-out ${
-          isSidebarCollapsed ? 'pl-16' : 'pl-64'
-        }`}
-      >
-        {/* 顶部搜索栏 */}
-        <div className="bg-bg-paper border-b border-border-primary px-6 py-3">
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="w-full max-w-md flex items-center px-4 py-2 text-sm text-text-tertiary bg-bg-secondary rounded-lg hover:bg-bg-tertiary transition-colors duration-200"
-          >
-            <Search className="h-4 w-4 mr-3" />
-            <span className="mr-auto">搜索项目、API...</span>
-            <div className="flex items-center space-x-1">
-              <kbd className="px-1.5 py-0.5 text-xs bg-bg-paper border border-border-primary rounded">
-                {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}
-              </kbd>
-              <kbd className="px-1.5 py-0.5 text-xs bg-bg-paper border border-border-primary rounded">
-                K
-              </kbd>
-            </div>
-          </button>
-        </div>
+      {/* 主内容区域 - 完全独立的容器，不使用padding-left */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* 顶部搜索栏 - 只在非desktop模式下显示 */}
+        {!isDesktopMode && (
+          <div className="bg-bg-paper border-b border-border-primary px-6 py-1 flex-shrink-0">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="w-full max-w-md flex items-center px-4 py-2 text-sm text-text-tertiary bg-bg-secondary rounded-lg hover:bg-bg-tertiary transition-colors duration-200"
+            >
+              <Search className="h-4 w-4 mr-3" />
+              <span className="mr-auto">搜索项目、API...</span>
+              <div className="flex items-center space-x-1">
+                <kbd className="px-1.5 py-0.5 text-xs bg-bg-paper border border-border-primary rounded">
+                  {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}
+                </kbd>
+                <kbd className="px-1.5 py-0.5 text-xs bg-bg-paper border border-border-primary rounded">
+                  K
+                </kbd>
+              </div>
+            </button>
+          </div>
+        )}
 
-        <main className="min-h-[calc(100vh-60px)] p-6">
+        {/* 主内容区域 - 独立的滚动容器，滚动条只在这个区域内 */}
+        <main className="flex-1 p-6 overflow-y-auto custom-scrollbar">
           <Outlet />
         </main>
       </div>

@@ -52,11 +52,12 @@ export class OllamaAdapter extends BaseAIAdapter {
     
     this.client = axios.create({
       baseURL: config.apiUrl,
-      timeout: config.timeout || 60000,
+      timeout: config.timeout || 120000, // 默认2分钟超时
       headers: {
         'Content-Type': 'application/json',
         ...config.customHeaders
-      }
+      },
+      proxy: false // 禁用代理，避免本地连接问题
     })
 
     // 初始化时检测可用模型并选择最佳模型
@@ -164,26 +165,31 @@ export class OllamaAdapter extends BaseAIAdapter {
   private async checkModelAvailability(): Promise<void> {
     try {
       // 检查Ollama服务是否运行
-      await this.client.get('/api/tags')
+      const response = await this.client.get('/api/tags')
       
-      // 检查指定模型是否可用
-      const model = this.getModelVersion()
-      const testResponse = await this.client.post('/api/generate', {
-        model,
-        prompt: 'Hello',
-        stream: false,
-        options: {
-          num_predict: 1
-        }
-      })
+      // 检查指定模型是否在模型列表中
+      const models = response.data?.models || []
+      const targetModel = this.getModelVersion()
+      const modelExists = models.some((model: any) => 
+        model.name === targetModel || model.model === targetModel
+      )
 
-      this.isModelAvailable = true
-      this.lastHealthCheck = Date.now()
+      if (modelExists) {
+        this.isModelAvailable = true
+        logger.info('Ollama模型可用性检查成功', { 
+          model: targetModel, 
+          available: true 
+        })
+      } else {
+        this.isModelAvailable = false
+        logger.warn('Ollama模型不存在', { 
+          model: targetModel,
+          availableModels: models.map((m: any) => m.name || m.model),
+          available: false
+        })
+      }
       
-      logger.info('Ollama模型可用性检查成功', { 
-        model, 
-        available: true 
-      })
+      this.lastHealthCheck = Date.now()
     } catch (error) {
       this.isModelAvailable = false
       this.lastHealthCheck = Date.now()

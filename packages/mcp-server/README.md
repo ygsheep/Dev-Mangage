@@ -5,18 +5,21 @@ Model Context Protocol (MCP) 服务器，为 DevAPI Manager 提供强大的向�
 ## 🎯 核心功能
 
 ### ✨ 向量语义搜索
+
 - **深度学习模型**: all-MiniLM-L6-v2 (Q4F16量化，28.6MB)
 - **向量维度**: 384维语义向量表示
 - **智能回退**: 网络问题时自动使用TF-IDF算法
 - **本地缓存**: 模型文件本地缓存，减少网络依赖
 
 ### 🔍 搜索算法
+
 - **向量搜索**: 基于余弦相似度的语义匹配
 - **TF-IDF回退**: 专为API搜索优化的关键词匹配
 - **混合搜索**: 结合向量语义和模糊匹配
 - **RAG增强**: 智能上下文分析和API推荐
 
 ### 🛠️ MCP工具集 (12个)
+
 1. `search_projects` - 项目搜索
 2. `search_apis` - API接口搜索
 3. `search_tags` - 标签搜索
@@ -31,6 +34,7 @@ Model Context Protocol (MCP) 服务器，为 DevAPI Manager 提供强大的向�
 12. `build_vector_index` - 构建向量索引
 
 ### 📊 数据持久化
+
 - **Prisma ORM**: 类型安全的数据库操作
 - **SQLite**: 轻量级本地数据库
 - **索引缓存**: 搜索索引内存缓存
@@ -39,16 +43,19 @@ Model Context Protocol (MCP) 服务器，为 DevAPI Manager 提供强大的向�
 ## 🚀 快速开始
 
 ### 安装依赖
+
 ```bash
 npm install
 ```
 
 ### 构建项目
+
 ```bash
 npm run build
 ```
 
 ### 运行服务器
+
 ```bash
 # 开发模式
 npm run dev
@@ -58,6 +65,7 @@ npm start
 ```
 
 ### 数据库操作
+
 ```bash
 # 生成Prisma客户端
 npm run db:generate
@@ -93,12 +101,13 @@ packages/mcp-server/
 ## 🔧 配置说明
 
 ### 环境变量
+
 ```bash
 # 数据库URL
 DATABASE_URL="file:./dev.db"
 
 # 服务端口
-PORT=3001
+PORT=3000
 
 # 向量搜索配置
 VECTOR_SEARCH_THRESHOLD=0.3
@@ -110,18 +119,20 @@ HTTPS_PROXY=https://proxy:port
 ```
 
 ### 向量模型配置
+
 ```typescript
 // 支持的模型列表
 const modelOptions = [
-  'Xenova/all-MiniLM-L6-v2',    // 首选：轻量英文模型
+  'Xenova/all-MiniLM-L6-v2', // 首选：轻量英文模型
   'Xenova/multilingual-e5-small', // 备选：多语言支持
-  'Xenova/all-MiniLM-L12-v2'    // 备选：更强理解能力
+  'Xenova/all-MiniLM-L12-v2', // 备选：更强理解能力
 ]
 ```
 
 ## 🎯 使用示例
 
 ### 基础搜索
+
 ```javascript
 // 向量语义搜索
 const results = await mcpServer.request({
@@ -131,9 +142,9 @@ const results = await mcpServer.request({
     arguments: {
       query: '用户登录API',
       limit: 5,
-      threshold: 0.3
-    }
-  }
+      threshold: 0.3,
+    },
+  },
 })
 
 // 混合搜索
@@ -145,13 +156,14 @@ const hybridResults = await mcpServer.request({
       query: 'GET /api/users',
       limit: 10,
       vectorWeight: 0.6,
-      fuzzyWeight: 0.4
-    }
-  }
+      fuzzyWeight: 0.4,
+    },
+  },
 })
 ```
 
 ### RAG增强搜索
+
 ```javascript
 // RAG增强API搜索
 const ragResults = await mcpServer.request({
@@ -161,9 +173,9 @@ const ragResults = await mcpServer.request({
     arguments: {
       query: '需要用户认证的接口',
       includeContext: true,
-      maxResults: 8
-    }
-  }
+      maxResults: 8,
+    },
+  },
 })
 
 // 获取API推荐
@@ -173,27 +185,30 @@ const recommendations = await mcpServer.request({
     name: 'get_api_recommendations',
     arguments: {
       baseApi: 'POST /api/users',
-      count: 5
-    }
-  }
+      count: 5,
+    },
+  },
 })
 ```
 
 ## 📊 性能指标
 
 ### 向量模型性能
+
 - **模型大小**: 28.6MB (Q4F16量化)
 - **向量维度**: 384
 - **推理速度**: <50ms
 - **内存使用**: ~100MB
 
 ### TF-IDF回退性能
+
 - **算法复杂度**: O(n×m)
 - **响应时间**: <10ms
 - **内存使用**: ~2MB
 - **准确率**: 85%+ (API搜索场景)
 
 ### 搜索性能
+
 - **索引大小**: ~1MB (1000个API)
 - **搜索延迟**: <100ms
 - **并发支持**: 100+ QPS
@@ -202,12 +217,14 @@ const recommendations = await mcpServer.request({
 ## 🛡️ 可靠性设计
 
 ### 智能回退机制
+
 1. **优先级顺序**: 本地模型 → 在线模型 → TF-IDF回退
 2. **故障检测**: 自动检测网络和模型加载失败
 3. **无缝切换**: 用户无感知的算法降级
 4. **状态监控**: 实时监控服务状态和性能
 
 ### 错误处理
+
 - **网络超时**: 自动重试和降级
 - **模型加载失败**: 智能回退到TF-IDF
 - **数据库错误**: 优雅降级和错误日志
@@ -216,6 +233,7 @@ const recommendations = await mcpServer.request({
 ## 🧪 测试和调试
 
 ### 运行测试
+
 ```bash
 # 测试向量模型加载
 node test-local-model.js
@@ -228,6 +246,7 @@ node import-local-models.js
 ```
 
 ### 调试工具
+
 ```bash
 # 启用调试日志
 DEBUG=mcp-server:* npm start
@@ -236,17 +255,19 @@ DEBUG=mcp-server:* npm start
 NODE_ENV=development npm start
 
 # 检查服务状态
-curl http://localhost:3001/health
+curl http://localhost:3000/health
 ```
 
 ## 📈 监控和运维
 
 ### 健康检查
+
 - **HTTP接口**: `GET /health`
 - **服务状态**: 运行时间、内存使用、请求计数
 - **搜索指标**: 响应时间、错误率、缓存命中率
 
 ### 日志系统
+
 - **结构化日志**: JSON格式，便于分析
 - **日志级别**: DEBUG, INFO, WARN, ERROR
 - **日志轮转**: 自动清理过期日志
@@ -257,6 +278,7 @@ curl http://localhost:3001/health
 ### 与 Trae AI 集成
 
 #### 标准 stdio 连接（推荐）
+
 ```json
 {
   "mcpServers": {
@@ -266,7 +288,7 @@ curl http://localhost:3001/health
       "env": {
         "NODE_ENV": "production",
         "DATABASE_URL": "file:d:\\Code\\Dev-Mangage\\packages\\backend\\prisma\\dev.db",
-        "PORT": "3001"
+        "PORT": "3000"
       }
     }
   }
@@ -274,6 +296,7 @@ curl http://localhost:3001/health
 ```
 
 #### HTTP 连接方式
+
 ```json
 {
   "mcpServers": {
@@ -291,6 +314,7 @@ curl http://localhost:3001/health
 ### 与 Claude Desktop 集成
 
 #### 开发环境配置
+
 ```json
 {
   "mcpServers": {
@@ -300,7 +324,7 @@ curl http://localhost:3001/health
       "env": {
         "NODE_ENV": "development",
         "DATABASE_URL": "file:./packages/backend/prisma/dev.db",
-        "PORT": "3001"
+        "PORT": "3000"
       }
     }
   }
@@ -308,6 +332,7 @@ curl http://localhost:3001/health
 ```
 
 #### 生产环境配置
+
 ```json
 {
   "mcpServers": {
@@ -324,21 +349,20 @@ curl http://localhost:3001/health
 ```
 
 #### HTTP 连接配置
+
 ```json
 {
   "mcpServers": {
     "devapi-manager-http": {
       "command": "curl",
-      "args": [
-        "-X", "GET",
-        "http://localhost:3320/mcp/tools"
-      ]
+      "args": ["-X", "GET", "http://localhost:3320/mcp/tools"]
     }
   }
 }
 ```
 
 ### 与DevAPI Manager集成
+
 ```typescript
 // 前端调用示例
 import { mcpServerAPI } from '@/api/mcpServer'
@@ -351,6 +375,7 @@ const results = await mcpServerAPI.search('用户API', 10, 0.3)
 ```
 
 ### 与其他系统集成
+
 ```javascript
 // HTTP API调用
 const response = await fetch('http://localhost:3320/mcp/tools/vector_search', {
@@ -360,9 +385,9 @@ const response = await fetch('http://localhost:3320/mcp/tools/vector_search', {
     arguments: {
       query: 'user authentication',
       limit: 5,
-      threshold: 0.3
-    }
-  })
+      threshold: 0.3,
+    },
+  }),
 })
 ```
 

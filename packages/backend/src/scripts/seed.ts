@@ -9,7 +9,7 @@ async function main() {
   try {
     // Clean existing data
     await prisma.aPITag.deleteMany()
-    await prisma.aPI.deleteMany()
+    await prisma.aPIEndpoint.deleteMany()
     await prisma.tag.deleteMany()
     await prisma.project.deleteMany()
 
@@ -85,7 +85,7 @@ async function main() {
 
     // Create sample APIs for project 1
     const apis1 = await Promise.all([
-      prisma.aPI.create({
+      prisma.aPIEndpoint.create({
         data: {
           name: '获取项目列表',
           method: HTTPMethod.GET,
@@ -107,7 +107,7 @@ router.get('/projects', async (req, res) => {
 })`,
         },
       }),
-      prisma.aPI.create({
+      prisma.aPIEndpoint.create({
         data: {
           name: '创建新项目',
           method: HTTPMethod.POST,
@@ -117,7 +117,7 @@ router.get('/projects', async (req, res) => {
           projectId: project1.id,
         },
       }),
-      prisma.aPI.create({
+      prisma.aPIEndpoint.create({
         data: {
           name: '获取API列表',
           method: HTTPMethod.GET,
@@ -131,7 +131,7 @@ router.get('/projects', async (req, res) => {
 
     // Create sample APIs for project 2
     const apis2 = await Promise.all([
-      prisma.aPI.create({
+      prisma.aPIEndpoint.create({
         data: {
           name: '获取商品列表',
           method: HTTPMethod.GET,
@@ -141,7 +141,7 @@ router.get('/projects', async (req, res) => {
           projectId: project2.id,
         },
       }),
-      prisma.aPI.create({
+      prisma.aPIEndpoint.create({
         data: {
           name: '创建订单',
           method: HTTPMethod.POST,
@@ -151,7 +151,7 @@ router.get('/projects', async (req, res) => {
           projectId: project2.id,
         },
       }),
-      prisma.aPI.create({
+      prisma.aPIEndpoint.create({
         data: {
           name: '处理支付',
           method: HTTPMethod.POST,
@@ -169,24 +169,24 @@ router.get('/projects', async (req, res) => {
     await Promise.all([
       // Project 1 API tags
       prisma.aPITag.create({
-        data: { apiId: apis1[0].id, tagId: tags1[1].id }, // 获取项目列表 -> 项目管理
+        data: { endpointId: apis1[0].id, tagId: tags1[1].id }, // 获取项目列表 -> 项目管理
       }),
       prisma.aPITag.create({
-        data: { apiId: apis1[1].id, tagId: tags1[1].id }, // 创建新项目 -> 项目管理
+        data: { endpointId: apis1[1].id, tagId: tags1[1].id }, // 创建新项目 -> 项目管理
       }),
       prisma.aPITag.create({
-        data: { apiId: apis1[2].id, tagId: tags1[2].id }, // 获取API列表 -> API管理
+        data: { endpointId: apis1[2].id, tagId: tags1[2].id }, // 获取API列表 -> API管理
       }),
 
       // Project 2 API tags
       prisma.aPITag.create({
-        data: { apiId: apis2[0].id, tagId: tags2[0].id }, // 获取商品列表 -> 商品管理
+        data: { endpointId: apis2[0].id, tagId: tags2[0].id }, // 获取商品列表 -> 商品管理
       }),
       prisma.aPITag.create({
-        data: { apiId: apis2[1].id, tagId: tags2[1].id }, // 创建订单 -> 订单管理
+        data: { endpointId: apis2[1].id, tagId: tags2[1].id }, // 创建订单 -> 订单管理
       }),
       prisma.aPITag.create({
-        data: { apiId: apis2[2].id, tagId: tags2[2].id }, // 处理支付 -> 支付系统
+        data: { endpointId: apis2[2].id, tagId: tags2[2].id }, // 处理支付 -> 支付系统
       }),
     ])
 
@@ -194,7 +194,7 @@ router.get('/projects', async (req, res) => {
 
     // Print summary
     const totalProjects = await prisma.project.count()
-    const totalAPIs = await prisma.aPI.count()
+    const totalAPIs = await prisma.aPIEndpoint.count()
     const totalTags = await prisma.tag.count()
 
     console.log('\n📊 Seed completed successfully!')

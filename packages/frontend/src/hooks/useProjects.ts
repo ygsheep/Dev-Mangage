@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
+import { getBackendBaseUrl } from '../config/env';
+
+// 获取后端基础URL
+const API_BASE_URL = getBackendBaseUrl();
 
 interface Project {
   id: string;
@@ -30,13 +34,14 @@ export const useProjects = (): UseProjectsReturn => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/v1/projects', {
+      const response = await fetch(`${API_BASE_URL}/projects`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +55,7 @@ export const useProjects = (): UseProjectsReturn => {
       const result = await response.json();
 
       if (result.success) {
-        setProjects(result.data || []);
+        setProjects(result.data.projects || []);
       } else {
         throw new Error(result.message || '获取项目列表失败');
       }
@@ -61,11 +66,11 @@ export const useProjects = (): UseProjectsReturn => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [refreshTrigger]);
 
   const createProject = useCallback(async (data: any): Promise<Project> => {
     try {
-      const response = await fetch('/api/v1/projects', {
+      const response = await fetch(`${API_BASE_URL}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +85,7 @@ export const useProjects = (): UseProjectsReturn => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchProjects(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || '项目创建成功');
         return result.data;
       } else {
@@ -91,11 +96,11 @@ export const useProjects = (): UseProjectsReturn => {
       toast.error(error.message || '创建项目失败');
       throw error;
     }
-  }, [fetchProjects]);
+  }, []);
 
   const updateProject = useCallback(async (id: string, data: any): Promise<Project> => {
     try {
-      const response = await fetch(`/api/v1/projects/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +115,7 @@ export const useProjects = (): UseProjectsReturn => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchProjects(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || '项目更新成功');
         return result.data;
       } else {
@@ -121,11 +126,11 @@ export const useProjects = (): UseProjectsReturn => {
       toast.error(error.message || '更新项目失败');
       throw error;
     }
-  }, [fetchProjects]);
+  }, []);
 
   const deleteProject = useCallback(async (id: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/v1/projects/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +144,7 @@ export const useProjects = (): UseProjectsReturn => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchProjects(); // 重新获取列表
+        setRefreshTrigger(prev => prev + 1); // 触发重新获取列表
         toast.success(result.message || '项目删除成功');
       } else {
         throw new Error(result.message || '删除项目失败');
@@ -149,11 +154,11 @@ export const useProjects = (): UseProjectsReturn => {
       toast.error(error.message || '删除项目失败');
       throw error;
     }
-  }, [fetchProjects]);
+  }, []);
 
   useEffect(() => {
     fetchProjects();
-  }, [fetchProjects]);
+  }, []);
 
   return {
     projects,

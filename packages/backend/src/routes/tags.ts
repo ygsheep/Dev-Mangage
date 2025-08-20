@@ -48,7 +48,7 @@ router.get(
             select: { id: true, name: true },
           },
           _count: {
-            select: { apiTags: true },
+            select: { endpointTags: true },
           },
         },
         orderBy: { name: 'asc' },
@@ -86,7 +86,7 @@ router.get(
         project: {
           select: { id: true, name: true, description: true },
         },
-        apiTags: {
+        endpointTags: {
           include: {
             api: {
               select: { id: true, name: true, method: true, path: true, status: true },
@@ -94,7 +94,7 @@ router.get(
           },
         },
         _count: {
-          select: { apiTags: true },
+          select: { endpointTags: true },
         },
       },
     })
@@ -133,7 +133,7 @@ router.post(
           select: { id: true, name: true },
         },
         _count: {
-          select: { apiTags: true },
+          select: { endpointTags: true },
         },
       },
     })
@@ -162,7 +162,7 @@ router.put(
           select: { id: true, name: true },
         },
         _count: {
-          select: { apiTags: true },
+          select: { endpointTags: true },
         },
       },
     })
@@ -209,7 +209,7 @@ router.get(
       where: { projectId },
       include: {
         _count: {
-          select: { apiTags: true },
+          select: { endpointTags: true },
         },
       },
       orderBy: { name: 'asc' },
@@ -237,11 +237,11 @@ router.get(
           select: { id: true, name: true },
         },
         _count: {
-          select: { apiTags: true },
+          select: { endpointTags: true },
         },
       },
       orderBy: {
-        apiTags: {
+        endpointTags: {
           _count: 'desc',
         },
       },
@@ -289,7 +289,7 @@ router.post(
               select: { id: true, name: true },
             },
             _count: {
-              select: { apiTags: true },
+              select: { endpointTags: true },
             },
           },
         })

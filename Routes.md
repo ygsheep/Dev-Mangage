@@ -165,6 +165,38 @@ POST   /api/v1/database/tables/:id/indexes # 创建索引
 DELETE /api/v1/database/indexes/:id        # 删除索引
 ```
 
+### Issue管理API
+
+#### Issue基础操作
+```
+GET    /api/v1/:projectId/issues                    # 获取项目的Issues列表
+POST   /api/v1/:projectId/issues                    # 创建新Issue
+GET    /api/v1/:projectId/issues/stats              # 获取Issue统计信息
+GET    /api/v1/:projectId/issues/:issueId           # 获取Issue详情
+PUT    /api/v1/:projectId/issues/:issueId           # 更新Issue
+DELETE /api/v1/:projectId/issues/:issueId           # 删除Issue
+```
+
+#### Issue关联管理API
+```
+GET    /api/v1/:projectId/issues/:issueId/relations/available    # 获取可关联的资源
+GET    /api/v1/:projectId/issues/:issueId/relations              # 获取Issue的所有关联关系
+
+POST   /api/v1/:projectId/issues/:issueId/relations/api          # 创建Issue与API的关联
+POST   /api/v1/:projectId/issues/:issueId/relations/table        # 创建Issue与数据表的关联  
+POST   /api/v1/:projectId/issues/:issueId/relations/feature      # 创建Issue与功能模块的关联
+
+DELETE /api/v1/:projectId/issues/:issueId/relations/api/:relationId      # 删除API关联
+DELETE /api/v1/:projectId/issues/:issueId/relations/table/:relationId    # 删除数据表关联
+DELETE /api/v1/:projectId/issues/:issueId/relations/feature/:relationId  # 删除功能模块关联
+```
+
+#### Issue关联参数说明
+- API关联参数：`{ apiId?, endpointId?, relationType, description? }`
+- 数据表关联参数：`{ tableId, relationType, description? }`
+- 功能模块关联参数：`{ featureName, component?, relationType, description? }`
+- 关联类型：`RELATES_TO | DEPENDS_ON | BLOCKS | IMPLEMENTS | TESTS`
+
 ### MCP搜索API
 
 #### 搜索服务
@@ -268,6 +300,18 @@ POST   /api/v1/config/reset                # 重置配置为默认值
 /database/migration                        # 数据迁移管理
 ```
 
+#### Issue管理页面
+```
+/issues                                    # Issue列表页面
+/issues/:id                                # Issue详情页面
+/issues/:id/edit                           # 编辑Issue页面
+/issues/new                                # 创建新Issue页面
+/projects/:projectId/issues                # 项目下的Issue列表
+/projects/:projectId/issues/new            # 在项目下创建Issue
+/projects/:projectId/issues/:id            # 项目Issue详情
+/projects/:projectId/issues/:id/relations  # Issue关联管理页面
+```
+
 #### 搜索相关页面
 ```
 /search                                    # 全局搜索页面
@@ -307,6 +351,8 @@ POST   /api/v1/config/reset                # 重置配置为默认值
 - `:apiId` - API端点ID参数
 - `:tagId` - 标签ID参数
 - `:jobId` - 批量作业ID参数
+- `:issueId` - Issue ID参数
+- `:relationId` - 关联关系ID参数
 
 ### 查询参数
 
@@ -322,6 +368,9 @@ POST   /api/v1/config/reset                # 重置配置为默认值
 ?filter[status]=active                    # 状态过滤
 ?filter[method]=GET                       # HTTP方法过滤
 ?filter[project]=uuid                     # 项目过滤
+?filter[priority]=HIGH                    # Issue优先级过滤
+?filter[issueType]=BUG                    # Issue类型过滤
+?filter[assignee]=userId                  # Issue分配人过滤
 ?sort=created_at&order=desc               # 排序参数
 ```
 

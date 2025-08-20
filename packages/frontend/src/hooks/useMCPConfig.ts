@@ -3,8 +3,8 @@
  * 提供在 React 组件中使用 MCP 配置的便捷方法
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { mcpConfig, getMCPUrls, type MCPConfigType } from '../config/mcpConfig'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { getMCPUrls, mcpConfig } from '../config/mcpConfig'
 
 /**
  * MCP 配置状态接口
@@ -26,7 +26,7 @@ export const useMCPConfig = () => {
     config: mcpConfig.getCurrentConfig(),
     urls: getMCPUrls(),
     validation: mcpConfig.validateConfig(),
-    isValid: mcpConfig.validateConfig().isValid
+    isValid: mcpConfig.validateConfig().isValid,
   }))
 
   /**
@@ -36,12 +36,12 @@ export const useMCPConfig = () => {
     const config = mcpConfig.getCurrentConfig()
     const urls = getMCPUrls()
     const validation = mcpConfig.validateConfig()
-    
+
     setConfigState({
       config,
       urls,
       validation,
-      isValid: validation.isValid
+      isValid: validation.isValid,
     })
   }, [])
 
@@ -49,10 +49,13 @@ export const useMCPConfig = () => {
    * 更新配置
    * @param newConfig 新的配置项
    */
-  const updateConfig = useCallback((newConfig: Partial<ReturnType<typeof mcpConfig.getCurrentConfig>>) => {
-    mcpConfig.updateConfig(newConfig)
-    updateConfigState()
-  }, [updateConfigState])
+  const updateConfig = useCallback(
+    (newConfig: Partial<ReturnType<typeof mcpConfig.getCurrentConfig>>) => {
+      mcpConfig.updateConfig(newConfig)
+      updateConfigState()
+    },
+    [updateConfigState]
+  )
 
   /**
    * 重置为默认配置
@@ -70,7 +73,7 @@ export const useMCPConfig = () => {
     setConfigState(prev => ({
       ...prev,
       validation,
-      isValid: validation.isValid
+      isValid: validation.isValid,
     }))
     return validation
   }, [])
@@ -101,15 +104,15 @@ export const useMCPConfig = () => {
   const getEnvironmentSuggestions = useMemo(() => {
     const isDev = import.meta.env.DEV
     const isProd = import.meta.env.PROD
-    
+
     if (isDev) {
       return {
         environment: 'development',
         suggestions: [
           '开发环境建议使用 localhost',
-          '确保后端服务器在端口 3001 运行',
-          '确保 MCP HTTP 服务器在端口 3321 运行'
-        ]
+          '确保后端服务器在端口 3000 运行',
+          '确保 MCP HTTP 服务器在端口 3321 运行',
+        ],
       }
     } else if (isProd) {
       return {
@@ -117,14 +120,14 @@ export const useMCPConfig = () => {
         suggestions: [
           '生产环境建议使用域名或 IP 地址',
           '确保配置了正确的 CORS 策略',
-          '建议启用 HTTPS'
-        ]
+          '建议启用 HTTPS',
+        ],
       }
     }
-    
+
     return {
       environment: 'unknown',
-      suggestions: ['请检查环境配置']
+      suggestions: ['请检查环境配置'],
     }
   }, [])
 
@@ -149,16 +152,16 @@ export const useMCPConfig = () => {
     validation: configState.validation,
     isValid: configState.isValid,
     environmentSuggestions: getEnvironmentSuggestions,
-    
+
     // 操作方法
     updateConfig,
     resetToDefault,
     validateConfig,
     getToolUrl,
     testConnection,
-    
+
     // 便捷方法
-    refresh: updateConfigState
+    refresh: updateConfigState,
   }
 }
 
@@ -168,20 +171,20 @@ export const useMCPConfig = () => {
  */
 export const useMCPUrls = () => {
   const [urls, setUrls] = useState(() => getMCPUrls())
-  
+
   const refresh = useCallback(() => {
     setUrls(getMCPUrls())
   }, [])
-  
+
   useEffect(() => {
     // 暂时禁用配置变化监听
     // const interval = setInterval(refresh, 60000)
     // return () => clearInterval(interval)
   }, [])
-  
+
   return {
     urls,
-    refresh
+    refresh,
   }
 }
 
@@ -193,20 +196,20 @@ export const useMCPConnection = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null)
   const [lastChecked, setLastChecked] = useState<Date | null>(null)
   const [isChecking, setIsChecking] = useState(false)
-  
+
   const checkConnection = useCallback(async () => {
     if (isChecking) return
-    
+
     setIsChecking(true)
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 5000)
-      
+
       const response = await fetch(mcpConfig.getMCPPingUrl(), {
         method: 'GET',
-        signal: controller.signal
+        signal: controller.signal,
       })
-      
+
       clearTimeout(timeoutId)
       const connected = response.ok
       setIsConnected(connected)
@@ -223,21 +226,21 @@ export const useMCPConnection = () => {
       setIsChecking(false)
     }
   }, [isChecking])
-  
+
   // 自动检查连接状态 (暂时禁用避免无限循环)
   useEffect(() => {
     checkConnection() // 只执行一次初始检查
-    
+
     // 暂时禁用定时器
     // const interval = setInterval(checkConnection, 60000)
     // return () => clearInterval(interval)
   }, []) // 移除checkConnection依赖，避免无限循环
-  
+
   return {
     isConnected,
     lastChecked,
     isChecking,
-    checkConnection
+    checkConnection,
   }
 }
 
@@ -250,18 +253,21 @@ export const useMCPConfigForm = () => {
   const [formData, setFormData] = useState(config)
   const [isDirty, setIsDirty] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  
+
   /**
    * 更新表单数据
    */
-  const updateFormData = useCallback((field: string, value: string) => {
-    setFormData(prev => {
-      const newData = { ...prev, [field]: value }
-      setIsDirty(JSON.stringify(newData) !== JSON.stringify(config))
-      return newData
-    })
-  }, [config])
-  
+  const updateFormData = useCallback(
+    (field: string, value: string) => {
+      setFormData(prev => {
+        const newData = { ...prev, [field]: value }
+        setIsDirty(JSON.stringify(newData) !== JSON.stringify(config))
+        return newData
+      })
+    },
+    [config]
+  )
+
   /**
    * 验证表单
    */
@@ -271,11 +277,11 @@ export const useMCPConfigForm = () => {
     mcpConfig.updateConfig(formData)
     const validation = mcpConfig.validateConfig()
     mcpConfig.updateConfig(originalConfig) // 恢复原配置
-    
+
     setErrors(validation.errors)
     return validation.isValid
   }, [formData])
-  
+
   /**
    * 提交表单
    */
@@ -287,7 +293,7 @@ export const useMCPConfigForm = () => {
     }
     return false
   }, [formData, updateConfig, validateForm])
-  
+
   /**
    * 重置表单
    */
@@ -296,7 +302,7 @@ export const useMCPConfigForm = () => {
     setIsDirty(false)
     setErrors([])
   }, [config])
-  
+
   /**
    * 重置为默认值
    */
@@ -306,25 +312,25 @@ export const useMCPConfigForm = () => {
     setIsDirty(false)
     setErrors([])
   }, [resetToDefault])
-  
+
   // 同步配置变化
   useEffect(() => {
     if (!isDirty) {
       setFormData(config)
     }
   }, [config, isDirty])
-  
+
   return {
     formData,
     isDirty,
     errors,
     isValid: errors.length === 0,
-    
+
     updateFormData,
     validateForm,
     submitForm,
     resetForm,
-    resetToDefaultForm
+    resetToDefaultForm,
   }
 }
 

@@ -36,11 +36,11 @@ npm run start:http
 ### 配置端口
 
 ```bash
-# 默认端口 3001
-export HTTP_MCP_PORT=3001
+# 默认端口 3000
+export HTTP_MCP_PORT=3000
 
 # 或在 .env 文件中设置
-HTTP_MCP_PORT=3001
+HTTP_MCP_PORT=3000
 ```
 
 ## 📖 API 使用指南
@@ -48,7 +48,7 @@ HTTP_MCP_PORT=3001
 ### 健康检查
 
 ```bash
-curl http://localhost:3001/health
+curl http://localhost:3000/health
 ```
 
 **响应:**
@@ -65,7 +65,7 @@ curl http://localhost:3001/health
 ### 获取工具列表
 
 ```bash
-curl http://localhost:3001/mcp/tools
+curl http://localhost:3000/mcp/tools
 ```
 
 **响应:**
@@ -98,7 +98,7 @@ curl http://localhost:3001/mcp/tools
 #### 1. 项目搜索
 
 ```bash
-curl -X POST http://localhost:3001/mcp/tools/search_projects \
+curl -X POST http://localhost:3000/mcp/tools/search_projects \
   -H "Content-Type: application/json" \
   -d '{"arguments": {"query": "API管理", "limit": 5}}'
 ```
@@ -106,7 +106,7 @@ curl -X POST http://localhost:3001/mcp/tools/search_projects \
 #### 2. API 搜索
 
 ```bash
-curl -X POST http://localhost:3001/mcp/tools/search_apis \
+curl -X POST http://localhost:3000/mcp/tools/search_apis \
   -H "Content-Type: application/json" \
   -d '{"arguments": {"query": "用户登录", "method": "POST", "limit": 10}}'
 ```
@@ -114,7 +114,7 @@ curl -X POST http://localhost:3001/mcp/tools/search_apis \
 #### 3. 全局搜索
 
 ```bash
-curl -X POST http://localhost:3001/mcp/tools/global_search \
+curl -X POST http://localhost:3000/mcp/tools/global_search \
   -H "Content-Type: application/json" \
   -d '{"arguments": {"query": "用户", "types": ["projects", "apis"], "limit": 10}}'
 ```
@@ -122,7 +122,7 @@ curl -X POST http://localhost:3001/mcp/tools/global_search \
 #### 4. 向量搜索
 
 ```bash
-curl -X POST http://localhost:3001/mcp/tools/vector_search \
+curl -X POST http://localhost:3000/mcp/tools/vector_search \
   -H "Content-Type: application/json" \
   -d '{"arguments": {"query": "用户认证", "limit": 5, "threshold": 0.3}}'
 ```
@@ -130,7 +130,7 @@ curl -X POST http://localhost:3001/mcp/tools/vector_search \
 #### 5. 混合搜索
 
 ```bash
-curl -X POST http://localhost:3001/mcp/tools/hybrid_search \
+curl -X POST http://localhost:3000/mcp/tools/hybrid_search \
   -H "Content-Type: application/json" \
   -d '{"arguments": {"query": "API接口", "vectorWeight": 0.7, "fuzzyWeight": 0.3, "limit": 10}}'
 ```
@@ -138,7 +138,7 @@ curl -X POST http://localhost:3001/mcp/tools/hybrid_search \
 #### 6. RAG 增强搜索
 
 ```bash
-curl -X POST http://localhost:3001/mcp/tools/rag_search_apis \
+curl -X POST http://localhost:3000/mcp/tools/rag_search_apis \
   -H "Content-Type: application/json" \
   -d '{"arguments": {"query": "用户管理", "includeRelated": true, "limit": 5}}'
 ```
@@ -150,67 +150,59 @@ curl -X POST http://localhost:3001/mcp/tools/rag_search_apis \
 ```typescript
 // MCP HTTP 客户端类
 class MCPHTTPClient {
-  private baseUrl: string;
+  private baseUrl: string
 
-  constructor(baseUrl: string = "http://localhost:3001") {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl: string = 'http://localhost:3000') {
+    this.baseUrl = baseUrl
   }
 
   async callTool(toolName: string, args: any) {
     const response = await fetch(`${this.baseUrl}/mcp/tools/${toolName}`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ arguments: args }),
-    });
+    })
 
     if (!response.ok) {
-      throw new Error(`Tool call failed: ${response.statusText}`);
+      throw new Error(`Tool call failed: ${response.statusText}`)
     }
 
-    return response.json();
+    return response.json()
   }
 
   async searchProjects(query: string, limit: number = 10) {
-    return this.callTool("search_projects", { query, limit });
+    return this.callTool('search_projects', { query, limit })
   }
 
   async searchAPIs(query: string, method?: string, limit: number = 10) {
-    return this.callTool("search_apis", { query, method, limit });
+    return this.callTool('search_apis', { query, method, limit })
   }
 
-  async globalSearch(
-    query: string,
-    types: string[] = ["projects", "apis"],
-    limit: number = 10
-  ) {
-    return this.callTool("global_search", { query, types, limit });
+  async globalSearch(query: string, types: string[] = ['projects', 'apis'], limit: number = 10) {
+    return this.callTool('global_search', { query, types, limit })
   }
 
-  async vectorSearch(
-    query: string,
-    limit: number = 10,
-    threshold: number = 0.3
-  ) {
-    return this.callTool("vector_search", { query, limit, threshold });
+  async vectorSearch(query: string, limit: number = 10, threshold: number = 0.3) {
+    return this.callTool('vector_search', { query, limit, threshold })
   }
 }
 
 // 使用示例
-const client = new MCPHTTPClient();
+const client = new MCPHTTPClient()
 
 // 搜索项目
-const projects = await client.searchProjects("API管理");
-console.log(projects);
+const projects = await client.searchProjects('API管理')
+console.log(projects)
 
 // 搜索API
-const apis = await client.searchAPIs("用户登录", "POST");
-console.log(apis);
+const apis = await client.searchAPIs('用户登录', 'POST')
+console.log(apis)
 
 // 向量搜索
-const vectorResults = await client.vectorSearch("用户认证");
-console.log(vectorResults);
+const vectorResults = await client.vectorSearch('用户认证')
+console.log(vectorResults)
 ```
 
 ### React Hook
@@ -225,7 +217,7 @@ interface MCPSearchResult {
   }>;
 }
 
-export function useMCPSearch(baseUrl: string = 'http://localhost:3001') {
+export function useMCPSearch(baseUrl: string = 'http://localhost:3000') {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -304,7 +296,7 @@ import requests
 import json
 
 class MCPHTTPClient:
-    def __init__(self, base_url="http://localhost:3001"):
+    def __init__(self, base_url="http://localhost:3000"):
         self.base_url = base_url
 
     def call_tool(self, tool_name, args):
@@ -429,7 +421,7 @@ print(json.dumps(vector_results, indent=2, ensure_ascii=False))
 服务器默认允许以下来源：
 
 - `http://localhost:5173` (前端开发服务器)
-- `http://localhost:3001` (后端服务器)
+- `http://localhost:3000` (后端服务器)
 
 ### 生产环境
 

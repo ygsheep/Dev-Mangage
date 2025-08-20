@@ -433,7 +433,7 @@ const ERDiagramDesigner: React.FC<ERDiagramDesignerProps> = ({
             </div>
           </div>
           
-          <div className="p-4 max-h-96 overflow-y-auto">
+          <div className="p-4 max-h-96 overflow-y-auto scrollbar-thin">
             {(() => {
               const table = tables.find(t => t.id === selectedTable)
               if (!table) return null

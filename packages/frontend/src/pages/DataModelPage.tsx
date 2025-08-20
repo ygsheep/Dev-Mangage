@@ -439,7 +439,7 @@ const DataModelPage: React.FC = () => {
           </div>
           
           {/* 桌面端导航 */}
-          <nav className="hidden sm:flex space-x-8 overflow-x-auto">
+          <nav className="hidden sm:flex space-x-8 overflow-x-auto custom-scrollbar">
             {tabs.map((tab) => {
               const Icon = tab.icon
               return (

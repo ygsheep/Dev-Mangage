@@ -1,16 +1,7 @@
+import { DATA_MODEL_STATUS_COLORS, DatabaseFieldType, DatabaseTable } from '@shared/types'
+import { Copy, Database, Edit3, Eye, Key, MoreVertical, Trash2 } from 'lucide-react'
 import React, { memo } from 'react'
-import { Handle, Position, NodeProps } from 'reactflow'
-import {
-  Database,
-  Key,
-  Hash,
-  Edit3,
-  Trash2,
-  MoreVertical,
-  Eye,
-  Copy
-} from 'lucide-react'
-import { DatabaseTable, DatabaseFieldType, DATA_MODEL_STATUS_COLORS } from '@shared/types'
+import { Handle, NodeProps, Position } from 'reactflow'
 
 interface TableNodeData {
   table: DatabaseTable
@@ -52,7 +43,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
     if (type === 'BOOLEAN') {
       return 'text-purple-600'
     }
-    return 'text-gray-600'
+    return 'text-text-secondary'
   }
 
   const primaryKeys = table.fields?.filter(f => f.isPrimaryKey) || []
@@ -65,37 +56,37 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
       className={`bg-bg-paper rounded-lg shadow-lg border-2 transition-all duration-200 cursor-pointer min-w-[280px] max-w-[320px] ${
         selected || isSelected
           ? 'border-blue-500 shadow-xl'
-          : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
+          : 'border-gray-200 hover:border-gray-300 bg-bg-secondary hover:shadow-lg'
       }`}
     >
       {/* 表头 */}
       <div className="table-drag-handle bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 rounded-t-lg border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
-            <Database className="w-5 h-5 text-gray-600 flex-shrink-0" />
+            <Database className="w-5 h-5 text-text-secondary flex-shrink-0" />
             <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-gray-900 truncate text-sm">
+              <h3 className="font-semibold text-text-primary truncate text-sm">
                 {table.displayName || table.name}
               </h3>
-              <p className="text-xs text-gray-500 truncate">
-                {table.name}
-              </p>
+              <p className="text-xs text-gray-500 truncate">{table.name}</p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-1">
-            <span className={`px-2 py-1 rounded text-xs font-medium ${DATA_MODEL_STATUS_COLORS[table.status]}`}>
+            <span
+              className={`px-2 py-1 rounded text-xs font-medium ${DATA_MODEL_STATUS_COLORS[table.status]}`}
+            >
               {table.status === 'DRAFT' ? '草稿' : table.status === 'ACTIVE' ? '活跃' : '废弃'}
             </span>
-            
+
             <div className="relative group">
               <button className="p-1 hover:bg-gray-200 rounded">
                 <MoreVertical className="w-4 h-4 text-gray-500" />
               </button>
-              
+
               <div className="absolute right-0 top-full mt-1 bg-bg-paper rounded-lg shadow-lg border border-gray-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[120px]">
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     onEdit()
                   }}
@@ -105,7 +96,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
                   <span>编辑</span>
                 </button>
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     // TODO: 复制表结构
                   }}
@@ -115,7 +106,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
                   <span>复制</span>
                 </button>
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     // TODO: 查看详情
                   }}
@@ -126,7 +117,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
                 </button>
                 <hr className="my-1 border-gray-200" />
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     onDelete()
                   }}
@@ -139,7 +130,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
             </div>
           </div>
         </div>
-        
+
         {/* 表统计信息 */}
         <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
           <span>{table.fields?.length || 0} 字段</span>
@@ -149,55 +140,51 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
       </div>
 
       {/* 字段列表 */}
-      <div className="px-4 py-3 space-y-1 max-h-64 overflow-y-auto">
+      <div className="px-4 py-3 space-y-1 max-h-64 overflow-y-auto scrollbar-thin">
         {/* 主键字段 */}
-        {primaryKeys.map((field) => (
+        {primaryKeys.map(field => (
           <div key={field.id} className="flex items-center space-x-2 py-1">
             <Key className="w-3 h-3 text-yellow-500 flex-shrink-0" />
-            <span className="font-medium text-gray-900 text-sm flex-1 truncate">
+            <span className="font-medium text-text-primary text-sm flex-1 truncate">
               {field.name}
             </span>
             <span className={`text-xs ${getFieldTypeColor(field.type)}`}>
               {getFieldTypeIcon(field.type)}
             </span>
-            <span className="text-xs text-gray-500 w-12 text-right">
-              {field.type}
-            </span>
+            <span className="text-xs text-gray-500 w-12 text-right">{field.type}</span>
           </div>
         ))}
-        
+
         {/* 分隔线 */}
         {primaryKeys.length > 0 && regularFields.length > 0 && (
           <hr className="border-gray-200 my-2" />
         )}
-        
+
         {/* 普通字段 */}
-        {regularFields.map((field) => (
+        {regularFields.map(field => (
           <div key={field.id} className="flex items-center space-x-2 py-1">
             <div className="w-3 h-3 flex-shrink-0">
               {!field.nullable && (
                 <div className="w-2 h-2 bg-red-400 rounded-full" title="NOT NULL" />
               )}
             </div>
-            <span className="text-text-primary text-sm flex-1 truncate">
-              {field.name}
-            </span>
+            <span className="text-text-primary text-sm flex-1 truncate">{field.name}</span>
             <span className={`text-xs ${getFieldTypeColor(field.type)}`}>
               {getFieldTypeIcon(field.type)}
             </span>
-            <span className="text-xs text-gray-500 w-12 text-right">
-              {field.type}
-            </span>
+            <span className="text-xs text-gray-500 w-12 text-right">{field.type}</span>
           </div>
         ))}
-        
+
         {/* 更多字段指示器 */}
         {hasMoreFields && (
           <div className="flex items-center justify-center py-2 text-xs text-gray-500">
-            <span>+ {(table.fields?.length || 0) - primaryKeys.length - regularFields.length} 个字段</span>
+            <span>
+              + {(table.fields?.length || 0) - primaryKeys.length - regularFields.length} 个字段
+            </span>
           </div>
         )}
-        
+
         {/* 空状态 */}
         {(!table.fields || table.fields.length === 0) && (
           <div className="text-center py-4 text-gray-400">
@@ -210,9 +197,7 @@ const TableNode: React.FC<NodeProps<TableNodeData>> = ({ data, selected }) => {
       {/* 表说明 */}
       {table.comment && (
         <div className="px-4 py-2 border-t border-gray-100 bg-bg-secondary rounded-b-lg">
-          <p className="text-xs text-gray-600 line-clamp-2">
-            {table.comment}
-          </p>
+          <p className="text-xs text-text-secondary line-clamp-2">{table.comment}</p>
         </div>
       )}
 

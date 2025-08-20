@@ -8,17 +8,17 @@
 
 ### 默认端口分配
 
-| 服务 | 端口 | 用途 | 配置项 |
-|------|------|------|--------|
-| 后端API服务器 | 3001 | Express.js 服务器，包含 MCP HTTP 接口 | `VITE_BACKEND_PORT` |
-| 前端开发服务器 | 5173 | Vite 开发服务器 | Vite 默认 |
-| 独立MCP服务器 | 3004 | 开发环境的独立 MCP 服务器 | 独立配置 |
+| 服务           | 端口 | 用途                                  | 配置项              |
+| -------------- | ---- | ------------------------------------- | ------------------- |
+| 后端API服务器  | 3000 | Express.js 服务器，包含 MCP HTTP 接口 | `VITE_BACKEND_PORT` |
+| 前端开发服务器 | 5173 | Vite 开发服务器                       | Vite 默认           |
+| 独立MCP服务器  | 3000 | 开发环境的独立 MCP 服务器             | 独立配置            |
 
 ### 架构说明
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
-│  前端 (5173)    │───→│  后端 (3001)    │
+│  前端 (5173)    │───→│  后端 (3000)    │
 │                 │    │                 │
 │  - React App    │    │  - Express API  │
 │  - Vite Dev     │    │  - MCP HTTP     │
@@ -44,15 +44,15 @@
 ```bash
 # 后端服务器
 VITE_BACKEND_HOST=localhost
-VITE_BACKEND_PORT=3001
+VITE_BACKEND_PORT=3000
 
 # MCP HTTP 服务器（集成在后端中）
 VITE_MCP_HTTP_HOST=localhost
-VITE_MCP_HTTP_PORT=3001
+VITE_MCP_HTTP_PORT=3000
 
 # MCP WebSocket 服务器
 VITE_MCP_WS_HOST=localhost
-VITE_MCP_WS_PORT=3001
+VITE_MCP_WS_PORT=3000
 ```
 
 ### 2. 配置优先级
@@ -67,26 +67,29 @@ VITE_MCP_WS_PORT=3001
 import { ENV_CONFIG, getBackendBaseUrl } from '../config/env'
 
 // 获取后端URL
-const apiUrl = getBackendBaseUrl() // http://localhost:3001/api/v1
+const apiUrl = getBackendBaseUrl() // http://localhost:3000/api/v1
 
 // 获取端口
-const port = ENV_CONFIG.backend.port // 3001
+const port = ENV_CONFIG.backend.port // 3000
 ```
 
 ## 🔧 配置文件说明
 
 ### `src/config/env.ts`
+
 - 环境配置的核心文件
 - 定义默认端口和主机
 - 提供配置验证功能
 - 统一的 URL 生成器
 
 ### `src/config/mcpConfig.ts`
+
 - MCP 服务器专用配置
 - 继承自 `env.ts` 的基础配置
 - 提供 MCP 相关的 URL 生成方法
 
 ### `.env`
+
 - 本地环境变量配置
 - 覆盖默认设置
 - 不提交到版本控制
@@ -94,27 +97,31 @@ const port = ENV_CONFIG.backend.port // 3001
 ## 🌍 不同环境配置
 
 ### 开发环境
+
 ```bash
 VITE_BACKEND_HOST=localhost
-VITE_BACKEND_PORT=3001
+VITE_BACKEND_PORT=3000
 ```
 
 ### 生产环境
+
 ```bash
 VITE_BACKEND_HOST=your-domain.com
-VITE_BACKEND_PORT=3001
+VITE_BACKEND_PORT=3000
 ```
 
 ### Docker 环境
+
 ```bash
 VITE_BACKEND_HOST=backend
-VITE_BACKEND_PORT=3001
+VITE_BACKEND_PORT=3000
 ```
 
 ### 局域网环境
+
 ```bash
 VITE_BACKEND_HOST=192.168.1.100
-VITE_BACKEND_PORT=3001
+VITE_BACKEND_PORT=3000
 ```
 
 ## 🔍 端口冲突解决
@@ -122,21 +129,24 @@ VITE_BACKEND_PORT=3001
 如果端口被占用，可以通过环境变量修改：
 
 ### 1. 修改后端端口
+
 ```bash
 # .env 文件
-VITE_BACKEND_PORT=3002
+VITE_BACKEND_PORT=3000
 ```
 
 ### 2. 检查端口占用
+
 ```bash
 # Windows
-netstat -ano | findstr :3001
+netstat -ano | findstr :3000
 
 # Linux/Mac
-lsof -i :3001
+lsof -i :3000
 ```
 
 ### 3. 终止占用进程
+
 ```bash
 # Windows
 taskkill /PID <PID> /F
@@ -166,16 +176,18 @@ kill -9 <PID>
 如果您的项目中还有硬编码的端口号，请参考以下步骤进行迁移：
 
 1. **查找硬编码端口**
+
    ```bash
    grep -r "localhost:30" src/
-   grep -r "3002" src/
+   grep -r "3000" src/
    ```
 
 2. **替换为环境配置**
+
    ```typescript
    // 旧代码
-   const url = 'http://localhost:3002'
-   
+   const url = 'http://localhost:3000'
+
    // 新代码
    import { getBackendBaseUrl } from '../config/env'
    const url = getBackendBaseUrl()

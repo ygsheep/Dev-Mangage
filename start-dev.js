@@ -34,30 +34,30 @@ async function killProcessOnPort(port) {
 const runCommand = (command, args, cwd, label, color = '\x1b[36m') => {
   return new Promise((resolve, reject) => {
     console.log(`${color}📦 Starting ${label}...\x1b[0m`)
-    
+
     const child = spawn(command, args, {
       cwd,
       stdio: 'pipe',
       shell: true,
-      env: { ...process.env, FORCE_COLOR: '1' }
+      env: { ...process.env, FORCE_COLOR: '1' },
     })
 
-    child.stdout.on('data', (data) => {
+    child.stdout.on('data', data => {
       const output = data.toString()
       process.stdout.write(`${color}[${label}]\x1b[0m ${output}`)
     })
 
-    child.stderr.on('data', (data) => {
+    child.stderr.on('data', data => {
       const output = data.toString()
       process.stderr.write(`${color}[${label}]\x1b[0m ${output}`)
     })
 
-    child.on('error', (error) => {
+    child.on('error', error => {
       console.error(`❌ ${label} failed:`, error.message)
       reject(error)
     })
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0) {
         console.log(`✅ ${label} started successfully`)
         resolve(child)
@@ -90,39 +90,47 @@ async function waitForService(url, maxAttempts = 30) {
 
 async function main() {
   const processes = []
-  
+
   try {
     // Step 1: Clean up any existing processes
     console.log('🧹 Cleaning up existing processes...')
-    await killProcessOnPort(3001) // Backend
+    await killProcessOnPort(3000) // Backend
     await killProcessOnPort(5173) // Frontend
-    
+
     // Step 2: Build shared package
     console.log('📦 Building shared package...')
-    await runCommand('npm', ['run', 'build'], 
-      path.join(__dirname, 'packages/shared'), 
+    await runCommand(
+      'npm',
+      ['run', 'build'],
+      path.join(__dirname, 'packages/shared'),
       'Shared Build'
     )
 
     // Step 3: Setup database
     console.log('🗄️  Setting up database...')
-    
+
     // Generate Prisma client
-    await runCommand('npx', ['prisma', 'generate'], 
-      path.join(__dirname, 'packages/backend'), 
+    await runCommand(
+      'npx',
+      ['prisma', 'generate'],
+      path.join(__dirname, 'packages/backend'),
       'Prisma Generate'
     )
 
     // Push database schema
-    await runCommand('npx', ['prisma', 'db', 'push'], 
-      path.join(__dirname, 'packages/backend'), 
+    await runCommand(
+      'npx',
+      ['prisma', 'db', 'push'],
+      path.join(__dirname, 'packages/backend'),
       'Database Push'
     )
 
     // Seed database (only if empty)
     try {
-      await runCommand('npm', ['run', 'db:seed'], 
-        path.join(__dirname, 'packages/backend'), 
+      await runCommand(
+        'npm',
+        ['run', 'db:seed'],
+        path.join(__dirname, 'packages/backend'),
         'Database Seed'
       )
     } catch (error) {
@@ -132,32 +140,41 @@ async function main() {
     console.log('\n🚀 Starting development servers...\n')
 
     // Step 4: Start backend server
-    const backendProcess = await runCommand('npm', ['run', 'dev'], 
-      path.join(__dirname, 'packages/backend'), 
-      'Backend', '\x1b[32m' // Green
+    const backendProcess = await runCommand(
+      'npm',
+      ['run', 'dev'],
+      path.join(__dirname, 'packages/backend'),
+      'Backend',
+      '\x1b[32m' // Green
     )
     processes.push(backendProcess)
 
     // Wait for backend to be ready
     console.log('⏳ Waiting for backend to be ready...')
-    const backendReady = await waitForService('http://localhost:3001/health')
+    const backendReady = await waitForService('http://localhost:3000/health')
     if (!backendReady) {
       throw new Error('Backend failed to start within timeout')
     }
     console.log('✅ Backend is ready!')
 
     // Step 5: Start frontend server
-    const frontendProcess = await runCommand('npm', ['run', 'dev'], 
-      path.join(__dirname, 'packages/frontend'), 
-      'Frontend', '\x1b[35m' // Magenta
+    const frontendProcess = await runCommand(
+      'npm',
+      ['run', 'dev'],
+      path.join(__dirname, 'packages/frontend'),
+      'Frontend',
+      '\x1b[35m' // Magenta
     )
     processes.push(frontendProcess)
 
     // Step 6: Start MCP server (optional)
     try {
-      const mcpProcess = await runCommand('npm', ['run', 'dev'], 
-        path.join(__dirname, 'packages/mcp-server'), 
-        'MCP Server', '\x1b[33m' // Yellow
+      const mcpProcess = await runCommand(
+        'npm',
+        ['run', 'dev'],
+        path.join(__dirname, 'packages/mcp-server'),
+        'MCP Server',
+        '\x1b[33m' // Yellow
       )
       processes.push(mcpProcess)
     } catch (error) {
@@ -167,9 +184,9 @@ async function main() {
     console.log('\n🎉 DevAPI Manager is running!')
     console.log('=====================================')
     console.log('📱 Frontend:  http://localhost:5173')
-    console.log('🔧 Backend:   http://localhost:3001')
-    console.log('📚 API Docs:  http://localhost:3001/api/v1')
-    console.log('🏥 Health:    http://localhost:3001/health')
+    console.log('🔧 Backend:   http://localhost:3000')
+    console.log('📚 API Docs:  http://localhost:3000/api/v1')
+    console.log('🏥 Health:    http://localhost:3000/health')
     console.log('\n💡 Press Ctrl+C to stop all services')
 
     // Handle graceful shutdown
@@ -180,7 +197,7 @@ async function main() {
           process.kill('SIGTERM')
         }
       })
-      
+
       setTimeout(() => {
         console.log('👋 All services stopped')
         process.exit(0)
@@ -192,27 +209,26 @@ async function main() {
 
     // Keep the process running
     await new Promise(() => {}) // Run forever until interrupted
-
   } catch (error) {
     console.error('\n❌ Setup failed:', error.message)
-    
+
     // Clean up any started processes
     processes.forEach(process => {
       if (process && process.kill) {
         process.kill('SIGTERM')
       }
     })
-    
+
     process.exit(1)
   }
 }
 
 // Add fetch polyfill for older Node.js versions
 if (!global.fetch) {
-  global.fetch = async (url) => {
+  global.fetch = async url => {
     const http = require('http')
     return new Promise((resolve, reject) => {
-      const req = http.get(url, (res) => {
+      const req = http.get(url, res => {
         resolve({ ok: res.statusCode === 200 })
       })
       req.on('error', reject)

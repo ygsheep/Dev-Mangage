@@ -1,39 +1,28 @@
-import React, { useState, useEffect } from 'react'
 import {
-  FileText,
-  Plus,
-  Edit3,
-  Trash2,
-  Copy,
-  Download,
-  Upload,
-  Search,
-  Filter,
-  Eye,
   Code,
+  Copy,
   Database,
-  Settings,
-  Tag,
-  Clock,
-  User,
-  Star,
-  StarOff,
+  Edit3,
+  Eye,
+  FileText,
   PlayCircle,
+  Plus,
+  RefreshCw,
+  Search,
+  Settings,
+  Star,
+  Trash2,
   X,
-  Check,
-  AlertCircle,
-  RefreshCw
 } from 'lucide-react'
-import {
-  getCodeTemplates,
-  createCodeTemplate,
-  updateCodeTemplate,
-  deleteCodeTemplate,
-  renderCodeTemplate,
-  importCodeTemplates,
-  exportCodeTemplates
-} from '../../../../utils/api'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import {
+  createCodeTemplate,
+  deleteCodeTemplate,
+  getCodeTemplates,
+  renderCodeTemplate,
+  updateCodeTemplate,
+} from '../../../../utils/api'
 import CodeHighlight from '../../../common/CodeHighlight'
 
 interface CodeTemplate {
@@ -87,19 +76,25 @@ const TEMPLATE_CATEGORIES = [
   { value: 'migration', label: '迁移脚本', icon: Code },
   { value: 'api', label: 'API代码', icon: FileText },
   { value: 'model', label: '数据模型', icon: Settings },
-  { value: 'custom', label: '自定义', icon: Star }
+  { value: 'custom', label: '自定义', icon: Star },
 ]
 
 const PROGRAMMING_LANGUAGES = [
-  'SQL', 'JavaScript', 'TypeScript', 'Python', 'Java', 'C#', 'PHP', 'Go', 'Rust', 'Other'
+  'SQL',
+  'JavaScript',
+  'TypeScript',
+  'Python',
+  'Java',
+  'C#',
+  'PHP',
+  'Go',
+  'Rust',
+  'Other',
 ]
 
 const VARIABLE_TYPES = ['string', 'number', 'boolean', 'array']
 
-const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({ 
-  onClose, 
-  onTemplateSelect 
-}) => {
+const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({ onClose, onTemplateSelect }) => {
   const [templates, setTemplates] = useState<CodeTemplate[]>([])
   const [filteredTemplates, setFilteredTemplates] = useState<CodeTemplate[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<CodeTemplate | null>(null)
@@ -114,7 +109,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
   const [showBuiltIn, setShowBuiltIn] = useState(true)
   const [showFavorites, setShowFavorites] = useState(false)
   const [testVariables, setTestVariables] = useState<Record<string, any>>({})
-  
+
   const [formData, setFormData] = useState<TemplateFormData>({
     name: '',
     description: '',
@@ -123,7 +118,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
     content: '',
     variables: [],
     isPublic: false,
-    tags: []
+    tags: [],
   })
 
   // 加载模板列表
@@ -137,10 +132,11 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
 
     // 搜索筛选
     if (searchQuery) {
-      filtered = filtered.filter(template =>
-        template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      filtered = filtered.filter(
+        template =>
+          template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     }
 
@@ -191,7 +187,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
       content: '',
       variables: [],
       isPublic: false,
-      tags: []
+      tags: [],
     })
     setShowForm(true)
   }
@@ -201,7 +197,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
       toast.error('内置模板不可编辑')
       return
     }
-    
+
     setEditingTemplate(template)
     setFormData({
       name: template.name,
@@ -211,7 +207,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
       content: template.content,
       variables: template.variables,
       isPublic: template.isPublic,
-      tags: template.tags
+      tags: template.tags,
     })
     setShowForm(true)
   }
@@ -233,7 +229,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
           throw new Error(response.error || '创建失败')
         }
       }
-      
+
       setShowForm(false)
       loadTemplates()
     } catch (error: any) {
@@ -300,16 +296,16 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
           name: '',
           type: 'string',
           description: '',
-          required: true
-        }
-      ]
+          required: true,
+        },
+      ],
     }))
   }
 
   const removeVariable = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      variables: prev.variables.filter((_, i) => i !== index)
+      variables: prev.variables.filter((_, i) => i !== index),
     }))
   }
 
@@ -318,7 +314,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
       ...prev,
       variables: prev.variables.map((variable, i) =>
         i === index ? { ...variable, [field]: value } : variable
-      )
+      ),
     }))
   }
 
@@ -353,10 +349,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
               <Plus className="w-4 h-4" />
               <span>新建模板</span>
             </button>
-            <button
-              onClick={loadTemplates}
-              className="btn-outline flex items-center space-x-2"
-            >
+            <button onClick={loadTemplates} className="btn-outline flex items-center space-x-2">
               <RefreshCw className="w-4 h-4" />
               <span>刷新</span>
             </button>
@@ -371,7 +364,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
 
         <div className="flex h-[calc(90vh-80px)]">
           {/* 左侧：筛选和模板列表 */}
-          <div className="w-1/3 border-r border-gray-200 overflow-y-auto">
+          <div className="w-1/3 border-r border-gray-200 overflow-y-auto custom-scrollbar">
             {/* 搜索和筛选 */}
             <div className="p-4 border-b border-gray-200 bg-bg-secondary">
               <div className="space-y-3">
@@ -381,7 +374,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="input w-full pl-10"
                     placeholder="搜索模板..."
                   />
@@ -391,7 +384,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                 <div className="grid grid-cols-2 gap-2">
                   <select
                     value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    onChange={e => setCategoryFilter(e.target.value)}
                     className="input text-sm"
                   >
                     <option value="">所有分类</option>
@@ -403,7 +396,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                   </select>
                   <select
                     value={languageFilter}
-                    onChange={(e) => setLanguageFilter(e.target.value)}
+                    onChange={e => setLanguageFilter(e.target.value)}
                     className="input text-sm"
                   >
                     <option value="">所有语言</option>
@@ -421,8 +414,8 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                     <input
                       type="checkbox"
                       checked={showBuiltIn}
-                      onChange={(e) => setShowBuiltIn(e.target.checked)}
-                      className="rounded border-gray-300"
+                      onChange={e => setShowBuiltIn(e.target.checked)}
+                      className="rounded border-gray-300 bg-bg-secondary"
                     />
                     <span>内置模板</span>
                   </label>
@@ -430,8 +423,8 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                     <input
                       type="checkbox"
                       checked={showFavorites}
-                      onChange={(e) => setShowFavorites(e.target.checked)}
-                      className="rounded border-gray-300"
+                      onChange={e => setShowFavorites(e.target.checked)}
+                      className="rounded border-gray-300 bg-bg-secondary"
                     />
                     <span>收藏</span>
                   </label>
@@ -452,7 +445,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {filteredTemplates.map((template) => {
+                  {filteredTemplates.map(template => {
                     const CategoryIcon = getCategoryIcon(template.category)
                     return (
                       <div
@@ -460,7 +453,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                         className={`p-3 rounded-lg border cursor-pointer transition-all ${
                           selectedTemplate?.id === template.id
                             ? 'border-blue-300 bg-primary-50 dark:bg-primary-900/20'
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-bg-secondary'
+                            : 'border-gray-200 hover:border-gray-300 bg-bg-secondary hover:bg-bg-secondary'
                         }`}
                         onClick={() => setSelectedTemplate(template)}
                       >
@@ -502,17 +495,14 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
           </div>
 
           {/* 右侧：详情和编辑 */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
             {showForm ? (
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-medium text-text-primary">
                     {editingTemplate ? '编辑' : '新建'}代码模板
                   </h3>
-                  <button
-                    onClick={() => setShowForm(false)}
-                    className="btn-outline"
-                  >
+                  <button onClick={() => setShowForm(false)} className="btn-outline">
                     取消
                   </button>
                 </div>
@@ -527,7 +517,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       <input
                         type="text"
                         value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                         className="input w-full"
                         placeholder="输入模板名称"
                       />
@@ -538,7 +528,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       </label>
                       <select
                         value={formData.category}
-                        onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                        onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
                         className="input w-full"
                       >
                         {TEMPLATE_CATEGORIES.map(category => (
@@ -557,7 +547,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       </label>
                       <select
                         value={formData.language}
-                        onChange={(e) => setFormData(prev => ({ ...prev, language: e.target.value }))}
+                        onChange={e => setFormData(prev => ({ ...prev, language: e.target.value }))}
                         className="input w-full"
                       >
                         {PROGRAMMING_LANGUAGES.map(lang => (
@@ -574,10 +564,15 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       <input
                         type="text"
                         value={formData.tags.join(', ')}
-                        onChange={(e) => setFormData(prev => ({ 
-                          ...prev, 
-                          tags: e.target.value.split(',').map(tag => tag.trim()).filter(Boolean)
-                        }))}
+                        onChange={e =>
+                          setFormData(prev => ({
+                            ...prev,
+                            tags: e.target.value
+                              .split(',')
+                              .map(tag => tag.trim())
+                              .filter(Boolean),
+                          }))
+                        }
                         className="input w-full"
                         placeholder="用逗号分隔多个标签"
                       />
@@ -585,12 +580,12 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-text-primary mb-2">
-                      描述
-                    </label>
+                    <label className="block text-sm font-medium text-text-primary mb-2">描述</label>
                     <textarea
                       value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, description: e.target.value }))
+                      }
                       className="input w-full h-20 resize-none"
                       placeholder="描述模板的用途和使用场景"
                     />
@@ -603,7 +598,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                     </label>
                     <textarea
                       value={formData.content}
-                      onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                      onChange={e => setFormData(prev => ({ ...prev, content: e.target.value }))}
                       className="input w-full h-48 font-mono text-sm"
                       placeholder="输入模板代码，使用 {{variableName}} 表示变量"
                     />
@@ -628,37 +623,44 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       </button>
                     </div>
                     {formData.variables.length > 0 && (
-                      <div className="space-y-3 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                      <div className="space-y-3 max-h-48 overflow-y-auto scrollbar-thin border border-gray-200 rounded-lg p-3">
                         {formData.variables.map((variable, index) => (
-                          <div key={index} className="flex items-center space-x-3 bg-bg-secondary p-3 rounded">
+                          <div
+                            key={index}
+                            className="flex items-center space-x-3 bg-bg-secondary p-3 rounded"
+                          >
                             <div className="grid grid-cols-5 gap-2 flex-1">
                               <input
                                 type="text"
                                 value={variable.name}
-                                onChange={(e) => updateVariable(index, 'name', e.target.value)}
+                                onChange={e => updateVariable(index, 'name', e.target.value)}
                                 className="input text-sm"
                                 placeholder="变量名"
                               />
                               <select
                                 value={variable.type}
-                                onChange={(e) => updateVariable(index, 'type', e.target.value)}
+                                onChange={e => updateVariable(index, 'type', e.target.value)}
                                 className="input text-sm"
                               >
                                 {VARIABLE_TYPES.map(type => (
-                                  <option key={type} value={type}>{type}</option>
+                                  <option key={type} value={type}>
+                                    {type}
+                                  </option>
                                 ))}
                               </select>
                               <input
                                 type="text"
                                 value={variable.description}
-                                onChange={(e) => updateVariable(index, 'description', e.target.value)}
+                                onChange={e => updateVariable(index, 'description', e.target.value)}
                                 className="input text-sm"
                                 placeholder="描述"
                               />
                               <input
                                 type="text"
                                 value={variable.defaultValue || ''}
-                                onChange={(e) => updateVariable(index, 'defaultValue', e.target.value)}
+                                onChange={e =>
+                                  updateVariable(index, 'defaultValue', e.target.value)
+                                }
                                 className="input text-sm"
                                 placeholder="默认值"
                               />
@@ -667,8 +669,10 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                                   <input
                                     type="checkbox"
                                     checked={variable.required}
-                                    onChange={(e) => updateVariable(index, 'required', e.target.checked)}
-                                    className="rounded border-gray-300"
+                                    onChange={e =>
+                                      updateVariable(index, 'required', e.target.checked)
+                                    }
+                                    className="rounded border-gray-300 bg-bg-secondary"
                                   />
                                   <span className="text-xs">必填</span>
                                 </label>
@@ -693,8 +697,10 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       <input
                         type="checkbox"
                         checked={formData.isPublic}
-                        onChange={(e) => setFormData(prev => ({ ...prev, isPublic: e.target.checked }))}
-                        className="rounded border-gray-300"
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, isPublic: e.target.checked }))
+                        }
+                        className="rounded border-gray-300 bg-bg-secondary"
                       />
                       <span className="text-sm text-text-primary">公开模板</span>
                     </label>
@@ -702,16 +708,10 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
 
                   {/* 操作按钮 */}
                   <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-                    <button
-                      onClick={() => setShowForm(false)}
-                      className="btn-outline"
-                    >
+                    <button onClick={() => setShowForm(false)} className="btn-outline">
                       取消
                     </button>
-                    <button
-                      onClick={handleSubmitForm}
-                      className="btn-primary"
-                    >
+                    <button onClick={handleSubmitForm} className="btn-primary">
                       {editingTemplate ? '更新' : '创建'}
                     </button>
                   </div>
@@ -722,7 +722,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
                     {React.createElement(getCategoryIcon(selectedTemplate.category), {
-                      className: "w-6 h-6 text-gray-500"
+                      className: 'w-6 h-6 text-gray-500',
                     })}
                     <div>
                       <h3 className="text-lg font-medium text-text-primary flex items-center space-x-2">
@@ -791,7 +791,10 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       <div>
                         <span className="text-text-secondary">分类：</span>
                         <span className="font-medium">
-                          {TEMPLATE_CATEGORIES.find(c => c.value === selectedTemplate.category)?.label}
+                          {
+                            TEMPLATE_CATEGORIES.find(c => c.value === selectedTemplate.category)
+                              ?.label
+                          }
                         </span>
                       </div>
                       <div>
@@ -834,27 +837,28 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                       </div>
                       <div className="p-4 space-y-3">
                         {selectedTemplate.variables.map((variable, index) => (
-                          <div key={index} className="flex items-center space-x-4 p-3 bg-bg-secondary rounded">
+                          <div
+                            key={index}
+                            className="flex items-center space-x-4 p-3 bg-bg-secondary rounded"
+                          >
                             <div className="flex-1 grid grid-cols-4 gap-3 text-sm">
                               <div>
                                 <span className="font-medium">{variable.name}</span>
-                                {variable.required && (
-                                  <span className="text-red-500 ml-1">*</span>
-                                )}
+                                {variable.required && <span className="text-red-500 ml-1">*</span>}
                               </div>
                               <div className="text-text-secondary">{variable.type}</div>
                               <div className="text-text-secondary">{variable.description}</div>
-                              <div className="text-gray-500">
-                                {variable.defaultValue || '-'}
-                              </div>
+                              <div className="text-gray-500">{variable.defaultValue || '-'}</div>
                             </div>
                             <input
                               type="text"
                               value={testVariables[variable.name] || variable.defaultValue || ''}
-                              onChange={(e) => setTestVariables(prev => ({
-                                ...prev,
-                                [variable.name]: e.target.value
-                              }))}
+                              onChange={e =>
+                                setTestVariables(prev => ({
+                                  ...prev,
+                                  [variable.name]: e.target.value,
+                                }))
+                              }
                               className="input text-sm w-32"
                               placeholder="测试值"
                             />
@@ -885,12 +889,8 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-text-primary mb-2">
-                    选择代码模板
-                  </h3>
-                  <p className="text-text-secondary">
-                    从左侧列表中选择一个模板查看详情
-                  </p>
+                  <h3 className="text-lg font-medium text-text-primary mb-2">选择代码模板</h3>
+                  <p className="text-text-secondary">从左侧列表中选择一个模板查看详情</p>
                 </div>
               </div>
             )}
@@ -910,7 +910,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-4 overflow-y-auto max-h-[calc(80vh-120px)]">
+              <div className="p-4 overflow-y-auto custom-scrollbar max-h-[calc(80vh-120px)]">
                 <CodeHighlight
                   code={previewResult}
                   language="sql"
@@ -927,10 +927,7 @@ const CodeTemplateManager: React.FC<CodeTemplateManagerProps> = ({
                   <Copy className="w-4 h-4" />
                   <span>复制</span>
                 </button>
-                <button
-                  onClick={() => setShowPreview(false)}
-                  className="btn-primary"
-                >
+                <button onClick={() => setShowPreview(false)} className="btn-primary">
                   关闭
                 </button>
               </div>

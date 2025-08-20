@@ -34,7 +34,7 @@ export const TestAPIModal: React.FC<TestAPIModalProps> = ({
 
   return (
     // 模态框遮罩层和主容器
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto custom-scrollbar">
       <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         {/* 背景遮罩层，点击可关闭模态框 */}
         <div 

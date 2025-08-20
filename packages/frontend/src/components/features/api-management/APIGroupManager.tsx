@@ -1,26 +1,26 @@
-import React from 'react';
-import { Folder, Plus, Settings } from 'lucide-react';
+import { Folder } from 'lucide-react'
+import React from 'react'
 
 interface APIGroupManagerProps {
-  projectId: string;
-  groups?: any[];
-  loading?: boolean;
-  onRefresh?: () => void;
+  projectId: string
+  groups?: any[]
+  loading?: boolean
+  onRefresh?: () => void
 }
 
 export const APIGroupManager: React.FC<APIGroupManagerProps> = ({
   projectId,
   groups = [],
   loading = false,
-  onRefresh
+  onRefresh,
 }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        <span className="ml-2 text-gray-600">加载中...</span>
+        <span className="ml-2 text-text-secondary">加载中...</span>
       </div>
-    );
+    )
   }
 
   return (
@@ -31,5 +31,5 @@ export const APIGroupManager: React.FC<APIGroupManagerProps> = ({
         <p className="text-gray-400 text-sm">此功能正在开发中，敬请期待</p>
       </div>
     </div>
-  );
-};
+  )
+}

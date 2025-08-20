@@ -1,112 +1,130 @@
-import React, { useState } from 'react';
-import { 
-  AlertTriangle, 
-  X, 
-  CheckCircle, 
-  Database, 
-  Globe, 
+import {
+  AlertTriangle,
   ArrowRight,
+  CheckCircle,
+  Database,
   Eye,
-  RotateCcw
-} from 'lucide-react';
+  Globe,
+  RotateCcw,
+  X,
+} from 'lucide-react'
+import React, { useState } from 'react'
 
 interface Conflict {
-  id: string;
-  type: 'field_type_mismatch' | 'field_count_mismatch' | 'missing_parameter' | 'path_mismatch' | 'naming_conflict';
-  tableId?: string;
-  endpointId?: string;
-  description: string;
-  modelData?: any;
-  apiData?: any;
-  severity: 'high' | 'medium' | 'low';
+  id: string
+  type:
+    | 'field_type_mismatch'
+    | 'field_count_mismatch'
+    | 'missing_parameter'
+    | 'path_mismatch'
+    | 'naming_conflict'
+  tableId?: string
+  endpointId?: string
+  description: string
+  modelData?: any
+  apiData?: any
+  severity: 'high' | 'medium' | 'low'
 }
 
 interface ConflictResolution {
-  conflictId: string;
-  resolution: 'use_model' | 'use_api' | 'merge' | 'skip';
-  customData?: any;
+  conflictId: string
+  resolution: 'use_model' | 'use_api' | 'merge' | 'skip'
+  customData?: any
 }
 
 interface ConflictResolutionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  conflicts: Conflict[];
-  onResolve: (resolutions: ConflictResolution[]) => void;
+  isOpen: boolean
+  onClose: () => void
+  conflicts: Conflict[]
+  onResolve: (resolutions: ConflictResolution[]) => void
 }
 
 export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = ({
   isOpen,
   onClose,
   conflicts,
-  onResolve
+  onResolve,
 }) => {
-  const [resolutions, setResolutions] = useState<{ [key: string]: ConflictResolution }>({});
-  const [processing, setProcessing] = useState(false);
+  const [resolutions, setResolutions] = useState<{ [key: string]: ConflictResolution }>({})
+  const [processing, setProcessing] = useState(false)
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
-  const handleResolutionChange = (conflictId: string, resolution: ConflictResolution['resolution']) => {
+  const handleResolutionChange = (
+    conflictId: string,
+    resolution: ConflictResolution['resolution']
+  ) => {
     setResolutions(prev => ({
       ...prev,
       [conflictId]: {
         conflictId,
-        resolution
-      }
-    }));
-  };
+        resolution,
+      },
+    }))
+  }
 
   const handleApplyAllResolution = (resolution: ConflictResolution['resolution']) => {
-    const newResolutions: { [key: string]: ConflictResolution } = {};
+    const newResolutions: { [key: string]: ConflictResolution } = {}
     conflicts.forEach(conflict => {
       newResolutions[conflict.id] = {
         conflictId: conflict.id,
-        resolution
-      };
-    });
-    setResolutions(newResolutions);
-  };
+        resolution,
+      }
+    })
+    setResolutions(newResolutions)
+  }
 
   const handleResolve = async () => {
-    setProcessing(true);
+    setProcessing(true)
     try {
-      const resolutionList = Object.values(resolutions);
-      await onResolve(resolutionList);
+      const resolutionList = Object.values(resolutions)
+      await onResolve(resolutionList)
     } finally {
-      setProcessing(false);
+      setProcessing(false)
     }
-  };
+  }
 
   const getConflictTypeLabel = (type: Conflict['type']) => {
     switch (type) {
-      case 'field_type_mismatch': return '字段类型不匹配';
-      case 'field_count_mismatch': return '字段数量不匹配';
-      case 'missing_parameter': return '缺少API参数';
-      case 'path_mismatch': return '路径不匹配';
-      case 'naming_conflict': return '命名冲突';
-      default: return '未知冲突';
+      case 'field_type_mismatch':
+        return '字段类型不匹配'
+      case 'field_count_mismatch':
+        return '字段数量不匹配'
+      case 'missing_parameter':
+        return '缺少API参数'
+      case 'path_mismatch':
+        return '路径不匹配'
+      case 'naming_conflict':
+        return '命名冲突'
+      default:
+        return '未知冲突'
     }
-  };
+  }
 
   const getSeverityColor = (severity: Conflict['severity']) => {
     switch (severity) {
-      case 'high': return 'text-red-600 bg-red-100';
-      case 'medium': return 'text-orange-600 bg-orange-100';
-      case 'low': return 'text-yellow-600 bg-yellow-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'high':
+        return 'text-red-600 bg-red-100'
+      case 'medium':
+        return 'text-orange-600 bg-orange-100'
+      case 'low':
+        return 'text-yellow-600 bg-yellow-100'
+      default:
+        return 'text-text-secondary bg-gray-100'
     }
-  };
+  }
 
-  const allResolved = conflicts.every(conflict => resolutions[conflict.id]);
+  const allResolved = conflicts.every(conflict => resolutions[conflict.id])
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto custom-scrollbar">
       <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         {/* Backdrop */}
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
           onClick={onClose}
         />
-        
+
         {/* Modal */}
         <div className="relative transform overflow-hidden rounded-lg bg-bg-paper text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl max-h-[90vh]">
           {/* Header */}
@@ -162,9 +180,9 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
               </div>
             </div>
           </div>
-          
+
           {/* Body */}
-          <div className="px-6 py-4 max-h-96 overflow-y-auto">
+          <div className="px-6 py-4 max-h-96 overflow-y-auto scrollbar-thin">
             <div className="space-y-4">
               {conflicts.map((conflict, index) => (
                 <div key={conflict.id} className="border border-gray-200 rounded-lg p-4">
@@ -178,13 +196,17 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                           <h5 className="font-medium text-text-primary">
                             冲突 #{index + 1}: {getConflictTypeLabel(conflict.type)}
                           </h5>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(conflict.severity)}`}>
-                            {conflict.severity === 'high' ? '高' : conflict.severity === 'medium' ? '中' : '低'}
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(conflict.severity)}`}
+                          >
+                            {conflict.severity === 'high'
+                              ? '高'
+                              : conflict.severity === 'medium'
+                                ? '中'
+                                : '低'}
                           </span>
                         </div>
-                        <p className="text-sm text-text-secondary mb-3">
-                          {conflict.description}
-                        </p>
+                        <p className="text-sm text-text-secondary mb-3">{conflict.description}</p>
 
                         {/* 冲突详情 */}
                         {(conflict.modelData || conflict.apiData) && (
@@ -193,9 +215,11 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                               <div className="bg-primary-50 dark:bg-primary-900/20 border border-blue-200 rounded-md p-3">
                                 <div className="flex items-center space-x-2 mb-2">
                                   <Database size={14} className="text-blue-600" />
-                                  <span className="text-sm font-medium text-blue-800">数据模型</span>
+                                  <span className="text-sm font-medium text-blue-800">
+                                    数据模型
+                                  </span>
                                 </div>
-                                <pre className="text-xs text-blue-700 overflow-x-auto">
+                                <pre className="text-xs text-blue-700 overflow-x-auto custom-scrollbar">
                                   {JSON.stringify(conflict.modelData, null, 2)}
                                 </pre>
                               </div>
@@ -204,9 +228,11 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
                               <div className="bg-green-50 border border-green-200 rounded-md p-3">
                                 <div className="flex items-center space-x-2 mb-2">
                                   <Globe size={14} className="text-green-600" />
-                                  <span className="text-sm font-medium text-green-800">API数据</span>
+                                  <span className="text-sm font-medium text-green-800">
+                                    API数据
+                                  </span>
                                 </div>
-                                <pre className="text-xs text-green-700 overflow-x-auto">
+                                <pre className="text-xs text-green-700 overflow-x-auto custom-scrollbar">
                                   {JSON.stringify(conflict.apiData, null, 2)}
                                 </pre>
                               </div>
@@ -274,7 +300,7 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
               ))}
             </div>
           </div>
-          
+
           {/* Footer */}
           <div className="flex justify-between items-center px-6 py-4 border-t border-border-primary bg-bg-tertiary">
             <div className="text-sm text-text-secondary">
@@ -303,5 +329,5 @@ export const ConflictResolutionModal: React.FC<ConflictResolutionModalProps> = (
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

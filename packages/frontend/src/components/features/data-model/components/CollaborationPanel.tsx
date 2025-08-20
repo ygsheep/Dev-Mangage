@@ -17,6 +17,8 @@ import {
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import MarkdownEditor from '../../../common/MarkdownEditor'
+import MarkdownPreview from '@uiw/react-markdown-preview'
 import { getComments, createComment, updateComment, deleteComment, resolveComment } from '../../../../utils/api'
 
 interface Comment {
@@ -226,14 +228,14 @@ const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
               placeholder="搜索评论..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input pl-10 w-64"
+              className="pl-10 w-64 px-3 py-2 border border-border-primary bg-bg-elevated text-text-primary placeholder-text-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
 
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as any)}
-            className="input w-auto"
+            className="px-3 py-2 border border-border-primary bg-bg-elevated text-text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-auto"
           >
             <option value="all">全部评论</option>
             <option value="unresolved">待解决</option>
@@ -243,48 +245,46 @@ const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
       </div>
 
       {/* 新评论输入 */}
-      <div className="bg-bg-paper rounded-lg border border-gray-200 p-4">
+      <div className="bg-bg-paper rounded-lg border border-border-primary p-4">
         <div className="flex items-start space-x-3">
           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
             {currentUserName.charAt(0)}
           </div>
           
           <div className="flex-1">
-            <textarea
+            <MarkdownEditor
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={setNewComment}
               placeholder={`对 ${targetName} 添加评论...`}
-              className="input w-full resize-none"
-              rows={3}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                  handleAddComment(newComment)
-                }
-              }}
+              rows={4}
+              helpText="支持 Markdown 格式，Ctrl+Enter 快速发送"
+              showCharCount={true}
             />
             
-            <div className="flex items-center justify-between mt-3">
-              <div className="text-sm text-gray-500">
-                支持 Markdown 格式，Ctrl+Enter 快速发送
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setNewComment('')}
-                  className="btn-outline"
-                  disabled={!newComment.trim()}
-                >
-                  清空
-                </button>
-                <button
-                  onClick={() => handleAddComment(newComment)}
-                  disabled={!newComment.trim() || createCommentMutation.isLoading}
-                  className="btn-primary flex items-center space-x-2"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>发送</span>
-                </button>
-              </div>
+            <div className="flex items-center justify-end space-x-2 mt-3">
+              <button
+                onClick={() => setNewComment('')}
+                className="px-3 py-2 text-text-secondary bg-bg-paper border border-border-primary rounded-md hover:bg-bg-tertiary transition-colors"
+                disabled={!newComment.trim()}
+              >
+                清空
+              </button>
+              <button
+                onClick={() => handleAddComment(newComment)}
+                disabled={!newComment.trim() || createCommentMutation.isLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    handleAddComment(newComment)
+                  }
+                }}
+              >
+                {createCommentMutation.isLoading && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                )}
+                <Send className="w-4 h-4" />
+                <span>发送</span>
+              </button>
             </div>
           </div>
         </div>
@@ -472,11 +472,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
       <div className="mb-3">
         {isEditing ? (
           <div className="space-y-3">
-            <textarea
+            <MarkdownEditor
               value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              className="input w-full resize-none"
+              onChange={setEditContent}
+              placeholder="编辑评论内容..."
               rows={3}
+              helpText="支持 Markdown 格式"
+              showCharCount={true}
             />
             <div className="flex items-center space-x-2">
               <button
@@ -484,7 +486,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   onEdit(comment.id, editContent)
                   setEditingComment(null)
                 }}
-                className="btn-primary"
+                className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!editContent.trim()}
               >
                 保存
@@ -494,27 +496,39 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   setEditingComment(null)
                   setEditContent(comment.content)
                 }}
-                className="btn-outline"
+                className="px-3 py-2 text-text-secondary bg-bg-paper border border-border-primary rounded-md hover:bg-bg-tertiary transition-colors"
               >
                 取消
               </button>
             </div>
           </div>
         ) : (
-          <div className="text-text-primary whitespace-pre-wrap">{comment.content}</div>
+          <div className="text-text-primary">
+            <div className="comment-content">
+              <MarkdownPreview
+                source={comment.content}
+                data-color-mode={document.documentElement.classList.contains('dark') ? 'dark' : 'light'}
+                style={{ 
+                  backgroundColor: 'transparent',
+                  padding: 0,
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+          </div>
         )}
       </div>
 
       {/* 回复输入 */}
       {replyingTo === comment.id && (
         <div className="mt-4 ml-8 bg-bg-secondary rounded-lg p-3">
-          <textarea
+          <MarkdownEditor
             value={replyContent}
-            onChange={(e) => setReplyContent(e.target.value)}
+            onChange={setReplyContent}
             placeholder="写下你的回复..."
-            className="input w-full resize-none"
-            rows={2}
-            autoFocus
+            rows={3}
+            helpText="支持 Markdown 格式"
+            showCharCount={true}
           />
           <div className="flex items-center space-x-2 mt-2">
             <button
@@ -523,7 +537,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 setReplyContent('')
               }}
               disabled={!replyContent.trim()}
-              className="btn-primary"
+              className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               回复
             </button>
@@ -532,7 +546,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 setReplyingTo(null)
                 setReplyContent('')
               }}
-              className="btn-outline"
+              className="px-3 py-2 text-text-secondary bg-bg-paper border border-border-primary rounded-md hover:bg-bg-tertiary transition-colors"
             >
               取消
             </button>
@@ -563,7 +577,19 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   </button>
                 )}
               </div>
-              <div className="text-text-primary text-sm whitespace-pre-wrap">{reply.content}</div>
+              <div className="text-text-primary text-sm">
+                <div className="comment-content">
+                  <MarkdownPreview
+                    source={reply.content}
+                    data-color-mode={document.documentElement.classList.contains('dark') ? 'dark' : 'light'}
+                    style={{ 
+                      backgroundColor: 'transparent',
+                      padding: 0,
+                      fontSize: '13px'
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           ))}
         </div>

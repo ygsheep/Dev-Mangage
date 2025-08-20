@@ -7,6 +7,7 @@
 ## 🎯 功能特性
 
 ### ✅ 已实现功能
+
 - **可视化展示**: 支持项目、分类、数据表的层次化展示
 - **交互操作**: 支持拖拽、缩放、选择、编辑
 - **多种布局**: 层次布局、放射布局、力导向布局、环形布局
@@ -15,6 +16,7 @@
 - **实时保存**: 布局和配置自动保存到数据库
 
 ### 🔧 技术栈
+
 - **前端**: React 18 + TypeScript + React Flow + Zustand
 - **后端**: Node.js + Express + Prisma + SQLite/PostgreSQL
 - **样式**: Tailwind CSS
@@ -23,12 +25,14 @@
 ## 📦 安装依赖
 
 ### 前端依赖
+
 ```bash
 cd packages/frontend
 npm install reactflow zustand react-hot-toast
 ```
 
 ### 后端依赖
+
 ```bash
 cd packages/backend
 # 安装tsx用于TypeScript执行（如果未安装）
@@ -38,6 +42,7 @@ npm install tsx --save-dev
 ## 🗄️ 数据库迁移
 
 ### 1. 运行Prisma迁移
+
 ```bash
 cd packages/backend
 npx prisma db push
@@ -46,12 +51,15 @@ npx prisma migrate dev --name add-mindmap-layout
 ```
 
 ### 2. 验证数据库表
+
 确保以下表已创建：
+
 - `mindmap_layouts`: 存储mindmap布局数据
 
 ## 🔧 后端集成
 
 ### 1. 添加mindmap端点配置
+
 编辑 `packages/backend/src/config/api-endpoints.ts`:
 
 ```typescript
@@ -67,6 +75,7 @@ MINDMAP: {
 ```
 
 ### 2. 注册mindmap路由
+
 编辑 `packages/backend/src/routes/index.ts`:
 
 ```typescript
@@ -74,10 +83,10 @@ import { mindmapRouter } from './mindmap'
 
 export const setupRoutes = (app: Express): void => {
   // ... 现有路由
-  
+
   // 添加mindmap路由（注意顺序）
   app.use(API_ENDPOINTS.MINDMAP.BASE, mindmapRouter)
-  
+
   // 在API documentation的endpoints中添加
   endpoints: {
     // ... 其他端点
@@ -87,6 +96,7 @@ export const setupRoutes = (app: Express): void => {
 ```
 
 ### 3. 添加数据模型关系端点
+
 编辑 `packages/backend/src/routes/dataModels.ts`:
 
 ```typescript
@@ -103,26 +113,24 @@ router.get(
 
     const relationships = await prisma.tableRelationship.findMany({
       where: {
-        OR: [
-          { fromTable: { projectId } },
-          { toTable: { projectId } }
-        ]
+        OR: [{ fromTable: { projectId } }, { toTable: { projectId } }],
       },
       include: {
         fromTable: { select: { id: true, name: true, displayName: true } },
-        toTable: { select: { id: true, name: true, displayName: true } }
-      }
+        toTable: { select: { id: true, name: true, displayName: true } },
+      },
     })
 
     res.json({
       success: true,
-      data: { relationships }
+      data: { relationships },
     })
   })
 )
 ```
 
 ### 4. 扩展API工具函数
+
 编辑 `packages/frontend/src/utils/api.ts`:
 
 ```typescript
@@ -166,6 +174,7 @@ export const apiMethods = {
 ## 🎨 前端集成
 
 ### 1. 集成到项目详情页
+
 编辑 `packages/frontend/src/pages/ProjectDetailPage.tsx`:
 
 ```typescript
@@ -181,7 +190,7 @@ const [activeTab, setActiveTab] = useState<'apis' | 'features' | 'models' | 'min
   className={`flex items-center px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
     activeTab === 'mindmap'
       ? 'border-blue-500 text-blue-600 bg-blue-50'
-      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+      : 'border-transparent text-gray-500 hover:text-text-secondary hover:border-gray-300 bg-bg-secondary'
   }`}
 >
   <GitBranch className="w-4 h-4 mr-2" />
@@ -215,6 +224,7 @@ const [activeTab, setActiveTab] = useState<'apis' | 'features' | 'models' | 'min
 ```
 
 ### 2. 添加到导航菜单
+
 编辑 `packages/frontend/src/components/Layout.tsx`:
 
 ```typescript
@@ -222,10 +232,10 @@ const [activeTab, setActiveTab] = useState<'apis' | 'features' | 'models' | 'min
 {project && (
   <nav className="space-y-1">
     {/* 现有导航项 */}
-    
+
     <Link
       to={`/projects/${project.id}/mindmap`}
-      className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+      className="flex items-center px-3 py-2 text-sm font-medium text-text-secondary rounded-md hover:bg-bg-tertiary hover:text-text-primary"
     >
       <GitBranch className="w-5 h-5 mr-3" />
       关系图谱
@@ -235,6 +245,7 @@ const [activeTab, setActiveTab] = useState<'apis' | 'features' | 'models' | 'min
 ```
 
 ### 3. 创建独立mindmap页面
+
 创建 `packages/frontend/src/pages/MindmapPage.tsx`:
 
 ```typescript
@@ -260,10 +271,10 @@ const MindmapPage: React.FC = () => {
   if (!projectId) {
     return (
       <div className="card text-center py-12">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-text-primary mb-2">
           项目ID缺失
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-text-secondary mb-6">
           请通过有效的项目链接访问
         </p>
         <Link to="/projects" className="btn-primary">
@@ -288,10 +299,10 @@ const MindmapPage: React.FC = () => {
   if (!project) {
     return (
       <div className="card text-center py-12">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-text-primary mb-2">
           项目不存在
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-text-secondary mb-6">
           请检查项目ID是否正确
         </p>
         <Link to="/projects" className="btn-primary">
@@ -304,7 +315,7 @@ const MindmapPage: React.FC = () => {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-bg-paper border-b border-gray-200 px-6 py-4">
         <div className="flex items-center space-x-4">
           <Link
             to={`/projects/${projectId}`}
@@ -315,10 +326,10 @@ const MindmapPage: React.FC = () => {
           <div className="flex items-center space-x-3">
             <GitBranch className="w-6 h-6 text-blue-600" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">
+              <h1 className="text-xl font-bold text-text-primary">
                 {project.name} - 关系图谱
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-secondary">
                 数据表关系可视化展示
               </p>
             </div>
@@ -352,6 +363,7 @@ export default MindmapPage
 ```
 
 ### 4. 创建缺失的边组件
+
 创建 `packages/frontend/src/components/MindmapViewer/edges/ForeignKeyEdge.tsx`:
 
 ```typescript
@@ -466,6 +478,7 @@ export default ReferenceEdge
 ```
 
 ### 5. 更新路由配置
+
 编辑 `packages/frontend/src/App.tsx` 或路由配置文件:
 
 ```typescript
@@ -478,6 +491,7 @@ import MindmapPage from './pages/MindmapPage'
 ## 🚀 使用示例
 
 ### 基础使用
+
 ```typescript
 import MindmapViewer from '../components/MindmapViewer'
 
@@ -498,12 +512,13 @@ function MyComponent() {
 ```
 
 ### 高级配置
+
 ```typescript
 import { useMindmapStore } from '../stores/mindmapStore'
 
 function AdvancedMindmap() {
   const { config, updateConfig } = useMindmapStore()
-  
+
   // 自定义配置
   const customConfig = {
     layout: {
@@ -516,26 +531,27 @@ function AdvancedMindmap() {
       compactMode: false
     }
   }
-  
+
   useEffect(() => {
     updateConfig(customConfig)
   }, [])
-  
+
   return <MindmapViewer projectId="project-id" />
 }
 ```
 
 ### 监听事件
+
 ```typescript
 function EventExample() {
   const handleNodeChange = useCallback((nodes: MindmapNode[]) => {
     // 节点变更时的处理逻辑
     console.log('Nodes changed:', nodes)
-    
+
     // 可以在这里触发保存操作
     // saveMindmapLayout(...)
   }, [])
-  
+
   return (
     <MindmapViewer
       projectId="project-id"
@@ -548,46 +564,50 @@ function EventExample() {
 ## 🎛️ 配置选项
 
 ### 布局配置
+
 ```typescript
 interface LayoutConfig {
   type: 'hierarchical' | 'radial' | 'force' | 'circular'
-  direction: 'TB' | 'BT' | 'LR' | 'RL'  // 仅层次布局
+  direction: 'TB' | 'BT' | 'LR' | 'RL' // 仅层次布局
   spacing: {
-    node: number      // 节点间距
-    level: number     // 层级间距
+    node: number // 节点间距
+    level: number // 层级间距
   }
   animation: {
-    enabled: boolean  // 启用动画
-    duration: number  // 动画持续时间(ms)
+    enabled: boolean // 启用动画
+    duration: number // 动画持续时间(ms)
   }
 }
 ```
 
 ### 显示配置
+
 ```typescript
 interface DisplayConfig {
-  showLabels: boolean              // 显示节点标签
-  showIcons: boolean              // 显示节点图标
-  showStatistics: boolean         // 显示统计信息
+  showLabels: boolean // 显示节点标签
+  showIcons: boolean // 显示节点图标
+  showStatistics: boolean // 显示统计信息
   showRelationshipLabels: boolean // 显示关系标签
-  compactMode: boolean           // 紧凑模式
+  compactMode: boolean // 紧凑模式
 }
 ```
 
 ### 交互配置
+
 ```typescript
 interface InteractionConfig {
-  enableDrag: boolean      // 启用拖拽
-  enableZoom: boolean      // 启用缩放
+  enableDrag: boolean // 启用拖拽
+  enableZoom: boolean // 启用缩放
   enableSelection: boolean // 启用选择
-  enableCollapse: boolean  // 启用折叠
-  autoLayout: boolean     // 自动布局
+  enableCollapse: boolean // 启用折叠
+  autoLayout: boolean // 自动布局
 }
 ```
 
 ## 🎨 样式定制
 
 ### CSS变量
+
 ```css
 /* 在你的CSS文件中定义mindmap主题变量 */
 .mindmap-viewer {
@@ -600,6 +620,7 @@ interface InteractionConfig {
 ```
 
 ### 自定义节点样式
+
 ```typescript
 // 在MindmapViewer/nodes/CustomTableNode.tsx中
 const CustomTableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
@@ -624,6 +645,7 @@ const CustomTableNode: React.FC<TableNodeProps> = ({ data, selected }) => {
 ## 🔍 调试和开发
 
 ### 开发模式
+
 ```bash
 # 启动前端开发服务器
 cd packages/frontend
@@ -635,6 +657,7 @@ npm run dev
 ```
 
 ### 调试技巧
+
 1. **React DevTools**: 查看组件状态和props
 2. **Network Tab**: 检查API请求和响应
 3. **Console**: 查看mindmap事件日志
@@ -643,6 +666,7 @@ npm run dev
 ### 常见问题排查
 
 #### 1. ReactFlow 警告: Unknown event handler property `onViewportChange`
+
 **问题**: React DevTools 显示 `onViewportChange` 警告
 **解决方案**: 移除 ReactFlow 组件中的 `onViewportChange` 属性，新版本不再需要
 
@@ -661,6 +685,7 @@ npm run dev
 ```
 
 #### 2. API 400 错误: `/data-models/relationships` 端点不存在
+
 **问题**: 前端请求 relationships 端点时返回 400 错误
 **解决方案**: 在 dataModels 路由中添加 relationships 端点，**必须放在参数化路由之前**
 
@@ -672,10 +697,12 @@ router.get('/:id', ...)
 ```
 
 #### 3. 后端编译错误: 重复声明 `relationshipsQuerySchema`
+
 **问题**: tsx 编译时报错重复声明
 **解决方案**: 确保只声明一次 schema，检查是否有重复的导入或声明
 
 #### 4. tsx 命令未找到错误
+
 **问题**: `'tsx' is not recognized as an internal or external command`
 **解决方案**: 安装 tsx 依赖
 
@@ -685,6 +712,7 @@ npm install tsx --save-dev
 ```
 
 #### 5. 数据不显示
+
 ```typescript
 // 检查数据加载
 const { isLoading, nodes, edges } = useMindmapStore()
@@ -694,6 +722,7 @@ console.log('Edges:', edges.length)
 ```
 
 #### 6. 布局异常
+
 ```typescript
 // 检查布局配置
 const { config } = useMindmapStore()
@@ -705,12 +734,13 @@ applyLayout('hierarchical')
 ```
 
 #### 7. API错误调试
+
 ```bash
 # 检查后端路由注册
-curl http://localhost:3001/api/v1/mindmap/PROJECT_ID
+curl http://localhost:3000/api/v1/mindmap/PROJECT_ID
 
 # 检查 relationships 端点
-curl "http://localhost:3001/api/v1/data-models/relationships?projectId=PROJECT_ID"
+curl "http://localhost:3000/api/v1/data-models/relationships?projectId=PROJECT_ID"
 
 # 检查数据库连接
 npx prisma studio
@@ -719,6 +749,7 @@ npx prisma studio
 ## 📊 性能优化
 
 ### 1. 大数据集处理
+
 ```typescript
 // 使用虚拟化和筛选
 const { getFilteredNodes, getFilteredEdges } = useMindmapStore()
@@ -729,17 +760,19 @@ const displayNodes = getFilteredNodes().slice(0, maxNodes)
 ```
 
 ### 2. 动画优化
+
 ```typescript
 // 禁用复杂动画以提升性能
 updateConfig({
   layout: {
     ...config.layout,
-    animation: { enabled: false, duration: 0 }
-  }
+    animation: { enabled: false, duration: 0 },
+  },
 })
 ```
 
 ### 3. 缓存策略
+
 ```typescript
 // 在useMindmapStore中启用缓存
 const cachedData = useMemo(() => {
@@ -750,18 +783,20 @@ const cachedData = useMemo(() => {
 ## 📋 测试
 
 ### 单元测试
+
 ```bash
 cd packages/frontend
 npm test -- MindmapViewer
 ```
 
 ### 集成测试
+
 ```typescript
 // 测试mindmap数据加载
 test('should load mindmap data', async () => {
   const { loadMindmapData } = useMindmapStore.getState()
   await loadMindmapData('test-project-id')
-  
+
   const { nodes, edges } = useMindmapStore.getState()
   expect(nodes.length).toBeGreaterThan(0)
   expect(edges.length).toBeGreaterThan(0)
@@ -777,11 +812,12 @@ test('should load mindmap data', async () => {
 ## 📚 扩展功能
 
 ### 1. 自定义节点类型
+
 ```typescript
 // 添加新的节点类型
 enum CustomNodeType {
   SERVICE = 'service',
-  MODULE = 'module'
+  MODULE = 'module',
 }
 
 // 创建自定义节点组件
@@ -791,6 +827,7 @@ const ServiceNode: React.FC<NodeProps> = ({ data }) => {
 ```
 
 ### 2. 插件系统
+
 ```typescript
 // 注册mindmap插件
 const customPlugin = {
@@ -798,13 +835,14 @@ const customPlugin = {
   nodeEnhancer: (node: MindmapNode) => {
     // 增强节点数据
     return { ...node, metrics: calculateMetrics(node) }
-  }
+  },
 }
 
 mindmapLayoutService.registerPlugin(customPlugin)
 ```
 
 ### 3. 导出扩展
+
 ```typescript
 // 添加自定义导出格式
 const exportToExcel = async (nodes: MindmapNode[], edges: MindmapEdge[]) => {
@@ -835,16 +873,18 @@ const exportToExcel = async (nodes: MindmapNode[], edges: MindmapEdge[]) => {
 ## 🚀 快速开始
 
 ### 开发环境启动
+
 ```bash
 # 启动完整开发环境
 npm run dev
 
 # 或者分别启动
-npm run dev:backend   # 后端 (localhost:3001)
+npm run dev:backend   # 后端 (localhost:3000)
 npm run dev:frontend  # 前端 (localhost:5173)
 ```
 
 ### 访问Mindmap功能
+
 1. **项目详情页集成**:
    - 访问: `http://localhost:5173/projects/{PROJECT_ID}`
    - 点击"关系图谱"标签页
@@ -853,18 +893,20 @@ npm run dev:frontend  # 前端 (localhost:5173)
    - 访问: `http://localhost:5173/projects/{PROJECT_ID}/mindmap`
 
 ### 验证功能
+
 ```bash
 # 检查后端API
-curl "http://localhost:3001/api/v1/mindmap/PROJECT_ID"
-curl "http://localhost:3001/api/v1/data-models/relationships?projectId=PROJECT_ID"
+curl "http://localhost:3000/api/v1/mindmap/PROJECT_ID"
+curl "http://localhost:3000/api/v1/data-models/relationships?projectId=PROJECT_ID"
 
 # 检查项目列表获取有效PROJECT_ID
-curl "http://localhost:3001/api/v1/projects"
+curl "http://localhost:3000/api/v1/projects"
 ```
 
 ### 当前状态
+
 - ✅ 数据库包含 mindmap_layouts 表
-- ✅ 后端 API 端点已就绪 
+- ✅ 后端 API 端点已就绪
 - ✅ 前端组件已集成
 - ✅ 路由配置完成
 - ✅ 所有已知问题已修复

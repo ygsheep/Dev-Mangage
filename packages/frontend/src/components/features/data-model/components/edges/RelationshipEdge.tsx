@@ -1,13 +1,7 @@
-import React from 'react'
-import {
-  BaseEdge,
-  EdgeLabelRenderer,
-  EdgeProps,
-  getBezierPath,
-  MarkerType
-} from 'reactflow'
-import { Edit3, Trash2, Eye } from 'lucide-react'
 import { TableRelationship } from '@shared/types'
+import { Edit3, Eye, Trash2 } from 'lucide-react'
+import React from 'react'
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, MarkerType, getBezierPath } from 'reactflow'
 
 interface RelationshipEdgeData {
   relationship: TableRelationship
@@ -24,7 +18,7 @@ const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
   sourcePosition,
   targetPosition,
   data,
-  selected
+  selected,
 }) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -32,7 +26,7 @@ const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
     sourcePosition,
     targetX,
     targetY,
-    targetPosition
+    targetPosition,
   })
 
   if (!data) return null
@@ -76,37 +70,34 @@ const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
         style={{
           stroke: color,
           strokeWidth: selected ? 3 : 2,
-          strokeDasharray: relationship.relationshipType === 'MANY_TO_MANY' ? '5,5' : undefined
+          strokeDasharray: relationship.relationshipType === 'MANY_TO_MANY' ? '5,5' : undefined,
         }}
         markerEnd={{
           type: MarkerType.ArrowClosed,
           width: 20,
           height: 20,
-          color
+          color,
         }}
       />
-      
+
       <EdgeLabelRenderer>
         <div
           style={{
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-            pointerEvents: 'all'
+            pointerEvents: 'all',
           }}
           className="group"
         >
           {/* 关系标签 */}
-          <div 
+          <div
             className={`bg-bg-paper border-2 rounded-lg px-2 py-1 shadow-sm transition-all duration-200 ${
-              selected ? 'border-blue-500 shadow-lg' : 'border-gray-300'
+              selected ? 'border-blue-500 shadow-lg' : 'border-gray-300 bg-bg-secondary'
             }`}
             style={{ borderColor: color }}
           >
             <div className="flex items-center space-x-2">
-              <span 
-                className="text-xs font-medium"
-                style={{ color }}
-              >
+              <span className="text-xs font-medium" style={{ color }}>
                 {label}
               </span>
               {relationship.name && (
@@ -121,29 +112,29 @@ const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <div className="bg-bg-paper rounded-lg shadow-lg border border-gray-200 flex items-center">
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   // TODO: 查看关系详情
                 }}
                 className="p-2 hover:bg-bg-secondary rounded-l-lg transition-colors"
                 title="查看详情"
               >
-                <Eye className="w-3 h-3 text-gray-600" />
+                <Eye className="w-3 h-3 text-text-secondary" />
               </button>
-              
+
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   onEdit()
                 }}
                 className="p-2 hover:bg-bg-secondary transition-colors border-x border-gray-200"
                 title="编辑关系"
               >
-                <Edit3 className="w-3 h-3 text-gray-600" />
+                <Edit3 className="w-3 h-3 text-text-secondary" />
               </button>
-              
+
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   onDelete()
                 }}
@@ -163,7 +154,7 @@ const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
                 <div>更新: {relationship.onUpdate}</div>
                 <div>删除: {relationship.onDelete}</div>
               </div>
-              
+
               {/* 箭头 */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-900" />
             </div>

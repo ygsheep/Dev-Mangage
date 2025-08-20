@@ -1,38 +1,40 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
+import useDebugStore from '../DebugStore'
+import ComponentsTab from './ComponentsTab'
 import DraggableWindow from './DraggableWindow'
 import LogsTab from './LogsTab'
 import NetworkTab from './NetworkTab'
 import PerformanceTab from './PerformanceTab'
-import ComponentsTab from './ComponentsTab'
-import useDebugStore from '../DebugStore'
 
 type TabType = 'logs' | 'network' | 'performance' | 'components'
 
 const DebugPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('logs')
   const [position, setPosition] = useState({ x: 100, y: 100 })
-  
-  const { 
-    isVisible, 
-    setVisible, 
-    logs, 
-    networkRequests, 
-    performanceMetrics, 
+
+  const {
+    isVisible,
+    setVisible,
+    logs,
+    networkRequests,
+    performanceMetrics,
     componentStates,
     clearLogs,
     clearNetworkRequests,
     clearPerformanceMetrics,
     clearComponentStates,
     exportAllData,
-    viewServerLogs
+    viewServerLogs,
   } = useDebugStore()
 
   // 计算各种统计信息
   const stats = useMemo(() => {
     const errorLogs = logs.filter(log => log.level === 'error').length
     const warnLogs = logs.filter(log => log.level === 'warn').length
-    const failedRequests = networkRequests.filter(req => req.error || (req.status && req.status >= 400)).length
-    
+    const failedRequests = networkRequests.filter(
+      req => req.error || (req.status && req.status >= 400)
+    ).length
+
     return {
       totalLogs: logs.length,
       errorLogs,
@@ -40,37 +42,37 @@ const DebugPanel: React.FC = () => {
       totalRequests: networkRequests.length,
       failedRequests,
       totalMetrics: performanceMetrics.length,
-      totalComponents: componentStates.length
+      totalComponents: componentStates.length,
     }
   }, [logs, networkRequests, performanceMetrics, componentStates])
 
   if (!isVisible) return null
 
   const tabs = [
-    { 
-      id: 'logs', 
-      label: '日志', 
+    {
+      id: 'logs',
+      label: '日志',
       count: stats.totalLogs,
       badge: stats.errorLogs > 0 ? stats.errorLogs : undefined,
-      badgeColor: 'bg-red-500'
+      badgeColor: 'bg-red-500',
     },
-    { 
-      id: 'network', 
-      label: '网络', 
+    {
+      id: 'network',
+      label: '网络',
       count: stats.totalRequests,
       badge: stats.failedRequests > 0 ? stats.failedRequests : undefined,
-      badgeColor: 'bg-red-500'
+      badgeColor: 'bg-red-500',
     },
-    { 
-      id: 'performance', 
-      label: '性能', 
-      count: stats.totalMetrics
+    {
+      id: 'performance',
+      label: '性能',
+      count: stats.totalMetrics,
     },
-    { 
-      id: 'components', 
-      label: '组件', 
-      count: stats.totalComponents
-    }
+    {
+      id: 'components',
+      label: '组件',
+      count: stats.totalComponents,
+    },
   ]
 
   const handleClearAll = () => {
@@ -94,14 +96,12 @@ const DebugPanel: React.FC = () => {
         {/* 工具栏 */}
         <div className="bg-bg-secondary border-b border-gray-200 px-4 py-2 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="text-xs text-gray-500">
-              🐛 Debug Console
-            </div>
+            <div className="text-xs text-gray-500">🐛 Debug Console</div>
             <div className="text-xs text-gray-400">
               Ctrl+Shift+D: Toggle | Ctrl+Shift+E: Export | Ctrl+Shift+C: Clear
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={viewServerLogs}
@@ -128,22 +128,22 @@ const DebugPanel: React.FC = () => {
         {/* 标签页导航 */}
         <div className="bg-bg-paper border-b border-gray-200">
           <div className="flex">
-            {tabs.map((tab) => (
+            {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors relative ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-text-primary hover:border-gray-300'
+                    : 'border-transparent text-gray-500 hover:text-text-primary hover:border-gray-300 bg-bg-secondary'
                 }`}
               >
                 <span>{tab.label}</span>
-                {tab.count > 0 && (
-                  <span className="ml-1 text-xs text-gray-400">({tab.count})</span>
-                )}
+                {tab.count > 0 && <span className="ml-1 text-xs text-gray-400">({tab.count})</span>}
                 {tab.badge && tab.badge > 0 && (
-                  <span className={`absolute -top-1 -right-1 min-w-5 h-5 text-xs text-white rounded-full flex items-center justify-center ${tab.badgeColor}`}>
+                  <span
+                    className={`absolute -top-1 -right-1 min-w-5 h-5 text-xs text-white rounded-full flex items-center justify-center ${tab.badgeColor}`}
+                  >
                     {tab.badge}
                   </span>
                 )}
@@ -153,7 +153,7 @@ const DebugPanel: React.FC = () => {
         </div>
 
         {/* 标签页内容 */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden custom-scrollbar">
           {activeTab === 'logs' && <LogsTab />}
           {activeTab === 'network' && <NetworkTab />}
           {activeTab === 'performance' && <PerformanceTab />}
@@ -168,7 +168,7 @@ const DebugPanel: React.FC = () => {
             <span>性能: {stats.totalMetrics}</span>
             <span>组件: {stats.totalComponents}</span>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             {stats.errorLogs > 0 && (
               <span className="text-red-500">⚠ {stats.errorLogs} 个错误</span>
@@ -176,9 +176,7 @@ const DebugPanel: React.FC = () => {
             {stats.failedRequests > 0 && (
               <span className="text-red-500">⚠ {stats.failedRequests} 个失败请求</span>
             )}
-            <span className="text-gray-400">
-              {new Date().toLocaleTimeString()}
-            </span>
+            <span className="text-gray-400">{new Date().toLocaleTimeString()}</span>
           </div>
         </div>
       </div>

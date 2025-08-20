@@ -22,62 +22,12 @@ router.get('/:projectId/members', [
     const { projectId } = req.params
     const { role, status, search } = req.query
 
-    // 模拟团队成员数据
-    const mockMembers = [
-      {
-        id: 'current-user',
-        name: '当前用户',
-        email: 'current@example.com',
-        avatar: '',
-        role: 'owner',
-        joinedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        lastActive: new Date(),
-        status: 'active'
-      },
-      {
-        id: 'user-2',
-        name: '张三',
-        email: 'zhangsan@example.com',
-        avatar: '',
-        role: 'admin',
-        joinedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-        lastActive: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        status: 'active'
-      },
-      {
-        id: 'user-3',
-        name: '李四',
-        email: 'lisi@example.com',
-        avatar: '',
-        role: 'editor',
-        joinedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-        lastActive: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        status: 'active'
-      },
-      {
-        id: 'user-4',
-        name: '王五',
-        email: 'wangwu@example.com',
-        avatar: '',
-        role: 'viewer',
-        joinedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-        lastActive: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        status: 'active'
-      },
-      {
-        id: 'user-5',
-        name: '赵六',
-        email: 'zhaoliu@example.com',
-        avatar: '',
-        role: 'editor',
-        joinedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        lastActive: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-        status: 'pending'
-      }
-    ]
+    // TODO: 从数据库获取真实团队成员数据
+    // 当前返回空数组，等待用户管理系统建立后实现真实数据查询
+    const members = []
 
     // 应用过滤器
-    let filteredMembers = mockMembers
+    let filteredMembers = members
     
     if (role) {
       filteredMembers = filteredMembers.filter(member => member.role === role)

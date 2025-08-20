@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useDebugStore from '../DebugStore'
 import { LogEntry } from '../types'
 
@@ -7,22 +7,18 @@ const LogsTab: React.FC = () => {
   const [autoScroll, setAutoScroll] = useState(true)
   const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null)
   const logsEndRef = useRef<HTMLDivElement>(null)
-  
-  const { 
-    logs, 
-    filters, 
-    setLogFilter, 
-    clearLogs 
-  } = useDebugStore()
+
+  const { logs, filters, setLogFilter, clearLogs } = useDebugStore()
 
   // 过滤日志
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
       const levelMatch = filters.logLevel.includes(log.level)
-      const searchMatch = searchTerm === '' || 
+      const searchMatch =
+        searchTerm === '' ||
         log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.source?.toLowerCase().includes(searchTerm.toLowerCase())
-      
+
       return levelMatch && searchMatch
     })
   }, [logs, filters.logLevel, searchTerm])
@@ -36,31 +32,41 @@ const LogsTab: React.FC = () => {
 
   const getLevelColor = (level: LogEntry['level']) => {
     switch (level) {
-      case 'debug': return 'text-gray-500'
-      case 'info': return 'text-blue-600'
-      case 'warn': return 'text-yellow-600'
-      case 'error': return 'text-red-600'
-      default: return 'text-gray-600'
+      case 'debug':
+        return 'text-gray-500'
+      case 'info':
+        return 'text-blue-600'
+      case 'warn':
+        return 'text-yellow-600'
+      case 'error':
+        return 'text-red-600'
+      default:
+        return 'text-text-secondary'
     }
   }
 
   const getLevelBg = (level: LogEntry['level']) => {
     switch (level) {
-      case 'debug': return 'bg-gray-100'
-      case 'info': return 'bg-primary-50 dark:bg-primary-900/20'
-      case 'warn': return 'bg-yellow-50'
-      case 'error': return 'bg-red-50'
-      default: return 'bg-bg-secondary'
+      case 'debug':
+        return 'bg-gray-100'
+      case 'info':
+        return 'bg-primary-50 dark:bg-primary-900/20'
+      case 'warn':
+        return 'bg-yellow-50'
+      case 'error':
+        return 'bg-red-50'
+      default:
+        return 'bg-bg-secondary'
     }
   }
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp)
-    const timeStr = date.toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      second: '2-digit'
+    const timeStr = date.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
     })
     const ms = date.getMilliseconds().toString().padStart(3, '0')
     return `${timeStr}.${ms}`
@@ -77,11 +83,11 @@ const LogsTab: React.FC = () => {
     const data = {
       version: '1.0',
       timestamp: new Date().toISOString(),
-      logs: filteredLogs
+      logs: filteredLogs,
     }
 
     const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json'
+      type: 'application/json',
     })
 
     const url = URL.createObjectURL(blob)
@@ -104,20 +110,20 @@ const LogsTab: React.FC = () => {
               type="text"
               placeholder="搜索日志..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              onChange={e => setSearchTerm(e.target.value)}
+              className="px-2 py-1 text-xs border border-gray-300 bg-bg-secondary focus:outline-none rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <label className="flex items-center text-xs">
               <input
                 type="checkbox"
                 checked={autoScroll}
-                onChange={(e) => setAutoScroll(e.target.checked)}
+                onChange={e => setAutoScroll(e.target.checked)}
                 className="mr-1"
               />
               自动滚动
             </label>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={exportLogs}
@@ -145,9 +151,7 @@ const LogsTab: React.FC = () => {
                 onChange={() => handleLevelToggle(level)}
                 className="mr-1"
               />
-              <span className={`capitalize ${getLevelColor(level)}`}>
-                {level}
-              </span>
+              <span className={`capitalize ${getLevelColor(level)}`}>{level}</span>
               <span className="ml-1 text-gray-400">
                 ({logs.filter(log => log.level === level).length})
               </span>
@@ -158,13 +162,15 @@ const LogsTab: React.FC = () => {
 
       <div className="flex flex-1 min-h-0">
         {/* 日志列表 */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto custom-scrollbar">
           <div className="divide-y divide-gray-100">
-            {filteredLogs.map((log) => (
+            {filteredLogs.map(log => (
               <div
                 key={log.id}
                 className={`p-2 hover:bg-bg-secondary cursor-pointer text-xs ${
-                  selectedLog?.id === log.id ? 'bg-primary-50 dark:bg-primary-900/20 border-l-2 border-blue-500' : ''
+                  selectedLog?.id === log.id
+                    ? 'bg-primary-50 dark:bg-primary-900/20 border-l-2 border-blue-500'
+                    : ''
                 }`}
                 onClick={() => setSelectedLog(selectedLog?.id === log.id ? null : log)}
               >
@@ -172,29 +178,28 @@ const LogsTab: React.FC = () => {
                   <span className="text-gray-400 font-mono-nerd text-xs whitespace-nowrap">
                     {formatTime(log.timestamp)}
                   </span>
-                  <span className={`px-1 py-0.5 rounded text-xs font-medium uppercase ${getLevelBg(log.level)} ${getLevelColor(log.level)}`}>
+                  <span
+                    className={`px-1 py-0.5 rounded text-xs font-medium uppercase ${getLevelBg(log.level)} ${getLevelColor(log.level)}`}
+                  >
                     {log.level}
                   </span>
                   {log.source && (
-                    <span className="text-purple-600 text-xs font-medium">
-                      [{log.source}]
-                    </span>
+                    <span className="text-purple-600 text-xs font-medium">[{log.source}]</span>
                   )}
-                  <span className="flex-1 text-gray-800 break-words">
-                    {log.message}
-                  </span>
+                  <span className="flex-1 text-gray-800 break-words">{log.message}</span>
                 </div>
-                
+
                 {log.data && (
-                  <div className="mt-1 ml-20 text-gray-600 text-xs font-mono-nerd">
-                    Data: {typeof log.data === 'object' ? JSON.stringify(log.data) : String(log.data)}
+                  <div className="mt-1 ml-20 text-text-secondary text-xs font-mono-nerd">
+                    Data:{' '}
+                    {typeof log.data === 'object' ? JSON.stringify(log.data) : String(log.data)}
                   </div>
                 )}
               </div>
             ))}
             <div ref={logsEndRef} />
           </div>
-          
+
           {filteredLogs.length === 0 && (
             <div className="flex items-center justify-center h-32 text-gray-500 text-sm">
               暂无日志显示
@@ -204,13 +209,13 @@ const LogsTab: React.FC = () => {
 
         {/* 详情面板 */}
         {selectedLog && (
-          <div className="w-80 border-l border-gray-200 bg-bg-secondary overflow-auto">
+          <div className="w-80 border-l border-gray-200 bg-bg-secondary overflow-auto scrollbar-thin">
             <div className="p-3">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium text-gray-800">日志详情</h4>
                 <button
                   onClick={() => setSelectedLog(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-text-secondary"
                 >
                   ✕
                 </button>
@@ -246,7 +251,7 @@ const LogsTab: React.FC = () => {
                 {selectedLog.data && (
                   <div>
                     <label className="text-gray-500 font-medium">数据:</label>
-                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-32">
+                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-32 scrollbar-thin">
                       {JSON.stringify(selectedLog.data, null, 2)}
                     </pre>
                   </div>
@@ -255,7 +260,7 @@ const LogsTab: React.FC = () => {
                 {selectedLog.stack && (
                   <div>
                     <label className="text-gray-500 font-medium">调用栈:</label>
-                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-40 whitespace-pre-wrap">
+                    <pre className="mt-1 bg-bg-paper p-2 rounded border text-xs font-mono-nerd overflow-auto max-h-40 whitespace-pre-wrap scrollbar-thin">
                       {selectedLog.stack}
                     </pre>
                   </div>

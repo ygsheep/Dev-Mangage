@@ -36,7 +36,6 @@ export { default as APITestModal } from './features/api/components/modals/APITes
 
 // 导入功能
 export { default as UnifiedImportModal } from './features/import/components/modals/UnifiedImportModal'
-export { default as ImportDocumentModal } from './features/import/components/modals/ImportDocumentModal'
 export { default as ImportSwaggerModal } from './features/import/components/modals/ImportSwaggerModal'
 export { default as ImportAPIDocModal } from './features/import/components/modals/ImportAPIDocModal'
 
@@ -60,6 +59,9 @@ export { default as QuickSearch } from './features/search/components/QuickSearch
 // 集成组件
 export { default as AIConfigModal } from './integrations/ai/AIConfigModal'
 export { default as MCPServerControl } from './integrations/mcp/MCPServerControl'
+
+// 通用组件
+export { default as AIDocumentParser } from './common/AIDocumentParser'
 
 // 共享组件
 // export { default as FontTest } from './shared/FontTest'
