@@ -334,14 +334,20 @@ const Layout: React.FC = () => {
       >
         <div className="flex h-full flex-col" onClick={e => e.stopPropagation()}>
           {/* 顶部Logo和收起按钮 */}
-          <div className="flex h-12 items-center px-3">
-            <div className="flex items-center gap-2 w-full">
+          <div
+            className={`flex h-12 items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'px-3'}`}
+          >
+            <div
+              className={`flex items-center w-full ${isSidebarCollapsed ? 'justify-center' : 'gap-2'}`}
+            >
               <button
                 onClick={toggleSidebar}
-                className="px-2 py-2 rounded hover:bg-[#404040] transition-colors duration-300 flex-shrink-0"
+                className={`rounded hover:bg-[#404040] transition-colors duration-300 flex-shrink-0 ${
+                  isSidebarCollapsed ? 'p-3 w-8 h-8 flex items-center justify-center' : 'px-2 py-2'
+                }`}
                 title={isSidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
               >
-                <Menu className="w-3 h-3" />
+                <Menu className="w-4 h-4" />
               </button>
               <div
                 className={`overflow-hidden transition-all duration-300 flex-1 flex justify-center ${
@@ -355,17 +361,17 @@ const Layout: React.FC = () => {
 
           {/* Desktop模式下的搜索组件 */}
           {isDesktopMode && (
-            <div className="px-3 py-2">
+            <div className={`py-2 ${isSidebarCollapsed ? 'px-2' : 'px-3'}`}>
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className={`w-full flex items-center text-sm rounded-lg transition-all duration-300 ${
+                className={`flex items-center text-sm rounded-lg transition-all duration-300 ${
                   isSidebarCollapsed
-                    ? 'justify-center w-6 h-6 hover:bg-[#404040]'
-                    : 'px-3 py-2 text-[#b8b8b8] bg-[#404040] hover:bg-[#505050]'
+                    ? 'justify-center w-8 h-8 hover:bg-[#404040]'
+                    : 'w-full px-3 py-2 text-[#b8b8b8] bg-[#404040] hover:bg-[#505050]'
                 }`}
                 title={isSidebarCollapsed ? '搜索' : '搜索项目、API...'}
               >
-                <Search className="w-3 h-3 flex-shrink-0" />
+                <Search className="w-4 h-4 flex-shrink-0" />
                 <div
                   className={`overflow-hidden transition-all duration-300 ${
                     isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
@@ -378,7 +384,7 @@ const Layout: React.FC = () => {
           )}
 
           {/* 主要功能按钮 */}
-          <div className="p-3 space-y-1">
+          <div className={`space-y-1 ${isSidebarCollapsed ? 'px-2' : 'px-3'} py-3`}>
             {navigation.map(item => {
               const active = isActive(item.href)
               return (
@@ -392,10 +398,10 @@ const Layout: React.FC = () => {
                       : active
                         ? 'bg-[#404040] text-white'
                         : 'hover:bg-[#404040] hover:text-white'
-                  } ${isSidebarCollapsed ? 'justify-center w-6 h-6' : 'px-3 py-2.5'}`}
+                  } ${isSidebarCollapsed ? 'justify-center w-8 h-8' : 'px-3 py-2.5'}`}
                   title={isSidebarCollapsed ? item.name : ''}
                 >
-                  <item.icon className="w-3 h-3 flex-shrink-0" />
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
                   <div
                     className={`overflow-hidden transition-all duration-300 ${
                       isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
@@ -412,7 +418,7 @@ const Layout: React.FC = () => {
           <div className="mx-3 my-2"></div>
 
           {/* 功能模块导航 */}
-          <div className="px-3 flex-1 space-y-1">
+          <div className={`flex-1 space-y-1 ${isSidebarCollapsed ? 'px-2' : 'px-3'}`}>
             {mainNavigation.map(item => {
               const active = isActive(item.href)
               return (
@@ -426,10 +432,10 @@ const Layout: React.FC = () => {
                       : isSidebarCollapsed
                         ? 'hover:bg-[#d97757] hover:text-white'
                         : 'hover:bg-[#404040] hover:text-white'
-                  } ${isSidebarCollapsed ? 'justify-center w-6 h-6' : 'px-3 py-2'}`}
+                  } ${isSidebarCollapsed ? 'justify-center w-8 h-8' : 'px-3 py-2'}`}
                   title={isSidebarCollapsed ? item.name : ''}
                 >
-                  <item.icon className="w-3 h-3 flex-shrink-0" />
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
                   <div
                     className={`overflow-hidden transition-all duration-300 ${
                       isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
@@ -464,19 +470,21 @@ const Layout: React.FC = () => {
                 {/* 当前项目信息 - 可点击跳转到项目总览 */}
                 <Link
                   to={`/projects/${activeProjectId}`}
-                  className={`mx-3 mb-2 block p-2 bg-[#404040] rounded-lg hover:bg-[#4a4a4a] transition-colors ${isSidebarCollapsed ? 'px-1' : ''}`}
+                  className={`block rounded-lg hover:bg-[#4a4a4a] transition-colors ${
+                    isSidebarCollapsed ? 'mx-0 mb-2' : 'mx-0 mb-2 p-2 bg-[#404040]'
+                  }`}
                   title={isSidebarCollapsed ? '点击查看项目总览' : ''}
                 >
                   {isSidebarCollapsed ? (
-                    <div className="w-full h-8 bg-primary-600 rounded flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">
+                    <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">
                         {projectData?.data?.project?.name?.charAt(0).toUpperCase() || 'P'}
                       </span>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 bg-primary-600 rounded flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-[10px] font-bold">
+                      <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-sm font-bold">
                           {projectData?.data?.project?.name?.charAt(0).toUpperCase() || 'P'}
                         </span>
                       </div>
@@ -515,16 +523,16 @@ const Layout: React.FC = () => {
                       key={item.name}
                       to={item.href}
                       onClick={e => handleMainNavClick(e, item.href)}
-                      className={`claude-nav-item group flex items-center text-sm rounded-lg transition-all duration-300 mx-3 mb-1 ${
+                      className={`claude-nav-item group flex items-center text-sm rounded-lg transition-all duration-300 mb-1 ${
                         active
                           ? 'bg-[#404040] text-white'
                           : isSidebarCollapsed
                             ? 'hover:bg-[#d97757] hover:text-white'
                             : 'hover:bg-[#404040] hover:text-white'
-                      } ${isSidebarCollapsed ? 'justify-center w-6 h-6' : 'px-3 py-2'}`}
+                      } ${isSidebarCollapsed ? 'justify-center w-8 h-8 mx-0' : 'px-3 py-2 mx-0'}`}
                       title={isSidebarCollapsed ? item.name : ''}
                     >
-                      <item.icon className="w-3 h-3 flex-shrink-0" />
+                      <item.icon className="w-4 h-4 flex-shrink-0" />
                       <div
                         className={`overflow-hidden transition-all duration-300 ${
                           isSidebarCollapsed ? 'w-0 opacity-0 ml-0' : 'w-auto opacity-100 ml-3'
@@ -546,18 +554,18 @@ const Layout: React.FC = () => {
           />
 
           {/* 底部用户菜单 */}
-          <div className="p-3" ref={userMenuRef}>
+          <div className={`${isSidebarCollapsed ? 'px-2' : 'px-3'} py-3`} ref={userMenuRef}>
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className={`claude-user-btn flex items-center rounded-lg hover:bg-[#404040] transition-colors duration-300 ${
-                  isSidebarCollapsed ? 'justify-center w-6 h-6' : 'w-full px-2 py-2'
+                  isSidebarCollapsed ? 'justify-center w-8 h-8' : 'w-full px-2 py-2'
                 }`}
                 title={isSidebarCollapsed ? '用户菜单' : ''}
               >
                 <div className="flex-shrink-0">
-                  <div className="h-4 w-4 rounded bg-[#d97757] flex items-center justify-center">
-                    <span className="text-[10px] font-medium text-white">D</span>
+                  <div className="h-6 w-6 rounded bg-[#d97757] flex items-center justify-center">
+                    <span className="text-xs font-medium text-white">D</span>
                   </div>
                 </div>
                 <div

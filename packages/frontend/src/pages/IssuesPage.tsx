@@ -1,3 +1,4 @@
+import { ArrowLeft } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GitHubSyncPanel } from '../components/features/issues/GitHubSyncPanel'
@@ -6,7 +7,6 @@ import { IssuesFilterBar } from '../components/features/issues/IssuesFilterBar'
 import { CreateIssueModal } from '../components/features/issues/modals/CreateIssueModal'
 import { Issue, IssueFilters, IssuePriority, IssueStats } from '../types'
 import { getIssueStats, getIssues } from '../utils/api'
-
 export const IssuesPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>()
   const navigate = useNavigate()
@@ -120,27 +120,65 @@ export const IssuesPage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* 页面标题和操作栏 */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">Issues 管理</h1>
-          <p className="text-text-secondary mt-1">管理项目中的 Issues 和 GitHub 同步</p>
-        </div>
-
-        <div className="flex space-x-3">
-          <button
-            onClick={() => setShowSyncPanel(true)}
-            className="px-4 py-2 bg-gray-100 text-text-secondary rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            GitHub 同步
-          </button>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            新建 Issue
-          </button>
+    <div className="max-w-7xl mx-auto">
+      {/* 页面头部 */}
+      <div className="bg-bg-paper border-b border-border-primary mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => navigate(`/projects/${projectId}`)}
+                  className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors mr-2"
+                  title="返回项目详情"
+                >
+                  <ArrowLeft className="w-5 h-5 text-text-secondary" />
+                </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-6 h-6 text-white"
+                >
+                  <path d="m8 2 1.88 1.88"></path>
+                  <path d="M14.12 3.88 16 2"></path>
+                  <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"></path>
+                  <path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"></path>
+                  <path d="M12 20v-9"></path>
+                  <path d="M6.53 9C4.6 8.8 3 7.1 3 5"></path>
+                  <path d="M6 13H2"></path>
+                  <path d="M3 21c0-2.1 1.7-3.9 3.8-4"></path>
+                  <path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"></path>
+                  <path d="M22 13h-4"></path>
+                  <path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"></path>
+                </svg>
+                <div>
+                  <h1 className="text-xl font-bold text-text-primary">Issues 管理</h1>
+                  <p className="text-sm text-text-secondary">管理项目中的 Issues 和 GitHub 同步</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex space-x-3 ">
+              <button
+                onClick={() => setShowSyncPanel(true)}
+                className="px-4 py-2 bg-gray-100 text-text-secondary rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                GitHub 同步
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                新建 Issue
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

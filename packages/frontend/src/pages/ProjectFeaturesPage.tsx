@@ -1,15 +1,12 @@
+import { ArrowLeft, Layers } from 'lucide-react'
 import React from 'react'
-import { useParams } from 'react-router-dom'
-import {
-  Layers,
-  Users
-} from 'lucide-react'
-
+import { useNavigate, useParams } from 'react-router-dom'
 // 功能模块组件
 import FeatureModuleList from '../components/features/data-model/components/FeatureModuleList'
 
 const ProjectFeaturesPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -19,14 +16,18 @@ const ProjectFeaturesPage: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => navigate(`/projects/${projectId}`)}
+                  className="p-2 hover:bg-bg-tertiary rounded-lg transition-colors mr-2"
+                  title="返回项目详情"
+                >
+                  <ArrowLeft className="w-5 h-5 text-text-secondary" />
+                </button>
+
                 <Layers className="w-8 h-8 text-primary-600" />
                 <div>
-                  <h1 className="text-xl font-semibold text-text-primary">
-                    功能模块管理
-                  </h1>
-                  <p className="text-sm text-text-secondary">
-                    管理项目的功能模块和业务组件
-                  </p>
+                  <h1 className="text-xl font-semibold text-text-primary">功能模块管理</h1>
+                  <p className="text-sm text-text-secondary">管理项目的功能模块和业务组件</p>
                 </div>
               </div>
             </div>

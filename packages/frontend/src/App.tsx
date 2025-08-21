@@ -25,6 +25,7 @@ import ProjectFeaturesPage from './pages/ProjectFeaturesPage'
 import ProjectsPage from './pages/ProjectsPage'
 import ProjectsManagePage from './pages/ProjectsManagePage'
 import SettingsPage from './pages/SettingsPage'
+import MCPConfigTestPage from './pages/MCPConfigTestPage'
 
 // 布局组件
 import Layout from './components/layout'
@@ -96,6 +97,7 @@ function App() {
             <Route path="api-management" element={<APIManagementPage />} />
             <Route path="ai-parse" element={<AIDocumentParsePage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="mcp-config-test" element={<MCPConfigTestPage />} />
           </Route>
           </Routes>
         </div>

@@ -18,9 +18,9 @@ router.get('/stats', async (req, res, next) => {
       const project = await prisma.project.findUnique({
         where: { id: projectId as string },
         include: {
-          apiEndpoints: {
+          apis: {
             include: {
-              endpointTags: {
+              apiTags: {
                 include: {
                   tag: true
                 }
@@ -42,20 +42,20 @@ router.get('/stats', async (req, res, next) => {
       }
 
       // API状态分布
-      const apiStatusStats = project.apiEndpoints.reduce((acc: any, api) => {
+      const apiStatusStats = project.apis.reduce((acc: any, api) => {
         acc[api.status] = (acc[api.status] || 0) + 1;
         return acc;
       }, {});
 
       // HTTP方法分布
-      const methodStats = project.apiEndpoints.reduce((acc: any, api) => {
+      const methodStats = project.apis.reduce((acc: any, api) => {
         acc[api.method] = (acc[api.method] || 0) + 1;
         return acc;
       }, {});
 
       // 标签使用统计
-      const tagStats = project.apiEndpoints.flatMap(api => 
-        api.endpointTags.map(at => at.tag.name)
+      const tagStats = project.apis.flatMap(api => 
+        api.apiTags.map(at => at.tag.name)
       ).reduce((acc: any, tagName) => {
         acc[tagName] = (acc[tagName] || 0) + 1;
         return acc;
@@ -73,7 +73,7 @@ router.get('/stats', async (req, res, next) => {
 
       const projectStats = {
         overview: {
-          totalApis: project.apiEndpoints.length,
+          totalApis: project.apis.length,
           totalTags: project.tags.length,
           totalTables: project.databaseTables.length,
           lastUpdated: project.updatedAt

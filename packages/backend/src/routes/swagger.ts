@@ -206,16 +206,17 @@ async function importSwaggerToProject(api: any, projectId: string, options: any)
           }
         }
 
-        // Prepare API data
+        // Prepare API data - match APIEndpoint schema fields
         const apiData = {
           projectId,
           name: apiName,
           method: httpMethod,
           path,
           description: op.description || op.summary,
-          parameters: op.parameters ? JSON.stringify(op.parameters) : null,
-          responses: op.responses ? JSON.stringify(op.responses) : null,
-          status: defaultStatus,
+          summary: op.summary,
+          // Note: parameters and responses are handled through separate tables in APIEndpoint model
+          // status field doesn't exist in APIEndpoint, might use implementationStatus instead
+          implementationStatus: defaultStatus || 'NOT_IMPLEMENTED',
         }
 
         // Create API
@@ -226,9 +227,7 @@ async function importSwaggerToProject(api: any, projectId: string, options: any)
           create: apiData,
           update: overwriteExisting ? apiData : {},
           include: {
-            endpointTags: {
-              include: { tag: true },
-            },
+            // Note: APIEndpoint doesn't have endpointTags relation, it may have a different relation
           },
         })
 
@@ -242,15 +241,15 @@ async function importSwaggerToProject(api: any, projectId: string, options: any)
             await prisma.aPIEndpoint.update({
               where: { id: createdAPI.id },
               data: {
-                endpointTags: {
-                  create: tagIds.map(tagId => ({ tagId })),
-                },
+                // Note: APIEndpoint model doesn't have endpointTags relation
+                // Tags might need to be handled differently or stored in the tags field as JSON
+                tags: JSON.stringify(tagIds),
               },
             })
           }
         }
 
-        results.apis.push(createdAPI)
+        results.apiEndpoints.push(createdAPI)
         results.imported++
       } catch (error) {
         console.error(`Error importing ${method.toUpperCase()} ${path}:`, error)

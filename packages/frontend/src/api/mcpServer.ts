@@ -24,11 +24,143 @@ export interface MCPServerLog {
   source?: string
 }
 
+export interface MCPConfig {
+  backend: {
+    host: string
+    port: number
+    url: string
+    apiBaseUrl: string
+  }
+  mcp: {
+    http: {
+      host: string
+      port: number
+      url: string
+      endpoints: {
+        health: string
+        tools: string
+        status: string
+        logs: string
+        start: string
+        stop: string
+        ping: string
+      }
+    }
+    ws: {
+      host: string
+      port: number
+      url: string
+      enabled: boolean
+    }
+    standalone: {
+      host: string
+      port: number
+      url: string
+      serverPath: string
+      enabled: boolean
+    }
+  }
+  tools: {
+    available: string[]
+    count: number
+  }
+  runtime: {
+    nodeVersion: string
+    platform: string
+    architecture: string
+    workingDirectory: string
+    environment: string
+    uptime: number
+  }
+  status: MCPServerStatus
+  timestamp: string
+}
+
 /**
  * MCP 服务器 API 客户端
  * 统一管理与 MCP 服务器的通信
  */
 class MCPServerAPI {
+  /**
+   * 获取 MCP 配置信息
+   */
+  async getConfig(): Promise<MCPConfig> {
+    try {
+      const response = await fetch(`${mcpConfig.getBackendBaseUrl()}/mcp/config`)
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.message || '获取配置失败')
+      }
+      debug.log('获取MCP配置成功', result.config, 'MCPServerAPI')
+      return result.config
+    } catch (error) {
+      debug.error('获取MCP配置失败', error, 'MCPServerAPI')
+      // 返回默认配置
+      return {
+        backend: {
+          host: ENV_CONFIG.backend.host,
+          port: ENV_CONFIG.backend.port,
+          url: `http://${ENV_CONFIG.backend.host}:${ENV_CONFIG.backend.port}`,
+          apiBaseUrl: '/api/v1'
+        },
+        mcp: {
+          http: {
+            host: ENV_CONFIG.mcp.http.host,
+            port: ENV_CONFIG.mcp.http.port,
+            url: `http://${ENV_CONFIG.mcp.http.host}:${ENV_CONFIG.mcp.http.port}`,
+            endpoints: {
+              health: '/mcp/health',
+              tools: '/mcp/tools',
+              status: '/api/v1/mcp/status',
+              logs: '/api/v1/mcp/logs',
+              start: '/api/v1/mcp/start',
+              stop: '/api/v1/mcp/stop',
+              ping: '/api/v1/mcp/ping'
+            }
+          },
+          ws: {
+            host: ENV_CONFIG.mcp.ws.host,
+            port: ENV_CONFIG.mcp.ws.port,
+            url: `ws://${ENV_CONFIG.mcp.ws.host}:${ENV_CONFIG.mcp.ws.port}`,
+            enabled: false
+          },
+          standalone: {
+            host: 'localhost',
+            port: 3000,
+            url: 'http://localhost:3000',
+            serverPath: '',
+            enabled: false
+          }
+        },
+        tools: {
+          available: [],
+          count: 0
+        },
+        runtime: {
+          nodeVersion: '',
+          platform: '',
+          architecture: '',
+          workingDirectory: '',
+          environment: 'development',
+          uptime: 0
+        },
+        status: {
+          isRunning: false,
+          port: ENV_CONFIG.backend.port,
+          uptime: 0,
+          requestCount: 0,
+          lastActivity: null,
+          vectorSearchStatus: 'idle',
+          databaseStatus: 'disconnected'
+        },
+        timestamp: new Date().toISOString()
+      }
+    }
+  }
+
   /**
    * 获取 MCP 服务器状态
    */

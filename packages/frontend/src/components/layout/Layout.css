@@ -7,7 +7,22 @@
   transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 200ms ease;
 }
 
-/* 侧边栏收起状态悬停效果已移除 */
+/* 收起状态下的居中优化 */
+.claude-sidebar.group:has(.w-16) .claude-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 4px;
+  width: 40px;
+  height: 40px;
+}
+
+/* 项目头像在收起状态下的居中 */
+.claude-sidebar.group:has(.w-16) .project-avatar {
+  margin: 0 auto 8px;
+  width: 40px;
+  height: 40px;
+}
 
 /* 内容区域动画 */
 .content-transition {

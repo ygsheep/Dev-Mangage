@@ -241,12 +241,15 @@ export function printConfigInfo(): void {
     safeConfig.database.url = url.toString();
   }
 
-  console.log('🔧 MCP服务器配置:');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`📦 服务器: ${config.server.name} v${config.server.version}`);
-  console.log(`🌐 HTTP端口: ${config.http.host}:${config.http.port}`);
-  console.log(`🔍 搜索配置: 默认限制=${config.search.defaultLimit}, 向量搜索=${config.search.enableVectorSearch ? '启用' : '禁用'}`);
-  console.log(`📊 RAG功能: ${config.rag.enabled ? '启用' : '禁用'}`);
-  console.log(`📝 日志级别: ${config.log.level}`);
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  // 只在HTTP模式下输出配置信息，避免STDIO模式下干扰MCP协议
+  if (process.env.HTTP_MCP_PORT) {
+    console.log('🔧 MCP服务器配置:');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`📦 服务器: ${config.server.name} v${config.server.version}`);
+    console.log(`🌐 HTTP端口: ${config.http.host}:${config.http.port}`);
+    console.log(`🔍 搜索配置: 默认限制=${config.search.defaultLimit}, 向量搜索=${config.search.enableVectorSearch ? '启用' : '禁用'}`);
+    console.log(`📊 RAG功能: ${config.rag.enabled ? '启用' : '禁用'}`);
+    console.log(`📝 日志级别: ${config.log.level}`);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  }
 }

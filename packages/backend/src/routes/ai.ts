@@ -116,7 +116,7 @@ router.post('/config', [
     // 更新AI服务配置
     const success = await aiServiceManager.updateProviderConfig(provider, {
       model,
-      baseUrl,
+      apiUrl: baseUrl,
       apiKey,
       timeout: timeout || 120000,
       temperature: temperature || 0.1

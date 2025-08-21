@@ -452,7 +452,6 @@ router.post('/:projectId/issues', [
           data: relatedAPIs.map((relation: any) => ({
             issueId: newIssue.id,
             endpointId: relation.endpointId,
-            endpointId: relation.endpointId,
             relationType: relation.relationType || 'RELATES_TO',
             description: relation.description
           }))
@@ -476,7 +475,7 @@ router.post('/:projectId/issues', [
         await tx.issueFeatureRelation.createMany({
           data: relatedFeatures.map((relation: any) => ({
             issueId: newIssue.id,
-            featureName: relation.featureName,
+            featureId: relation.featureId,
             component: relation.component,
             relationType: relation.relationType || 'RELATES_TO',
             description: relation.description
@@ -691,10 +690,17 @@ router.get('/:projectId/issues/:issueId/relations/available', [
           issue: { projectId }
         },
         select: {
-          featureName: true,
-          component: true
+          featureId: true,
+          component: true,
+          feature: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true
+            }
+          }
         },
-        distinct: ['featureName', 'component']
+        distinct: ['featureId', 'component']
       })
     ])
 
@@ -713,13 +719,14 @@ router.get('/:projectId/issues/:issueId/relations/available', [
     const featureMap = new Map()
 
     for (const feature of features) {
-      const key = `${feature.featureName}-${feature.component || ''}`
+      const featureName = feature.feature?.name || feature.feature?.displayName || `Feature-${feature.featureId}`
+      const key = `${featureName}-${feature.component || ''}`
       if (!featureMap.has(key)) {
         featureMap.set(key, {
           id: key,
-          name: feature.featureName,
+          name: featureName,
           component: feature.component,
-          description: feature.component ? `${feature.featureName} (${feature.component})` : feature.featureName
+          description: feature.component ? `${featureName} (${feature.component})` : featureName
         })
       }
     }
@@ -747,13 +754,16 @@ router.get('/:projectId/issues/:issueId/relations/available', [
         excludeRelations = {
           apiEndpoints: issue.relatedAPIs.map(rel => rel.endpointId).filter(Boolean),
           tables: issue.relatedTables.map(rel => rel.tableId),
-          features: issue.relatedFeatures.map(rel => `${rel.featureName}-${rel.component || ''}`)
+          features: issue.relatedFeatures.map(rel => {
+            // Since we don't have the feature relation included, use featureId directly
+            return `Feature-${rel.featureId}-${rel.component || ''}`
+          })
         }
       }
     }
 
     // 过滤已关联的资源
-    const availableAPIs = flattenedAPIs.filter(api => !excludeRelations.apis.includes(api.id))
+    const availableAPIs = flattenedAPIs.filter(api => !excludeRelations.apiEndpoints.includes(api.id))
     const availableTables = tables.filter(table => !excludeRelations.tables.includes(table.id))
     const availableFeatures = uniqueFeatures.filter(feature => !excludeRelations.features.includes(feature.id))
 
@@ -878,7 +888,6 @@ router.post('/:projectId/issues/:issueId/relations/api', [
       data: {
         issueId,
         endpointId,
-        endpointId,
         relationType,
         description
       },
@@ -964,14 +973,15 @@ router.post('/:projectId/issues/:issueId/relations/table', [
 router.post('/:projectId/issues/:issueId/relations/feature', [
   param('projectId').isUUID().withMessage('项目ID格式无效'),
   param('issueId').isUUID().withMessage('IssueID格式无效'),
-  body('featureId').isString().notEmpty().withMessage('FeatureID不能为空'),
+  body('featureId').isUUID().withMessage('FeatureID格式无效'),
+  body('component').optional().isString().withMessage('组件名称格式无效'),
   body('relationType').optional().isIn(['RELATES_TO', 'DEPENDS_ON', 'BLOCKS', 'IMPLEMENTS', 'TESTS']).withMessage('关联类型无效'),
   body('description').optional().isString(),
   validateRequest()
 ], async (req, res, next) => {
   try {
     const { projectId, issueId } = req.params
-    const { featureId, relationType = 'RELATES_TO', description } = req.body
+    const { featureId, component, relationType = 'RELATES_TO', description } = req.body
 
     // 验证 Issue 是否存在
     const issue = await prisma.issue.findFirst({
@@ -982,22 +992,29 @@ router.post('/:projectId/issues/:issueId/relations/feature', [
       return next(new AppError('Issue不存在', 404))
     }
 
-    // 解析 featureId (格式: "featureName-component")
-    const parts = featureId.split('-')
-    const featureName = parts[0]
-    const component = parts.slice(1).join('-') || null
+    // 验证 FeatureModule 是否存在
+    const feature = await prisma.featureModule.findFirst({
+      where: { id: featureId, projectId }
+    })
+    
+    if (!feature) {
+      return next(new AppError('功能模块不存在', 404))
+    }
 
     const relation = await prisma.issueFeatureRelation.create({
       data: {
         issueId,
-        featureName,
+        featureId,
         component,
         relationType,
         description
+      },
+      include: {
+        feature: { select: { id: true, name: true, displayName: true } }
       }
     })
 
-    logger.info('创建Issue-Feature关联', { projectId, issueId, featureName, component, relationType })
+    logger.info('创建Issue-Feature关联', { projectId, issueId, featureId, component, relationType })
 
     res.status(201).json({
       success: true,

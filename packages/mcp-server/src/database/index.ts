@@ -41,18 +41,27 @@ export class DatabaseService {
       // 使用共享的 Prisma 实例来确保与后端的一致性
       this.prismaClient = sharedPrisma;
 
-      // 设置日志事件监听
-      this.prismaClient.$on('query', (e: any) => {
-        logger.debug(`数据库查询: ${e.query} | 参数: ${e.params} | 耗时: ${e.duration}ms`);
-      });
+      // 在STDIO模式下禁用Prisma日志输出以避免干扰MCP协议
+      if (!process.env.HTTP_MCP_PORT) {
+        // STDIO模式 - 不设置事件监听，避免输出
+      } else {
+        // HTTP模式 - 可以正常记录日志
+        try {
+          (this.prismaClient as any).$on('query', (e: any) => {
+            logger.debug(`数据库查询: ${e.query} | 参数: ${e.params} | 耗时: ${e.duration}ms`);
+          });
 
-      this.prismaClient.$on('error', (e: any) => {
-        logger.error('数据库错误:', e);
-      });
+          (this.prismaClient as any).$on('error', (e: any) => {
+            logger.error('数据库错误:', e);
+          });
 
-      this.prismaClient.$on('warn', (e: any) => {
-        logger.warn('数据库警告:', e);
-      });
+          (this.prismaClient as any).$on('warn', (e: any) => {
+            logger.warn('数据库警告:', e);
+          });
+        } catch (error) {
+          // 忽略事件监听设置错误
+        }
+      }
 
       // 测试连接
       await this.prismaClient.$connect();
@@ -102,17 +111,20 @@ export class DatabaseService {
    * 执行事务
    */
   public async transaction<T>(
-    fn: (client: PrismaClient) => Promise<T>,
+    fn: (client: any) => Promise<T>,
     options?: {
       timeout?: number;
       isolationLevel?: any;
     }
   ): Promise<T> {
     const client = this.getClient();
-    return await client.$transaction(fn, {
-      timeout: options?.timeout || config.database.queryTimeout,
-      isolationLevel: options?.isolationLevel
-    });
+    return await client.$transaction(
+      (prisma: any) => fn(prisma),
+      {
+        timeout: options?.timeout || config.database.queryTimeout,
+        isolationLevel: options?.isolationLevel
+      }
+    );
   }
 
   /**

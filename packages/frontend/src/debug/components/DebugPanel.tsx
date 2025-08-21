@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import useDebugStore from '../DebugStore'
 import ComponentsTab from './ComponentsTab'
 import DraggableWindow from './DraggableWindow'
@@ -123,17 +123,19 @@ const DebugPanel: React.FC = () => {
    */
   const handleToolbarMouseDown = (e: React.MouseEvent) => {
     // 如果点击的是按钮或按钮内的元素，不触发拖拽
-    if ((e.target as HTMLElement).tagName === 'BUTTON' || (e.target as HTMLElement).closest('button')) {
+    if (
+      (e.target as HTMLElement).tagName === 'BUTTON' ||
+      (e.target as HTMLElement).closest('button')
+    ) {
       return
     }
-    
+
     setIsDragging(true)
     setDragOffset({
       x: e.clientX - position.x,
       y: e.clientY - position.y,
     })
   }
-
   return (
     <DraggableWindow
       title="DevAPI Manager Debug Console"
@@ -146,7 +148,7 @@ const DebugPanel: React.FC = () => {
     >
       <div className="flex flex-col h-full">
         {/* 工具栏 - 支持拖拽 */}
-        <div 
+        <div
           className={`bg-bg-secondary border-b border-gray-200 px-4 py-2 flex items-center justify-between cursor-move select-none ${
             isDragging ? 'bg-gray-300' : ''
           }`}

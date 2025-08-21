@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import App from './App.tsx'
 import './index.css'
+import { mcpConfig } from './config/mcpConfig'
+import { debug } from './debug'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -20,6 +22,27 @@ const queryClient = new QueryClient({
 // 检测Electron环境
 const isElectron = typeof window !== 'undefined' && window.electronAPI
 const Router = isElectron ? HashRouter : BrowserRouter
+
+// 初始化MCP动态配置
+const initializeApp = async () => {
+  try {
+    debug.log('开始初始化应用配置', {}, 'App')
+    
+    // 初始化MCP动态配置
+    await mcpConfig.initializeDynamicConfig()
+    
+    debug.log('应用配置初始化完成', {
+      configType: mcpConfig.getConfigType(),
+      isDynamicEnabled: mcpConfig.isDynamicConfigEnabled()
+    }, 'App')
+    
+  } catch (error) {
+    debug.error('应用配置初始化失败', error, 'App')
+  }
+}
+
+// 启动应用配置初始化（异步）
+initializeApp()
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

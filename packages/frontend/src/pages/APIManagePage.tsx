@@ -1,5 +1,5 @@
+import { ArrowLeft, Code2 } from 'lucide-react'
 import React from 'react'
-import { Code2, ArrowLeft } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { APIManagementPage } from './APIManagementPage'
 
@@ -18,9 +18,9 @@ const APIManagePage: React.FC = () => {
             <div className="flex items-center space-x-4">
               {/* 返回按钮 */}
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate(`/projects/${projectId}`)}
                 className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary rounded-lg transition-colors"
-                title="返回首页"
+                title="返回项目详情"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>

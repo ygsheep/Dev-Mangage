@@ -178,7 +178,6 @@ router.post('/:projectId/issues/:issueId/relations/apis', [
       data: {
         issueId,
         endpointId,
-        endpointId,
         relationType,
         description
       },
@@ -208,7 +207,6 @@ router.post('/:projectId/issues/:issueId/relations/apis', [
     logger.info('创建Issue-API关联', {
       projectId,
       issueId,
-      endpointId,
       endpointId,
       relationType
     })
@@ -323,7 +321,7 @@ router.post('/:projectId/issues/:issueId/relations/features', [
 ], async (req, res, next) => {
   try {
     const { projectId, issueId } = req.params
-    const { featureName, component, relationType, description } = req.body
+    const { featureId, component, relationType, description } = req.body
 
     // 验证 Issue 是否存在
     const issue = await prisma.issue.findFirst({
@@ -341,7 +339,7 @@ router.post('/:projectId/issues/:issueId/relations/features', [
     const existingRelation = await prisma.issueFeatureRelation.findFirst({
       where: {
         issueId,
-        featureName,
+        featureId,
         component: component || null
       }
     })
@@ -354,7 +352,7 @@ router.post('/:projectId/issues/:issueId/relations/features', [
     const relation = await prisma.issueFeatureRelation.create({
       data: {
         issueId,
-        featureName,
+        featureId,
         component,
         relationType,
         description
@@ -364,7 +362,7 @@ router.post('/:projectId/issues/:issueId/relations/features', [
     logger.info('创建Issue-Feature关联', {
       projectId,
       issueId,
-      featureName,
+      featureId,
       component,
       relationType
     })
@@ -593,7 +591,7 @@ router.post('/:projectId/issues/:issueId/relations/batch', [
             const existing = await tx.issueFeatureRelation.findFirst({
               where: {
                 issueId,
-                featureName: relation.featureName,
+                featureId: relation.featureId,
                 component: relation.component || null
               }
             })
@@ -602,7 +600,7 @@ router.post('/:projectId/issues/:issueId/relations/batch', [
               await tx.issueFeatureRelation.create({
                 data: {
                   issueId,
-                  featureName: relation.featureName,
+                  featureId: relation.featureId,
                   component: relation.component,
                   relationType: relation.relationType,
                   description: relation.description
@@ -664,7 +662,7 @@ router.get('/:projectId/issues/:issueId/relations/available', [
     if (!type || type === 'api') {
       // 获取未关联的 API
       const [apiEndpoints, endpoints] = await Promise.all([
-        prisma.aPIEndpoint.findMany({
+        prisma.aPI.findMany({
           where: {
             projectId,
             relatedIssues: {
@@ -699,7 +697,7 @@ router.get('/:projectId/issues/:issueId/relations/available', [
         })
       ])
 
-      available.apis = apis
+      available.apis = apiEndpoints
       available.endpoints = endpoints
     }
 
@@ -732,10 +730,17 @@ router.get('/:projectId/issues/:issueId/relations/available', [
           issue: { projectId }
         },
         select: {
-          featureName: true,
-          component: true
+          featureId: true,
+          component: true,
+          feature: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true
+            }
+          }
         },
-        distinct: ['featureName', 'component']
+        distinct: ['featureId', 'component']
       })
 
       available.features = existingFeatures

@@ -250,6 +250,91 @@ class MCPServerManager extends EventEmitter {
 
 const mcpManager = new MCPServerManager()
 
+// 获取MCP配置信息
+router.get('/config', (req, res) => {
+  try {
+    // 获取当前运行环境的配置信息
+    const config = {
+      // 后端配置
+      backend: {
+        host: process.env.BACKEND_HOST || 'localhost',
+        port: parseInt(process.env.PORT || '3000'),
+        url: `http://${process.env.BACKEND_HOST || 'localhost'}:${process.env.PORT || '3000'}`,
+        apiBaseUrl: `/api/v1`,
+      },
+      
+      // MCP HTTP服务配置 (集成在后端中)
+      mcp: {
+        http: {
+          host: process.env.MCP_HTTP_HOST || 'localhost', 
+          port: parseInt(process.env.PORT || '3000'), // 使用同一端口
+          url: `http://${process.env.MCP_HTTP_HOST || 'localhost'}:${process.env.PORT || '3000'}`,
+          endpoints: {
+            health: '/mcp/health',
+            tools: '/mcp/tools',
+            status: '/api/v1/mcp/status',
+            logs: '/api/v1/mcp/logs',
+            start: '/api/v1/mcp/start',
+            stop: '/api/v1/mcp/stop',
+            ping: '/api/v1/mcp/ping'
+          }
+        },
+        
+        // MCP WebSocket配置 (预留)
+        ws: {
+          host: process.env.MCP_WS_HOST || 'localhost',
+          port: parseInt(process.env.MCP_WS_PORT || '3001'),
+          url: `ws://${process.env.MCP_WS_HOST || 'localhost'}:${process.env.MCP_WS_PORT || '3001'}`,
+          enabled: false // 当前未启用WebSocket
+        },
+        
+        // 独立MCP服务器配置 (开发环境)
+        standalone: {
+          host: process.env.MCP_STANDALONE_HOST || 'localhost',
+          port: parseInt(process.env.MCP_STANDALONE_PORT || '3000'),
+          url: `http://${process.env.MCP_STANDALONE_HOST || 'localhost'}:${process.env.MCP_STANDALONE_PORT || '3000'}`,
+          serverPath: path.join(process.cwd(), '..', 'mcp-server'),
+          enabled: false // 当前使用集成模式
+        }
+      },
+      
+      // 工具配置
+      tools: {
+        available: mcpService.getToolsList().map(tool => tool.name),
+        count: mcpService.getToolsList().length
+      },
+      
+      // 运行时信息
+      runtime: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        architecture: process.arch,
+        workingDirectory: process.cwd(),
+        environment: process.env.NODE_ENV || 'development',
+        uptime: process.uptime()
+      },
+      
+      // 服务状态
+      status: mcpManager.getStatus(),
+      
+      // 配置生成时间
+      timestamp: new Date().toISOString()
+    }
+    
+    res.json({
+      success: true,
+      config,
+      message: 'MCP配置获取成功'
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+      error: 'Failed to get MCP configuration'
+    })
+  }
+})
+
 // 获取MCP服务器状态
 router.get('/status', (req, res) => {
   res.json(mcpManager.getStatus())

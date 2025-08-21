@@ -169,24 +169,24 @@ router.get('/projects', async (req, res) => {
     await Promise.all([
       // Project 1 API tags
       prisma.aPITag.create({
-        data: { endpointId: apis1[0].id, tagId: tags1[1].id }, // 获取项目列表 -> 项目管理
+        data: { apiId: apis1[0].id, tagId: tags1[1].id }, // 获取项目列表 -> 项目管理
       }),
       prisma.aPITag.create({
-        data: { endpointId: apis1[1].id, tagId: tags1[1].id }, // 创建新项目 -> 项目管理
+        data: { apiId: apis1[1].id, tagId: tags1[1].id }, // 创建新项目 -> 项目管理
       }),
       prisma.aPITag.create({
-        data: { endpointId: apis1[2].id, tagId: tags1[2].id }, // 获取API列表 -> API管理
+        data: { apiId: apis1[2].id, tagId: tags1[2].id }, // 获取API列表 -> API管理
       }),
 
       // Project 2 API tags
       prisma.aPITag.create({
-        data: { endpointId: apis2[0].id, tagId: tags2[0].id }, // 获取商品列表 -> 商品管理
+        data: { apiId: apis2[0].id, tagId: tags2[0].id }, // 获取商品列表 -> 商品管理
       }),
       prisma.aPITag.create({
-        data: { endpointId: apis2[1].id, tagId: tags2[1].id }, // 创建订单 -> 订单管理
+        data: { apiId: apis2[1].id, tagId: tags2[1].id }, // 创建订单 -> 订单管理
       }),
       prisma.aPITag.create({
-        data: { endpointId: apis2[2].id, tagId: tags2[2].id }, // 处理支付 -> 支付系统
+        data: { apiId: apis2[2].id, tagId: tags2[2].id }, // 处理支付 -> 支付系统
       }),
     ])
 
